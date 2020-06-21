@@ -5,7 +5,7 @@
   
 
 
-<html class="theme-next muse use-motion" lang="en">
+<html class="theme-next muse use-motion" lang="zh-Hans">
 <head>
   <meta charset="UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -83,16 +83,15 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="Gitlab配置ssh，实现秘钥上传下载代码">
 <meta property="og:url" content="https://brucewayne2099.github.io/2019/05/21/Gitlab%E9%85%8D%E7%BD%AEssh%EF%BC%8C%E5%AE%9E%E7%8E%B0%E7%A7%98%E9%92%A5%E4%B8%8A%E4%BC%A0%E4%B8%8B%E8%BD%BD%E4%BB%A3%E7%A0%81/index.html">
-<meta property="og:site_name" content="Hexo">
+<meta property="og:site_name" content="石锤淡啤酒">
 <meta property="og:description" content="据说ssh连接可以不指定文件大小，而https还要设定文件大小">
-<meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://brucewayne2099.github.io/images/gitlab32.png">
 <meta property="og:image" content="https://brucewayne2099.github.io/images/gitlab33.png">
 <meta property="og:image" content="https://brucewayne2099.github.io/images/gitlab34.png">
 <meta property="og:image" content="https://brucewayne2099.github.io/images/gitlab35.png">
 <meta property="article:published_time" content="2019-05-21T09:28:26.000Z">
 <meta property="article:modified_time" content="2019-05-21T13:03:28.000Z">
-<meta property="article:author" content="John Doe">
+<meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="容器">
 <meta property="article:tag" content="gitlab">
 <meta property="article:tag" content="ssh keys">
@@ -113,7 +112,7 @@
     motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
     duoshuo: {
       userId: '0',
-      author: 'Author'
+      author: '博主'
     },
     algolia: {
       applicationID: '',
@@ -133,7 +132,7 @@
 
 
 
-  <title>Gitlab配置ssh，实现秘钥上传下载代码 | Hexo</title>
+  <title>Gitlab配置ssh，实现秘钥上传下载代码 | 石锤淡啤酒</title>
   
 
 
@@ -145,7 +144,7 @@
 
 <meta name="generator" content="Hexo 4.2.1"></head>
 
-<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
   
   
@@ -163,12 +162,12 @@
     <div class="custom-logo-site-title">
       <a href="/chenblog.github.io/"  class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
-        <span class="site-title">Hexo</span>
+        <span class="site-title">石锤淡啤酒</span>
         <span class="logo-line-after"><i></i></span>
       </a>
     </div>
       
-        <p class="site-subtitle"></p>
+        <p class="site-subtitle">生活就是等待戈多</p>
       
   </div>
 
@@ -193,7 +192,27 @@
             
               <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
             
-            Home
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/chenblog.github.io/about/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/chenblog.github.io/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
           </a>
         </li>
       
@@ -203,7 +222,7 @@
             
               <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
             
-            Archives
+            归档
           </a>
         </li>
       
@@ -243,13 +262,13 @@
     <link itemprop="mainEntityOfPage" href="https://brucewayne2099.github.io/chenblog.github.io/2019/05/21/Gitlab%E9%85%8D%E7%BD%AEssh%EF%BC%8C%E5%AE%9E%E7%8E%B0%E7%A7%98%E9%92%A5%E4%B8%8A%E4%BC%A0%E4%B8%8B%E8%BD%BD%E4%BB%A3%E7%A0%81/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="John Doe">
+      <meta itemprop="name" content="Chris Chan">
       <meta itemprop="description" content="">
       <meta itemprop="image" content="/chenblog.github.io/images/avatar.gif">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Hexo">
+      <meta itemprop="name" content="石锤淡啤酒">
     </span>
 
     
@@ -267,9 +286,9 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               
-                <span class="post-meta-item-text">Posted on</span>
+                <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-05-21T17:28:26+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-05-21T17:28:26+08:00">
                 2019-05-21
               </time>
             
@@ -288,7 +307,7 @@
                 <i class="fa fa-folder-o"></i>
               </span>
               
-                <span class="post-meta-item-text">In</span>
+                <span class="post-meta-item-text">分类于</span>
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
@@ -440,10 +459,10 @@
       
         <ul class="sidebar-nav motion-element">
           <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
-            Table of Contents
+            文章目录
           </li>
           <li class="sidebar-nav-overview" data-target="site-overview-wrap">
-            Overview
+            站点概览
           </li>
         </ul>
       
@@ -452,7 +471,7 @@
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
-              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-author-name" itemprop="name">Chris Chan</p>
               <p class="site-description motion-element" itemprop="description"></p>
           </div>
 
@@ -464,7 +483,7 @@
                 <a href="/chenblog.github.io/archives/%20%7C%7C%20archive">
               
                   <span class="site-state-item-count">293</span>
-                  <span class="site-state-item-name">posts</span>
+                  <span class="site-state-item-name">日志</span>
                 </a>
               </div>
             
@@ -475,7 +494,7 @@
               <div class="site-state-item site-state-categories">
                 
                   <span class="site-state-item-count">8</span>
-                  <span class="site-state-item-name">categories</span>
+                  <span class="site-state-item-name">分类</span>
                 
               </div>
             
@@ -486,7 +505,7 @@
               <div class="site-state-item site-state-tags">
                 
                   <span class="site-state-item-count">252</span>
-                  <span class="site-state-item-name">tags</span>
+                  <span class="site-state-item-name">标签</span>
                 
               </div>
             
@@ -542,13 +561,13 @@
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>
-  <span class="author" itemprop="copyrightHolder">John Doe</span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
 
   
 </div>
 
 
-  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
 
 
 
@@ -556,7 +575,7 @@
 
 
 
-  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
 
 
 
