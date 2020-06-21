@@ -40,8 +40,8 @@
 <meta property="article:published_time" content="2018-08-30T03:39:27.000Z">
 <meta property="article:modified_time" content="2018-08-31T08:33:56.000Z">
 <meta property="article:author" content="Chris Chan">
-<meta property="article:tag" content="钉钉">
 <meta property="article:tag" content="Jenkins">
+<meta property="article:tag" content="钉钉">
 <meta property="article:tag" content="Docker">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://brucewayne2099.github.io/images/jenkinsdingding2.png">
@@ -350,8 +350,8 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/chenblog.github.io/tags/%E9%92%89%E9%92%89/" rel="tag"><i class="fa fa-tag"></i> 钉钉</a>
               <a href="/chenblog.github.io/tags/Jenkins/" rel="tag"><i class="fa fa-tag"></i> Jenkins</a>
+              <a href="/chenblog.github.io/tags/%E9%92%89%E9%92%89/" rel="tag"><i class="fa fa-tag"></i> 钉钉</a>
               <a href="/chenblog.github.io/tags/Docker/" rel="tag"><i class="fa fa-tag"></i> Docker</a>
           </div>
 
@@ -569,6 +569,10 @@
 
   
 
+  
+
+  <script async src="/js/cursor/fireworks.js"></script>
+
 <script>
 NexT.utils.loadComments(document.querySelector('#lv-container'), () => {
   window.livereOptions = {
@@ -586,32 +590,5 @@ NexT.utils.loadComments(document.querySelector('#lv-container'), () => {
 </script>
 
   
-  <script type="text/javascript">
-    function isPC() {
-      var userAgentInfo = navigator.userAgent;
-      var agents = ["Android", "iPhone", "SymbianOS", "Windows Phone", "iPad", "iPod"];
-      for (var i = 0; i < agents.length; i++) {
-        if (userAgentInfo.indexOf(agents[i]) > 0) {
-          return false;
-        }
-      }
-      return true;
-    }
-    var showOnMobile = false;
-    var openOnPC = isPC();
-
-    
-      if (openOnPC || showOnMobile) {
-        var newCanvas = $('<canvas class="fireworks" style="position: fixed; left: 0; top: 0; z-index: 1; pointer-events: none;"></canvas>');
-        $("body").append(newCanvas);
-        $.getScript("http://cdn.bootcss.com/animejs/2.2.0/anime.min.js").done(function (script, textstatus) {
-          if (textstatus == "success" && typeof(anime) != undefined) {
-            $.getScript("/js/src/fireworks.js");
-          }
-        });
-      }
-    
-  </script>
-
 <script src="/chenblog.github.io/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
 </html>

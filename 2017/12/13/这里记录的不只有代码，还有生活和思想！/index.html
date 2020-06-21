@@ -265,12 +265,12 @@
       
         <p><img src="/images/%E7%9F%B3%E9%94%A4%E6%B7%A1%E5%95%A4%E9%85%92.png" alt="beer" title="那些在阳光下挥洒青春的日子啊！"></p>
 
-        <div id="aplayer-ZbUUWJRK" class="aplayer aplayer-tag-marker" style="margin-bottom: 20px;">
+        <div id="aplayer-cQpYzhUI" class="aplayer aplayer-tag-marker" style="margin-bottom: 20px;">
             <pre class="aplayer-lrc-content"></pre>
         </div>
         <script>
           var ap = new APlayer({
-            element: document.getElementById("aplayer-ZbUUWJRK"),
+            element: document.getElementById("aplayer-cQpYzhUI"),
             narrow: false,
             autoplay: false,
             showlrc: false,
@@ -561,6 +561,10 @@
 
   
 
+  
+
+  <script async src="/js/cursor/fireworks.js"></script>
+
 <script>
 NexT.utils.loadComments(document.querySelector('#lv-container'), () => {
   window.livereOptions = {
@@ -578,32 +582,5 @@ NexT.utils.loadComments(document.querySelector('#lv-container'), () => {
 </script>
 
   
-  <script type="text/javascript">
-    function isPC() {
-      var userAgentInfo = navigator.userAgent;
-      var agents = ["Android", "iPhone", "SymbianOS", "Windows Phone", "iPad", "iPod"];
-      for (var i = 0; i < agents.length; i++) {
-        if (userAgentInfo.indexOf(agents[i]) > 0) {
-          return false;
-        }
-      }
-      return true;
-    }
-    var showOnMobile = false;
-    var openOnPC = isPC();
-
-    
-      if (openOnPC || showOnMobile) {
-        var newCanvas = $('<canvas class="fireworks" style="position: fixed; left: 0; top: 0; z-index: 1; pointer-events: none;"></canvas>');
-        $("body").append(newCanvas);
-        $.getScript("http://cdn.bootcss.com/animejs/2.2.0/anime.min.js").done(function (script, textstatus) {
-          if (textstatus == "success" && typeof(anime) != undefined) {
-            $.getScript("/js/src/fireworks.js");
-          }
-        });
-      }
-    
-  </script>
-
 <script src="/chenblog.github.io/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
 </html>
