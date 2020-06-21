@@ -265,12 +265,12 @@
       
         <p><img src="/images/%E7%9F%B3%E9%94%A4%E6%B7%A1%E5%95%A4%E9%85%92.png" alt="beer" title="那些在阳光下挥洒青春的日子啊！"></p>
 
-        <div id="aplayer-tHbaWkMs" class="aplayer aplayer-tag-marker" style="margin-bottom: 20px;">
+        <div id="aplayer-lBqUEUeq" class="aplayer aplayer-tag-marker" style="margin-bottom: 20px;">
             <pre class="aplayer-lrc-content"></pre>
         </div>
         <script>
           var ap = new APlayer({
-            element: document.getElementById("aplayer-tHbaWkMs"),
+            element: document.getElementById("aplayer-lBqUEUeq"),
             narrow: false,
             autoplay: false,
             showlrc: false,
@@ -593,7 +593,15 @@ NexT.utils.loadComments(document.querySelector('#lv-container'), () => {
     var openOnPC = isPC();
 
     
-      if (openOnPC || showOnMobile) $.getScript("/js/src/love.js");
+      if (openOnPC || showOnMobile) {
+        var newCanvas = $('<canvas class="fireworks" style="position: fixed; left: 0; top: 0; z-index: 1; pointer-events: none;"></canvas>');
+        $("body").append(newCanvas);
+        $.getScript("http://cdn.bootcss.com/animejs/2.2.0/anime.min.js").done(function (script, textstatus) {
+          if (textstatus == "success" && typeof(anime) != undefined) {
+            $.getScript("/js/src/fireworks.js");
+          }
+        });
+      }
     
   </script>
 

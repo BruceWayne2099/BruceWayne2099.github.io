@@ -263,12 +263,12 @@
 
       
         
-        <div id="aplayer-ppQqnYUz" class="aplayer aplayer-tag-marker" style="margin-bottom: 20px;">
+        <div id="aplayer-hJnuXbEZ" class="aplayer aplayer-tag-marker" style="margin-bottom: 20px;">
             <pre class="aplayer-lrc-content"></pre>
         </div>
         <script>
           var ap = new APlayer({
-            element: document.getElementById("aplayer-ppQqnYUz"),
+            element: document.getElementById("aplayer-hJnuXbEZ"),
             narrow: false,
             autoplay: false,
             showlrc: false,
@@ -649,7 +649,15 @@ NexT.utils.loadComments(document.querySelector('#lv-container'), () => {
     var openOnPC = isPC();
 
     
-      if (openOnPC || showOnMobile) $.getScript("/js/src/love.js");
+      if (openOnPC || showOnMobile) {
+        var newCanvas = $('<canvas class="fireworks" style="position: fixed; left: 0; top: 0; z-index: 1; pointer-events: none;"></canvas>');
+        $("body").append(newCanvas);
+        $.getScript("http://cdn.bootcss.com/animejs/2.2.0/anime.min.js").done(function (script, textstatus) {
+          if (textstatus == "success" && typeof(anime) != undefined) {
+            $.getScript("/js/src/fireworks.js");
+          }
+        });
+      }
     
   </script>
 

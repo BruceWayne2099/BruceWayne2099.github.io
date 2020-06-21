@@ -38,8 +38,8 @@
 <meta property="article:published_time" content="2018-02-12T11:57:18.000Z">
 <meta property="article:modified_time" content="2019-02-15T07:44:36.000Z">
 <meta property="article:author" content="Chris Chan">
-<meta property="article:tag" content="运维技术">
 <meta property="article:tag" content="linux">
+<meta property="article:tag" content="运维技术">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://brucewayne2099.github.io/images/logrotate1.png">
 
@@ -339,8 +339,8 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/chenblog.github.io/tags/%E8%BF%90%E7%BB%B4%E6%8A%80%E6%9C%AF/" rel="tag"><i class="fa fa-tag"></i> 运维技术</a>
               <a href="/chenblog.github.io/tags/linux/" rel="tag"><i class="fa fa-tag"></i> linux</a>
+              <a href="/chenblog.github.io/tags/%E8%BF%90%E7%BB%B4%E6%8A%80%E6%9C%AF/" rel="tag"><i class="fa fa-tag"></i> 运维技术</a>
           </div>
 
         
@@ -589,7 +589,15 @@ NexT.utils.loadComments(document.querySelector('#lv-container'), () => {
     var openOnPC = isPC();
 
     
-      if (openOnPC || showOnMobile) $.getScript("/js/src/love.js");
+      if (openOnPC || showOnMobile) {
+        var newCanvas = $('<canvas class="fireworks" style="position: fixed; left: 0; top: 0; z-index: 1; pointer-events: none;"></canvas>');
+        $("body").append(newCanvas);
+        $.getScript("http://cdn.bootcss.com/animejs/2.2.0/anime.min.js").done(function (script, textstatus) {
+          if (textstatus == "success" && typeof(anime) != undefined) {
+            $.getScript("/js/src/fireworks.js");
+          }
+        });
+      }
     
   </script>
 

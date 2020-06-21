@@ -577,25 +577,21 @@
     var openOnPC = isPC();
 
     
-      if (openOnPC || showOnMobile) $.getScript("/js/src/love.js");
+      if (openOnPC || showOnMobile) {
+        var newCanvas = $('<canvas class="fireworks" style="position: fixed; left: 0; top: 0; z-index: 1; pointer-events: none;"></canvas>');
+        $("body").append(newCanvas);
+        $.getScript("http://cdn.bootcss.com/animejs/2.2.0/anime.min.js").done(function (script, textstatus) {
+          if (textstatus == "success" && typeof(anime) != undefined) {
+            $.getScript("/js/src/fireworks.js");
+          }
+        });
+      }
     
   </script>
 
 <script src="/chenblog.github.io/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
 </html>
-livr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
-  <script src="/chenblog.github.io/lib/velocity/velocity.min.js"></script>
-  <script src="/chenblog.github.io/lib/velocity/velocity.ui.min.js"></script>
-
-<script src="/chenblog.github.io/js/utils.js"></script>
-
-<script src="/chenblog.github.io/js/motion.js"></script>
-
-
-<script src="/chenblog.github.io/js/schemes/muse.js"></script>
-
-
-<script src="/chenblog.github.io/js/next-boot.js"></script>
+ipt src="/chenblog.github.io/js/next-boot.js"></script>
 
 
 
@@ -641,7 +637,15 @@ livr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
     var openOnPC = isPC();
 
     
-      if (openOnPC || showOnMobile) $.getScript("/js/src/love.js");
+      if (openOnPC || showOnMobile) {
+        var newCanvas = $('<canvas class="fireworks" style="position: fixed; left: 0; top: 0; z-index: 1; pointer-events: none;"></canvas>');
+        $("body").append(newCanvas);
+        $.getScript("http://cdn.bootcss.com/animejs/2.2.0/anime.min.js").done(function (script, textstatus) {
+          if (textstatus == "success" && typeof(anime) != undefined) {
+            $.getScript("/js/src/fireworks.js");
+          }
+        });
+      }
     
   </script>
 

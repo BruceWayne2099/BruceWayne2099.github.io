@@ -33,8 +33,8 @@
 <meta property="article:published_time" content="2019-08-02T02:29:39.000Z">
 <meta property="article:modified_time" content="2019-09-12T09:17:34.000Z">
 <meta property="article:author" content="Chris Chan">
-<meta property="article:tag" content="AWS">
 <meta property="article:tag" content="ansible">
+<meta property="article:tag" content="AWS">
 <meta name="twitter:card" content="summary">
 
 <link rel="canonical" href="https://brucewayne2099.github.io/2019/08/02/Ansible-playbook%E6%89%B9%E9%87%8F%E6%9B%B4%E6%94%B9sudoers%E6%96%87%E4%BB%B6%E9%87%8C%E7%9A%84NOPASSWD-ALL/">
@@ -331,8 +331,8 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/chenblog.github.io/tags/AWS/" rel="tag"><i class="fa fa-tag"></i> AWS</a>
               <a href="/chenblog.github.io/tags/ansible/" rel="tag"><i class="fa fa-tag"></i> ansible</a>
+              <a href="/chenblog.github.io/tags/AWS/" rel="tag"><i class="fa fa-tag"></i> AWS</a>
           </div>
 
         
@@ -581,7 +581,15 @@ NexT.utils.loadComments(document.querySelector('#lv-container'), () => {
     var openOnPC = isPC();
 
     
-      if (openOnPC || showOnMobile) $.getScript("/js/src/love.js");
+      if (openOnPC || showOnMobile) {
+        var newCanvas = $('<canvas class="fireworks" style="position: fixed; left: 0; top: 0; z-index: 1; pointer-events: none;"></canvas>');
+        $("body").append(newCanvas);
+        $.getScript("http://cdn.bootcss.com/animejs/2.2.0/anime.min.js").done(function (script, textstatus) {
+          if (textstatus == "success" && typeof(anime) != undefined) {
+            $.getScript("/js/src/fireworks.js");
+          }
+        });
+      }
     
   </script>
 
