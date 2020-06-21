@@ -1,13 +1,85 @@
 <!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  
+
+
 
   
-  <title>记一次mysql无法启动的解决过程 | Hexo</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="一次启动，三个问题">
+
+
+<html class="theme-next pisces use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/chenblog.github.io/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/chenblog.github.io/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/chenblog.github.io/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/chenblog.github.io/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/chenblog.github.io/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/chenblog.github.io/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/chenblog.github.io/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="mysql,运维技术," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="一次启动，三个问题">
 <meta property="og:type" content="article">
 <meta property="og:title" content="记一次mysql无法启动的解决过程">
 <meta property="og:url" content="https://brucewayne2099.github.io/2018/03/12/%E8%AE%B0%E4%B8%80%E6%AC%A1mysql%E6%97%A0%E6%B3%95%E5%90%AF%E5%8A%A8%E7%9A%84%E8%A7%A3%E5%86%B3%E8%BF%87%E7%A8%8B/index.html">
@@ -20,79 +92,240 @@
 <meta property="article:tag" content="mysql">
 <meta property="article:tag" content="运维技术">
 <meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/chenblog.github.io/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://brucewayne2099.github.io/2018/03/12/记一次mysql无法启动的解决过程/"/>
+
+
+
+
+
+  <title>记一次mysql无法启动的解决过程 | Hexo</title>
   
-    <link rel="alternate" href="/chenblog.github.io/atom.xml" title="Hexo" type="application/atom+xml">
-  
-  
-    <link rel="icon" href="/favicon.png">
-  
-  
-    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
-  
-  
-<link rel="stylesheet" href="/chenblog.github.io/css/style.css">
+
+
+
+
+
+
+
 
 <meta name="generator" content="Hexo 4.2.1"></head>
 
-<body>
-  <div id="container">
-    <div id="wrap">
-      <header id="header">
-  <div id="banner"></div>
-  <div id="header-outer" class="outer">
-    <div id="header-title" class="inner">
-      <h1 id="logo-wrap">
-        <a href="/chenblog.github.io/" id="logo">Hexo</a>
-      </h1>
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/chenblog.github.io/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
       
-    </div>
-    <div id="header-inner" class="inner">
-      <nav id="main-nav">
-        <a id="main-nav-toggle" class="nav-icon"></a>
-        
-          <a class="main-nav-link" href="/chenblog.github.io/">Home</a>
-        
-          <a class="main-nav-link" href="/chenblog.github.io/archives">Archives</a>
-        
-      </nav>
-      <nav id="sub-nav">
-        
-          <a id="nav-rss-link" class="nav-icon" href="/chenblog.github.io/atom.xml" title="RSS Feed"></a>
-        
-        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
-      </nav>
-      <div id="search-form-wrap">
-        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://brucewayne2099.github.io"></form>
-      </div>
-    </div>
-  </div>
-</header>
-      <div class="outer">
-        <section id="main"><article id="post-记一次mysql无法启动的解决过程" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/chenblog.github.io/2018/03/12/%E8%AE%B0%E4%B8%80%E6%AC%A1mysql%E6%97%A0%E6%B3%95%E5%90%AF%E5%8A%A8%E7%9A%84%E8%A7%A3%E5%86%B3%E8%BF%87%E7%A8%8B/" class="article-date">
-  <time datetime="2018-03-12T13:35:15.000Z" itemprop="datePublished">2018-03-12</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/chenblog.github.io/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/">工作与技术</a>
+        <p class="site-subtitle"></p>
+      
   </div>
 
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
   </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 class="article-title" itemprop="name">
-      记一次mysql无法启动的解决过程
-    </h1>
+</div>
+
+<nav class="site-nav">
   
 
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/chenblog.github.io/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/chenblog.github.io/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://brucewayne2099.github.io/chenblog.github.io/2018/03/12/%E8%AE%B0%E4%B8%80%E6%AC%A1mysql%E6%97%A0%E6%B3%95%E5%90%AF%E5%8A%A8%E7%9A%84%E8%A7%A3%E5%86%B3%E8%BF%87%E7%A8%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/chenblog.github.io/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">记一次mysql无法启动的解决过程</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-03-12T21:35:15+08:00">
+                2018-03-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/chenblog.github.io/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index">
+                    <span itemprop="name">工作与技术</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+              <div class="post-description">
+                  一次启动，三个问题
+              </div>
+          
+
+        </div>
       </header>
     
-    <div class="article-entry" itemprop="articleBody">
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
       
         <h2 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h2><p>今天开发人员反馈一个问题，就是某一台开发环境机器的mysql无法启动了，但是如果这台服务器重启的话，mysql就好使，而第二天就会出现mysql死掉然后无法启动的情况。我使用<code>service mysqld restart</code>，命令行反馈如下的内容：<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@iZ2373j9xivZ data]# service mysqld restart</span><br><span class="line">MySQL server PID file could not be found!                  [FAILED]    </span><br><span class="line">Starting MySQL........The server quit without updating PID file (<span class="regexp">/data/my</span>sql/data/sock/mysql.pid).                                                         [FAILED]</span><br></pre></td></tr></table></figure></p>
 <p>打开错误日志看一下，里面是这么写的：<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">2018</span><span class="number">-03</span><span class="number">-10</span> <span class="number">00</span>:<span class="number">26</span>:<span class="number">24</span> <span class="number">25919</span> [Note] InnoDB: Using CPU crc32 instructions</span><br><span class="line"><span class="number">2018</span><span class="number">-03</span><span class="number">-10</span> <span class="number">00</span>:<span class="number">26</span>:<span class="number">24</span> <span class="number">25919</span> [Note] InnoDB: Initializing buffer pool, size = <span class="number">4.0</span>G</span><br><span class="line">InnoDB: mmap(<span class="number">549453824</span> bytes) failed; errno <span class="number">12</span></span><br><span class="line"><span class="number">2018</span><span class="number">-03</span><span class="number">-10</span> <span class="number">00</span>:<span class="number">26</span>:<span class="number">24</span> <span class="number">25919</span> [ERROR] InnoDB: Cannot allocate memory <span class="keyword">for</span> the buffer pool</span><br><span class="line"><span class="number">2018</span><span class="number">-03</span><span class="number">-10</span> <span class="number">00</span>:<span class="number">26</span>:<span class="number">24</span> <span class="number">25919</span> [ERROR] Plugin <span class="string">'InnoDB'</span> init <span class="function"><span class="keyword">function</span> <span class="title">returned</span> <span class="title">error</span>.</span></span><br><span class="line">2018-03-10 00:26:24 25919 [ERROR] Plugin 'InnoDB' registration as a STORAGE ENGINE failed.</span><br><span class="line"><span class="number">2018</span><span class="number">-03</span><span class="number">-10</span> <span class="number">00</span>:<span class="number">26</span>:<span class="number">24</span> <span class="number">25919</span> [ERROR] Unknown/unsupported storage engine: INNODB</span><br><span class="line"><span class="number">2018</span><span class="number">-03</span><span class="number">-10</span> <span class="number">00</span>:<span class="number">26</span>:<span class="number">24</span> <span class="number">25919</span> [ERROR] Aborting</span><br></pre></td></tr></table></figure></p>
@@ -107,151 +340,390 @@
 
       
     </div>
-    <footer class="article-footer">
-      <a data-url="https://brucewayne2099.github.io/2018/03/12/%E8%AE%B0%E4%B8%80%E6%AC%A1mysql%E6%97%A0%E6%B3%95%E5%90%AF%E5%8A%A8%E7%9A%84%E8%A7%A3%E5%86%B3%E8%BF%87%E7%A8%8B/" data-id="ckbnylm1e00zcjj6ufqa7bx96" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/chenblog.github.io/tags/mysql/" rel="tag">mysql</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/chenblog.github.io/tags/%E8%BF%90%E7%BB%B4%E6%8A%80%E6%9C%AF/" rel="tag">运维技术</a></li></ul>
+    
+    
+    
 
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/chenblog.github.io/tags/mysql/" rel="tag"># mysql</a>
+          
+            <a href="/chenblog.github.io/tags/%E8%BF%90%E7%BB%B4%E6%8A%80%E6%9C%AF/" rel="tag"># 运维技术</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/chenblog.github.io/2018/03/11/%E5%85%B3%E4%BA%8EHTTP-Alive%E5%BA%94%E8%AF%A5%E7%9F%A5%E9%81%93%E7%9A%84%E4%BA%8B/" rel="next" title="关于HTTP-Alive应该知道的事">
+                <i class="fa fa-chevron-left"></i> 关于HTTP-Alive应该知道的事
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/chenblog.github.io/2018/03/13/%E4%BD%BF%E7%94%A8python%E5%8E%BB%E5%81%9A%E4%B8%80%E4%B8%AA%E7%94%9F%E6%88%90%E9%9A%8F%E6%9C%BA%E7%A0%81%E7%9A%84%E9%A1%B5%E9%9D%A2/" rel="prev" title="使用python去做一个生成随机码的页面">
+                使用python去做一个生成随机码的页面 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
     </footer>
   </div>
   
-    
-<nav id="article-nav">
   
-    <a href="/chenblog.github.io/2018/03/13/%E4%BD%BF%E7%94%A8python%E5%8E%BB%E5%81%9A%E4%B8%80%E4%B8%AA%E7%94%9F%E6%88%90%E9%9A%8F%E6%9C%BA%E7%A0%81%E7%9A%84%E9%A1%B5%E9%9D%A2/" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Newer</strong>
-      <div class="article-nav-title">
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
         
-          使用python去做一个生成随机码的页面
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/chenblog.github.io/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">293</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">categories</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">252</span>
+                  <span class="site-state-item-name">tags</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#正文"><span class="nav-number">1.</span> <span class="nav-text">正文</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">2.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
         
       </div>
-    </a>
-  
-  
-    <a href="/chenblog.github.io/2018/03/11/%E5%85%B3%E4%BA%8EHTTP-Alive%E5%BA%94%E8%AF%A5%E7%9F%A5%E9%81%93%E7%9A%84%E4%BA%8B/" id="article-nav-older" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">关于HTTP-Alive应该知道的事</div>
-    </a>
-  
-</nav>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
 
   
-</article>
+</div>
 
-</section>
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
         
-          <aside id="sidebar">
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Categories</h3>
-    <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/chenblog.github.io/categories/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/">博客搭建</a></li><li class="category-list-item"><a class="category-list-link" href="/chenblog.github.io/categories/%E5%9D%A0%E4%B9%B1%E8%8A%B1%E5%A4%A9/">坠乱花天</a></li><li class="category-list-item"><a class="category-list-link" href="/chenblog.github.io/categories/%E5%A4%A7%E7%89%9B%E4%B9%8B%E8%B7%AF/">大牛之路</a></li><li class="category-list-item"><a class="category-list-link" href="/chenblog.github.io/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E5%8E%9F%E7%90%86/">工作与原理</a></li><li class="category-list-item"><a class="category-list-link" href="/chenblog.github.io/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/">工作与技术</a></li><li class="category-list-item"><a class="category-list-link" href="/chenblog.github.io/categories/%E6%8A%80%E6%9C%AF%E4%B8%8E%E5%B7%A5%E4%BD%9C/">技术与工作</a></li><li class="category-list-item"><a class="category-list-link" href="/chenblog.github.io/categories/%E7%94%A8%E6%9D%A5%E4%BF%9D%E6%8A%A4%E8%A7%86%E5%8A%9B%E7%9A%84%E5%9B%BE%E7%89%87/">用来保护视力的图片</a></li><li class="category-list-item"><a class="category-list-link" href="/chenblog.github.io/categories/%E7%9B%91%E6%8E%A7%E4%B8%8E%E6%8A%80%E6%9C%AF/">监控与技术</a></li></ul>
-    </div>
-  </div>
 
 
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Tags</h3>
-    <div class="widget">
-      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/AWS/" rel="tag">AWS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/Ajax/" rel="tag">Ajax</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/Ansible/" rel="tag">Ansible</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/Awk/" rel="tag">Awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/BBR/" rel="tag">BBR</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/CDN/" rel="tag">CDN</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/CI-CD/" rel="tag">CI/CD</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/Django/" rel="tag">Django</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/Docker/" rel="tag">Docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/ELK/" rel="tag">ELK</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/Excel/" rel="tag">Excel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/Github/" rel="tag">Github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/Gitlab/" rel="tag">Gitlab</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/Golang/" rel="tag">Golang</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/HTTP/" rel="tag">HTTP</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/Hadoop/" rel="tag">Hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/Hexo/" rel="tag">Hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/Jenkins/" rel="tag">Jenkins</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/Jquery/" rel="tag">Jquery</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/Linux/" rel="tag">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/MySQL/" rel="tag">MySQL</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/Mysql/" rel="tag">Mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/NBA/" rel="tag">NBA</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/Next/" rel="tag">Next</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/Nginx/" rel="tag">Nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/Prometheus/" rel="tag">Prometheus</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/Python-2-7/" rel="tag">Python 2.7</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/Qtunnel/" rel="tag">Qtunnel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/RDS/" rel="tag">RDS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/RabbitMQ/" rel="tag">RabbitMQ</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/SRE/" rel="tag">SRE</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/Shell/" rel="tag">Shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/UTC%E6%97%B6%E9%97%B4/" rel="tag">UTC时间</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/Uwsgi/" rel="tag">Uwsgi</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/Zabbix/" rel="tag">Zabbix</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/activemq/" rel="tag">activemq</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/ansible/" rel="tag">ansible</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/ansible-api/" rel="tag">ansible api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/anymail/" rel="tag">anymail</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/api/" rel="tag">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/apple/" rel="tag">apple</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/atlas/" rel="tag">atlas</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/aws/" rel="tag">aws</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/celery/" rel="tag">celery</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/centos/" rel="tag">centos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/centos-6-5/" rel="tag">centos 6.5</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/checkbox/" rel="tag">checkbox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/ci-cd/" rel="tag">ci/cd</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/crontab/" rel="tag">crontab</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/css/" rel="tag">css</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/curl/" rel="tag">curl</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/django/" rel="tag">django</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/django2/" rel="tag">django2</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/docker/" rel="tag">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/docker%E5%AE%B9%E5%99%A8/" rel="tag">docker容器</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/docker%E9%95%9C%E5%83%8F/" rel="tag">docker镜像</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/echart/" rel="tag">echart</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/elk/" rel="tag">elk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/enumerate/" rel="tag">enumerate</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/excel/" rel="tag">excel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/expect/" rel="tag">expect</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/filebeat/" rel="tag">filebeat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/gateone/" rel="tag">gateone</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/gc/" rel="tag">gc++</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/git/" rel="tag">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/github/" rel="tag">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/gitlab/" rel="tag">gitlab</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/gitlab-runner/" rel="tag">gitlab-runner</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/go/" rel="tag">go</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/golang/" rel="tag">golang</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/grafana/" rel="tag">grafana</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/gtid/" rel="tag">gtid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/gui/" rel="tag">gui</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/harbor/" rel="tag">harbor</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/hexo/" rel="tag">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/html/" rel="tag">html</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/html5/" rel="tag">html5</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/http/" rel="tag">http</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/httpd/" rel="tag">httpd</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/https/" rel="tag">https</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/https%E8%AF%81%E4%B9%A6/" rel="tag">https证书</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/http%E5%8D%8F%E8%AE%AE/" rel="tag">http协议</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/http%E7%BD%91%E7%BB%9C/" rel="tag">http网络</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/intellij-idea/" rel="tag">intellij idea</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/iptables/" rel="tag">iptables</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/itables/" rel="tag">itables</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/java/" rel="tag">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/jenkins/" rel="tag">jenkins</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/js/" rel="tag">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/jumpserver%E5%A0%A1%E5%9E%92%E6%9C%BA/" rel="tag">jumpserver堡垒机</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/k8s/" rel="tag">k8s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/kafka/" rel="tag">kafka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/kibana/" rel="tag">kibana</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/kubenetes/" rel="tag">kubenetes</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/kubernetes/" rel="tag">kubernetes</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/linux/" rel="tag">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/logrotate/" rel="tag">logrotate</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/logstash/" rel="tag">logstash</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/lsattr/" rel="tag">lsattr</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/memcached/" rel="tag">memcached</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/mycat/" rel="tag">mycat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/mysql/" rel="tag">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/mysql%E4%B8%BB%E4%BB%8E/" rel="tag">mysql主从</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/nba/" rel="tag">nba</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/nessus/" rel="tag">nessus</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/nginx/" rel="tag">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/nodejs/" rel="tag">nodejs</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/pandas/" rel="tag">pandas</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/paramiko/" rel="tag">paramiko</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/php/" rel="tag">php</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/php-fpm/" rel="tag">php-fpm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/proxy-pass/" rel="tag">proxy_pass</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/proxysql/" rel="tag">proxysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/python/" rel="tag">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/python2/" rel="tag">python2</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/python3/" rel="tag">python3</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/python3-6/" rel="tag">python3.6</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/raid/" rel="tag">raid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/rancher/" rel="tag">rancher</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/redhat/" rel="tag">redhat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/redis/" rel="tag">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/restfulapi/" rel="tag">restfulapi</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/s6-svscan/" rel="tag">s6-svscan</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/sftp/" rel="tag">sftp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/shell/" rel="tag">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/ssh/" rel="tag">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/ssh-keys/" rel="tag">ssh keys</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/ssl%E5%8A%A0%E5%AF%86/" rel="tag">ssl加密</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/ssr/" rel="tag">ssr</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/storm/" rel="tag">storm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/tcp%E8%BF%9E%E6%8E%A5/" rel="tag">tcp连接</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/tcp%E9%93%BE%E6%8E%A5/" rel="tag">tcp链接</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/tkinter/" rel="tag">tkinter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/tomcat/" rel="tag">tomcat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/top/" rel="tag">top</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/tps/" rel="tag">tps</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/url%E6%8B%A6%E6%88%AA/" rel="tag">url拦截</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/uwsgi/" rel="tag">uwsgi</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/v2ray/" rel="tag">v2ray</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/web%E7%9B%91%E6%8E%A7/" rel="tag">web监控</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/xshell/" rel="tag">xshell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/yum/" rel="tag">yum</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/yum%E6%BA%90/" rel="tag">yum源</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/zabbix/" rel="tag">zabbix</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/zookeeper/" rel="tag">zookeeper</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E4%B8%96%E7%95%8C%E6%9D%AF/" rel="tag">世界杯</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E4%B8%AD%E5%9B%BD%E6%94%BF%E6%B2%BB/" rel="tag">中国政治</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E4%B8%BB%E4%BB%8E%E5%90%8C%E6%AD%A5/" rel="tag">主从同步</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E4%BA%91%E5%8E%9F%E7%94%9F/" rel="tag">云原生</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E4%BA%9A%E6%B4%B2%E6%B0%91%E4%B8%BB/" rel="tag">亚洲民主</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E4%BA%B2%E6%83%85/" rel="tag">亲情</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E4%BC%A6%E6%95%A6/" rel="tag">伦敦</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%85%A8%E9%93%BE%E8%B7%AF%E5%8E%8B%E6%B5%8B/" rel="tag">全链路压测</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%85%B6%E4%BB%96%E8%BD%AF%E4%BB%B6/" rel="tag">其他软件</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F/" rel="tag">内存泄漏</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%86%85%E6%A0%B8/" rel="tag">内核</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%86%85%E6%A0%B8%E4%BC%98%E5%8C%96/" rel="tag">内核优化</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%88%97%E8%A1%A8%E5%8A%A0%E5%B7%A5/" rel="tag">列表加工</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%89%8D%E7%AB%AFnode/" rel="tag">前端node</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%89%8D%E7%AB%AFpm2/" rel="tag">前端pm2</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%89%8D%E7%AB%AF%E6%8A%80%E6%9C%AF/" rel="tag">前端技术</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%8A%A0%E5%AF%86%E6%8A%80%E6%9C%AF/" rel="tag">加密技术</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/" rel="tag">博客搭建</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%8D%9A%E5%AE%A2%E7%BE%8E%E5%8C%96/" rel="tag">博客美化</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%8F%8C%E5%8D%81%E4%B8%80/" rel="tag">双十一</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%8F%AF%E8%A7%86%E5%8C%96/" rel="tag">可视化</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%90%8E%E9%97%A8%E8%BD%AF%E4%BB%B6/" rel="tag">后门软件</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%9B%BD%E5%BA%86/" rel="tag">国庆</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%9B%BD%E9%99%85%E8%B6%B3%E5%9D%9B/" rel="tag">国际足坛</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%9B%BE%E5%83%8F%E7%9B%91%E6%8E%A7/" rel="tag">图像监控</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%9B%BE%E7%89%87/" rel="tag">图片</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/" rel="tag">基础知识</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/" rel="tag">多线程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%A4%A7%E4%BF%83/" rel="tag">大促</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE/" rel="tag">大数据</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90/" rel="tag">大数据分析</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%A4%A7%E7%89%9B%E4%B9%8B%E8%B7%AF/" rel="tag">大牛之路</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%AE%89%E5%85%A8/" rel="tag">安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%AE%B9%E5%99%A8/" rel="tag">容器</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF/" rel="tag">容器技术</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%B7%B4%E5%A1%9E%E7%BD%97%E9%82%A3/" rel="tag">巴塞罗那</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%BC%82%E6%AD%A5%E4%BB%BB%E5%8A%A1/" rel="tag">异步任务</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%BD%B1%E8%AF%84/" rel="tag">影评</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%BE%AE%E4%BF%A1/" rel="tag">微信</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%BF%83%E6%83%85/" rel="tag">心情</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E6%84%9F%E6%82%9F/" rel="tag">感悟</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E6%89%B9%E9%87%8F%E9%83%A8%E7%BD%B2/" rel="tag">批量部署</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90/" rel="tag">持续集成</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E6%94%BF%E6%B2%BB/" rel="tag">政治</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E6%95%B0%E6%8D%AE%E5%A4%87%E4%BB%BD/" rel="tag">数据备份</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag">数据库</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E4%B8%AD%E9%97%B4%E4%BB%B6/" rel="tag">数据库中间件</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/" rel="tag">文件上传</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E6%96%87%E4%BB%B6%E8%AF%BB%E5%86%99/" rel="tag">文件读写</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E6%97%85%E6%B8%B8/" rel="tag">旅游</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E6%97%A5%E5%BF%97%E7%BB%9F%E8%AE%A1/" rel="tag">日志统计</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E6%97%A5%E6%9C%AC/" rel="tag">日本</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E6%97%B6%E5%8C%BA%E8%BD%AC%E6%8D%A2/" rel="tag">时区转换</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E6%98%A5%E8%8A%82/" rel="tag">春节</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%9B%91%E6%8E%A7/" rel="tag">服务器监控</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F/" rel="tag">正则表达式</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E6%AD%A6%E6%B1%89/" rel="tag">武汉</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/" rel="tag">消息队列</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E7%88%AC%E8%99%AB/" rel="tag">爬虫</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E7%94%B5%E5%95%86/" rel="tag">电商</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E7%99%BD%E5%90%8D%E5%8D%95/" rel="tag">白名单</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E7%9B%91%E6%8E%A7/" rel="tag">监控</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E7%9B%91%E6%8E%A7%E6%8A%80%E6%9C%AF/" rel="tag">监控技术</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E7%A3%81%E7%9B%98%E9%98%B5%E5%88%97/" rel="tag">磁盘阵列</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/" rel="tag">私有仓库</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E7%AB%AF%E5%8F%A3%E6%8E%A2%E6%B5%8B/" rel="tag">端口探测</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E7%BC%96%E7%A8%8B/" rel="tag">编程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E7%BC%96%E8%BE%91%E5%99%A8/" rel="tag">编辑器</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E7%BD%91%E7%AB%99%E6%8A%80%E6%9C%AF/" rel="tag">网站技术</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/" rel="tag">网络基础</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E7%BD%91%E7%BB%9C%E7%9B%B8%E5%85%B3/" rel="tag">网络相关</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E7%BE%8E%E5%A5%B3/" rel="tag">美女</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E7%BF%BB%E5%A2%99/" rel="tag">翻墙</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E8%81%8C%E5%9C%BA/" rel="tag">职场</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E8%87%AA%E5%8A%A8%E5%8C%96%E9%83%A8%E7%BD%B2/" rel="tag">自动化部署</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E8%8A%82%E7%82%B9%E8%B0%83%E5%BA%A6/" rel="tag">节点调度</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E8%8B%8F%E5%B7%9E/" rel="tag">苏州</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98/" rel="tag">虚拟内存</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E8%AE%A4%E8%AF%81%E9%89%B4%E6%9D%83/" rel="tag">认证鉴权</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E8%AF%BB%E4%B9%A6/" rel="tag">读书</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB/" rel="tag">读写分离</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB%E4%B8%AD%E9%97%B4%E4%BB%B6/" rel="tag">读写分离中间件</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" rel="tag">负载均衡</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E8%B6%B3%E7%90%83/" rel="tag">足球</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E8%B7%A8%E5%9F%9F/" rel="tag">跨域</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E8%BF%90%E7%BB%B4/" rel="tag">运维</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E8%BF%90%E7%BB%B4%E4%B8%8E%E7%9B%91%E6%8E%A7/" rel="tag">运维与监控</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E8%BF%90%E7%BB%B4%E5%AE%89%E5%85%A8/" rel="tag">运维安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E8%BF%90%E7%BB%B4%E6%8A%80%E6%9C%AF/" rel="tag">运维技术</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E8%BF%90%E7%BB%B4%E7%9B%91%E6%8E%A7/" rel="tag">运维监控</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E8%BF%9B%E5%BA%A6%E6%9D%A1/" rel="tag">进度条</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E9%87%91%E5%B1%B1%E4%BA%91/" rel="tag">金山云</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E9%92%89%E9%92%89/" rel="tag">钉钉</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E9%95%BF%E6%B2%99/" rel="tag">长沙</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E9%98%B2%E7%9B%97%E9%93%BE/" rel="tag">防盗链</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E9%98%BF%E6%A0%B9%E5%BB%B7/" rel="tag">阿根廷</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E9%98%BF%E9%87%8C%E4%BA%91/" rel="tag">阿里云</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E9%98%BF%E9%87%8C%E4%BA%91OSS/" rel="tag">阿里云OSS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E9%98%BF%E9%87%8C%E4%BA%91api/" rel="tag">阿里云api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E9%98%BF%E9%87%8C%E4%BA%91oss/" rel="tag">阿里云oss</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E9%98%BF%E9%87%8C%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8/" rel="tag">阿里云服务器</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E9%9D%A2%E8%AF%95/" rel="tag">面试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E9%9D%A2%E8%AF%95%E7%AC%94%E8%AF%95/" rel="tag">面试笔试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E9%9D%A2%E8%AF%95%E7%BB%8F%E9%AA%8C/" rel="tag">面试经验</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E9%9F%B3%E4%B9%90/" rel="tag">音乐</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E9%AD%94%E5%85%BD%E4%B8%96%E7%95%8C/" rel="tag">魔兽世界</a></li></ul>
-    </div>
-  </div>
 
 
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Tag Cloud</h3>
-    <div class="widget tagcloud">
-      <a href="/chenblog.github.io/tags/AWS/" style="font-size: 10.67px;">AWS</a> <a href="/chenblog.github.io/tags/Ajax/" style="font-size: 11.33px;">Ajax</a> <a href="/chenblog.github.io/tags/Ansible/" style="font-size: 10px;">Ansible</a> <a href="/chenblog.github.io/tags/Awk/" style="font-size: 10px;">Awk</a> <a href="/chenblog.github.io/tags/BBR/" style="font-size: 10px;">BBR</a> <a href="/chenblog.github.io/tags/CDN/" style="font-size: 10.67px;">CDN</a> <a href="/chenblog.github.io/tags/CI-CD/" style="font-size: 10px;">CI/CD</a> <a href="/chenblog.github.io/tags/Django/" style="font-size: 14.67px;">Django</a> <a href="/chenblog.github.io/tags/Docker/" style="font-size: 10.67px;">Docker</a> <a href="/chenblog.github.io/tags/ELK/" style="font-size: 10px;">ELK</a> <a href="/chenblog.github.io/tags/Excel/" style="font-size: 10px;">Excel</a> <a href="/chenblog.github.io/tags/Github/" style="font-size: 10px;">Github</a> <a href="/chenblog.github.io/tags/Gitlab/" style="font-size: 10px;">Gitlab</a> <a href="/chenblog.github.io/tags/Golang/" style="font-size: 10px;">Golang</a> <a href="/chenblog.github.io/tags/HTTP/" style="font-size: 10px;">HTTP</a> <a href="/chenblog.github.io/tags/Hadoop/" style="font-size: 10px;">Hadoop</a> <a href="/chenblog.github.io/tags/Hexo/" style="font-size: 10px;">Hexo</a> <a href="/chenblog.github.io/tags/Jenkins/" style="font-size: 11.33px;">Jenkins</a> <a href="/chenblog.github.io/tags/Jquery/" style="font-size: 11.33px;">Jquery</a> <a href="/chenblog.github.io/tags/Linux/" style="font-size: 13.33px;">Linux</a> <a href="/chenblog.github.io/tags/MySQL/" style="font-size: 10px;">MySQL</a> <a href="/chenblog.github.io/tags/Mysql/" style="font-size: 11.33px;">Mysql</a> <a href="/chenblog.github.io/tags/NBA/" style="font-size: 10px;">NBA</a> <a href="/chenblog.github.io/tags/Next/" style="font-size: 10px;">Next</a> <a href="/chenblog.github.io/tags/Nginx/" style="font-size: 11.33px;">Nginx</a> <a href="/chenblog.github.io/tags/Prometheus/" style="font-size: 11.33px;">Prometheus</a> <a href="/chenblog.github.io/tags/Python-2-7/" style="font-size: 10px;">Python 2.7</a> <a href="/chenblog.github.io/tags/Qtunnel/" style="font-size: 10px;">Qtunnel</a> <a href="/chenblog.github.io/tags/RDS/" style="font-size: 10px;">RDS</a> <a href="/chenblog.github.io/tags/RabbitMQ/" style="font-size: 10px;">RabbitMQ</a> <a href="/chenblog.github.io/tags/SRE/" style="font-size: 10px;">SRE</a> <a href="/chenblog.github.io/tags/Shell/" style="font-size: 10px;">Shell</a> <a href="/chenblog.github.io/tags/UTC%E6%97%B6%E9%97%B4/" style="font-size: 10px;">UTC时间</a> <a href="/chenblog.github.io/tags/Uwsgi/" style="font-size: 10px;">Uwsgi</a> <a href="/chenblog.github.io/tags/Zabbix/" style="font-size: 10.67px;">Zabbix</a> <a href="/chenblog.github.io/tags/activemq/" style="font-size: 10.67px;">activemq</a> <a href="/chenblog.github.io/tags/ansible/" style="font-size: 13.33px;">ansible</a> <a href="/chenblog.github.io/tags/ansible-api/" style="font-size: 10px;">ansible api</a> <a href="/chenblog.github.io/tags/anymail/" style="font-size: 10px;">anymail</a> <a href="/chenblog.github.io/tags/api/" style="font-size: 10px;">api</a> <a href="/chenblog.github.io/tags/apple/" style="font-size: 10px;">apple</a> <a href="/chenblog.github.io/tags/atlas/" style="font-size: 10.67px;">atlas</a> <a href="/chenblog.github.io/tags/aws/" style="font-size: 10px;">aws</a> <a href="/chenblog.github.io/tags/celery/" style="font-size: 10px;">celery</a> <a href="/chenblog.github.io/tags/centos/" style="font-size: 10.67px;">centos</a> <a href="/chenblog.github.io/tags/centos-6-5/" style="font-size: 10px;">centos 6.5</a> <a href="/chenblog.github.io/tags/checkbox/" style="font-size: 10px;">checkbox</a> <a href="/chenblog.github.io/tags/ci-cd/" style="font-size: 10px;">ci/cd</a> <a href="/chenblog.github.io/tags/crontab/" style="font-size: 10.67px;">crontab</a> <a href="/chenblog.github.io/tags/css/" style="font-size: 10px;">css</a> <a href="/chenblog.github.io/tags/curl/" style="font-size: 10px;">curl</a> <a href="/chenblog.github.io/tags/django/" style="font-size: 19.33px;">django</a> <a href="/chenblog.github.io/tags/django2/" style="font-size: 10px;">django2</a> <a href="/chenblog.github.io/tags/docker/" style="font-size: 18px;">docker</a> <a href="/chenblog.github.io/tags/docker%E5%AE%B9%E5%99%A8/" style="font-size: 10px;">docker容器</a> <a href="/chenblog.github.io/tags/docker%E9%95%9C%E5%83%8F/" style="font-size: 10px;">docker镜像</a> <a href="/chenblog.github.io/tags/echart/" style="font-size: 10px;">echart</a> <a href="/chenblog.github.io/tags/elk/" style="font-size: 14px;">elk</a> <a href="/chenblog.github.io/tags/enumerate/" style="font-size: 10px;">enumerate</a> <a href="/chenblog.github.io/tags/excel/" style="font-size: 10.67px;">excel</a> <a href="/chenblog.github.io/tags/expect/" style="font-size: 10px;">expect</a> <a href="/chenblog.github.io/tags/filebeat/" style="font-size: 10px;">filebeat</a> <a href="/chenblog.github.io/tags/gateone/" style="font-size: 10px;">gateone</a> <a href="/chenblog.github.io/tags/gc/" style="font-size: 10px;">gc++</a> <a href="/chenblog.github.io/tags/git/" style="font-size: 12.67px;">git</a> <a href="/chenblog.github.io/tags/github/" style="font-size: 10.67px;">github</a> <a href="/chenblog.github.io/tags/gitlab/" style="font-size: 14.67px;">gitlab</a> <a href="/chenblog.github.io/tags/gitlab-runner/" style="font-size: 10px;">gitlab-runner</a> <a href="/chenblog.github.io/tags/go/" style="font-size: 10px;">go</a> <a href="/chenblog.github.io/tags/golang/" style="font-size: 10.67px;">golang</a> <a href="/chenblog.github.io/tags/grafana/" style="font-size: 12px;">grafana</a> <a href="/chenblog.github.io/tags/gtid/" style="font-size: 10px;">gtid</a> <a href="/chenblog.github.io/tags/gui/" style="font-size: 10px;">gui</a> <a href="/chenblog.github.io/tags/harbor/" style="font-size: 10px;">harbor</a> <a href="/chenblog.github.io/tags/hexo/" style="font-size: 10.67px;">hexo</a> <a href="/chenblog.github.io/tags/html/" style="font-size: 12px;">html</a> <a href="/chenblog.github.io/tags/html5/" style="font-size: 10px;">html5</a> <a href="/chenblog.github.io/tags/http/" style="font-size: 10.67px;">http</a> <a href="/chenblog.github.io/tags/httpd/" style="font-size: 10px;">httpd</a> <a href="/chenblog.github.io/tags/https/" style="font-size: 10.67px;">https</a> <a href="/chenblog.github.io/tags/https%E8%AF%81%E4%B9%A6/" style="font-size: 10.67px;">https证书</a> <a href="/chenblog.github.io/tags/http%E5%8D%8F%E8%AE%AE/" style="font-size: 11.33px;">http协议</a> <a href="/chenblog.github.io/tags/http%E7%BD%91%E7%BB%9C/" style="font-size: 10px;">http网络</a> <a href="/chenblog.github.io/tags/intellij-idea/" style="font-size: 10.67px;">intellij idea</a> <a href="/chenblog.github.io/tags/iptables/" style="font-size: 10px;">iptables</a> <a href="/chenblog.github.io/tags/itables/" style="font-size: 10px;">itables</a> <a href="/chenblog.github.io/tags/java/" style="font-size: 10px;">java</a> <a href="/chenblog.github.io/tags/jenkins/" style="font-size: 11.33px;">jenkins</a> <a href="/chenblog.github.io/tags/js/" style="font-size: 10px;">js</a> <a href="/chenblog.github.io/tags/jumpserver%E5%A0%A1%E5%9E%92%E6%9C%BA/" style="font-size: 10px;">jumpserver堡垒机</a> <a href="/chenblog.github.io/tags/k8s/" style="font-size: 12.67px;">k8s</a> <a href="/chenblog.github.io/tags/kafka/" style="font-size: 11.33px;">kafka</a> <a href="/chenblog.github.io/tags/kibana/" style="font-size: 10px;">kibana</a> <a href="/chenblog.github.io/tags/kubenetes/" style="font-size: 10px;">kubenetes</a> <a href="/chenblog.github.io/tags/kubernetes/" style="font-size: 10px;">kubernetes</a> <a href="/chenblog.github.io/tags/linux/" style="font-size: 16px;">linux</a> <a href="/chenblog.github.io/tags/logrotate/" style="font-size: 10px;">logrotate</a> <a href="/chenblog.github.io/tags/logstash/" style="font-size: 10.67px;">logstash</a> <a href="/chenblog.github.io/tags/lsattr/" style="font-size: 10px;">lsattr</a> <a href="/chenblog.github.io/tags/memcached/" style="font-size: 10px;">memcached</a> <a href="/chenblog.github.io/tags/mycat/" style="font-size: 11.33px;">mycat</a> <a href="/chenblog.github.io/tags/mysql/" style="font-size: 17.33px;">mysql</a> <a href="/chenblog.github.io/tags/mysql%E4%B8%BB%E4%BB%8E/" style="font-size: 10px;">mysql主从</a> <a href="/chenblog.github.io/tags/nba/" style="font-size: 10px;">nba</a> <a href="/chenblog.github.io/tags/nessus/" style="font-size: 10px;">nessus</a> <a href="/chenblog.github.io/tags/nginx/" style="font-size: 18.67px;">nginx</a> <a href="/chenblog.github.io/tags/nodejs/" style="font-size: 10px;">nodejs</a> <a href="/chenblog.github.io/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/chenblog.github.io/tags/paramiko/" style="font-size: 10px;">paramiko</a> <a href="/chenblog.github.io/tags/php/" style="font-size: 10.67px;">php</a> <a href="/chenblog.github.io/tags/php-fpm/" style="font-size: 10px;">php-fpm</a> <a href="/chenblog.github.io/tags/proxy-pass/" style="font-size: 10px;">proxy_pass</a> <a href="/chenblog.github.io/tags/proxysql/" style="font-size: 10.67px;">proxysql</a> <a href="/chenblog.github.io/tags/python/" style="font-size: 20px;">python</a> <a href="/chenblog.github.io/tags/python2/" style="font-size: 10px;">python2</a> <a href="/chenblog.github.io/tags/python3/" style="font-size: 14.67px;">python3</a> <a href="/chenblog.github.io/tags/python3-6/" style="font-size: 10px;">python3.6</a> <a href="/chenblog.github.io/tags/raid/" style="font-size: 10px;">raid</a> <a href="/chenblog.github.io/tags/rancher/" style="font-size: 10.67px;">rancher</a> <a href="/chenblog.github.io/tags/redhat/" style="font-size: 10px;">redhat</a> <a href="/chenblog.github.io/tags/redis/" style="font-size: 13.33px;">redis</a> <a href="/chenblog.github.io/tags/restfulapi/" style="font-size: 10px;">restfulapi</a> <a href="/chenblog.github.io/tags/s6-svscan/" style="font-size: 10px;">s6-svscan</a> <a href="/chenblog.github.io/tags/sftp/" style="font-size: 10px;">sftp</a> <a href="/chenblog.github.io/tags/shell/" style="font-size: 14px;">shell</a> <a href="/chenblog.github.io/tags/ssh/" style="font-size: 12px;">ssh</a> <a href="/chenblog.github.io/tags/ssh-keys/" style="font-size: 10px;">ssh keys</a> <a href="/chenblog.github.io/tags/ssl%E5%8A%A0%E5%AF%86/" style="font-size: 10px;">ssl加密</a> <a href="/chenblog.github.io/tags/ssr/" style="font-size: 10px;">ssr</a> <a href="/chenblog.github.io/tags/storm/" style="font-size: 10px;">storm</a> <a href="/chenblog.github.io/tags/tcp%E8%BF%9E%E6%8E%A5/" style="font-size: 10px;">tcp连接</a> <a href="/chenblog.github.io/tags/tcp%E9%93%BE%E6%8E%A5/" style="font-size: 10px;">tcp链接</a> <a href="/chenblog.github.io/tags/tkinter/" style="font-size: 10px;">tkinter</a> <a href="/chenblog.github.io/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/chenblog.github.io/tags/top/" style="font-size: 10px;">top</a> <a href="/chenblog.github.io/tags/tps/" style="font-size: 10px;">tps</a> <a href="/chenblog.github.io/tags/url%E6%8B%A6%E6%88%AA/" style="font-size: 10px;">url拦截</a> <a href="/chenblog.github.io/tags/uwsgi/" style="font-size: 10.67px;">uwsgi</a> <a href="/chenblog.github.io/tags/v2ray/" style="font-size: 10px;">v2ray</a> <a href="/chenblog.github.io/tags/web%E7%9B%91%E6%8E%A7/" style="font-size: 10px;">web监控</a> <a href="/chenblog.github.io/tags/xshell/" style="font-size: 10px;">xshell</a> <a href="/chenblog.github.io/tags/yum/" style="font-size: 10.67px;">yum</a> <a href="/chenblog.github.io/tags/yum%E6%BA%90/" style="font-size: 10px;">yum源</a> <a href="/chenblog.github.io/tags/zabbix/" style="font-size: 18.67px;">zabbix</a> <a href="/chenblog.github.io/tags/zookeeper/" style="font-size: 11.33px;">zookeeper</a> <a href="/chenblog.github.io/tags/%E4%B8%96%E7%95%8C%E6%9D%AF/" style="font-size: 10.67px;">世界杯</a> <a href="/chenblog.github.io/tags/%E4%B8%AD%E5%9B%BD%E6%94%BF%E6%B2%BB/" style="font-size: 10px;">中国政治</a> <a href="/chenblog.github.io/tags/%E4%B8%BB%E4%BB%8E%E5%90%8C%E6%AD%A5/" style="font-size: 10.67px;">主从同步</a> <a href="/chenblog.github.io/tags/%E4%BA%91%E5%8E%9F%E7%94%9F/" style="font-size: 11.33px;">云原生</a> <a href="/chenblog.github.io/tags/%E4%BA%9A%E6%B4%B2%E6%B0%91%E4%B8%BB/" style="font-size: 10px;">亚洲民主</a> <a href="/chenblog.github.io/tags/%E4%BA%B2%E6%83%85/" style="font-size: 10px;">亲情</a> <a href="/chenblog.github.io/tags/%E4%BC%A6%E6%95%A6/" style="font-size: 10px;">伦敦</a> <a href="/chenblog.github.io/tags/%E5%85%A8%E9%93%BE%E8%B7%AF%E5%8E%8B%E6%B5%8B/" style="font-size: 10px;">全链路压测</a> <a href="/chenblog.github.io/tags/%E5%85%B6%E4%BB%96%E8%BD%AF%E4%BB%B6/" style="font-size: 10px;">其他软件</a> <a href="/chenblog.github.io/tags/%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F/" style="font-size: 10px;">内存泄漏</a> <a href="/chenblog.github.io/tags/%E5%86%85%E6%A0%B8/" style="font-size: 10.67px;">内核</a> <a href="/chenblog.github.io/tags/%E5%86%85%E6%A0%B8%E4%BC%98%E5%8C%96/" style="font-size: 10px;">内核优化</a> <a href="/chenblog.github.io/tags/%E5%88%97%E8%A1%A8%E5%8A%A0%E5%B7%A5/" style="font-size: 10px;">列表加工</a> <a href="/chenblog.github.io/tags/%E5%89%8D%E7%AB%AF/" style="font-size: 10.67px;">前端</a> <a href="/chenblog.github.io/tags/%E5%89%8D%E7%AB%AFnode/" style="font-size: 10px;">前端node</a> <a href="/chenblog.github.io/tags/%E5%89%8D%E7%AB%AFpm2/" style="font-size: 10px;">前端pm2</a> <a href="/chenblog.github.io/tags/%E5%89%8D%E7%AB%AF%E6%8A%80%E6%9C%AF/" style="font-size: 10px;">前端技术</a> <a href="/chenblog.github.io/tags/%E5%8A%A0%E5%AF%86%E6%8A%80%E6%9C%AF/" style="font-size: 10px;">加密技术</a> <a href="/chenblog.github.io/tags/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/" style="font-size: 10.67px;">博客搭建</a> <a href="/chenblog.github.io/tags/%E5%8D%9A%E5%AE%A2%E7%BE%8E%E5%8C%96/" style="font-size: 10px;">博客美化</a> <a href="/chenblog.github.io/tags/%E5%8F%8C%E5%8D%81%E4%B8%80/" style="font-size: 10px;">双十一</a> <a href="/chenblog.github.io/tags/%E5%8F%AF%E8%A7%86%E5%8C%96/" style="font-size: 10px;">可视化</a> <a href="/chenblog.github.io/tags/%E5%90%8E%E9%97%A8%E8%BD%AF%E4%BB%B6/" style="font-size: 10px;">后门软件</a> <a href="/chenblog.github.io/tags/%E5%9B%BD%E5%BA%86/" style="font-size: 10px;">国庆</a> <a href="/chenblog.github.io/tags/%E5%9B%BD%E9%99%85%E8%B6%B3%E5%9D%9B/" style="font-size: 10px;">国际足坛</a> <a href="/chenblog.github.io/tags/%E5%9B%BE%E5%83%8F%E7%9B%91%E6%8E%A7/" style="font-size: 10px;">图像监控</a> <a href="/chenblog.github.io/tags/%E5%9B%BE%E7%89%87/" style="font-size: 10px;">图片</a> <a href="/chenblog.github.io/tags/%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/" style="font-size: 10px;">基础知识</a> <a href="/chenblog.github.io/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/" style="font-size: 10px;">多线程</a> <a href="/chenblog.github.io/tags/%E5%A4%A7%E4%BF%83/" style="font-size: 10px;">大促</a> <a href="/chenblog.github.io/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE/" style="font-size: 10.67px;">大数据</a> <a href="/chenblog.github.io/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90/" style="font-size: 12px;">大数据分析</a> <a href="/chenblog.github.io/tags/%E5%A4%A7%E7%89%9B%E4%B9%8B%E8%B7%AF/" style="font-size: 12.67px;">大牛之路</a> <a href="/chenblog.github.io/tags/%E5%AE%89%E5%85%A8/" style="font-size: 10.67px;">安全</a> <a href="/chenblog.github.io/tags/%E5%AE%B9%E5%99%A8/" style="font-size: 14px;">容器</a> <a href="/chenblog.github.io/tags/%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF/" style="font-size: 10px;">容器技术</a> <a href="/chenblog.github.io/tags/%E5%B7%B4%E5%A1%9E%E7%BD%97%E9%82%A3/" style="font-size: 10px;">巴塞罗那</a> <a href="/chenblog.github.io/tags/%E5%BC%82%E6%AD%A5%E4%BB%BB%E5%8A%A1/" style="font-size: 10px;">异步任务</a> <a href="/chenblog.github.io/tags/%E5%BD%B1%E8%AF%84/" style="font-size: 10px;">影评</a> <a href="/chenblog.github.io/tags/%E5%BE%AE%E4%BF%A1/" style="font-size: 10px;">微信</a> <a href="/chenblog.github.io/tags/%E5%BF%83%E6%83%85/" style="font-size: 10.67px;">心情</a> <a href="/chenblog.github.io/tags/%E6%84%9F%E6%82%9F/" style="font-size: 10px;">感悟</a> <a href="/chenblog.github.io/tags/%E6%89%B9%E9%87%8F%E9%83%A8%E7%BD%B2/" style="font-size: 10px;">批量部署</a> <a href="/chenblog.github.io/tags/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90/" style="font-size: 11.33px;">持续集成</a> <a href="/chenblog.github.io/tags/%E6%94%BF%E6%B2%BB/" style="font-size: 10.67px;">政治</a> <a href="/chenblog.github.io/tags/%E6%95%B0%E6%8D%AE%E5%A4%87%E4%BB%BD/" style="font-size: 10px;">数据备份</a> <a href="/chenblog.github.io/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" style="font-size: 10.67px;">数据库</a> <a href="/chenblog.github.io/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E4%B8%AD%E9%97%B4%E4%BB%B6/" style="font-size: 11.33px;">数据库中间件</a> <a href="/chenblog.github.io/tags/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/" style="font-size: 10px;">文件上传</a> <a href="/chenblog.github.io/tags/%E6%96%87%E4%BB%B6%E8%AF%BB%E5%86%99/" style="font-size: 10px;">文件读写</a> <a href="/chenblog.github.io/tags/%E6%97%85%E6%B8%B8/" style="font-size: 12.67px;">旅游</a> <a href="/chenblog.github.io/tags/%E6%97%A5%E5%BF%97%E7%BB%9F%E8%AE%A1/" style="font-size: 10px;">日志统计</a> <a href="/chenblog.github.io/tags/%E6%97%A5%E6%9C%AC/" style="font-size: 10.67px;">日本</a> <a href="/chenblog.github.io/tags/%E6%97%B6%E5%8C%BA%E8%BD%AC%E6%8D%A2/" style="font-size: 10px;">时区转换</a> <a href="/chenblog.github.io/tags/%E6%98%A5%E8%8A%82/" style="font-size: 10px;">春节</a> <a href="/chenblog.github.io/tags/%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%9B%91%E6%8E%A7/" style="font-size: 10px;">服务器监控</a> <a href="/chenblog.github.io/tags/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F/" style="font-size: 10px;">正则表达式</a> <a href="/chenblog.github.io/tags/%E6%AD%A6%E6%B1%89/" style="font-size: 10px;">武汉</a> <a href="/chenblog.github.io/tags/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/" style="font-size: 10.67px;">消息队列</a> <a href="/chenblog.github.io/tags/%E7%88%AC%E8%99%AB/" style="font-size: 11.33px;">爬虫</a> <a href="/chenblog.github.io/tags/%E7%94%B5%E5%95%86/" style="font-size: 10.67px;">电商</a> <a href="/chenblog.github.io/tags/%E7%99%BD%E5%90%8D%E5%8D%95/" style="font-size: 10px;">白名单</a> <a href="/chenblog.github.io/tags/%E7%9B%91%E6%8E%A7/" style="font-size: 13.33px;">监控</a> <a href="/chenblog.github.io/tags/%E7%9B%91%E6%8E%A7%E6%8A%80%E6%9C%AF/" style="font-size: 10.67px;">监控技术</a> <a href="/chenblog.github.io/tags/%E7%A3%81%E7%9B%98%E9%98%B5%E5%88%97/" style="font-size: 10px;">磁盘阵列</a> <a href="/chenblog.github.io/tags/%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/" style="font-size: 10px;">私有仓库</a> <a href="/chenblog.github.io/tags/%E7%AB%AF%E5%8F%A3%E6%8E%A2%E6%B5%8B/" style="font-size: 10px;">端口探测</a> <a href="/chenblog.github.io/tags/%E7%BC%96%E7%A8%8B/" style="font-size: 10px;">编程</a> <a href="/chenblog.github.io/tags/%E7%BC%96%E8%BE%91%E5%99%A8/" style="font-size: 10px;">编辑器</a> <a href="/chenblog.github.io/tags/%E7%BD%91%E7%AB%99%E6%8A%80%E6%9C%AF/" style="font-size: 10px;">网站技术</a> <a href="/chenblog.github.io/tags/%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/" style="font-size: 10px;">网络基础</a> <a href="/chenblog.github.io/tags/%E7%BD%91%E7%BB%9C%E7%9B%B8%E5%85%B3/" style="font-size: 10px;">网络相关</a> <a href="/chenblog.github.io/tags/%E7%BE%8E%E5%A5%B3/" style="font-size: 10px;">美女</a> <a href="/chenblog.github.io/tags/%E7%BF%BB%E5%A2%99/" style="font-size: 10px;">翻墙</a> <a href="/chenblog.github.io/tags/%E8%81%8C%E5%9C%BA/" style="font-size: 10.67px;">职场</a> <a href="/chenblog.github.io/tags/%E8%87%AA%E5%8A%A8%E5%8C%96%E9%83%A8%E7%BD%B2/" style="font-size: 10.67px;">自动化部署</a> <a href="/chenblog.github.io/tags/%E8%8A%82%E7%82%B9%E8%B0%83%E5%BA%A6/" style="font-size: 10px;">节点调度</a> <a href="/chenblog.github.io/tags/%E8%8B%8F%E5%B7%9E/" style="font-size: 10px;">苏州</a> <a href="/chenblog.github.io/tags/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98/" style="font-size: 10px;">虚拟内存</a> <a href="/chenblog.github.io/tags/%E8%AE%A4%E8%AF%81%E9%89%B4%E6%9D%83/" style="font-size: 10px;">认证鉴权</a> <a href="/chenblog.github.io/tags/%E8%AF%BB%E4%B9%A6/" style="font-size: 10px;">读书</a> <a href="/chenblog.github.io/tags/%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB/" style="font-size: 14px;">读写分离</a> <a href="/chenblog.github.io/tags/%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB%E4%B8%AD%E9%97%B4%E4%BB%B6/" style="font-size: 10px;">读写分离中间件</a> <a href="/chenblog.github.io/tags/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" style="font-size: 10.67px;">负载均衡</a> <a href="/chenblog.github.io/tags/%E8%B6%B3%E7%90%83/" style="font-size: 10.67px;">足球</a> <a href="/chenblog.github.io/tags/%E8%B7%A8%E5%9F%9F/" style="font-size: 10px;">跨域</a> <a href="/chenblog.github.io/tags/%E8%BF%90%E7%BB%B4/" style="font-size: 15.33px;">运维</a> <a href="/chenblog.github.io/tags/%E8%BF%90%E7%BB%B4%E4%B8%8E%E7%9B%91%E6%8E%A7/" style="font-size: 10px;">运维与监控</a> <a href="/chenblog.github.io/tags/%E8%BF%90%E7%BB%B4%E5%AE%89%E5%85%A8/" style="font-size: 10px;">运维安全</a> <a href="/chenblog.github.io/tags/%E8%BF%90%E7%BB%B4%E6%8A%80%E6%9C%AF/" style="font-size: 16.67px;">运维技术</a> <a href="/chenblog.github.io/tags/%E8%BF%90%E7%BB%B4%E7%9B%91%E6%8E%A7/" style="font-size: 10px;">运维监控</a> <a href="/chenblog.github.io/tags/%E8%BF%9B%E5%BA%A6%E6%9D%A1/" style="font-size: 10px;">进度条</a> <a href="/chenblog.github.io/tags/%E9%87%91%E5%B1%B1%E4%BA%91/" style="font-size: 10px;">金山云</a> <a href="/chenblog.github.io/tags/%E9%92%89%E9%92%89/" style="font-size: 10.67px;">钉钉</a> <a href="/chenblog.github.io/tags/%E9%95%BF%E6%B2%99/" style="font-size: 10px;">长沙</a> <a href="/chenblog.github.io/tags/%E9%98%B2%E7%9B%97%E9%93%BE/" style="font-size: 10px;">防盗链</a> <a href="/chenblog.github.io/tags/%E9%98%BF%E6%A0%B9%E5%BB%B7/" style="font-size: 10px;">阿根廷</a> <a href="/chenblog.github.io/tags/%E9%98%BF%E9%87%8C%E4%BA%91/" style="font-size: 16px;">阿里云</a> <a href="/chenblog.github.io/tags/%E9%98%BF%E9%87%8C%E4%BA%91OSS/" style="font-size: 10px;">阿里云OSS</a> <a href="/chenblog.github.io/tags/%E9%98%BF%E9%87%8C%E4%BA%91api/" style="font-size: 10px;">阿里云api</a> <a href="/chenblog.github.io/tags/%E9%98%BF%E9%87%8C%E4%BA%91oss/" style="font-size: 10px;">阿里云oss</a> <a href="/chenblog.github.io/tags/%E9%98%BF%E9%87%8C%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8/" style="font-size: 10px;">阿里云服务器</a> <a href="/chenblog.github.io/tags/%E9%9D%A2%E8%AF%95/" style="font-size: 12px;">面试</a> <a href="/chenblog.github.io/tags/%E9%9D%A2%E8%AF%95%E7%AC%94%E8%AF%95/" style="font-size: 10px;">面试笔试</a> <a href="/chenblog.github.io/tags/%E9%9D%A2%E8%AF%95%E7%BB%8F%E9%AA%8C/" style="font-size: 10.67px;">面试经验</a> <a href="/chenblog.github.io/tags/%E9%9F%B3%E4%B9%90/" style="font-size: 10px;">音乐</a> <a href="/chenblog.github.io/tags/%E9%AD%94%E5%85%BD%E4%B8%96%E7%95%8C/" style="font-size: 10px;">魔兽世界</a>
-    </div>
-  </div>
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Archives</h3>
-    <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2020/06/">June 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2020/05/">May 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2020/04/">April 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2020/03/">March 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2020/02/">February 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2020/01/">January 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2019/12/">December 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2019/11/">November 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2019/10/">October 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2019/09/">September 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2019/08/">August 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2019/07/">July 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2019/06/">June 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2019/05/">May 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2019/04/">April 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2019/03/">March 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2019/02/">February 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2019/01/">January 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2018/12/">December 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2018/11/">November 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2018/08/">August 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2018/07/">July 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2018/06/">June 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2018/02/">February 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2017/12/">December 2017</a></li></ul>
-    </div>
-  </div>
 
 
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Recent Posts</h3>
-    <div class="widget">
-      <ul>
-        
-          <li>
-            <a href="/chenblog.github.io/2020/06/01/Uwsgi-nginx%E8%BF%90%E8%A1%8CDjango%E5%B9%B6%E4%B8%94%E8%A7%A3%E5%86%B3%E8%B7%A8%E5%9F%9F/">Uwsgi+nginx运行Django并且解决跨域</a>
-          </li>
-        
-          <li>
-            <a href="/chenblog.github.io/2020/05/27/%E4%BD%BF%E7%94%A8Django%E7%BC%96%E5%86%99restful-API/">使用Django编写restful API</a>
-          </li>
-        
-          <li>
-            <a href="/chenblog.github.io/2020/04/26/Django%E5%89%8D%E7%AB%AF%E4%BC%A0%E5%85%A5excel%E5%B9%B6%E5%B0%86%E5%AD%97%E6%AE%B5%E4%BF%9D%E5%AD%98MySQL/">Django前端传入excel表格并将表格数据记录到MySQL里</a>
-          </li>
-        
-          <li>
-            <a href="/chenblog.github.io/2020/04/24/Mysql%E5%A6%82%E4%BD%95%E5%88%A4%E6%96%AD%E4%B8%A4%E4%B8%AA%E8%A1%8C%E9%83%BD%E4%B8%8D%E5%90%8C%E4%B8%BA%E4%B8%8D%E4%B8%80%E8%87%B4/">Mysql如何判断多列组合起来不重复</a>
-          </li>
-        
-          <li>
-            <a href="/chenblog.github.io/2020/03/27/%E7%94%B5%E5%95%86%E7%A8%B3%E5%AE%9A%E6%80%A7%E7%9A%84%E4%B8%AA%E4%BA%BA%E6%84%9F%E6%82%9F/">电商稳定性的个人感悟</a>
-          </li>
-        
-      </ul>
-    </div>
-  </div>
 
-  
-</aside>
         
       </div>
-      <footer id="footer">
-  
-  <div class="outer">
-    <div id="footer-info" class="inner">
-      &copy; 2020 John Doe<br>
-      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
-    </div>
-  </div>
-</footer>
-    </div>
-    <nav id="mobile-nav">
-  
-    <a href="/chenblog.github.io/" class="mobile-nav-link">Home</a>
-  
-    <a href="/chenblog.github.io/archives" class="mobile-nav-link">Archives</a>
-  
-</nav>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
     
 
-<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-
-
-  
-<link rel="stylesheet" href="/chenblog.github.io/fancybox/jquery.fancybox.css">
-
-  
-<script src="/chenblog.github.io/fancybox/jquery.fancybox.pack.js"></script>
-
-
-
-
-<script src="/chenblog.github.io/js/script.js"></script>
-
-
-
+    
 
   </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/chenblog.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/chenblog.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
 </body>
 </html>
