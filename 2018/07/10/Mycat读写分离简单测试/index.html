@@ -14,12 +14,13 @@
 
 
 <link rel="stylesheet" href="/chenblog.github.io/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
   <link rel="stylesheet" href="/chenblog.github.io/lib/pace/pace-theme-minimal.min.css">
   <script src="/chenblog.github.io/lib/pace/pace.min.js"></script>
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"brucewayne2099.github.io","root":"/chenblog.github.io/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+    var CONFIG = {"hostname":"brucewayne2099.github.io","root":"/chenblog.github.io/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
   <meta name="description" content="Mycat本身不负责任何数据的同步，具体的数据同步还是依赖Mysql数据库自身的功能">
@@ -36,8 +37,8 @@
 <meta property="article:modified_time" content="2018-07-10T08:48:00.000Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="读写分离">
-<meta property="article:tag" content="数据库中间件">
 <meta property="article:tag" content="mycat">
+<meta property="article:tag" content="数据库中间件">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://brucewayne2099.github.io/images/mycat12.png">
 
@@ -336,8 +337,8 @@
       <footer class="post-footer">
           <div class="post-tags">
               <a href="/chenblog.github.io/tags/%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB/" rel="tag"><i class="fa fa-tag"></i> 读写分离</a>
-              <a href="/chenblog.github.io/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E4%B8%AD%E9%97%B4%E4%BB%B6/" rel="tag"><i class="fa fa-tag"></i> 数据库中间件</a>
               <a href="/chenblog.github.io/tags/mycat/" rel="tag"><i class="fa fa-tag"></i> mycat</a>
+              <a href="/chenblog.github.io/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E4%B8%AD%E9%97%B4%E4%BB%B6/" rel="tag"><i class="fa fa-tag"></i> 数据库中间件</a>
           </div>
 
         
@@ -512,6 +513,8 @@
 
   
   <script src="/chenblog.github.io/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
   <script src="/chenblog.github.io/lib/velocity/velocity.min.js"></script>
   <script src="/chenblog.github.io/lib/velocity/velocity.ui.min.js"></script>
 
