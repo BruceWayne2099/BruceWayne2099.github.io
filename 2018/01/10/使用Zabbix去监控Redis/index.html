@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/chenblog.github.io/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/chenblog.github.io/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/chenblog.github.io/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/chenblog.github.io/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/chenblog.github.io/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/chenblog.github.io/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/chenblog.github.io/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="zabbix,redis," />
+
+
+
+
+  
+
+
+  <link rel="alternate" href="/chenblog.github.io/atom.xml" title="石锤淡啤酒" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="查看redis设置的最大连接数是CONFIG GET maxclients">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用Zabbix去监控Redis">
+<meta property="og:url" content="https://brucewayne2099.github.io/2018/01/10/%E4%BD%BF%E7%94%A8Zabbix%E5%8E%BB%E7%9B%91%E6%8E%A7Redis/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="查看redis设置的最大连接数是CONFIG GET maxclients">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/redisinfo.png">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/motiorredis.png">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/zabbixredis.png">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/grafanaredis.png">
+<meta property="article:published_time" content="2018-01-10T14:49:04.000Z">
+<meta property="article:modified_time" content="2019-07-03T12:54:18.000Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="zabbix">
+<meta property="article:tag" content="redis">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://brucewayne2099.github.io/images/redisinfo.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/chenblog.github.io/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://brucewayne2099.github.io/2018/01/10/使用Zabbix去监控Redis/"/>
+
+
+
+
+
+  <title>使用Zabbix去监控Redis | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/chenblog.github.io/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">石锤淡啤酒</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">生活就是等待戈多</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/chenblog.github.io/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/chenblog.github.io/about/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/chenblog.github.io/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/chenblog.github.io/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/chenblog.github.io/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://brucewayne2099.github.io/chenblog.github.io/2018/01/10/%E4%BD%BF%E7%94%A8Zabbix%E5%8E%BB%E7%9B%91%E6%8E%A7Redis/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/chenblog.github.io/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">使用Zabbix去监控Redis</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-10T22:49:04+08:00">
+                2018-01-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/chenblog.github.io/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index">
+                    <span itemprop="name">工作与技术</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+              <div class="post-description">
+                  查看redis设置的最大连接数是CONFIG GET maxclients
+              </div>
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="了解Redis的info"><a href="#了解Redis的info" class="headerlink" title="了解Redis的info"></a>了解Redis的info</h2><p>要获得Redis的当前情况，使用<code>info</code>命令即可。具体用法：<code>redis-cli -h 127.0.0.1 -p 6379 -a redis_passwd info [参数]</code> 。针对不同的参数就会看到具体的数字，如果没有带参数，那么就会把默认情况写出来，如果带上<code>all</code>参数，那么就会把所有情况都写出来。比如：<code>redis-cli -h 127.0.0.1 -p 6379 -a redis_passwd info server</code>，就会看到redis关于server的一些数据，如下：<br><img src="/images/redisinfo.png" alt="抱光妹" title="redis的info内容"><br>可以看出，从server里可以查询到的是版本号、pid号、配置文件路径等等东西。</p>
+<p>如果参数是<code>client</code>，记录了是客户端的相关信息：<br>    <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@func-redis-001 ~]# redis-cli -h 127.0.0.1 -p 6379 info clients</span><br><span class="line"># Clients</span><br><span class="line">connected_clients:64    #已连接客户端的数量（不包括通过从属服务器连接的客户端）</span><br><span class="line">client_longest_output_list:0    #当前连接的客户端当中，最长的输出列表</span><br><span class="line">client_biggest_input_buf:0    #当前连接的客户端当中，最大输入缓存</span><br><span class="line">blocked_clients:0    #正在等待阻塞命令（BLPOP、BRPOP、BRPOPLPUSH）的客户端的数量</span><br></pre></td></tr></table></figure></p>
+<p>如果参数是<code>memory</code>，记录的是内存的相关信息：<br>    <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[root@func-redis-001 ~]# redis-cli -h 127.0.0.1 -p 6379 info memory</span><br><span class="line"># Memory</span><br><span class="line">used_memory:2252984    #由 Redis 分配器分配的内存总量，以字节（byte）为单位</span><br><span class="line">used_memory_human:2.15M    #上面的数字加上了单位</span><br><span class="line">used_memory_rss:9293824    #常驻集大小，即Redis已分配的内存总量。这个值和top、ps等命令的输出一致</span><br><span class="line">used_memory_peak:2607520    #Redis 的内存消耗峰值（以字节为单位）</span><br><span class="line">used_memory_peak_human:2.49M    #上面的数字加上了单位</span><br><span class="line">used_memory_lua:33792    #Lua 引擎所使用的内存大小（以字节为单位）</span><br><span class="line">mem_fragmentation_ratio:4.13    #used_memory_rss 和 used_memory 之间的比率</span><br><span class="line">mem_allocator:jemalloc-3.2.0    #在编译时指定的，Redis所使用的内存分配器。可以是libc、jemalloc或者tcmalloc。</span><br></pre></td></tr></table></figure></p>
+<p>这里要注意！<font color=red>在理想情况下， used_memory_rss 的值应该只比 used_memory 稍微高一点儿</font>（我这个机器就已经属于严重的级别了）。当 rss &gt; used ，且两者的值相差较大时，表示存在（内部或外部的）内存碎片。内存碎片的比率可以通过 mem_fragmentation_ratio 的值看出。当 used &gt; rss 时，表示 Redis 的部分内存被操作系统换出到交换空间了，在这种情况下，操作可能会产生明显的延迟。</p>
+<p>如果参数是<code>stats</code>，那就是统计的相关信息：<br>    <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">[root@func-redis-001 ~]# redis-cli -h 127.0.0.1 -p 6379 info stats</span><br><span class="line"># Stats</span><br><span class="line">total_connections_received:150383    #服务器已接受的连接请求数量</span><br><span class="line">total_commands_processed:500935    #服务器已执行的命令数量</span><br><span class="line">instantaneous_ops_per_sec:0    #服务器每秒钟执行的命令数量</span><br><span class="line">rejected_connections:0    #因为最大客户端数量限制而被拒绝的连接请求数量</span><br><span class="line">sync_full:<span class="number">0</span>    </span><br><span class="line">sync_partial_ok:<span class="number">0</span>    </span><br><span class="line">sync_partial_err:0    #查找数据库键成功的次数</span><br><span class="line">expired_keys:41    #因为过期而被自动删除的数据库键数量</span><br><span class="line">evicted_keys:0    #因为最大内存容量限制而被驱逐（evict）的键数量</span><br><span class="line">keyspace_hits:78121    #查找数据库键成功的次数</span><br><span class="line">keyspace_misses:56    #查找数据库键失败的次数</span><br><span class="line">pubsub_channels:0    #目前被订阅的频道数量</span><br><span class="line">pubsub_patterns:0    #目前被订阅的模式数量</span><br><span class="line">latest_fork_usec:878    #最近一次 fork() 操作耗费的微秒数</span><br></pre></td></tr></table></figure></p>
+<p>如果参数是<code>CPU</code>，那么就会返回CPU的相关信息：<br>    <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@func-redis-001 ~]# redis-cli -h 127.0.0.1 -p 6379 info cpu</span><br><span class="line"># CPU</span><br><span class="line">used_cpu_sys:63.95    #Redis服务器耗费的系统CPU</span><br><span class="line">used_cpu_user:129.54    #Redis服务器耗费的用户CPU </span><br><span class="line">used_cpu_sys_children:1.70    #子进程耗费的系统CPU</span><br><span class="line">used_cpu_user_children:1.03    #子进程耗费的用户CPU</span><br></pre></td></tr></table></figure></p>
+<p>如果参数是<code>keyspace</code>，那么就会返回数据库相关的统计信息：<br>    <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@func-redis-001 ~]# redis-cli -h 127.0.0.1 -p 6379 info keyspace</span><br><span class="line"># Keyspace</span><br><span class="line">db0:keys=262,expires=183,avg_ttl=284091259423    #据库的键数量、数据库设置有过期时间的key的数量（这个值减少是正常的）</span><br></pre></td></tr></table></figure></p>
+<p>除了以上之外其他还有更多信息，请移步：<a href="http://redisdoc.com/server/info.html" target="_blank" rel="noopener">http://redisdoc.com/server/info.html</a> 。感谢前人栽树！！！</p>
+<h2 id="使用zabbix监控redis"><a href="#使用zabbix监控redis" class="headerlink" title="使用zabbix监控redis"></a>使用zabbix监控redis</h2><p>用zabbix监控redis是一个很简单的事儿，只需要把需要监控的数据提取出来即可。而提取数据的方法就是利用info去得到对应的数值。</p>
+<p>首先先来一个判断redis服务器连接的脚本：<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[root@func-redis-001 ~]# cat check_redis.sh</span><br><span class="line">#这个脚本是用来zabbix监控自建redis的</span><br><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line">PORT=<span class="string">'6379'</span></span><br><span class="line">PASSWD=‘REDIS密码’ </span><br><span class="line">STATUS_redis=$(redis-cli -h <span class="string">'127.0.0.1'</span> -p $PORT -a $PASSWD ping)</span><br><span class="line"><span class="keyword">if</span> [ <span class="string">"$STATUS_redis"</span> == <span class="string">'PONG'</span> ];then</span><br><span class="line">        echo <span class="string">'1'</span></span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">        echo <span class="string">'0'</span></span><br><span class="line">fi</span><br></pre></td></tr></table></figure></p>
+<p>然后更改<code>zabbix_agentd.conf</code>,如下：<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">UserParameter=redis_status[*],redis-cli -h <span class="string">'127.0.0.1'</span> -p $<span class="number">1</span> info | grep -w $<span class="number">2</span> | awk -F<span class="string">':'</span> <span class="string">'&#123;print $NF&#125;'</span></span><br><span class="line">UserParameter=redis_ping,sudo sh /root/check_redis.sh</span><br></pre></td></tr></table></figure></p>
+<p>修改<code>/etc/sudoers</code>文件如下：<br>    <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">## Allow root to run any commands anywhere</span><br><span class="line">root    ALL=(ALL)       ALL</span><br><span class="line">zabbix  ALL=(ALL)       NOPASSWD:ALL    #这个是新增</span><br><span class="line">Defaults:zabbix !requiretty        #这个是新增</span><br></pre></td></tr></table></figure></p>
+<p>保存之后，重启<code>zabbix-agent</code>服务，由于我这个redis是通过<code>zabbix-proxy</code>监控的，所以在<code>zabbix-proxy</code>一端用<code>zabbix_get</code>来查看结果：<br><img src="/images/motiorredis.png" alt="抱光妹" title="zabbix_get到redis内容"></p>
+<p>然后在<code>zabbix-proxy</code>的模板里面添加一些需要监控的<code>item</code>即可，有必要的话可以设置<code>trigger+action</code>用来报警，如图：<br><img src="/images/zabbixredis.png" alt="抱光妹" title="配置item"></p>
+<p>最后就是<code>grafana</code>搞一个炫酷的图表来，如图：<br><img src="/images/grafanaredis.png" alt="抱光妹" title="使用grafana展示成果"></p>
+<p>最后一点，关于redis的内存优化，各位可以来看看：<a href="https://cachecloud.github.io/2017/02/16/Redis%E5%86%85%E5%AD%98%E4%BC%98%E5%8C%96/" target="_blank" rel="noopener">https://cachecloud.github.io/2017/02/16/Redis%E5%86%85%E5%AD%98%E4%BC%98%E5%8C%96/</a> ，写的很全面了。还有zabbix各种模板整理，有需要的同学也可以去下载：<a href="https://monitoringartist.github.io/zabbix-searcher/" target="_blank" rel="noopener">https://monitoringartist.github.io/zabbix-searcher/</a> 。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+    
+    
+      <div>
+        <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+      </div>
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/chenblog.github.io/tags/zabbix/" rel="tag"><i class="fa fa-tag"></i> zabbix</a>
+          
+            <a href="/chenblog.github.io/tags/redis/" rel="tag"><i class="fa fa-tag"></i> redis</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/chenblog.github.io/2018/01/10/%E9%80%9A%E8%BF%87nginx%E9%85%8D%E7%BD%AE%E4%BF%AE%E6%94%B9%E7%BD%91%E9%A1%B5cookie%E5%B1%9E%E6%80%A7/" rel="next" title="通过nginx配置修改网页cookie属性">
+                <i class="fa fa-chevron-left"></i> 通过nginx配置修改网页cookie属性
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/chenblog.github.io/2018/01/11/%E5%9C%A8Python%E4%BD%BF%E7%94%A8yaml%E7%9A%84%E5%87%A0%E4%B8%AA%E4%BE%8B%E5%AD%90/" rel="prev" title="在Python使用yaml的几个例子">
+                在Python使用yaml的几个例子 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Chris Chan</p>
+              <p class="site-description motion-element" itemprop="description">Love Past,play future</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/chenblog.github.io/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">293</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">分类</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">252</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/chenblog.github.io/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#了解Redis的info"><span class="nav-number">1.</span> <span class="nav-text">了解Redis的info</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用zabbix监控redis"><span class="nav-number">2.</span> <span class="nav-text">使用zabbix监控redis</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/chenblog.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/chenblog.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>

@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/chenblog.github.io/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/chenblog.github.io/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/chenblog.github.io/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/chenblog.github.io/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/chenblog.github.io/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/chenblog.github.io/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/chenblog.github.io/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="读写分离,mycat,数据库中间件," />
+
+
+
+
+  
+
+
+  <link rel="alternate" href="/chenblog.github.io/atom.xml" title="石锤淡啤酒" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="mycat是通过分库而达到的分表的目的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Mycat配置文件解析与分表存储测试">
+<meta property="og:url" content="https://brucewayne2099.github.io/2018/07/06/Mycat%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E8%A7%A3%E6%9E%90%E4%B8%8E%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB%E6%B5%8B%E8%AF%95/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="mycat是通过分库而达到的分表的目的">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/mycat5.png">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/mycat4.png">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/mycat7.png">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/mycat6.png">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/mycat8.png">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/mycat9.png">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/mycat10.png">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/mycat11.png">
+<meta property="article:published_time" content="2018-07-06T11:51:18.000Z">
+<meta property="article:modified_time" content="2018-07-10T07:42:28.000Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="读写分离">
+<meta property="article:tag" content="mycat">
+<meta property="article:tag" content="数据库中间件">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://brucewayne2099.github.io/images/mycat5.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/chenblog.github.io/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://brucewayne2099.github.io/2018/07/06/Mycat配置文件解析与读写分离测试/"/>
+
+
+
+
+
+  <title>Mycat配置文件解析与分表存储测试 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/chenblog.github.io/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">石锤淡啤酒</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">生活就是等待戈多</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/chenblog.github.io/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/chenblog.github.io/about/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/chenblog.github.io/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/chenblog.github.io/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/chenblog.github.io/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://brucewayne2099.github.io/chenblog.github.io/2018/07/06/Mycat%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E8%A7%A3%E6%9E%90%E4%B8%8E%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB%E6%B5%8B%E8%AF%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/chenblog.github.io/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Mycat配置文件解析与分表存储测试</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-06T19:51:18+08:00">
+                2018-07-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/chenblog.github.io/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index">
+                    <span itemprop="name">工作与技术</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+              <div class="post-description">
+                  mycat是通过分库而达到的分表的目的
+              </div>
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>前文已经部署了mycat并且启动，此时登陆到mycat的8066端口，可以看到有一个database，这个database里有几个tables，如图：<br><img src="/images/mycat5.png" alt="akb48"></p>
+<p>这些库和表根本不是我数据库里的啊，那它是从哪里来的呢？前文说了，mycat有一个虚拟库（逻辑库），它会把逻辑库上的操作映射到真实库里，现在8066这个端口就是虚拟库，里面有几个逻辑表，但是这些表其实不是真正存在的。而mycat主要有三个配置文件，分别是<code>schema.xml</code>、<code>rule.xml</code>和<code>server.xml</code>，<code>server.xml</code>就是配置虚拟数据库的账号密码的地方，很简单没什么好说的，<code>rule.xml</code>是分片规则的配置文件，没事别动它。而<code>schema.xml</code>里是主要配置逻辑库和逻辑表的配置文件。</p>
+<h2 id="配置文件解析"><a href="#配置文件解析" class="headerlink" title="配置文件解析"></a>配置文件解析</h2><p>去除掉注释的<code>schema.xml</code>文件是这样的：<br><img src="/images/mycat4.png" alt="akb48"></p>
+<p>可以看到整个配置文件分为三大块，第一块是<code>schema</code>，第二块是<code>dataNode</code>，第三块是<code>dataHost</code>，其中第三块是跟读写分离相关的，所以这里就说前两个部分，先说第二块<code>dataNode</code>：<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;dataNode name=<span class="string">"dn1"</span> dataHost=<span class="string">"mycatTEST"</span> database=<span class="string">"db1"</span> /&gt;</span><br><span class="line">&lt;dataNode name=<span class="string">"dn2"</span> dataHost=<span class="string">"mycatTEST"</span> database=<span class="string">"db2"</span> /&gt;</span><br><span class="line">&lt;dataNode name=<span class="string">"dn3"</span> dataHost=<span class="string">"mycatTEST"</span> database=<span class="string">"db3"</span> /&gt;</span><br></pre></td></tr></table></figure></p>
+<p>这一段表示该数据库有哪些数据节点，以及这些数据节点实际对应的数据服务器（这个节点跟<code>dataHost</code>的块有关）和数据库名，这里配置了3个节点dn1,dn2,dn3，都是在mycatTEST服务器上，也就是说我们需要在mycatTEST那个服务器，也就是下面writeHost的机器里先创建三个database，分别叫db1,db2,db3。我们在逻辑库上的操作都会分别下发到这三个db里，具体的下发算法在上面<code>schema</code>里有写。</p>
+<p>再看第一块<code>schema</code>的内容：<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&lt;schema name=<span class="string">"TESTDB"</span> checkSQLschema=<span class="string">"false"</span> sqlMaxLimit=<span class="string">"100"</span>&gt;</span><br><span class="line">        &lt;table name=<span class="string">"travelrecord"</span> dataNode=<span class="string">"dn1,dn2,dn3"</span> rule=<span class="string">"auto-sharding-long"</span> /&gt;	</span><br><span class="line">        &lt;table name=<span class="string">"company"</span> primaryKey=<span class="string">"ID"</span> type=<span class="string">"global"</span> dataNode=<span class="string">"dn1,dn2,dn3"</span> /&gt;</span><br><span class="line">        &lt;table name=<span class="string">"goods"</span> primaryKey=<span class="string">"ID"</span> type=<span class="string">"global"</span> dataNode=<span class="string">"dn1,dn2"</span> /&gt;</span><br><span class="line">        &lt;table name=<span class="string">"hotnews"</span> primaryKey=<span class="string">"ID"</span> autoIncrement=<span class="string">"true"</span> dataNode=<span class="string">"dn1,dn2,dn3"</span> rule=<span class="string">"mod-long"</span> /&gt;</span><br><span class="line">        &lt;table name=<span class="string">"employee"</span> primaryKey=<span class="string">"ID"</span> dataNode=<span class="string">"dn1,dn2"</span> rule=<span class="string">"sharding-by-intfile"</span> /&gt;</span><br><span class="line">        &lt;table name=<span class="string">"customer"</span> primaryKey=<span class="string">"ID"</span> dataNode=<span class="string">"dn1,dn2"</span> rule=<span class="string">"sharding-by-intfile"</span>&gt;</span><br><span class="line">        &lt;childTable name=<span class="string">"orders"</span> primaryKey=<span class="string">"ID"</span> joinKey=<span class="string">"customer_id"</span> parentKey=<span class="string">"id"</span>&gt;</span><br><span class="line">        &lt;childTable name=<span class="string">"order_items"</span> joinKey=<span class="string">"order_id"</span> parentKey=<span class="string">"id"</span> /&gt;</span><br><span class="line">                &lt;<span class="regexp">/childTable&gt;</span></span><br><span class="line"><span class="regexp">        &lt;childTable name="customer_addr" primaryKey="ID" joinKey="customer_id"  parentKey="id" /</span>&gt;</span><br><span class="line">        &lt;<span class="regexp">/table&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>schema&gt;</span><br></pre></td></tr></table></figure></p>
+<p>这一段主要描述了虚拟数据库的schema即TESTDB中有哪些表，以及每个表分布在哪些数据节点上、分布的方法采用哪种算法。其他的选项含义如下：</p>
+<ol>
+<li><font color=red>checkSQLschema</font>:当该值设置为<code>true</code>时，如果我们执行语句<code>select * from TESTDB.travelrecord;</code>则MyCat会把语句修改为<code>select * from travelrecord;</code>。即把表示schema的字符去掉，避免发送到后端数据库执行时报<code>（ERROR 1146 (42S02): Table ‘testdb.travelrecord’ doesn’t exist）</code>。这里最好是采用默认的false；</li>
+<li><font color=red>sqlMaxLimit</font>:当该值设置为某个数值时。每条执行的SQL语句，如果没有加上limit语句，MyCat也会自动的加上所对应的值。例如设置值为100，执行<code>select fromTESTDB.travelrecord;</code>的效果为和执行<code>select from TESTDB.travelrecord limit 100;</code>相同。需要注意的是，如果运行的schema为非拆分库的，那么该属性不会生效。需要手动添加limit语句；</li>
+<li><font color=red>primaryKey</font>:该逻辑表对应真实表的主键，例如：分片的规则是使用非主键进行分片的，那么在使用主键查询的时候，就会发送查询语句到所有配置的DN上，如果使用该属性配置真实表的主键；</li>
+<li><font color=red>type</font>:该属性定义了逻辑表的类型，目前逻辑表只有“全局表（global）”和”普通表”两种类型；</li>
+<li><font color=red>autoIncrement</font>:mysql对非自增长主键，使用<code>last_insert_id()</code>是不会返回结果的，只会返回0。所以，只有定义了自增长主键的表才可以用<code>last_insert_id()</code>返回主键值。使用<code>autoIncrement=“true”</code>指定这个表有使用自增长主键，这样mycat才会不抛出分片键找不到的异常。这里最好是采用默认的false；</li>
+<li><font color=red>rule</font>:该属性用于指定逻辑表要使用的规则名字，规则名字在<code>rule.xml</code>中定义，必须与tableRule标签中name属性属性值一一对应；</li>
+<li><font color=red>joinKey</font>:插入子表的时候会使用这个列的值查找父表存储的数据节点；</li>
+<li><font color=red>parentKey</font>: 属性指定的值一般为与父表建立关联关系的列名。程序首先获取joinkey的值，再通过parentKey属性指定的列名产生查询语句，通过执行该语句得到父表存储在哪个分片上。从而确定子表存储的位置；</li>
+</ol>
+<p>举个例子方便理解，<code>&lt;table name=&quot;employee&quot; primaryKey=&quot;ID&quot; dataNode=&quot;dn1,dn2&quot; rule=&quot;sharding-by-intfile&quot; /&gt;</code>，意思就是“这个employee的表，主键是ID，只在dn1和dn2以<code>sharding-by-intfile</code>的规则存储”。</p>
+<h2 id="举个例子"><a href="#举个例子" class="headerlink" title="举个例子"></a>举个例子</h2><p>按照上面修改了配置文件之后，重启一波mycat，登陆mycat的9066管理端口，使用<code>show @@datanode;</code>和<code>show @@datasource;</code>可以查看到数据库源和datanode已经成功建立了，如图：<br><img src="/images/mycat7.png" alt="akb48"></p>
+<p>手动在阿里云的RDS的读库上创建db1、db2、db3这三个databases，如图：<br><img src="/images/mycat6.png" alt="akb48"></p>
+<p>由于阿里云读写同步，所以只读实例上也有了db1、db2、db3这三个databases。</p>
+<p>此时再开一个窗口，登陆mycat的8066端口，看到里面有了TESTDB这个逻辑库以及里面的逻辑表，但是这些逻辑表实际是不存在的，如图：<br><img src="/images/mycat8.png" alt="akb48"></p>
+<p>这时创建employee表，插入数据：<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">create table employee (id int not <span class="literal">null</span> primary key,name varchar(<span class="number">100</span>),sharding_id int not <span class="literal">null</span>);</span><br><span class="line">insert into employee(id,name,sharding_id) values(<span class="number">1</span>,<span class="string">'leader us'</span>,<span class="number">10000</span>);</span><br><span class="line">insert into employee(id,name,sharding_id) values(<span class="number">2</span>, <span class="string">'me'</span>,<span class="number">10010</span>);</span><br><span class="line">insert into employee(id,name,sharding_id) values(<span class="number">3</span>, <span class="string">'mycat'</span>,<span class="number">10000</span>);</span><br><span class="line">insert into employee(id,name,sharding_id) values(<span class="number">4</span>, <span class="string">'mydog'</span>,<span class="number">10010</span>);</span><br></pre></td></tr></table></figure></p>
+<p>检查一下数据已经被成功插入，并且如果使用<code>select * from</code>查看的话，会从两个datanode上去查，而且都自动加上了<code>limit 100</code>的字样，这一点符合我们在<code>schema.xml</code>里配置的<code>&lt;table name=&quot;employee&quot; primaryKey=&quot;ID&quot; dataNode=&quot;dn1,dn2&quot;/&gt;</code>和<code>sqlMaxLimit=&quot;100&quot;</code>，如图：<br><img src="/images/mycat9.png" alt="akb48"></p>
+<p>再来到阿里云只读RDS数据库里，检查一下刚刚在虚拟数据库里操作的动作是否被正确映射过来。如图:<br><img src="/images/mycat10.png" alt="akb48" title="插入4条数据，这里轮询插入了1和3"><br><img src="/images/mycat11.png" alt="akb48" title="插入4条数据，这里轮询插入了2和4"></p>
+<p>可见<code>writeType=“0”</code>已经成功，这就是分表存储。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://blog.csdn.net/wangshuang1631/article/details/62898469" target="_blank" rel="noopener">https://blog.csdn.net/wangshuang1631/article/details/62898469</a><br><a href="https://sylvanassun.github.io/2016/07/09/2016-07-09-MyCat/" target="_blank" rel="noopener">https://sylvanassun.github.io/2016/07/09/2016-07-09-MyCat/</a><br><a href="http://codingo.xyz/index.php/2018/02/27/mycat1/" target="_blank" rel="noopener">http://codingo.xyz/index.php/2018/02/27/mycat1/</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+    
+    
+      <div>
+        <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+      </div>
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/chenblog.github.io/tags/%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB/" rel="tag"><i class="fa fa-tag"></i> 读写分离</a>
+          
+            <a href="/chenblog.github.io/tags/mycat/" rel="tag"><i class="fa fa-tag"></i> mycat</a>
+          
+            <a href="/chenblog.github.io/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E4%B8%AD%E9%97%B4%E4%BB%B6/" rel="tag"><i class="fa fa-tag"></i> 数据库中间件</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/chenblog.github.io/2018/07/05/Mycat%E7%9A%84%E9%83%A8%E7%BD%B2%E4%B8%8E%E7%AE%80%E5%8D%95%E6%B5%8B%E8%AF%95/" rel="next" title="Mycat 1.6.5的部署与启动">
+                <i class="fa fa-chevron-left"></i> Mycat 1.6.5的部署与启动
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/chenblog.github.io/2018/07/09/%E5%8D%9A%E5%AE%A2%E8%AF%84%E8%AE%BA%E6%94%B9%E7%94%A8%E6%9D%A5%E5%BF%85%E5%8A%9B/" rel="prev" title="博客评论改用来必力">
+                博客评论改用来必力 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Chris Chan</p>
+              <p class="site-description motion-element" itemprop="description">Love Past,play future</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/chenblog.github.io/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">293</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">分类</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">252</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/chenblog.github.io/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#配置文件解析"><span class="nav-number">1.</span> <span class="nav-text">配置文件解析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#举个例子"><span class="nav-number">2.</span> <span class="nav-text">举个例子</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">3.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/chenblog.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/chenblog.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>

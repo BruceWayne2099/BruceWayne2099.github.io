@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/chenblog.github.io/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/chenblog.github.io/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/chenblog.github.io/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/chenblog.github.io/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/chenblog.github.io/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/chenblog.github.io/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/chenblog.github.io/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="django,paramiko," />
+
+
+
+
+  
+
+
+  <link rel="alternate" href="/chenblog.github.io/atom.xml" title="石锤淡啤酒" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="paramiko的SSHClient搭配get、put是可以实现文件传输的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在Django里插入paramiko实现批量操作">
+<meta property="og:url" content="https://brucewayne2099.github.io/2019/04/15/%E5%9C%A8Django%E9%87%8C%E6%8F%92%E5%85%A5paramiko%EF%BC%8C%E5%AE%9E%E7%8E%B0%E6%89%B9%E9%87%8F%E6%93%8D%E4%BD%9C/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="paramiko的SSHClient搭配get、put是可以实现文件传输的">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/gateone16.gif">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/gateone17.png">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/gateone18.png">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/MJ1.gif">
+<meta property="article:published_time" content="2019-04-15T05:52:29.000Z">
+<meta property="article:modified_time" content="2019-06-25T14:43:56.000Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="django">
+<meta property="article:tag" content="paramiko">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://brucewayne2099.github.io/images/gateone16.gif">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/chenblog.github.io/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://brucewayne2099.github.io/2019/04/15/在Django里插入paramiko，实现批量操作/"/>
+
+
+
+
+
+  <title>在Django里插入paramiko实现批量操作 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/chenblog.github.io/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">石锤淡啤酒</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">生活就是等待戈多</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/chenblog.github.io/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/chenblog.github.io/about/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/chenblog.github.io/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/chenblog.github.io/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/chenblog.github.io/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://brucewayne2099.github.io/chenblog.github.io/2019/04/15/%E5%9C%A8Django%E9%87%8C%E6%8F%92%E5%85%A5paramiko%EF%BC%8C%E5%AE%9E%E7%8E%B0%E6%89%B9%E9%87%8F%E6%93%8D%E4%BD%9C/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/chenblog.github.io/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">在Django里插入paramiko实现批量操作</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-15T13:52:29+08:00">
+                2019-04-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/chenblog.github.io/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index">
+                    <span itemprop="name">工作与技术</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+              <div class="post-description">
+                  paramiko的SSHClient搭配get、put是可以实现文件传输的
+              </div>
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="背景交代"><a href="#背景交代" class="headerlink" title="背景交代"></a>背景交代</h2><p>Django:2.1.1<br>paramiko:2.4.1<br>Python:3.6.5</p>
+<p>paramiko在“python批量操作”范围内占据着龙头老大的的地位，它主要就是通过IP、端口和密码登录到对应的服务器执行具体的命令。在Django页面里，我们有时候需要批量操作资产去执行同一个命令，这个时候就可以把paramiko接入到django里。</p>
+<p>首先先<code>pip install paramiko</code>，然后在app所在的文件夹里的<code>models.py</code>里添加新的数据库：<br>    <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.db <span class="keyword">import</span> models</span><br><span class="line">  </span><br><span class="line"><span class="comment"># Create your models here.</span></span><br><span class="line"><span class="comment">#这里是服务器数据</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">server</span><span class="params">(models.Model)</span>:</span></span><br><span class="line">    name = models.CharField(verbose_name=<span class="string">'服务器名称'</span>,max_length=<span class="number">50</span>)</span><br><span class="line">    inIP = models.GenericIPAddressField(verbose_name=<span class="string">'服务器内网IP地址'</span>)</span><br><span class="line">    outIP = models.GenericIPAddressField(verbose_name=<span class="string">'服务器外网IP地址'</span>,default=<span class="string">'0.0.0.0'</span>)</span><br><span class="line">    port = models.IntegerField(verbose_name=<span class="string">'登录端口'</span>,default=<span class="string">'这里是SSH端口'</span>)</span><br><span class="line">    username = models.CharField(verbose_name=<span class="string">'登录用户名'</span>,max_length=<span class="number">50</span>,default=<span class="string">'这里是登录用户名'</span>)</span><br><span class="line">    password = models.CharField(verbose_name=<span class="string">'登录密码'</span>,max_length=<span class="number">100</span>,default=<span class="string">'这里是服务器密码'</span>)</span><br><span class="line">    signtime = models.DateField(auto_now_add=<span class="literal">True</span>)</span><br><span class="line">    remark = models.CharField(verbose_name=<span class="string">'甲方环境'</span>,max_length=<span class="number">255</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__unicode__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> self.name</span><br></pre></td></tr></table></figure></p>
+<p>返回到<code>manage.py</code>这一层的目录，执行<code>python manage.py makemigrations</code>和<code>python manage.py migrate</code>，这个server表就是用来存储资产资料的。</p>
+<p>整个paramiko执行的逻辑是这样的：首先在<code>paramiko.html</code>里展示所有的资产信息，同时页面有一个button按钮，点击这个button，后台开始对页面里所有的服务器执行同样的命令（这里举例执行<code>date</code>命令），将执行的结果生成一个新的页面叫<code>result.html</code>，页面跳转到<code>result.html</code>给用户展示。</p>
+<h2 id="具体配置"><a href="#具体配置" class="headerlink" title="具体配置"></a>具体配置</h2><p>有了上面的铺垫，现在说一下paramiko在django里的具体配置。首先先在app所在的文件夹下新建一个<code>paramiko_client.py</code>的文件，内容如下：<br>    <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> time,paramiko</span><br><span class="line"><span class="keyword">from</span> .models <span class="keyword">import</span> server	<span class="comment">#注意这里的.</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ParamikoClient</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.client = paramiko.SSHClient()	<span class="comment">#创建sshclient对象</span></span><br><span class="line">        self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())	<span class="comment">#允许将信任的主机自动加入到host_allow 列表，此方法必须放在connect方法的前面</span></span><br><span class="line">        self.sftp_client = <span class="literal">None</span></span><br><span class="line">        self.client_state = <span class="number">0</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">connect</span><span class="params">(self,sshinfo)</span>:</span></span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            self.client.connect(hostname=sshinfo.outIP,port=sshinfo.port,username=sshinfo.username,password=sshinfo.password,timeout=<span class="number">1.0</span>)	<span class="comment">#调用connect方法连接服务器</span></span><br><span class="line">            self.client_state = <span class="number">1</span></span><br><span class="line">            <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line">        <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">            <span class="keyword">print</span> (e)</span><br><span class="line">            <span class="keyword">try</span>:</span><br><span class="line">                self.client.close()</span><br><span class="line">            <span class="keyword">except</span>:</span><br><span class="line">                <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">run_cmd</span><span class="params">(self,cmd_str)</span>:</span></span><br><span class="line">        stdin,stdout,stderr = self.client.exec_command(cmd_str)</span><br><span class="line">        <span class="keyword">return</span> stdout.read()</span><br></pre></td></tr></table></figure></p>
+<p>然后在<code>views.py</code>里增加如下内容：<br>    <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> paramiko</span><br><span class="line"><span class="keyword">from</span> .paramiko_client <span class="keyword">import</span> ParamikoClient	<span class="comment">#引用上面那个文件里的ParamikoClient函数</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#批量操作</span></span><br><span class="line"><span class="meta">@login_required</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">paramiko</span><span class="params">(request)</span>:</span></span><br><span class="line">    servers = server.objects.all()	<span class="comment">#获取server这个表里所有的资产信息</span></span><br><span class="line">    <span class="keyword">return</span> render(request, <span class="string">'agparamiko.html'</span>,&#123;<span class="string">'servers'</span>:servers&#125;)	<span class="comment">#反馈页面</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#批量操作结果</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">run_ssh_cmd</span><span class="params">(request)</span>:</span></span><br><span class="line">    sshs = server.objects.all().filter(inIP=<span class="string">'192.168.1.1'</span>)	<span class="comment">#这里我就拿出来内网IP是192.168.1.1这个机器的例子</span></span><br><span class="line">    cmd_res = &#123;&#125;	<span class="comment">#设定一个空的列表</span></span><br><span class="line">    <span class="keyword">for</span> ssh <span class="keyword">in</span> sshs:</span><br><span class="line">        client = ParamikoClient()</span><br><span class="line">        client.connect(ssh)</span><br><span class="line">        res = client.run_cmd(<span class="string">'date'</span>)	<span class="comment">#执行的命令是date</span></span><br><span class="line">        cmd_res[ssh.name] = res		<span class="comment">#给列表的元素一一对应赋值</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> render(request, <span class="string">'result.html'</span>,&#123;<span class="string">'cmd_res'</span>:cmd_res&#125;)	<span class="comment">#反馈界面</span></span><br></pre></td></tr></table></figure></p>
+<p><code>urls.py</code>的对应内容如下：<br>    <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.urls <span class="keyword">import</span> path</span><br><span class="line"><span class="keyword">from</span> . <span class="keyword">import</span> views</span><br><span class="line"></span><br><span class="line">urlpatterns = [</span><br><span class="line">   	path(<span class="string">r'paramiko.html'</span>,views.paramiko,name=<span class="string">"paramiko"</span>),    <span class="comment">#批量操作界面</span></span><br><span class="line">   	path(<span class="string">r'result.html'</span>,views.run_ssh_cmd,name=<span class="string">"run_ssh_cmd"</span>),    <span class="comment">#批量操作界面</span></span><br><span class="line">]</span><br></pre></td></tr></table></figure></p>
+<p>至于<code>result.html</code>就很简单了，主体部分代码是：<br>    <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">&lt;div class="table-responsive"&gt;  &lt;!-- 响应式表格 --&gt;</span><br><span class="line">        &lt;table id="server_table" class="table table-striped table-bordered table-hove"&gt;</span><br><span class="line">                &lt;thead&gt;</span><br><span class="line">                        &lt;tr&gt;</span><br><span class="line">                                &lt;th&gt;服务器名称&lt;/th&gt;</span><br><span class="line">                                &lt;th&gt;执行结果&lt;/th&gt;</span><br><span class="line">                        &lt;/tr&gt;</span><br><span class="line">                &lt;/thead&gt;</span><br><span class="line">                &lt;tbody&gt;</span><br><span class="line">                        &#123;% <span class="keyword">for</span> key,value <span class="keyword">in</span> cmd_res.items %&#125;</span><br><span class="line">                        &lt;tr&gt;</span><br><span class="line">                        &lt;td&gt;&#123;&#123; key &#125;&#125;&lt;/td&gt;</span><br><span class="line">                        &lt;td&gt;&#123;&#123; value &#125;&#125;&lt;/td&gt;</span><br><span class="line">                        &lt;/tr&gt;</span><br><span class="line">                        &#123;% endfor %&#125;</span><br><span class="line">                &lt;/tbody&gt;</span><br><span class="line">        &lt;/table&gt;</span><br><span class="line">&lt;/div&gt;</span><br></pre></td></tr></table></figure></p>
+<p>保存之后，系统重新启动django，在页面执行的效果如下：<br><img src="/images/gateone16.gif" alt="akb48"></p>
+<h2 id="Django的model加密"><a href="#Django的model加密" class="headerlink" title="Django的model加密"></a>Django的model加密</h2><p>上面已经实现了通过paramiko批量操作，但是在这个过程中，我们把密码明文的保存在mysql里，这样无疑是有安全隐患的。于是乎就有一个新的需求：当我们输入到mysql的时候是加密的，从mysql取值的时候是解密的，那么这样的需求可以实现么？当然可以，使用<code>django-fernet-fields</code>。</p>
+<p>首先要<code>pip install django-fernet-fields</code>安装这个插件，然后在对应的models.py里添加如下语句即可：<br>    <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> fernet_fields <span class="keyword">import</span> EncryptedTextField,EncryptedIntegerField</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyModel</span><span class="params">(models.Model)</span>:</span></span><br><span class="line">    name = models.CharField(verbose_name=<span class="string">'姓名'</span>,max_length=<span class="number">1000</span>)</span><br><span class="line">    cardid = EncryptedTextField()	<span class="comment">#加密字段</span></span><br><span class="line">    phone = EncryptedIntegerField()	<span class="comment">#加密字段</span></span><br><span class="line">    address = models.CharField(verbose_name=<span class="string">'住址'</span>,max_length=<span class="number">1000</span>)</span><br></pre></td></tr></table></figure></p>
+<p>然后在<code>manage.py</code>同级文件夹里执行<code>python manage.py makemigrations</code>和<code>python manage.py makemigrations</code>，发现新的表已经生成，然后在<code>admin.py</code>里添加后台展示代码：<br>    <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> .models <span class="keyword">import</span> MyModel</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyModelAdmin</span><span class="params">(admin.ModelAdmin)</span>:</span></span><br><span class="line">    list_display = (<span class="string">'name'</span>,<span class="string">'cardid'</span>,<span class="string">'phone'</span>,<span class="string">'address'</span>)</span><br><span class="line"></span><br><span class="line">admin.site.register(MyModel,MyModelAdmin)</span><br></pre></td></tr></table></figure></p>
+<p>然后登陆到django后台，发现一个叫<code>My models</code>的表已经生成了，那么我们添加一条记录如下：<br><img src="/images/gateone17.png" alt="akb48"></p>
+<p>跑到mysql命令行一看：<br><img src="/images/gateone18.png" alt="akb48"></p>
+<p>可见cardid和phone这两个字段已经被加密了，但是在<code>views.py</code>里使用<code>.objects.values()</code>方法获取是直接得到明文的，这样就达到了预期的效果。</p>
+<p>补充一下，<code>EncryptedIntegerField</code>这个其实不太实用，它不能保存超过2147483647的数字，也就是说电话号码（11位）是无法用这个方法保存的…</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="http://www.maiziedu.com/wiki/frame/embed/" target="_blank" rel="noopener">http://www.maiziedu.com/wiki/frame/embed/</a><br><a href="https://django-fernet-fields.readthedocs.io/en/latest/" target="_blank" rel="noopener">https://django-fernet-fields.readthedocs.io/en/latest/</a><br><a href="https://pypi.org/project/django-encrypted-model-fields/" target="_blank" rel="noopener">https://pypi.org/project/django-encrypted-model-fields/</a>  据说这个方法也能实现加密效果，我没有尝试<br><a href="https://www.59izt.com/zhoubin/2019/04/10/7025.html" target="_blank" rel="noopener">https://www.59izt.com/zhoubin/2019/04/10/7025.html</a><br><img src="/images/MJ1.gif" alt="akb48" title="帮主实战中罚球线起跳扣篮"></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+    
+    
+      <div>
+        <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+      </div>
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/chenblog.github.io/tags/django/" rel="tag"><i class="fa fa-tag"></i> django</a>
+          
+            <a href="/chenblog.github.io/tags/paramiko/" rel="tag"><i class="fa fa-tag"></i> paramiko</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/chenblog.github.io/2019/04/12/%E4%B8%80%E4%B8%AA%E6%89%B9%E9%87%8F%E9%83%A8%E7%BD%B2%E8%84%9A%E6%9C%AC/" rel="next" title="一个批量部署脚本（未完成）">
+                <i class="fa fa-chevron-left"></i> 一个批量部署脚本（未完成）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/chenblog.github.io/2019/04/22/Awk%E8%8E%B7%E5%8F%96%E6%9C%80%E5%A4%A7%E5%80%BC%E3%80%81%E6%9C%80%E5%B0%8F%E5%80%BC%E3%80%81%E5%B9%B3%E5%9D%87%E5%80%BC%E5%92%8C%E6%B1%82%E5%92%8C/" rel="prev" title="Awk获取最大值、最小值、平均值和求和">
+                Awk获取最大值、最小值、平均值和求和 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Chris Chan</p>
+              <p class="site-description motion-element" itemprop="description">Love Past,play future</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/chenblog.github.io/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">293</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">分类</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">252</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/chenblog.github.io/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#背景交代"><span class="nav-number">1.</span> <span class="nav-text">背景交代</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#具体配置"><span class="nav-number">2.</span> <span class="nav-text">具体配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Django的model加密"><span class="nav-number">3.</span> <span class="nav-text">Django的model加密</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">4.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/chenblog.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/chenblog.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>

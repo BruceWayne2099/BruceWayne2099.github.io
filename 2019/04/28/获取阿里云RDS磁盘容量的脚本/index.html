@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/chenblog.github.io/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/chenblog.github.io/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/chenblog.github.io/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/chenblog.github.io/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/chenblog.github.io/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/chenblog.github.io/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/chenblog.github.io/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="python3," />
+
+
+
+
+  
+
+
+  <link rel="alternate" href="/chenblog.github.io/atom.xml" title="石锤淡啤酒" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="用类一时爽，一直用类一直爽！">
+<meta property="og:type" content="article">
+<meta property="og:title" content="获取阿里云RDS磁盘容量的脚本">
+<meta property="og:url" content="https://brucewayne2099.github.io/2019/04/28/%E8%8E%B7%E5%8F%96%E9%98%BF%E9%87%8C%E4%BA%91RDS%E7%A3%81%E7%9B%98%E5%AE%B9%E9%87%8F%E7%9A%84%E8%84%9A%E6%9C%AC/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="用类一时爽，一直用类一直爽！">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/getRDS.png">
+<meta property="article:published_time" content="2019-04-28T08:16:48.000Z">
+<meta property="article:modified_time" content="2019-04-29T09:30:00.000Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="python3">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://brucewayne2099.github.io/images/getRDS.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/chenblog.github.io/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://brucewayne2099.github.io/2019/04/28/获取阿里云RDS磁盘容量的脚本/"/>
+
+
+
+
+
+  <title>获取阿里云RDS磁盘容量的脚本 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/chenblog.github.io/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">石锤淡啤酒</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">生活就是等待戈多</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/chenblog.github.io/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/chenblog.github.io/about/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/chenblog.github.io/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/chenblog.github.io/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/chenblog.github.io/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://brucewayne2099.github.io/chenblog.github.io/2019/04/28/%E8%8E%B7%E5%8F%96%E9%98%BF%E9%87%8C%E4%BA%91RDS%E7%A3%81%E7%9B%98%E5%AE%B9%E9%87%8F%E7%9A%84%E8%84%9A%E6%9C%AC/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/chenblog.github.io/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">获取阿里云RDS磁盘容量的脚本</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-28T16:16:48+08:00">
+                2019-04-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/chenblog.github.io/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index">
+                    <span itemprop="name">工作与技术</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+              <div class="post-description">
+                  用类一时爽，一直用类一直爽！
+              </div>
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="需求以及脚本正文"><a href="#需求以及脚本正文" class="headerlink" title="需求以及脚本正文"></a>需求以及脚本正文</h2><p>开发人员提出一个需求，想要每天从企业微信号里获取一下阿里云几个RDS的今天和昨天的磁盘容量，对比一下结果来判断删除模块是否正常运行，由于阿里云的相关API不支持查询历史数据，所以我们要建立一个数据表，把磁盘容量按照日期保存在数据表里，这个table的结构如下：<br>    <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#以下是创建databases的语句</span></span><br><span class="line">CREATE TABLE IF NOT EXISTS `onlinerds`(</span><br><span class="line">`id` INT UNSIGNED AUTO_INCREMENT,</span><br><span class="line">`rds_id` VARCHAR(<span class="number">100</span>) NOT NULL,		<span class="comment">#记录数据库ID号</span></span><br><span class="line">`rds_name` VARCHAR(<span class="number">100</span>) NOT NULL,	<span class="comment">#记录数据库名称</span></span><br><span class="line">`rds_diskused` VARCHAR(<span class="number">40</span>) NOT NULL,	<span class="comment">#记录使用磁盘容量</span></span><br><span class="line">`date` VARCHAR(<span class="number">40</span>) NOT NULL,	<span class="comment">#记录日期</span></span><br><span class="line">PRIMARY KEY ( `id` )</span><br><span class="line">)ENGINE=InnoDB DEFAULT CHARSET=utf8;</span><br></pre></td></tr></table></figure></p>
+<p>有了这个table，于是就写了一个py3的脚本，内容如下：<br>    <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python</span></span><br><span class="line"><span class="comment">#coding=utf-8</span></span><br><span class="line"><span class="comment">#这个py3脚本是用来获取阿里云线上数据库的磁盘容量</span></span><br><span class="line"><span class="comment">#pip install pymysql &amp; pip install aliyun-python-sdk-rds &amp; pip install aliyun-python-sdk-core</span></span><br><span class="line"><span class="keyword">from</span> aliyunsdkcore.client <span class="keyword">import</span> AcsClient</span><br><span class="line"><span class="keyword">from</span> aliyunsdkcore.acs_exception.exceptions <span class="keyword">import</span> ClientException</span><br><span class="line"><span class="keyword">from</span> aliyunsdkcore.acs_exception.exceptions <span class="keyword">import</span> ServerException</span><br><span class="line"><span class="keyword">from</span> aliyunsdkrds.request.v20140815.DescribeDBInstanceAttributeRequest <span class="keyword">import</span> DescribeDBInstanceAttributeRequest</span><br><span class="line"><span class="keyword">import</span> math,pymysql,urllib.request,json,datetime</span><br><span class="line"></span><br><span class="line"><span class="comment">#字典确定kv对应关系，这样可以取到服务器姓名</span></span><br><span class="line">dict = &#123;<span class="string">'第一台RDSid'</span>: <span class="string">"对应数据库名称"</span>,<span class="string">'第2台RDSid'</span>: <span class="string">"对应数据库名称"</span>，<span class="string">'第3台RDSid'</span>: <span class="string">"对应数据库名称"</span>，<span class="string">'4台RDSid'</span>: <span class="string">"对应数据库名称"</span>，<span class="string">'第5台RDSid'</span>: <span class="string">"对应数据库名称"</span>&#125;</span><br><span class="line"></span><br><span class="line">usedcap=[]	<span class="comment">#今天磁盘量</span></span><br><span class="line">usedcap_yes=[]	<span class="comment">#昨天磁盘量</span></span><br><span class="line">pro = []    <span class="comment">#比例</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#创建获取磁盘容量的类</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">getRDS</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self,ak,sk,domain)</span>:</span></span><br><span class="line">        self.ak = ak</span><br><span class="line">        self.sk = sk</span><br><span class="line">        self.domain = domain</span><br><span class="line">        client = AcsClient(ak,sk,domain)</span><br><span class="line">	</span><br><span class="line">	<span class="comment">#自动换算单位</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">convertBytes</span><span class="params">(self,bytes,lst=None)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> lst <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">            lst = [<span class="string">'Bytes'</span>, <span class="string">'KB'</span>, <span class="string">'MB'</span>, <span class="string">'GB'</span>]  <span class="comment"># 这里是单位，如果需要TB，PB，在后面添加进去即可</span></span><br><span class="line">        i = int(math.floor(  <span class="comment"># 舍弃小数点，取小</span></span><br><span class="line">            math.log(bytes, <span class="number">1024</span>)  <span class="comment"># 求对数(对数：若 a**b = N 则 b 叫做以 a 为底 N 的对数)</span></span><br><span class="line">        ))</span><br><span class="line">        <span class="keyword">if</span> i &gt;= len(lst):</span><br><span class="line">            i = len(lst) - <span class="number">1</span></span><br><span class="line">        <span class="keyword">return</span> (<span class="string">'%.2f'</span> + <span class="string">" "</span> + lst[i]) % (bytes / math.pow(<span class="number">1024</span>, i))</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">DiskUsed</span><span class="params">(self,rdsid)</span>:</span></span><br><span class="line">        lst = [<span class="string">'Bytes'</span>, <span class="string">'KB'</span>, <span class="string">'MB'</span>, <span class="string">'GB'</span>]</span><br><span class="line">        client = AcsClient(self.ak,self.sk,self.domain)</span><br><span class="line">        request = DescribeDBInstanceAttributeRequest()</span><br><span class="line">        request.set_accept_format(<span class="string">'json'</span>)</span><br><span class="line">        request.set_DBInstanceId(rdsid)</span><br><span class="line">        response = client.do_action_with_exception(request)</span><br><span class="line">        result = str(response, encoding=<span class="string">'utf-8'</span>)</span><br><span class="line">        data = json.loads(result)</span><br><span class="line">        DiskUsed = ((data)[<span class="string">'Items'</span>][<span class="string">'DBInstanceAttribute'</span>][<span class="number">0</span>][<span class="string">'DBInstanceDiskUsed'</span>])    <span class="comment">#获取当前使用磁盘</span></span><br><span class="line">        DiskTotal = ((data)[<span class="string">'Items'</span>][<span class="string">'DBInstanceAttribute'</span>][<span class="number">0</span>][<span class="string">'DBInstanceStorage'</span>])    <span class="comment">#获取总磁盘</span></span><br><span class="line">        DiskUsed_GB = getRDS.convertBytes(self,DiskUsed,lst=lst)	<span class="comment">#使用“自动换算单位”的函数</span></span><br><span class="line">        DiskUsed_num = float(getRDS.convertBytes(self,DiskUsed,lst=lst).split(<span class="string">' '</span>, <span class="number">1</span>)[<span class="number">0</span>])    <span class="comment">#提取纯数字</span></span><br><span class="line">        Proportion = <span class="string">"%.2f%%"</span> % ((DiskUsed_num / DiskTotal) * <span class="number">100</span>)      <span class="comment">#转化成百分比</span></span><br><span class="line">        <span class="keyword">return</span> DiskUsed_GB,Proportion	<span class="comment">#返回两个值</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#获取昨天的日期</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">getYesterday</span><span class="params">()</span>:</span></span><br><span class="line">    today = datetime.date.today()</span><br><span class="line">    oneday = datetime.timedelta(days=<span class="number">1</span>)</span><br><span class="line">    yesterday = today-oneday</span><br><span class="line">    <span class="keyword">return</span> yesterday</span><br><span class="line"></span><br><span class="line"><span class="comment">#MYSQL录入</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">mysql</span><span class="params">(i,usedcapacity)</span>:</span></span><br><span class="line">    db = pymysql.connect(<span class="string">"数据库地址"</span>, <span class="string">"数据库用户"</span>, <span class="string">"密码"</span>, <span class="string">"databases"</span>,charset=<span class="string">'utf8'</span>)</span><br><span class="line">    cursor = db.cursor()</span><br><span class="line">    sql = <span class="string">"INSERT INTO onlinerds (rds_id,rds_name,rds_diskused,date) VALUES ('%s','%s','%s',now())"</span> % (i,dict[i],usedcapacity)</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        cursor.execute(sql)        <span class="comment"># 执行sql语句</span></span><br><span class="line">        db.commit()         <span class="comment"># 执行sql语句</span></span><br><span class="line">    <span class="keyword">except</span>:</span><br><span class="line">        db.rollback()           <span class="comment"># 发生错误时回滚</span></span><br><span class="line">    db.close()  <span class="comment">#关闭数据库连接</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#获取昨天的数据</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">yes_mysql</span><span class="params">()</span>:</span></span><br><span class="line">    db = pymysql.connect(<span class="string">"数据库地址"</span>, <span class="string">"数据库用户"</span>, <span class="string">"密码"</span>, <span class="string">"databases"</span>,charset=<span class="string">'utf8'</span>)</span><br><span class="line">    cursor = db.cursor()</span><br><span class="line">    yes_sql = <span class="string">"select rds_diskused from onlinerds where date like '%s"</span> % (getYesterday()) + <span class="string">" 20:%';"</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        cursor.execute(yes_sql)</span><br><span class="line">        results = cursor.fetchall()</span><br><span class="line">        <span class="keyword">for</span> GB <span class="keyword">in</span> results:</span><br><span class="line">            aaa = GB[<span class="number">0</span>] 	<span class="comment">#增加一个aaa变量来调整格式</span></span><br><span class="line">            usedcap_yes.append(aaa)		<span class="comment">#获取的数据添加到列表里</span></span><br><span class="line">    <span class="keyword">except</span>:</span><br><span class="line">        print(<span class="string">"Error: unable to fecth data"</span>)</span><br><span class="line">    db.close()  <span class="comment">#关闭数据库连接</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#将类实例化</span></span><br><span class="line">gethzRDS = getRDS(<span class="string">"杭州区ak"</span>,<span class="string">"杭州区sk"</span>,<span class="string">"cn-hangzhou"</span>)</span><br><span class="line">getszRDS = getRDS(<span class="string">"深圳区ak"</span>,<span class="string">"深圳区sk"</span>,<span class="string">"cn-shenzhen"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 获取企业微信token，用来发送微信企业号</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_token</span><span class="params">(url, corpid, corpsecret)</span>:</span></span><br><span class="line">    token_url = <span class="string">'%s/cgi-bin/gettoken?corpid=%s&amp;corpsecret=%s'</span> % (url, corpid, corpsecret)</span><br><span class="line">    token = json.loads(urllib.request.urlopen(token_url).read().decode())[<span class="string">'access_token'</span>]</span><br><span class="line">    <span class="keyword">return</span> token</span><br><span class="line"></span><br><span class="line"><span class="comment"># 构建告警信息json，用来发送微信企业号</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">messages</span><span class="params">(msg)</span>:</span></span><br><span class="line">    values = &#123;</span><br><span class="line">        <span class="string">"touser"</span>: <span class="string">'@all'</span>,</span><br><span class="line">        <span class="string">"msgtype"</span>: <span class="string">'text'</span>,</span><br><span class="line">        <span class="string">"agentid"</span>: 微信企业号应用号码,</span><br><span class="line">        <span class="string">"text"</span>: &#123;<span class="string">'content'</span>: msg&#125;,</span><br><span class="line">        <span class="string">"safe"</span>: <span class="number">0</span></span><br><span class="line">        &#125;</span><br><span class="line">    msges=(bytes(json.dumps(values), <span class="string">'utf-8'</span>))</span><br><span class="line">    <span class="keyword">return</span> msges</span><br><span class="line"></span><br><span class="line"><span class="comment"># 发送告警信息，用来发送微信企业号</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">send_message</span><span class="params">(url, token, data)</span>:</span></span><br><span class="line">    send_url = <span class="string">'%s/cgi-bin/message/send?access_token=%s'</span> % (url, token)</span><br><span class="line">    respone = urllib.request.urlopen(urllib.request.Request(url=send_url, data=data)).read()</span><br><span class="line">    x = json.loads(respone.decode())[<span class="string">'errcode'</span>]</span><br><span class="line">    <span class="comment"># print(x)</span></span><br><span class="line">    <span class="keyword">if</span> x == <span class="number">0</span>:</span><br><span class="line">        print(<span class="string">'Success!'</span>)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        print(<span class="string">'Failed'</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    list = [<span class="string">'第一台RDSid'</span>,<span class="string">'第2台RDSid'</span>,<span class="string">'第3台RDSid'</span>,<span class="string">'第4台RDSid'</span>,<span class="string">'第5台RDSid'</span>]</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> list:</span><br><span class="line">        mysql(i,gethzRDS.DiskUsed(i))</span><br><span class="line">		x,y = gethzRDS.DiskUsed(i)  <span class="comment">#函数return多个值，就这样拆开，一一添加到list里</span></span><br><span class="line">       	usedcap.append(x)	<span class="comment">#添加到列表</span></span><br><span class="line">       	pro.append(y)		<span class="comment">#添加到列表</span></span><br><span class="line">        <span class="keyword">print</span> (i+<span class="string">"  OKok!"</span>)	<span class="comment">#证明已经录入到数据库里了</span></span><br><span class="line"></span><br><span class="line">    list = [<span class="string">'第一台RDSid'</span>,<span class="string">'第2台RDSid'</span>,<span class="string">'第3台RDSid'</span>,<span class="string">'第4台RDSid'</span>,<span class="string">'第5台RDSid'</span>]</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> list:</span><br><span class="line">        mysql(i,getszRDS.DiskUsed(i))</span><br><span class="line">        x, y = getszRDS.DiskUsed(i)</span><br><span class="line">       	usedcap.append(x)</span><br><span class="line">       	pro.append(y)</span><br><span class="line">        <span class="keyword">print</span> (i+<span class="string">"  OKok!"</span>)</span><br><span class="line"></span><br><span class="line">    yes_mysql()</span><br><span class="line">    print(usedcap)</span><br><span class="line">    print(usedcap_yes)</span><br><span class="line"></span><br><span class="line">    corpid = <span class="string">'微信企业号corpid'</span></span><br><span class="line">    corpsecret = <span class="string">'微信企业号应用的秘钥'</span></span><br><span class="line">    url = <span class="string">'https://qyapi.weixin.qq.com'</span></span><br><span class="line">    msg  = <span class="string">'''【第一台数据库】此时的容量是%s，昨天的容量是%s，当前的比例是：%s；</span></span><br><span class="line"><span class="string">    【第2台数据库】此时的容量是%s，昨天的容量是%s，当前的比例是：%s；</span></span><br><span class="line"><span class="string">    【第3台数据库】此时的容量是%s，昨天的容量是%s，当前的比例是：%s；</span></span><br><span class="line"><span class="string">    【第4台数据库】此时此时的容量是%s，昨天的容量是%s，当前的比例是：%s；</span></span><br><span class="line"><span class="string">    【第5台数据库】此时的容量是%s，昨天的容量是%s，当前的比例是：%s；</span></span><br><span class="line"><span class="string">    '''</span> % (usedcap[<span class="number">0</span>],usedcap_yes[<span class="number">0</span>],pro[<span class="number">0</span>],usedcap[<span class="number">1</span>],usedcap_yes[<span class="number">1</span>],pro[<span class="number">1</span>],usedcap[<span class="number">2</span>],usedcap_yes[<span class="number">2</span>],pro[<span class="number">2</span>],usedcap[<span class="number">3</span>],usedcap_yes[<span class="number">3</span>],pro[<span class="number">3</span>],usedcap[<span class="number">4</span>],usedcap_yes[<span class="number">4</span>],pro[<span class="number">4</span>],usedcap[<span class="number">5</span>],usedcap_yes[<span class="number">5</span>],pro[<span class="number">5</span>])</span><br><span class="line"></span><br><span class="line">    <span class="comment">#发送微信告警</span></span><br><span class="line">    test_token = get_token(url, corpid, corpsecret)</span><br><span class="line">    msg_data = messages(msg)</span><br><span class="line">	send_message(url, test_token, msg_data)</span><br></pre></td></tr></table></figure></p>
+<p>执行之后，效果如下：<br><img src="/images/getRDS.png" alt="akb48"></p>
+<h2 id="小数和百分数的相互转换"><a href="#小数和百分数的相互转换" class="headerlink" title="小数和百分数的相互转换"></a>小数和百分数的相互转换</h2><p>百分比转换为小数的代码如下：<br>    <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">s = <span class="string">'20%'</span>  <span class="comment"># 默认要转换的百分比是字符串</span></span><br><span class="line">aa = float(s.strip(<span class="string">'%'</span>)) <span class="comment"># 去掉s 字符串中的 %</span></span><br><span class="line">bb = aa/<span class="number">100.0</span>  <span class="comment">#运行环境是Python2.7   其中Python2.X  与 python 3X中的除法是有区别</span></span><br><span class="line"><span class="keyword">print</span> bb	<span class="comment"># 输出结果是 0.2</span></span><br></pre></td></tr></table></figure></p>
+<p>小数转换为百分比的代码如下：<br>    <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">a = <span class="number">0.3214323</span></span><br><span class="line">bb = <span class="string">"%.2f%%"</span> % (a * <span class="number">100</span>)</span><br><span class="line"><span class="keyword">print</span> bb	<span class="comment"># 输出结果是32.14%</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="如果函数返回了多个值"><a href="#如果函数返回了多个值" class="headerlink" title="如果函数返回了多个值"></a>如果函数返回了多个值</h2><p>如果函数一次性return了多个值，如何单独获取到这些值？其实这个函数返回的是一个元组。把元组解包，返回结果也可以赋值给单个变量，这时候这个变量值就是函数返回的那个元组本身了。如下：<br>    <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="function"><span class="keyword">def</span> <span class="title">myfun</span><span class="params">()</span>:</span></span><br><span class="line"><span class="meta">... </span><span class="keyword">return</span> <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span></span><br><span class="line">...</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>a, c = myfun()</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>a</span><br><span class="line"><span class="number">1</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>c</span><br><span class="line"><span class="number">3</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="智能转换存储单位"><a href="#智能转换存储单位" class="headerlink" title="智能转换存储单位"></a>智能转换存储单位</h2><p>智能转换<code>bytes</code>为<code>kb/mb/gb/tb/pb</code>的代码如下：<br>    <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> math</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">convertBytes</span><span class="params">(bytes, lst=None)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> lst <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">        lst=[<span class="string">'Bytes'</span>, <span class="string">'KB'</span>, <span class="string">'MB'</span>, <span class="string">'GB'</span>, <span class="string">'TB'</span>, <span class="string">'PB'</span>]</span><br><span class="line">    i = int(math.floor( <span class="comment"># 舍弃小数点，取小</span></span><br><span class="line">             math.log(bytes, <span class="number">1024</span>) <span class="comment"># 求对数(对数：若 a**b = N 则 b 叫做以 a 为底 N 的对数)</span></span><br><span class="line">            ))</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> i &gt;= len(lst):</span><br><span class="line">        i = len(lst) - <span class="number">1</span></span><br><span class="line">    <span class="keyword">return</span> (<span class="string">'%.2f'</span> + <span class="string">" "</span> + lst[i]) % (bytes/math.pow(<span class="number">1024</span>, i))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></span><br><span class="line">    lst = [<span class="string">'Bytes'</span>, <span class="string">'KB'</span>, <span class="string">'MB'</span>, <span class="string">'GB'</span>, <span class="string">'TB'</span>, <span class="string">'PB'</span>]</span><br><span class="line">    bytes = input(<span class="string">'Bytes: '</span>)</span><br><span class="line">    <span class="keyword">print</span> convertBytes(bytes, lst=lst)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure></p>
+<p>但是要注意！<code>bytes</code>作为传入值不能为负数，所以如果是负数想要转换单位，先要用<code>abs</code>取绝对值再计算。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://www.cnblogs.com/xuchunlin/p/6305720.html" target="_blank" rel="noopener">https://www.cnblogs.com/xuchunlin/p/6305720.html</a><br><a href="https://python3-cookbook.readthedocs.io/zh_CN/latest/c07/p04_return_multiple_values_from_function.html" target="_blank" rel="noopener">https://python3-cookbook.readthedocs.io/zh_CN/latest/c07/p04_return_multiple_values_from_function.html</a><br><a href="https://my.oschina.net/guoenzhou/blog/2989650" target="_blank" rel="noopener">https://my.oschina.net/guoenzhou/blog/2989650</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+    
+    
+      <div>
+        <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+      </div>
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/chenblog.github.io/tags/python3/" rel="tag"><i class="fa fa-tag"></i> python3</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/chenblog.github.io/2019/04/22/Awk%E8%8E%B7%E5%8F%96%E6%9C%80%E5%A4%A7%E5%80%BC%E3%80%81%E6%9C%80%E5%B0%8F%E5%80%BC%E3%80%81%E5%B9%B3%E5%9D%87%E5%80%BC%E5%92%8C%E6%B1%82%E5%92%8C/" rel="next" title="Awk获取最大值、最小值、平均值和求和">
+                <i class="fa fa-chevron-left"></i> Awk获取最大值、最小值、平均值和求和
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/chenblog.github.io/2019/04/29/%E8%A7%A3%E5%86%B3%E5%BE%AE%E4%BF%A1%E4%B8%8D%E6%94%AF%E6%8C%81%E9%98%BF%E9%87%8C%E4%BA%91OSS%E5%9F%9F%E5%90%8D%E7%9A%84%E9%97%AE%E9%A2%98/" rel="prev" title="解决微信不支持阿里云OSS域名的问题">
+                解决微信不支持阿里云OSS域名的问题 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Chris Chan</p>
+              <p class="site-description motion-element" itemprop="description">Love Past,play future</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/chenblog.github.io/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">293</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">分类</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">252</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/chenblog.github.io/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#需求以及脚本正文"><span class="nav-number">1.</span> <span class="nav-text">需求以及脚本正文</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#小数和百分数的相互转换"><span class="nav-number">2.</span> <span class="nav-text">小数和百分数的相互转换</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如果函数返回了多个值"><span class="nav-number">3.</span> <span class="nav-text">如果函数返回了多个值</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#智能转换存储单位"><span class="nav-number">4.</span> <span class="nav-text">智能转换存储单位</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">5.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/chenblog.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/chenblog.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>

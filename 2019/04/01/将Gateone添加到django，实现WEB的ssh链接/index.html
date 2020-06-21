@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/chenblog.github.io/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/chenblog.github.io/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/chenblog.github.io/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/chenblog.github.io/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/chenblog.github.io/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/chenblog.github.io/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/chenblog.github.io/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="django,gateone," />
+
+
+
+
+  
+
+
+  <link rel="alternate" href="/chenblog.github.io/atom.xml" title="石锤淡啤酒" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="paramiko更适合去用于批量操作">
+<meta property="og:type" content="article">
+<meta property="og:title" content="将Gateone添加到django，实现WEB的ssh链接">
+<meta property="og:url" content="https://brucewayne2099.github.io/2019/04/01/%E5%B0%86Gateone%E6%B7%BB%E5%8A%A0%E5%88%B0django%EF%BC%8C%E5%AE%9E%E7%8E%B0WEB%E7%9A%84ssh%E9%93%BE%E6%8E%A5/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="paramiko更适合去用于批量操作">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/gateone1.png">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/gateone3.png">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/gateone4.png">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/gateone5.png">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/gateone11.png">
+<meta property="article:published_time" content="2019-04-01T04:40:07.000Z">
+<meta property="article:modified_time" content="2019-04-08T09:04:56.000Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="django">
+<meta property="article:tag" content="gateone">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://brucewayne2099.github.io/images/gateone1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/chenblog.github.io/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://brucewayne2099.github.io/2019/04/01/将Gateone添加到django，实现WEB的ssh链接/"/>
+
+
+
+
+
+  <title>将Gateone添加到django，实现WEB的ssh链接 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/chenblog.github.io/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">石锤淡啤酒</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">生活就是等待戈多</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/chenblog.github.io/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/chenblog.github.io/about/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/chenblog.github.io/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/chenblog.github.io/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/chenblog.github.io/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://brucewayne2099.github.io/chenblog.github.io/2019/04/01/%E5%B0%86Gateone%E6%B7%BB%E5%8A%A0%E5%88%B0django%EF%BC%8C%E5%AE%9E%E7%8E%B0WEB%E7%9A%84ssh%E9%93%BE%E6%8E%A5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/chenblog.github.io/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">将Gateone添加到django，实现WEB的ssh链接</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-01T12:40:07+08:00">
+                2019-04-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/chenblog.github.io/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index">
+                    <span itemprop="name">工作与技术</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+              <div class="post-description">
+                  paramiko更适合去用于批量操作
+              </div>
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="背景交代"><a href="#背景交代" class="headerlink" title="背景交代"></a>背景交代</h2><p>python3 + django2.1<br>Django project:accessgateway</p>
+<h2 id="gateone的安装"><a href="#gateone的安装" class="headerlink" title="gateone的安装"></a>gateone的安装</h2><p>Gateone是一个web界面的交互工具，很多堡垒机都会使用到它，它的生命力很长久也很经得住考验（不过最近github上已经不再对它有更新了）。安装方法如下：<br>    <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">pip install --upgrade setuptools</span><br><span class="line">pip install tornado==<span class="number">4.3</span></span><br><span class="line">pip install Pillow</span><br><span class="line">docker pull liftoff/gateone		<span class="comment">#拉取镜像，个人推荐把原有的镜像修改一下，添加vim等工具</span></span><br><span class="line">docker run -t -p <span class="number">8008</span>:<span class="number">8000</span> -h GATEONE --name gateone liftoff/gateone gateone	<span class="comment">#创建容器</span></span><br></pre></td></tr></table></figure></p>
+<p>这样我们就创建了一个叫<code>gateone</code>的容器，宿主机端口是<code>8008</code>，此时通过浏览器访问<code>https://IP：8008</code>，就会看到效果：<br><img src="/images/gateone1.png" alt="akb48"></p>
+<p>默认的gateone是<code>https</code>访问，如果要改成<code>http</code>访问。那么就要修改容器里的<code>/etc/gateone/conf.d</code>文件夹下的<code>10server.conf</code>，修改如下两处：<br>    <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"disable_ssl"</span>: true,	<span class="comment">#改成http方式</span></span><br><span class="line"><span class="string">"origins"</span>: [<span class="string">"localhost:8000"</span>, <span class="string">"127.0.0.1:8000"</span>, <span class="string">"594f279c70b0:8000"</span>, <span class="string">"django的外网IP:django端口"</span>],	<span class="comment">#添加django的地址和端口</span></span><br></pre></td></tr></table></figure></p>
+<p>然后重启容器，改用<code>http://IP：8008</code>方式去访问，发现已经改成HTTP协议了。</p>
+<h2 id="gateone的配置"><a href="#gateone的配置" class="headerlink" title="gateone的配置"></a>gateone的配置</h2><p>现在这个gateone容器需要已经指定准许django来访问，但是还要生成一个api，让django通过api来访问。在容器里执行<code>gateone --new_api_key</code>，发现在<code>/etc/gateone/conf.d</code>文件夹下多了一个<code>30api_keys.conf</code>：<br><img src="/images/gateone3.png" alt="akb48"></p>
+<p>然后修改<code>60docker.conf</code>，把<code>&quot;auth&quot;: &quot;none&quot;</code>,改成<code>&quot;auth&quot;: &quot;api&quot;</code>,保存之后，此时如果重启容器，发现web界面已经不能访问了，会出现<code>unauthenticated</code>的提示，如图：<br><img src="/images/gateone4.png" alt="akb48"></p>
+<h2 id="gateone集成到django"><a href="#gateone集成到django" class="headerlink" title="gateone集成到django"></a>gateone集成到django</h2><p>gateone部分暂时告于段落，现在配置Django，首先是<code>views.py</code>，注意！python2与python3有些地方不同，我这里是python3版本：<br>    <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> time,hmac,hashlib,json</span><br><span class="line"></span><br><span class="line"><span class="comment">#web交互界面gateone</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">gateone</span><span class="params">(request)</span>:</span></span><br><span class="line">    id = <span class="number">1</span>	<span class="comment">#这里暂时写死只要id为1的服务器</span></span><br><span class="line">    svr = server.objects.get(id = id)</span><br><span class="line">    ip = svr.outIP</span><br><span class="line">    port = svr.port</span><br><span class="line">    username = svr.username   <span class="comment">#写死端口和用户名</span></span><br><span class="line">    <span class="keyword">return</span> render(request,<span class="string">'aggateone.html'</span>,locals())	<span class="comment">#返回aggateone.html页面</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#gateone认证</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">create_signature</span><span class="params">(secret,*parts)</span>:</span></span><br><span class="line">    hash = hmac.new(secret, digestmod=hashlib.sha1)</span><br><span class="line">    <span class="keyword">for</span> part <span class="keyword">in</span> parts:</span><br><span class="line">        hash.update(str(part).encode(<span class="string">"utf-8"</span>))</span><br><span class="line">    <span class="keyword">return</span> hash.hexdigest()</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_auth_obj</span><span class="params">(request)</span>:</span></span><br><span class="line">    <span class="comment"># 安装gateone的服务器以及端口.</span></span><br><span class="line">    gateone_server = <span class="string">'http://121.41.37.251:8008'</span>	<span class="comment">#本地gateone的访问地址，注意http格式</span></span><br><span class="line">    <span class="comment"># 生成的api_key 和secret</span></span><br><span class="line">    api_key = <span class="string">'OGQxZGM5OGM1MGNlNDZkNmEwMTNmM2IyY2NlMGZlNjA3Z'</span>  <span class="comment">#这里是30api_keys.conf文件里的key</span></span><br><span class="line">    secret = <span class="string">b'MDIzOWQyN2Y2MmU0NDdhMWIwN2Q3MjIzODU1MGFjYWVkY'</span>	<span class="comment">#这里是30api_keys.conf文件里的secret</span></span><br><span class="line">    authobj = &#123;</span><br><span class="line">        <span class="string">'api_key'</span>:api_key,</span><br><span class="line">        <span class="string">'upn'</span>:<span class="string">'gateone'</span>,</span><br><span class="line">        <span class="string">'timestamp'</span>:str(int(time.time() * <span class="number">1000</span>)),</span><br><span class="line">        <span class="string">'signature_method'</span>:<span class="string">'HMAC-SHA1'</span>,</span><br><span class="line">        <span class="string">'api_version'</span>:<span class="string">'1.2'</span></span><br><span class="line">        &#125;</span><br><span class="line">    authobj[<span class="string">'signature'</span>] = create_signature(secret,authobj[<span class="string">'api_key'</span>],authobj[<span class="string">'upn'</span>],authobj[<span class="string">'timestamp'</span>])</span><br><span class="line">    auth_info_and_server = &#123;<span class="string">'url'</span>:gateone_server,<span class="string">'auth'</span>:authobj&#125;</span><br><span class="line">    <span class="keyword">return</span> JsonResponse(auth_info_and_server)</span><br></pre></td></tr></table></figure></p>
+<p>然后新增两条路由到<code>urls.py</code>：<br>    <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">path(<span class="string">r'gateone.html'</span>, views.gateone),</span><br><span class="line">path(<span class="string">r'get_auth_obj.html'</span>,views.get_auth_obj,name=<span class="string">"get_auth_obj"</span>),</span><br></pre></td></tr></table></figure></p>
+<p>最后就是编写前端页面<code>aggateone.html</code>：<br>    <figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line">&#123;% extends 'agbase.html' %&#125;</span><br><span class="line">&#123;% load staticfiles %&#125;</span><br><span class="line">&#123;% block title %&#125;Gateone远程连接&#123;% endblock %&#125;</span><br><span class="line"></span><br><span class="line">&#123;% block css %&#125;</span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span> = <span class="string">"/static/jquery-3.3.1.min.js"</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span> = <span class="string">"/static/gateone/gateone.js"</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span>	<span class="comment">&lt;!-- 这里需要手动复制一下gateone.js文件到django的静态文件夹里 --&gt;</span></span><br><span class="line">&#123;% endblock %&#125;</span><br><span class="line"></span><br><span class="line">&#123;% block content %&#125;</span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="javascript">$(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span></span><br><span class="line"><span class="handlebars"><span class="xml">        <span class="comment">&lt;!--添加参数--&gt;</span></span></span></span><br><span class="line"><span class="actionscript">        <span class="keyword">var</span> ip = <span class="string">'&#123;&#123; ip &#125;&#125;'</span>;</span></span><br><span class="line"><span class="actionscript">        <span class="keyword">var</span> user = <span class="string">'&#123;&#123; username &#125;&#125;'</span>;</span></span><br><span class="line"><span class="actionscript">        <span class="keyword">var</span> port = <span class="string">'&#123;&#123; port &#125;&#125;'</span>;</span></span><br><span class="line"><span class="actionscript">        <span class="keyword">var</span> ssh_url = <span class="string">'ssh://'</span>+user+<span class="string">'@'</span>+ip+<span class="string">':'</span>+port;</span></span><br><span class="line"><span class="actionscript">        <span class="comment">//请求认证信息</span></span></span><br><span class="line"><span class="handlebars"><span class="xml">        <span class="comment">&lt;!--发起认证请求--&gt;</span></span></span></span><br><span class="line"><span class="javascript">        $.ajax(&#123;</span></span><br><span class="line"><span class="actionscript">                        url:<span class="string">'&#123;% url '</span>get_auth_obj<span class="string">' %&#125;'</span>,</span></span><br><span class="line"><span class="actionscript">                        type:<span class="string">'GET'</span>,</span></span><br><span class="line"><span class="actionscript">                        dataType:<span class="string">'json'</span>,</span></span><br><span class="line"><span class="actionscript">                        success:<span class="function"><span class="keyword">function</span> <span class="params">(data)</span> </span>&#123;</span></span><br><span class="line"><span class="actionscript">                        <span class="keyword">var</span> auth_message = data.auth;</span></span><br><span class="line"><span class="actionscript">                        <span class="keyword">var</span> auth_url = data.url;</span></span><br><span class="line">                        GateOne.init(&#123;</span><br><span class="line">                                auth:auth_message,</span><br><span class="line">                                url:auth_url,</span><br><span class="line"><span class="actionscript">                                theme:<span class="string">'solarized'</span>,</span></span><br><span class="line"><span class="actionscript">                                goDiv:<span class="string">'#gateone'</span>,</span></span><br><span class="line"><span class="actionscript">                                disableTermTransitions:<span class="string">'true'</span>,</span></span><br><span class="line">                                autoConnectURL:ssh_url</span><br><span class="line">                        &#125;);</span><br><span class="line">                &#125;</span><br><span class="line">        &#125;);</span><br><span class="line"><span class="handlebars"><span class="xml">        <span class="comment">&lt;!--状态记录--&gt;</span></span></span></span><br><span class="line"><span class="actionscript">        GateOne.Base.superSandbox(<span class="string">"GateOne.SomePlugin"</span>, [<span class="string">"GateOne"</span>, <span class="string">"GateOne.Net"</span>,  <span class="string">"GateOne.Terminal.Input"</span>, <span class="string">"GateOne.Terminal"</span>], <span class="function"><span class="keyword">function</span><span class="params">(window, undefined)</span> </span>&#123;</span></span><br><span class="line"><span class="actionscript">                <span class="keyword">var</span> location =  ip;</span></span><br><span class="line">                GateOne.prefs.autoConnectURL=ssh_url;</span><br><span class="line"><span class="actionscript">                GateOne.prefs.fontSize=<span class="string">"100%"</span>;</span></span><br><span class="line"><span class="actionscript">                GateOne.prefs.scrollback = <span class="number">10000</span>;  <span class="comment">// scrollback buffer up to 10,000 lines</span></span></span><br><span class="line"><span class="actionscript">                GateOne.Terminal.loadFont(<span class="string">"Source Code Pro"</span>, <span class="string">"150%"</span>);</span></span><br><span class="line">                GateOne.Net.setLocation(location);</span><br><span class="line"><span class="handlebars"><span class="xml">                <span class="comment">&lt;!--记录登录状态--&gt;</span></span></span></span><br><span class="line">        &#125;);</span><br><span class="line">&#125;)</span><br><span class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span> = <span class="string">"gateone_container"</span> <span class="attr">style</span> = <span class="string">"position:relative; width: 110em; height: 55em;"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span> = <span class="string">"gateone"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">&#123;% endblock %&#125;</span><br></pre></td></tr></table></figure></p>
+<p>重启django进程，浏览器打开<code>gateone.html</code>页面看一下效果：<br><img src="/images/gateone5.png" alt="akb48"></p>
+<p>可见我们已经成功的把gateone嵌入到django里了，而且自动就链接”id=1”这台服务器。大功告成，剩下的就是修改一下细节，给所有服务器一个按钮，只要点击这个按钮就会打开对应的远程链接界面。</p>
+<h2 id="事后补充"><a href="#事后补充" class="headerlink" title="事后补充"></a>事后补充</h2><p>刚才那个<code>views.py</code>里“gateone认证”那两个def函数上面不要加上<code>@login_required</code>，会出现<code>AttributeError: &#39;bytes&#39; object has no attribute &#39;user&#39;</code>错误：<br><img src="/images/gateone11.png" alt="akb48"></p>
+<p>这是因为<code>@login_required</code>这个装饰器首先回去判断user是否是登录状态，会从<code>request</code>里获取<code>User</code>，但是在下面的函数里并没有传递这个User，所以就会报错。如果说非要加上<code>@login_required</code>这个装饰器，那么就要把<code>User</code>传入当做第一个函数。</p>
+<p>详情可见：<a href="https://stackoverflow.com/questions/13423022/django-str-object-has-no-attribute-user" target="_blank" rel="noopener">https://stackoverflow.com/questions/13423022/django-str-object-has-no-attribute-user</a></p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="http://blog.codecp.org/2018/03/23/Django%E5%9F%BA%E7%A1%80Gateone%E5%AE%9E%E7%8E%B0Web%E7%BB%88%E7%AB%AFSSH%E5%8A%9F%E8%83%BD/" target="_blank" rel="noopener">http://blog.codecp.org/2018/03/23/Django%E5%9F%BA%E7%A1%80Gateone%E5%AE%9E%E7%8E%B0Web%E7%BB%88%E7%AB%AFSSH%E5%8A%9F%E8%83%BD/</a><br><a href="https://github.com/liftoff/GateOne/issues/257" target="_blank" rel="noopener">https://github.com/liftoff/GateOne/issues/257</a><br><a href="https://www.jianshu.com/p/b8123a8178de" target="_blank" rel="noopener">https://www.jianshu.com/p/b8123a8178de</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+    
+    
+      <div>
+        <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+      </div>
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/chenblog.github.io/tags/django/" rel="tag"><i class="fa fa-tag"></i> django</a>
+          
+            <a href="/chenblog.github.io/tags/gateone/" rel="tag"><i class="fa fa-tag"></i> gateone</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/chenblog.github.io/2019/03/26/Atlas%E5%87%BA%E4%BA%86%E4%B8%80%E4%B8%AA%E5%BE%88%E8%AF%A1%E5%BC%82%E7%9A%84bug/" rel="next" title="Atlas出了一个很诡异的bug">
+                <i class="fa fa-chevron-left"></i> Atlas出了一个很诡异的bug
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/chenblog.github.io/2019/04/02/Zabbix-api%E8%8E%B7%E5%8F%96%E5%80%BC%E5%9C%A8Django%E9%A1%B5%E9%9D%A2%E5%B1%95%E7%A4%BA/" rel="prev" title="Zabbix-api获取值在Django页面展示">
+                Zabbix-api获取值在Django页面展示 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Chris Chan</p>
+              <p class="site-description motion-element" itemprop="description">Love Past,play future</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/chenblog.github.io/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">293</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">分类</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">252</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/chenblog.github.io/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#背景交代"><span class="nav-number">1.</span> <span class="nav-text">背景交代</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#gateone的安装"><span class="nav-number">2.</span> <span class="nav-text">gateone的安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#gateone的配置"><span class="nav-number">3.</span> <span class="nav-text">gateone的配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#gateone集成到django"><span class="nav-number">4.</span> <span class="nav-text">gateone集成到django</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#事后补充"><span class="nav-number">5.</span> <span class="nav-text">事后补充</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">6.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/chenblog.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/chenblog.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>

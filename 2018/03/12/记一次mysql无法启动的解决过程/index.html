@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/chenblog.github.io/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/chenblog.github.io/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/chenblog.github.io/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/chenblog.github.io/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/chenblog.github.io/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/chenblog.github.io/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/chenblog.github.io/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="mysql,运维技术," />
+
+
+
+
+  
+
+
+  <link rel="alternate" href="/chenblog.github.io/atom.xml" title="石锤淡啤酒" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="一次启动，三个问题">
+<meta property="og:type" content="article">
+<meta property="og:title" content="记一次mysql无法启动的解决过程">
+<meta property="og:url" content="https://brucewayne2099.github.io/2018/03/12/%E8%AE%B0%E4%B8%80%E6%AC%A1mysql%E6%97%A0%E6%B3%95%E5%90%AF%E5%8A%A8%E7%9A%84%E8%A7%A3%E5%86%B3%E8%BF%87%E7%A8%8B/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="一次启动，三个问题">
+<meta property="article:published_time" content="2018-03-12T13:35:15.000Z">
+<meta property="article:modified_time" content="2018-04-22T14:03:12.000Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="mysql">
+<meta property="article:tag" content="运维技术">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/chenblog.github.io/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://brucewayne2099.github.io/2018/03/12/记一次mysql无法启动的解决过程/"/>
+
+
+
+
+
+  <title>记一次mysql无法启动的解决过程 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/chenblog.github.io/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">石锤淡啤酒</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">生活就是等待戈多</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/chenblog.github.io/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/chenblog.github.io/about/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/chenblog.github.io/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/chenblog.github.io/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/chenblog.github.io/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://brucewayne2099.github.io/chenblog.github.io/2018/03/12/%E8%AE%B0%E4%B8%80%E6%AC%A1mysql%E6%97%A0%E6%B3%95%E5%90%AF%E5%8A%A8%E7%9A%84%E8%A7%A3%E5%86%B3%E8%BF%87%E7%A8%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/chenblog.github.io/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">记一次mysql无法启动的解决过程</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-12T21:35:15+08:00">
+                2018-03-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/chenblog.github.io/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index">
+                    <span itemprop="name">工作与技术</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+              <div class="post-description">
+                  一次启动，三个问题
+              </div>
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h2><p>今天开发人员反馈一个问题，就是某一台开发环境机器的mysql无法启动了，但是如果这台服务器重启的话，mysql就好使，而第二天就会出现mysql死掉然后无法启动的情况。我使用<code>service mysqld restart</code>，命令行反馈如下的内容：<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@iZ2373j9xivZ data]# service mysqld restart</span><br><span class="line">MySQL server PID file could not be found!                  [FAILED]    </span><br><span class="line">Starting MySQL........The server quit without updating PID file (<span class="regexp">/data/my</span>sql/data/sock/mysql.pid).                                                         [FAILED]</span><br></pre></td></tr></table></figure></p>
+<p>打开错误日志看一下，里面是这么写的：<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">2018</span><span class="number">-03</span><span class="number">-10</span> <span class="number">00</span>:<span class="number">26</span>:<span class="number">24</span> <span class="number">25919</span> [Note] InnoDB: Using CPU crc32 instructions</span><br><span class="line"><span class="number">2018</span><span class="number">-03</span><span class="number">-10</span> <span class="number">00</span>:<span class="number">26</span>:<span class="number">24</span> <span class="number">25919</span> [Note] InnoDB: Initializing buffer pool, size = <span class="number">4.0</span>G</span><br><span class="line">InnoDB: mmap(<span class="number">549453824</span> bytes) failed; errno <span class="number">12</span></span><br><span class="line"><span class="number">2018</span><span class="number">-03</span><span class="number">-10</span> <span class="number">00</span>:<span class="number">26</span>:<span class="number">24</span> <span class="number">25919</span> [ERROR] InnoDB: Cannot allocate memory <span class="keyword">for</span> the buffer pool</span><br><span class="line"><span class="number">2018</span><span class="number">-03</span><span class="number">-10</span> <span class="number">00</span>:<span class="number">26</span>:<span class="number">24</span> <span class="number">25919</span> [ERROR] Plugin <span class="string">'InnoDB'</span> init <span class="function"><span class="keyword">function</span> <span class="title">returned</span> <span class="title">error</span>.</span></span><br><span class="line">2018-03-10 00:26:24 25919 [ERROR] Plugin 'InnoDB' registration as a STORAGE ENGINE failed.</span><br><span class="line"><span class="number">2018</span><span class="number">-03</span><span class="number">-10</span> <span class="number">00</span>:<span class="number">26</span>:<span class="number">24</span> <span class="number">25919</span> [ERROR] Unknown/unsupported storage engine: INNODB</span><br><span class="line"><span class="number">2018</span><span class="number">-03</span><span class="number">-10</span> <span class="number">00</span>:<span class="number">26</span>:<span class="number">24</span> <span class="number">25919</span> [ERROR] Aborting</span><br></pre></td></tr></table></figure></p>
+<p>爆<code>InnoDB: mmap(549453824 bytes) failed; errno 12</code>，然后我就<code>free -m</code>查看一下，当前服务器的内存已经不够用了。<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@iZ2373j9xivZ sock]# free -m</span><br><span class="line">             total       used       free     shared    buffers     cached</span><br><span class="line">Mem:          <span class="number">7869</span>       <span class="number">7747</span>        <span class="number">121</span>          <span class="number">0</span>         <span class="number">16</span>         <span class="number">15</span></span><br><span class="line">-<span class="regexp">/+ buffers/</span>cache:       <span class="number">7716</span>        <span class="number">152</span></span><br><span class="line">Swap:            <span class="number">0</span>          <span class="number">0</span>          <span class="number">0</span></span><br></pre></td></tr></table></figure></p>
+<p>那么是什么在占用这台服务器的内存？使用<code>ps aux | sort -k4nr |head -5</code> 这个命令查找当前占用内存最大的五个进程一看，全是<code>php-fpm</code>，同时也发现服务器里面运行大量的<code>php-fpm</code>，在征得开发人员的同意之后，重启<code>php-fpm</code>进程，内存空出来很多。</p>
+<p>此时再次<code>service mysqld restart</code>，发现mysql的错误日志改成如下的样子了：<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">2018</span><span class="number">-03</span><span class="number">-12</span> <span class="number">10</span>:<span class="number">53</span>:<span class="number">42</span> <span class="number">28238</span> [Note] InnoDB: Highest supported file format is Barracuda.</span><br><span class="line"><span class="number">2018</span><span class="number">-03</span><span class="number">-12</span> <span class="number">10</span>:<span class="number">53</span>:<span class="number">42</span> <span class="number">28238</span> [Note] InnoDB: The log sequence numbers <span class="number">16939991440</span> and <span class="number">16939991440</span> <span class="keyword">in</span> ibdata files <span class="keyword">do</span> not match the log sequence number <span class="number">16940121908</span> <span class="keyword">in</span> the ib_logfiles!</span><br><span class="line"><span class="number">2018</span><span class="number">-03</span><span class="number">-12</span> <span class="number">10</span>:<span class="number">53</span>:<span class="number">42</span> <span class="number">28238</span> [Note] InnoDB: Database was not shutdown normally!</span><br><span class="line"><span class="number">2018</span><span class="number">-03</span><span class="number">-12</span> <span class="number">10</span>:<span class="number">53</span>:<span class="number">42</span> <span class="number">28238</span> [Note] InnoDB: Starting crash recovery.</span><br></pre></td></tr></table></figure></p>
+<p>这次变成了<code>The log sequence numbers 16939991440 and 16939991440 in ibdata files do not match the log sequence number 16940121908 in the ib_logfiles!</code>，我打开<code>my.cnf</code>，适当的调小了<code>max_connections</code>和<code>innodb_buffer_pool_size</code>，然后<code>service mysqld restart</code>的时候发现错误又变了：<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">2018</span><span class="number">-03</span><span class="number">-12</span> <span class="number">11</span>:<span class="number">03</span>:<span class="number">57</span> <span class="number">29190</span> [Note] InnoDB: <span class="number">5.6</span><span class="number">.27</span> started; log sequence number <span class="number">16940121918</span></span><br><span class="line"><span class="number">2018</span><span class="number">-03</span><span class="number">-12</span> <span class="number">11</span>:<span class="number">03</span>:<span class="number">57</span> <span class="number">29190</span> [Note] Server hostname (bind-address): <span class="string">'*'</span>; port: <span class="number">3306</span></span><br><span class="line"><span class="number">2018</span><span class="number">-03</span><span class="number">-12</span> <span class="number">11</span>:<span class="number">03</span>:<span class="number">57</span> <span class="number">29190</span> [Note] IPv6 is not available.</span><br><span class="line"><span class="number">2018</span><span class="number">-03</span><span class="number">-12</span> <span class="number">11</span>:<span class="number">03</span>:<span class="number">57</span> <span class="number">29190</span> [Note]   - <span class="string">'0.0.0.0'</span> resolves to <span class="string">'0.0.0.0'</span>;</span><br><span class="line"><span class="number">2018</span><span class="number">-03</span><span class="number">-12</span> <span class="number">11</span>:<span class="number">03</span>:<span class="number">57</span> <span class="number">29190</span> [Note] Server socket created on IP: <span class="string">'0.0.0.0'</span>.</span><br><span class="line"><span class="number">2018</span><span class="number">-03</span><span class="number">-12</span> <span class="number">11</span>:<span class="number">03</span>:<span class="number">57</span> <span class="number">29190</span> [ERROR] Can<span class="string">'t start server : Bind on unix socket: Permission denied    </span></span><br><span class="line"><span class="string">2018-03-12 11:03:57 29190 [ERROR] Do you already have another mysqld server running on socket: /data/mysql/data/sock/mysql.sock ?</span></span><br><span class="line"><span class="string">2018-03-12 11:03:57 29190 [ERROR] Aborting</span></span><br></pre></td></tr></table></figure></p>
+<p>这就是文件权限问题了，我再次打开<code>my.cnf</code>发现里面的<code>user</code>填写的是<code>mysql</code>，那么把<code>/data/mysql/data/sock/mysql.sock</code>这一系列的文件的所属人都改成了<code>mysql</code>用户，这一次重启mysql就OK了。</p>
+<p>为什么这个<code>mysql</code>会好好的突然自动死掉呢？我发现日志里面有这样的字样：<code>InnoDB: Database was not shutdown normally!</code>，于是我猜想很有可能是<code>php-fpm</code>这进程不断地增长，占用的内存太大，导致<code>mysql</code>被<code>linux</code>的内核杀死了。于是查看<code>/var/log/message</code>的文件，结合mysql的错误日志时间找到了如下的字样：<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Mar <span class="number">10</span> <span class="number">00</span>:<span class="number">26</span>:<span class="number">22</span> iZ2373j9xivZ kernel: Out <span class="keyword">of</span> memory: Kill process <span class="number">1883</span> (mysqld) score <span class="number">53</span> or sacrifice child</span><br><span class="line">Mar <span class="number">10</span> <span class="number">00</span>:<span class="number">26</span>:<span class="number">22</span> iZ2373j9xivZ kernel: Killed process <span class="number">1883</span>, UID <span class="number">501</span>, (mysqld) total-vm:<span class="number">6849508</span>kB, anon-rss:<span class="number">429368</span>kB, file-rss:<span class="number">176</span>kB</span><br><span class="line">Mar <span class="number">10</span> <span class="number">04</span>:<span class="number">11</span>:<span class="number">38</span> iZ2373j9xivZ kernel: php-fpm invoked oom-killer: gfp_mask=<span class="number">0x201da</span>, order=<span class="number">0</span>, oom_adj=<span class="number">0</span>, oom_score_adj=<span class="number">0</span></span><br><span class="line">Mar <span class="number">10</span> <span class="number">04</span>:<span class="number">11</span>:<span class="number">38</span> iZ2373j9xivZ kernel: php-fpm cpuset=<span class="regexp">/ mems_allowed=0</span></span><br><span class="line"><span class="regexp">Mar 10 04:11:38 iZ2373j9xivZ kernel: Pid: 4375, comm: php-fpm Not tainted 2.6.32-431.23.3.el6.x86_64 #1</span></span><br></pre></td></tr></table></figure></p>
+<p>证据确凿，<code>php-fpm</code>的无休止增长导致服务器的可用内存变小，最后内核把<code>mysql</code>杀死，修改<code>php-fpm</code>的文件之后，暂时好了点…</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="http://robinchen.me/tech/2016/03/14/tech-aliyun-centos-mysql-shutdown-itself-irregularly.html" target="_blank" rel="noopener">http://robinchen.me/tech/2016/03/14/tech-aliyun-centos-mysql-shutdown-itself-irregularly.html</a><br><a href="http://www.wisedream.net/2017/12/20/traps/mysql-corrupt/" target="_blank" rel="noopener">http://www.wisedream.net/2017/12/20/traps/mysql-corrupt/</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+    
+    
+      <div>
+        <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+      </div>
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/chenblog.github.io/tags/mysql/" rel="tag"><i class="fa fa-tag"></i> mysql</a>
+          
+            <a href="/chenblog.github.io/tags/%E8%BF%90%E7%BB%B4%E6%8A%80%E6%9C%AF/" rel="tag"><i class="fa fa-tag"></i> 运维技术</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/chenblog.github.io/2018/03/11/%E5%85%B3%E4%BA%8EHTTP-Alive%E5%BA%94%E8%AF%A5%E7%9F%A5%E9%81%93%E7%9A%84%E4%BA%8B/" rel="next" title="关于HTTP-Alive应该知道的事">
+                <i class="fa fa-chevron-left"></i> 关于HTTP-Alive应该知道的事
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/chenblog.github.io/2018/03/13/%E4%BD%BF%E7%94%A8python%E5%8E%BB%E5%81%9A%E4%B8%80%E4%B8%AA%E7%94%9F%E6%88%90%E9%9A%8F%E6%9C%BA%E7%A0%81%E7%9A%84%E9%A1%B5%E9%9D%A2/" rel="prev" title="使用python去做一个生成随机码的页面">
+                使用python去做一个生成随机码的页面 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Chris Chan</p>
+              <p class="site-description motion-element" itemprop="description">Love Past,play future</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/chenblog.github.io/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">293</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">分类</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">252</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/chenblog.github.io/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#正文"><span class="nav-number">1.</span> <span class="nav-text">正文</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">2.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/chenblog.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/chenblog.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>

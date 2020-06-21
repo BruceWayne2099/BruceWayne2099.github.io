@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/chenblog.github.io/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/chenblog.github.io/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/chenblog.github.io/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/chenblog.github.io/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/chenblog.github.io/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/chenblog.github.io/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/chenblog.github.io/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="django,html,css," />
+
+
+
+
+  
+
+
+  <link rel="alternate" href="/chenblog.github.io/atom.xml" title="石锤淡啤酒" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="从这里，开始往bootstrap发展">
+<meta property="og:type" content="article">
+<meta property="og:title" content="通过调整Css让界面美观一点">
+<meta property="og:url" content="https://brucewayne2099.github.io/2018/11/05/%E9%80%9A%E8%BF%87%E8%B0%83%E6%95%B4Css%E8%AE%A9%E7%95%8C%E9%9D%A2%E7%BE%8E%E8%A7%82%E4%B8%80%E7%82%B9/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="从这里，开始往bootstrap发展">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/css3.png">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/css4.png">
+<meta property="article:published_time" content="2018-11-05T06:07:43.000Z">
+<meta property="article:modified_time" content="2018-11-05T08:23:46.000Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="django">
+<meta property="article:tag" content="html">
+<meta property="article:tag" content="css">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://brucewayne2099.github.io/images/css3.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/chenblog.github.io/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://brucewayne2099.github.io/2018/11/05/通过调整Css让界面美观一点/"/>
+
+
+
+
+
+  <title>通过调整Css让界面美观一点 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/chenblog.github.io/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">石锤淡啤酒</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">生活就是等待戈多</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/chenblog.github.io/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/chenblog.github.io/about/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/chenblog.github.io/tags/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/chenblog.github.io/categories/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/chenblog.github.io/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://brucewayne2099.github.io/chenblog.github.io/2018/11/05/%E9%80%9A%E8%BF%87%E8%B0%83%E6%95%B4Css%E8%AE%A9%E7%95%8C%E9%9D%A2%E7%BE%8E%E8%A7%82%E4%B8%80%E7%82%B9/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/chenblog.github.io/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">通过调整Css让界面美观一点</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-11-05T14:07:43+08:00">
+                2018-11-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/chenblog.github.io/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index">
+                    <span itemprop="name">工作与技术</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+              <div class="post-description">
+                  从这里，开始往bootstrap发展
+              </div>
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>数据可视化肯定需要前端知识，同时也要美化前端，让用户的体验更好，这时候就需要接触到css技术。</p>
+<p>css简单来说就是先给你需要修饰的部分设定变量，然后针对不同的变量做不同的声明，达到修改界面的目的。css规则由两个主要的部分构成：选择器，以及一条或多条声明，格式是：<code>selector {declaration1; declaration2; ... declarationN }</code>。</p>
+<p>在html文本里添加一个style标签，比如：<code>&lt;style type=&quot;test/css&quot;&gt; &lt;/style&gt;</code>。这个标签可以放到<code>&lt;body&gt;</code>最尾处也可以放到<code>&lt;head&gt;</code>最尾处。不过一般来说都是放到<code>&lt;body&gt;</code>里。</p>
+<p>在调整css的时候，可以搭配chrome的F12键直接修改，然后将修改的内容拷贝粘贴到html文件里。</p>
+<p>比如我现在的页面是如下这个样子的：<br><img src="/images/css3.png" alt="akb48"></p>
+<p>这个结构可以看出使用最直白的html语言编写，为了美观大方，我们需要把它改成如下的样子：<br><img src="/images/css4.png" alt="akb48"></p>
+<p>原来的代码如下：<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">        &lt;div&gt;</span><br><span class="line">                &lt;a href=<span class="string">"&#123;% url 'home' %&#125;"</span>&gt;</span><br><span class="line">                        &lt;h2&gt;Homepage&lt;<span class="regexp">/h2&gt;</span></span><br><span class="line"><span class="regexp">                &lt;/</span>a&gt;</span><br><span class="line">                &lt;a href=<span class="string">"&#123;% url 'blog_list' %&#125;"</span>&gt;List&lt;<span class="regexp">/a&gt;</span></span><br><span class="line"><span class="regexp">                &lt;a href="http:/</span><span class="regexp">/www.baidu.com"&gt;跳往百度&lt;/</span>a&gt;</span><br><span class="line">                &lt;a href=<span class="string">"http://www.lechange.com"</span>&gt;跳往乐橙&lt;<span class="regexp">/a&gt;</span></span><br><span class="line"><span class="regexp">        &lt;/</span>div&gt;</span><br><span class="line">        &lt;hr&gt;</span><br><span class="line">        &#123;% block content %&#125; &#123;% endblock %&#125;</span><br><span class="line">&lt;<span class="regexp">/body&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>html&gt;</span><br></pre></td></tr></table></figure></p>
+<p>更改后的代码如下：<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">        &lt;div  <span class="class"><span class="keyword">class</span></span>=<span class="string">"nav"</span>&gt;</span><br><span class="line">		&lt;!-- 给这个div标签添加一个<span class="class"><span class="keyword">class</span>叫<span class="title">nav</span> --&gt;</span></span><br><span class="line"><span class="class">                &lt;<span class="title">a</span> <span class="title">class</span></span>=<span class="string">"logo"</span> href=<span class="string">"&#123;% url 'home' %&#125;"</span>&gt;</span><br><span class="line">				&lt;!-- 给这个div下的这个a标签添加一个<span class="class"><span class="keyword">class</span>叫<span class="title">logo</span> --&gt;</span></span><br><span class="line"><span class="class">                        &lt;<span class="title">h2</span>&gt;<span class="title">Homepage</span>&lt;/<span class="title">h2</span>&gt;</span></span><br><span class="line"><span class="class">                &lt;/<span class="title">a</span>&gt;</span></span><br><span class="line"><span class="class">                &lt;<span class="title">a</span> <span class="title">href</span></span>=<span class="string">"&#123;% url 'blog_list' %&#125;"</span>&gt;List&lt;<span class="regexp">/a&gt;</span></span><br><span class="line"><span class="regexp">                &lt;a href="http:/</span><span class="regexp">/www.baidu.com"&gt;跳往百度&lt;/</span>a&gt;</span><br><span class="line">                &lt;a href=<span class="string">"http://www.lechange.com"</span>&gt;跳往乐橙&lt;<span class="regexp">/a&gt;</span></span><br><span class="line"><span class="regexp">        &lt;/</span>div&gt;</span><br><span class="line">        &lt;hr&gt;</span><br><span class="line">        &#123;% block content %&#125; &#123;% endblock %&#125;</span><br><span class="line">        &lt;style type=<span class="string">'text/css'</span>&gt;</span><br><span class="line">				body&#123;</span><br><span class="line">                       margin: <span class="number">0</span>;</span><br><span class="line">                       padding: <span class="number">0</span>;</span><br><span class="line">					&lt;!-- 这是对整个body标签进行声明，外边距和内边距都是<span class="number">0</span> --&gt;</span><br><span class="line">                &#125;</span><br><span class="line">                div.nav&#123;</span><br><span class="line">                       background-color: #eee;</span><br><span class="line">					border-bottom: <span class="number">2</span>px solid blue;</span><br><span class="line">					padding: <span class="number">5</span>px <span class="number">10</span>px;</span><br><span class="line">					&lt;!-- 这是对整个nav的div标签进行声明：颜色灰色 --&gt;</span><br><span class="line">					&lt;!-- 增加一条底线取代&lt;hr&gt;，设定宽是<span class="number">2</span>px，实线，颜色是蓝色 --&gt;</span><br><span class="line">					&lt;!-- 设定上下边距<span class="number">5</span>px,左右边距<span class="number">10</span>px --&gt;</span><br><span class="line">               	&#125;</span><br><span class="line">				div.nav a&#123;</span><br><span class="line">					text-decoration: none;</span><br><span class="line">					color: #000;</span><br><span class="line">					&lt;!-- 这是对整个nav的div标签里的所有a标签说明：取消下划线，并且规定为黑色 --&gt;</span><br><span class="line">				&#125;</span><br><span class="line">                div.nav a.logo &#123;</span><br><span class="line">					display: inline-block;</span><br><span class="line">					color: green;</span><br><span class="line">					font-size:<span class="number">120</span>%;</span><br><span class="line">					&lt;!-- 在这里对nav的div标签里那个叫logo的a标签进行单独的说明：缩进，并且规定为绿色 --&gt;</span><br><span class="line">					&lt;!-- 字体大小是原来的<span class="number">120</span>% --&gt;</span><br><span class="line">                &#125;</span><br><span class="line">        &lt;<span class="regexp">/style&gt;</span></span><br><span class="line"><span class="regexp">&lt;/</span>body&gt;</span><br><span class="line">&lt;<span class="regexp">/html&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>调整css是一个很繁琐很麻烦的事情，需要耐心。至于如何整合css样式到一个文件然后统一配置的内容，请去看：<a href="https://rorschachchan.github.io/2018/05/12/%E5%8A%A0%E8%BD%BDcss%E6%A0%B7%E5%BC%8F%E7%9A%84%E4%B8%A4%E4%B8%AA%E6%96%B9%E6%B3%95/" target="_blank" rel="noopener">https://rorschachchan.github.io/2018/05/12/%E5%8A%A0%E8%BD%BDcss%E6%A0%B7%E5%BC%8F%E7%9A%84%E4%B8%A4%E4%B8%AA%E6%96%B9%E6%B3%95/</a> 。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+    
+    
+      <div>
+        <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+      </div>
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/chenblog.github.io/tags/django/" rel="tag"><i class="fa fa-tag"></i> django</a>
+          
+            <a href="/chenblog.github.io/tags/html/" rel="tag"><i class="fa fa-tag"></i> html</a>
+          
+            <a href="/chenblog.github.io/tags/css/" rel="tag"><i class="fa fa-tag"></i> css</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/chenblog.github.io/2018/11/02/%E4%BD%BF%E7%94%A8%E6%A8%A1%E6%9D%BF%E6%A0%87%E7%AD%BE%E6%9D%A5%E7%B2%BE%E7%AE%80html%E4%BB%A3%E7%A0%81/" rel="next" title="使用模板嵌套来精简html代码">
+                <i class="fa fa-chevron-left"></i> 使用模板嵌套来精简html代码
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/chenblog.github.io/2018/11/12/Git-clone%E7%9A%84%E5%87%A0%E4%B8%AA%E5%B0%8F%E6%95%85%E9%9A%9C/" rel="prev" title="Git clone的几个错误">
+                Git clone的几个错误 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Chris Chan</p>
+              <p class="site-description motion-element" itemprop="description">Love Past,play future</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/chenblog.github.io/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">293</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">分类</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">252</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/chenblog.github.io/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/chenblog.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/chenblog.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>
