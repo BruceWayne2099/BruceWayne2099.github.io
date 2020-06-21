@@ -1,89 +1,26 @@
 <!DOCTYPE html>
-
-
-
-  
-
-
-<html class="theme-next gemini use-motion" lang="zh-Hans">
+<html lang="zh-Hans">
 <head>
-  <meta charset="UTF-8"/>
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/chenblog.github.io/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/chenblog.github.io/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/chenblog.github.io/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/chenblog.github.io/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/chenblog.github.io/css/main.css">
 
 
+<link rel="stylesheet" href="/chenblog.github.io/lib/font-awesome/css/all.min.css">
 
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"brucewayne2099.github.io","root":"/chenblog.github.io/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
 
-
-
-
-
-
-<meta http-equiv="Cache-Control" content="no-transform" />
-<meta http-equiv="Cache-Control" content="no-siteapp" />
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-  
-  <link href="/chenblog.github.io/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
-
-
-
-
-
-
-
-<link href="/chenblog.github.io/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
-
-<link href="/chenblog.github.io/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
-
-
-  <link rel="apple-touch-icon" sizes="180x180" href="/chenblog.github.io/images/apple-touch-icon-next.png?v=5.1.4">
-
-
-  <link rel="icon" type="image/png" sizes="32x32" href="/chenblog.github.io/images/favicon-32x32-next.png?v=5.1.4">
-
-
-  <link rel="icon" type="image/png" sizes="16x16" href="/chenblog.github.io/images/favicon-16x16-next.png?v=5.1.4">
-
-
-  <link rel="mask-icon" href="/chenblog.github.io/images/logo.svg?v=5.1.4" color="#222">
-
-
-
-
-
-  <meta name="keywords" content="python3,UTC时间,时区转换," />
-
-
-
-
-  
-
-
-  <link rel="alternate" href="/chenblog.github.io/atom.xml" title="石锤淡啤酒" type="application/atom+xml" />
-
-
-
-
-
-
-<meta name="description" content="遇到转换时区的事情真是够蛋疼的！">
+  <meta name="description" content="遇到转换时区的事情真是够蛋疼的！">
 <meta property="og:type" content="article">
 <meta property="og:title" content="将本地时间转化成UTC时间">
 <meta property="og:url" content="https://brucewayne2099.github.io/2019/01/22/%E5%B0%86%E6%9C%AC%E5%9C%B0%E6%97%B6%E9%97%B4%E8%BD%AC%E5%8C%96%E6%88%90UTC%E6%97%B6%E9%97%B4/index.html">
@@ -97,39 +34,18 @@
 <meta property="article:tag" content="时区转换">
 <meta name="twitter:card" content="summary">
 
+<link rel="canonical" href="https://brucewayne2099.github.io/2019/01/22/%E5%B0%86%E6%9C%AC%E5%9C%B0%E6%97%B6%E9%97%B4%E8%BD%AC%E5%8C%96%E6%88%90UTC%E6%97%B6%E9%97%B4/">
 
 
-<script type="text/javascript" id="hexo.configurations">
-  var NexT = window.NexT || {};
-  var CONFIG = {
-    root: '/chenblog.github.io/',
-    scheme: 'Gemini',
-    version: '5.1.4',
-    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
-    fancybox: true,
-    tabs: true,
-    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
-    duoshuo: {
-      userId: '0',
-      author: '博主'
-    },
-    algolia: {
-      applicationID: '',
-      apiKey: '',
-      indexName: '',
-      hits: {"per_page":10},
-      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
-    }
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
   };
 </script>
-
-
-
-  <link rel="canonical" href="https://brucewayne2099.github.io/2019/01/22/将本地时间转化成UTC时间/"/>
-
-
-
-
 
   <title>将本地时间转化成UTC时间 | 石锤淡啤酒</title>
   
@@ -139,252 +55,160 @@
 
 
 
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
 
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
 
-<meta name="generator" content="Hexo 4.2.1"></head>
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
 
-<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+<link rel="alternate" href="/chenblog.github.io/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
 
-  
-  
-    
-  
-
-  <div class="container sidebar-position-left page-post-detail">
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
     <div class="headband"></div>
 
-    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
-      <div class="header-inner"><div class="site-brand-wrapper">
-  <div class="site-meta ">
-    
-
-    <div class="custom-logo-site-title">
-      <a href="/chenblog.github.io/"  class="brand" rel="start">
-        <span class="logo-line-before"><i></i></span>
-        <span class="site-title">石锤淡啤酒</span>
-        <span class="logo-line-after"><i></i></span>
-      </a>
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
     </div>
-      
-        <p class="site-subtitle">生活就是等待戈多</p>
-      
   </div>
 
-  <div class="site-nav-toggle">
-    <button>
-      <span class="btn-bar"></span>
-      <span class="btn-bar"></span>
-      <span class="btn-bar"></span>
-    </button>
+  <div class="site-meta">
+
+    <a href="/chenblog.github.io/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">生活就是等待戈多</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
   </div>
 </div>
+
+
+
 
 <nav class="site-nav">
-  
-
-  
-    <ul id="menu" class="menu">
-      
-        
+  <ul id="menu" class="main-menu menu">
         <li class="menu-item menu-item-home">
-          <a href="/chenblog.github.io/%20" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
-            
-            首页
-          </a>
-        </li>
-      
-        
-        <li class="menu-item menu-item-about">
-          <a href="/chenblog.github.io/about/%20" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
-            
-            关于
-          </a>
-        </li>
-      
-        
-        <li class="menu-item menu-item-tags">
-          <a href="/chenblog.github.io/tags/%20" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
-            
-            标签
-          </a>
-        </li>
-      
-        
-        <li class="menu-item menu-item-categories">
-          <a href="/chenblog.github.io/categories/%20" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
-            
-            分类
-          </a>
-        </li>
-      
-        
+
+    <a href="/chenblog.github.io/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
         <li class="menu-item menu-item-archives">
-          <a href="/chenblog.github.io/archives/%20" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
-            
-            归档
-          </a>
-        </li>
-      
 
-      
-        <li class="menu-item menu-item-search">
-          
-            <a href="javascript:;" class="popup-trigger">
-          
-            
-              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
-            
-            搜索
-          </a>
-        </li>
-      
-    </ul>
-  
+    <a href="/chenblog.github.io/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
 
-  
-    <div class="site-search">
-      
-  <div class="popup search-popup local-search-popup">
-  <div class="local-search-header clearfix">
-    <span class="search-icon">
-      <i class="fa fa-search"></i>
-    </span>
-    <span class="popup-btn-close">
-      <i class="fa fa-times-circle"></i>
-    </span>
-    <div class="local-search-input-wrapper">
-      <input autocomplete="off"
-             placeholder="搜索..." spellcheck="false"
-             type="text" id="local-search-input">
-    </div>
-  </div>
-  <div id="local-search-result"></div>
-</div>
-
-
-
-    </div>
-  
+  </li>
+  </ul>
 </nav>
 
 
 
- </div>
+
+</div>
     </header>
 
-    <main id="main" class="main">
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
       <div class="main-inner">
         <div class="content-wrap">
-          <div id="content" class="content">
+          
+
+          <div class="content post posts-expand">
             
 
-  <div id="posts" class="posts-expand">
     
-
-  
-
   
   
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://brucewayne2099.github.io/chenblog.github.io/2019/01/22/%E5%B0%86%E6%9C%AC%E5%9C%B0%E6%97%B6%E9%97%B4%E8%BD%AC%E5%8C%96%E6%88%90UTC%E6%97%B6%E9%97%B4/">
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://brucewayne2099.github.io/2019/01/22/%E5%B0%86%E6%9C%AC%E5%9C%B0%E6%97%B6%E9%97%B4%E8%BD%AC%E5%8C%96%E6%88%90UTC%E6%97%B6%E9%97%B4/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Chris Chan">
-      <meta itemprop="description" content="">
       <meta itemprop="image" content="/chenblog.github.io/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="Love Past,play future">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
       <meta itemprop="name" content="石锤淡啤酒">
     </span>
-
-    
       <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">将本地时间转化成UTC时间</h1>
-        
+        <h1 class="post-title" itemprop="name headline">
+          将本地时间转化成UTC时间
+        </h1>
 
         <div class="post-meta">
-          <span class="post-time">
-            
+            <span class="post-meta-item">
               <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
+                <i class="far fa-calendar"></i>
               </span>
+              <span class="post-meta-item-text">Posted on</span>
               
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-22T13:56:46+08:00">
-                2019-01-22
-              </time>
-            
 
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/chenblog.github.io/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index">
-                    <span itemprop="name">工作与技术</span>
-                  </a>
-                </span>
-
-                
-                
-              
+              <time title="Created: 2019-01-22 13:56:46 / Modified: 16:06:40" itemprop="dateCreated datePublished" datetime="2019-01-22T13:56:46+08:00">2019-01-22</time>
             </span>
-          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/chenblog.github.io/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
 
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-              <div class="post-description">
-                  遇到转换时区的事情真是够蛋疼的！
-              </div>
-          
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>2.3k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>2 mins.</span>
+            </span>
+            <div class="post-description">遇到转换时区的事情真是够蛋疼的！</div>
 
         </div>
       </header>
-    
 
     
     
@@ -392,286 +216,193 @@
     <div class="post-body" itemprop="articleBody">
 
       
-      
-
-      
         <h2 id="实际代码"><a href="#实际代码" class="headerlink" title="实际代码"></a>实际代码</h2><p>在日常工作中，有些时候需要把本地时间转换成UTC时间，通常来说，最直接的方法就是把北京时间（<code>CST时间</code>）减去8小时，但是如果考虑到夏令时，那么这样简单的数学计算就会得到错误的结果。要解决这种涉及时区的问题，就要使用特殊的模块<code>pytz</code>。<br>    <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">Python <span class="number">3.6</span><span class="number">.4</span> (default, Sep  <span class="number">3</span> <span class="number">2018</span>, <span class="number">10</span>:<span class="number">11</span>:<span class="number">51</span>) </span><br><span class="line">[GCC <span class="number">4.8</span><span class="number">.5</span> <span class="number">20150623</span> (Red Hat <span class="number">4.8</span><span class="number">.5</span><span class="number">-28</span>)] on linux</span><br><span class="line">Type <span class="string">"help"</span>, <span class="string">"copyright"</span>, <span class="string">"credits"</span> <span class="keyword">or</span> <span class="string">"license"</span> <span class="keyword">for</span> more information.</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> datetime,time,pytz    <span class="comment">#引入模块</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>now = time.strftime(<span class="string">"%Y-%m-%d %H:%M:%S"</span>)     <span class="comment">#得到当前时间</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>now</span><br><span class="line"><span class="string">'2019-01-22 14:03:03'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>type(now)</span><br><span class="line">&lt;<span class="class"><span class="keyword">class</span> '<span class="title">str</span>'&gt;     #此时类型是字符串</span></span><br><span class="line">&gt;&gt;&gt; now = datetime.datetime.now()</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>now</span><br><span class="line">datetime.datetime(<span class="number">2019</span>, <span class="number">1</span>, <span class="number">22</span>, <span class="number">14</span>, <span class="number">4</span>, <span class="number">49</span>, <span class="number">707859</span>)     <span class="comment">#转换成datetime模式</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>type(now)</span><br><span class="line">&lt;<span class="class"><span class="keyword">class</span> '<span class="title">datetime</span>.<span class="title">datetime</span>'&gt;</span></span><br><span class="line">&gt;&gt;&gt; utc_time = now.astimezone(pytz.utc)    #转换成了UTC时间就不要用担心夏令时等等麻烦事了</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(utc_time)</span><br><span class="line"><span class="number">2019</span><span class="number">-01</span><span class="number">-22</span> <span class="number">06</span>:<span class="number">04</span>:<span class="number">49.707859</span>+<span class="number">00</span>:<span class="number">00</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>type(utc_time)</span><br><span class="line">&lt;<span class="class"><span class="keyword">class</span> '<span class="title">datetime</span>.<span class="title">datetime</span>'&gt;     #还需要将<span class="title">datetime</span>格式转换成<span class="title">str</span></span></span><br><span class="line">&gt;&gt;&gt; utc_now = utc_time.strftime('%Y-%m-%d %H:%M:00')</span><br><span class="line"><span class="string">'2019-01-22 13:57:00'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>type(utc_now)</span><br><span class="line">&lt;<span class="class"><span class="keyword">class</span> '<span class="title">str</span>'&gt;     #此时返回了字符串</span></span><br></pre></td></tr></table></figure></p>
 <p>上面的代码说明了过程，以及得到的东西的类型，其实精简下来只有三行：<br>    <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> datetime,time,pytz</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>now = datetime.datetime.now()</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>utc_time = now.astimezone(pytz.utc)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>utc_now = utc_time.strftime(<span class="string">'%Y-%m-%dT%H:%M:00Z'</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">print</span> (utc_now)</span><br><span class="line"><span class="number">2019</span><span class="number">-01</span><span class="number">-22</span>T06:<span class="number">46</span>:<span class="number">00</span>Z</span><br></pre></td></tr></table></figure></p>
 <p>如果要查时区名称，可以使用<code>pytz.country_timezones</code>，如下：<br>    <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">from</span> pytz <span class="keyword">import</span> timezone </span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>pytz.country_timezones[<span class="string">'CN'</span>]</span><br><span class="line">[<span class="string">'Asia/Shanghai'</span>, <span class="string">'Asia/Urumqi'</span>]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>pytz.country_timezones[<span class="string">'US'</span>]</span><br><span class="line">[<span class="string">'America/New_York'</span>, <span class="string">'America/Detroit'</span>, <span class="string">'America/Kentucky/Louisville'</span>, <span class="string">'America/Kentucky/Monticello'</span>, <span class="string">'America/Indiana/Indianapolis'</span>, <span class="string">'America/Indiana/Vincennes'</span>, <span class="string">'America/Indiana/Winamac'</span>, <span class="string">'America/Indiana/Marengo'</span>, <span class="string">'America/Indiana/Petersburg'</span>, <span class="string">'America/Indiana/Vevay'</span>, <span class="string">'America/Chicago'</span>, <span class="string">'America/Indiana/Tell_City'</span>, <span class="string">'America/Indiana/Knox'</span>, <span class="string">'America/Menominee'</span>, <span class="string">'America/North_Dakota/Center'</span>, <span class="string">'America/North_Dakota/New_Salem'</span>, <span class="string">'America/North_Dakota/Beulah'</span>, <span class="string">'America/Denver'</span>, <span class="string">'America/Boise'</span>, <span class="string">'America/Phoenix'</span>, <span class="string">'America/Los_Angeles'</span>, <span class="string">'America/Anchorage'</span>, <span class="string">'America/Juneau'</span>, <span class="string">'America/Sitka'</span>, <span class="string">'America/Metlakatla'</span>, <span class="string">'America/Yakutat'</span>, <span class="string">'America/Nome'</span>, <span class="string">'America/Adak'</span>, <span class="string">'Pacific/Honolulu'</span>]</span><br></pre></td></tr></table></figure></p>
 <h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://www.cnblogs.com/cathouse/archive/2012/11/19/2777678.html" target="_blank" rel="noopener">https://www.cnblogs.com/cathouse/archive/2012/11/19/2777678.html</a><br><a href="https://blog.csdn.net/junli_chen/article/details/52999448" target="_blank" rel="noopener">https://blog.csdn.net/junli_chen/article/details/52999448</a><br>《Python cookbook》字符串如何转化成日期<br>《Python cookbook》处理设计到市区的日期问题</p>
 
-      
     </div>
-    
-    
-    
 
     
     
     
-      <div>
-        <div>
-    
-        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
-    
-</div>
-      </div>
-    
 
-    
-
-    
-
-    <footer class="post-footer">
-      
-        <div class="post-tags">
-          
-            <a href="/chenblog.github.io/tags/python3/" rel="tag"><i class="fa fa-tag"></i> python3</a>
-          
-            <a href="/chenblog.github.io/tags/UTC%E6%97%B6%E9%97%B4/" rel="tag"><i class="fa fa-tag"></i> UTC时间</a>
-          
-            <a href="/chenblog.github.io/tags/%E6%97%B6%E5%8C%BA%E8%BD%AC%E6%8D%A2/" rel="tag"><i class="fa fa-tag"></i> 时区转换</a>
-          
-        </div>
-      
-
-      
-      
-      
-
-      
-        <div class="post-nav">
-          <div class="post-nav-next post-nav-item">
-            
-              <a href="/chenblog.github.io/2019/01/21/%E8%BE%83%E6%B7%B1%E5%85%A5%E8%A7%A3%E6%9E%90filebeat-yml%E5%90%84%E5%AD%97%E6%AE%B5%E5%8A%9F%E8%83%BD/" rel="next" title="较深入解析filebeat.yml各字段功能">
-                <i class="fa fa-chevron-left"></i> 较深入解析filebeat.yml各字段功能
-              </a>
-            
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/chenblog.github.io/tags/python3/" rel="tag"># python3</a>
+              <a href="/chenblog.github.io/tags/UTC%E6%97%B6%E9%97%B4/" rel="tag"># UTC时间</a>
+              <a href="/chenblog.github.io/tags/%E6%97%B6%E5%8C%BA%E8%BD%AC%E6%8D%A2/" rel="tag"># 时区转换</a>
           </div>
 
-          <span class="post-nav-divider"></span>
+        
 
-          <div class="post-nav-prev post-nav-item">
-            
-              <a href="/chenblog.github.io/2019/01/23/%E8%A7%A3%E5%86%B3html%E9%87%8C%E5%8D%95%E5%BC%95%E5%8F%B7%E8%BD%AC%E4%B9%89%E7%9A%84%E9%97%AE%E9%A2%98/" rel="prev" title="解决html里单引号转义的问题">
-                解决html里单引号转义的问题 <i class="fa fa-chevron-right"></i>
-              </a>
-            
-          </div>
-        </div>
-      
 
-      
-      
-    </footer>
-  </div>
-  
-  
-  
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/chenblog.github.io/2019/01/21/%E8%BE%83%E6%B7%B1%E5%85%A5%E8%A7%A3%E6%9E%90filebeat-yml%E5%90%84%E5%AD%97%E6%AE%B5%E5%8A%9F%E8%83%BD/" rel="prev" title="较深入解析filebeat.yml各字段功能">
+      <i class="fa fa-chevron-left"></i> 较深入解析filebeat.yml各字段功能
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/chenblog.github.io/2019/01/23/%E8%A7%A3%E5%86%B3html%E9%87%8C%E5%8D%95%E5%BC%95%E5%8F%B7%E8%BD%AC%E4%B9%89%E7%9A%84%E9%97%AE%E9%A2%98/" rel="next" title="解决html里单引号转义的问题">
+      解决html里单引号转义的问题 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
   </article>
+  
+  
+  
 
-
-
-    <div class="post-spread">
-      
-    </div>
-  </div>
 
 
           </div>
           
 
-
-          
-
-  
-
-
-
-        </div>
-        
-          
-  
-  <div class="sidebar-toggle">
-    <div class="sidebar-toggle-line-wrap">
-      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
-      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
-      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
-    </div>
-  </div>
-
-  <aside id="sidebar" class="sidebar">
-    
-    <div class="sidebar-inner">
-
-      
-
-      
-        <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
-            文章目录
-          </li>
-          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
-            站点概览
-          </li>
-        </ul>
-      
-
-      <section class="site-overview-wrap sidebar-panel">
-        <div class="site-overview">
-          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-            
-              <p class="site-author-name" itemprop="name">Chris Chan</p>
-              <p class="site-description motion-element" itemprop="description">Love Past,play future</p>
-          </div>
-
-          <nav class="site-state motion-element">
-
-            
-              <div class="site-state-item site-state-posts">
-              
-                <a href="/chenblog.github.io/archives/%20%7C%7C%20archive">
-              
-                  <span class="site-state-item-count">293</span>
-                  <span class="site-state-item-name">日志</span>
-                </a>
-              </div>
-            
-
-            
-              
-              
-              <div class="site-state-item site-state-categories">
-                <a href="/chenblog.github.io/tags/index.html">
-                  <span class="site-state-item-count">8</span>
-                  <span class="site-state-item-name">分类</span>
-                </a>
-              </div>
-            
-
-            
-              
-              
-              <div class="site-state-item site-state-tags">
-                <a href="/chenblog.github.io/categories/index.html">
-                  <span class="site-state-item-count">252</span>
-                  <span class="site-state-item-name">标签</span>
-                </a>
-              </div>
-            
-
-          </nav>
-
-          
-            <div class="feed-link motion-element">
-              <a href="/chenblog.github.io/atom.xml" rel="alternate">
-                <i class="fa fa-rss"></i>
-                RSS
-              </a>
-            </div>
-          
-
-          
-
-          
-          
-
-          
-          
-
-          
-
-        </div>
-      </section>
-
-      
-      <!--noindex-->
-        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
-          <div class="post-toc">
-
-            
-              
-            
-
-            
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#实际代码"><span class="nav-number">1.</span> <span class="nav-text">实际代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">2.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
-            
-
-          </div>
-        </section>
-      <!--/noindex-->
-      
-
-      
-
-    </div>
-  </aside>
-
-
-        
-      </div>
-    </main>
-
-    <footer id="footer" class="footer">
-      <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
-  <span class="with-love">
-    <i class="fa fa-user"></i>
-  </span>
-  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
-
-  
-</div>
-
-
-  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
-
-
-
-  <span class="post-meta-divider">|</span>
-
-
-
-  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
-
-
-
-
-        
-
-
-
-
-
-
-
-        
-      </div>
-    </footer>
-
-    
-      <div class="back-to-top">
-        <i class="fa fa-arrow-up"></i>
-        
-      </div>
-    
-
-    
-
-  </div>
-
-  
-
-<script type="text/javascript">
-  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
-    window.Promise = null;
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
   }
 </script>
 
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#实际代码"><span class="nav-number">1.</span> <span class="nav-text">实际代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">2.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">Love Past,play future</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/chenblog.github.io/archives/">
+        
+          <span class="site-state-item-count">293</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/chenblog.github.io/categories/">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/chenblog.github.io/tags/">
+        <span class="site-state-item-count">252</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">729k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">11:03</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
 
 
 
 
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/chenblog.github.io/lib/anime.min.js"></script>
+  <script src="/chenblog.github.io/lib/velocity/velocity.min.js"></script>
+  <script src="/chenblog.github.io/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/chenblog.github.io/js/utils.js"></script>
+
+<script src="/chenblog.github.io/js/motion.js"></script>
+
+
+<script src="/chenblog.github.io/js/schemes/muse.js"></script>
+
+
+<script src="/chenblog.github.io/js/next-boot.js"></script>
 
 
 
@@ -689,422 +420,6 @@
 
 
 
-  
-  
-    <script type="text/javascript" src="/chenblog.github.io/lib/jquery/index.js?v=2.1.3"></script>
-  
-
-  
-  
-    <script type="text/javascript" src="/chenblog.github.io/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
-  
-
-  
-  
-    <script type="text/javascript" src="/chenblog.github.io/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
-  
-
-  
-  
-    <script type="text/javascript" src="/chenblog.github.io/lib/velocity/velocity.min.js?v=1.2.1"></script>
-  
-
-  
-  
-    <script type="text/javascript" src="/chenblog.github.io/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
-  
-
-  
-  
-    <script type="text/javascript" src="/chenblog.github.io/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
-  
-
-
-  
-
-
-  <script type="text/javascript" src="/chenblog.github.io/js/src/utils.js?v=5.1.4"></script>
-
-  <script type="text/javascript" src="/chenblog.github.io/js/src/motion.js?v=5.1.4"></script>
-
-
-
-  
-  
-
-
-  <script type="text/javascript" src="/chenblog.github.io/js/src/affix.js?v=5.1.4"></script>
-
-  <script type="text/javascript" src="/chenblog.github.io/js/src/schemes/pisces.js?v=5.1.4"></script>
-
-
-
-  
-  <script type="text/javascript" src="/chenblog.github.io/js/src/scrollspy.js?v=5.1.4"></script>
-<script type="text/javascript" src="/chenblog.github.io/js/src/post-details.js?v=5.1.4"></script>
-
-
-
-  
-
-
-  <script type="text/javascript" src="/chenblog.github.io/js/src/bootstrap.js?v=5.1.4"></script>
-
-
-
-  
-
-
-  
-
-
-
-
-	
-
-
-
-
-
-  
-
-
-
-
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-  <script type="text/javascript">
-    // Popup Window;
-    var isfetched = false;
-    var isXml = true;
-    // Search DB path;
-    var search_path = "search.xml";
-    if (search_path.length === 0) {
-      search_path = "search.xml";
-    } else if (/json$/i.test(search_path)) {
-      isXml = false;
-    }
-    var path = "/chenblog.github.io/" + search_path;
-    // monitor main search box;
-
-    var onPopupClose = function (e) {
-      $('.popup').hide();
-      $('#local-search-input').val('');
-      $('.search-result-list').remove();
-      $('#no-result').remove();
-      $(".local-search-pop-overlay").remove();
-      $('body').css('overflow', '');
-    }
-
-    function proceedsearch() {
-      $("body")
-        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
-        .css('overflow', 'hidden');
-      $('.search-popup-overlay').click(onPopupClose);
-      $('.popup').toggle();
-      var $localSearchInput = $('#local-search-input');
-      $localSearchInput.attr("autocapitalize", "none");
-      $localSearchInput.attr("autocorrect", "off");
-      $localSearchInput.focus();
-    }
-
-    // search function;
-    var searchFunc = function(path, search_id, content_id) {
-      'use strict';
-
-      // start loading animation
-      $("body")
-        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
-          '<div id="search-loading-icon">' +
-          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
-          '</div>' +
-          '</div>')
-        .css('overflow', 'hidden');
-      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
-
-      $.ajax({
-        url: path,
-        dataType: isXml ? "xml" : "json",
-        async: true,
-        success: function(res) {
-          // get the contents from search data
-          isfetched = true;
-          $('.popup').detach().appendTo('.header-inner');
-          var datas = isXml ? $("entry", res).map(function() {
-            return {
-              title: $("title", this).text(),
-              content: $("content",this).text(),
-              url: $("url" , this).text()
-            };
-          }).get() : res;
-          var input = document.getElementById(search_id);
-          var resultContent = document.getElementById(content_id);
-          var inputEventFunction = function() {
-            var searchText = input.value.trim().toLowerCase();
-            var keywords = searchText.split(/[\s\-]+/);
-            if (keywords.length > 1) {
-              keywords.push(searchText);
-            }
-            var resultItems = [];
-            if (searchText.length > 0) {
-              // perform local searching
-              datas.forEach(function(data) {
-                var isMatch = false;
-                var hitCount = 0;
-                var searchTextCount = 0;
-                var title = data.title.trim();
-                var titleInLowerCase = title.toLowerCase();
-                var content = data.content.trim().replace(/<[^>]+>/g,"");
-                var contentInLowerCase = content.toLowerCase();
-                var articleUrl = decodeURIComponent(data.url);
-                var indexOfTitle = [];
-                var indexOfContent = [];
-                // only match articles with not empty titles
-                if(title != '') {
-                  keywords.forEach(function(keyword) {
-                    function getIndexByWord(word, text, caseSensitive) {
-                      var wordLen = word.length;
-                      if (wordLen === 0) {
-                        return [];
-                      }
-                      var startPosition = 0, position = [], index = [];
-                      if (!caseSensitive) {
-                        text = text.toLowerCase();
-                        word = word.toLowerCase();
-                      }
-                      while ((position = text.indexOf(word, startPosition)) > -1) {
-                        index.push({position: position, word: word});
-                        startPosition = position + wordLen;
-                      }
-                      return index;
-                    }
-
-                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
-                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
-                  });
-                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
-                    isMatch = true;
-                    hitCount = indexOfTitle.length + indexOfContent.length;
-                  }
-                }
-
-                // show search results
-
-                if (isMatch) {
-                  // sort index by position of keyword
-
-                  [indexOfTitle, indexOfContent].forEach(function (index) {
-                    index.sort(function (itemLeft, itemRight) {
-                      if (itemRight.position !== itemLeft.position) {
-                        return itemRight.position - itemLeft.position;
-                      } else {
-                        return itemLeft.word.length - itemRight.word.length;
-                      }
-                    });
-                  });
-
-                  // merge hits into slices
-
-                  function mergeIntoSlice(text, start, end, index) {
-                    var item = index[index.length - 1];
-                    var position = item.position;
-                    var word = item.word;
-                    var hits = [];
-                    var searchTextCountInSlice = 0;
-                    while (position + word.length <= end && index.length != 0) {
-                      if (word === searchText) {
-                        searchTextCountInSlice++;
-                      }
-                      hits.push({position: position, length: word.length});
-                      var wordEnd = position + word.length;
-
-                      // move to next position of hit
-
-                      index.pop();
-                      while (index.length != 0) {
-                        item = index[index.length - 1];
-                        position = item.position;
-                        word = item.word;
-                        if (wordEnd > position) {
-                          index.pop();
-                        } else {
-                          break;
-                        }
-                      }
-                    }
-                    searchTextCount += searchTextCountInSlice;
-                    return {
-                      hits: hits,
-                      start: start,
-                      end: end,
-                      searchTextCount: searchTextCountInSlice
-                    };
-                  }
-
-                  var slicesOfTitle = [];
-                  if (indexOfTitle.length != 0) {
-                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
-                  }
-
-                  var slicesOfContent = [];
-                  while (indexOfContent.length != 0) {
-                    var item = indexOfContent[indexOfContent.length - 1];
-                    var position = item.position;
-                    var word = item.word;
-                    // cut out 100 characters
-                    var start = position - 20;
-                    var end = position + 80;
-                    if(start < 0){
-                      start = 0;
-                    }
-                    if (end < position + word.length) {
-                      end = position + word.length;
-                    }
-                    if(end > content.length){
-                      end = content.length;
-                    }
-                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
-                  }
-
-                  // sort slices in content by search text's count and hits' count
-
-                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
-                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
-                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
-                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
-                      return sliceRight.hits.length - sliceLeft.hits.length;
-                    } else {
-                      return sliceLeft.start - sliceRight.start;
-                    }
-                  });
-
-                  // select top N slices in content
-
-                  var upperBound = parseInt('1');
-                  if (upperBound >= 0) {
-                    slicesOfContent = slicesOfContent.slice(0, upperBound);
-                  }
-
-                  // highlight title and content
-
-                  function highlightKeyword(text, slice) {
-                    var result = '';
-                    var prevEnd = slice.start;
-                    slice.hits.forEach(function (hit) {
-                      result += text.substring(prevEnd, hit.position);
-                      var end = hit.position + hit.length;
-                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
-                      prevEnd = end;
-                    });
-                    result += text.substring(prevEnd, slice.end);
-                    return result;
-                  }
-
-                  var resultItem = '';
-
-                  if (slicesOfTitle.length != 0) {
-                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
-                  } else {
-                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
-                  }
-
-                  slicesOfContent.forEach(function (slice) {
-                    resultItem += "<a href='" + articleUrl + "'>" +
-                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
-                      "...</p>" + "</a>";
-                  });
-
-                  resultItem += "</li>";
-                  resultItems.push({
-                    item: resultItem,
-                    searchTextCount: searchTextCount,
-                    hitCount: hitCount,
-                    id: resultItems.length
-                  });
-                }
-              })
-            };
-            if (keywords.length === 1 && keywords[0] === "") {
-              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
-            } else if (resultItems.length === 0) {
-              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
-            } else {
-              resultItems.sort(function (resultLeft, resultRight) {
-                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
-                  return resultRight.searchTextCount - resultLeft.searchTextCount;
-                } else if (resultLeft.hitCount !== resultRight.hitCount) {
-                  return resultRight.hitCount - resultLeft.hitCount;
-                } else {
-                  return resultRight.id - resultLeft.id;
-                }
-              });
-              var searchResultList = '<ul class=\"search-result-list\">';
-              resultItems.forEach(function (result) {
-                searchResultList += result.item;
-              })
-              searchResultList += "</ul>";
-              resultContent.innerHTML = searchResultList;
-            }
-          }
-
-          if ('auto' === 'auto') {
-            input.addEventListener('input', inputEventFunction);
-          } else {
-            $('.search-icon').click(inputEventFunction);
-            input.addEventListener('keypress', function (event) {
-              if (event.keyCode === 13) {
-                inputEventFunction();
-              }
-            });
-          }
-
-          // remove loading animation
-          $(".local-search-pop-overlay").remove();
-          $('body').css('overflow', '');
-
-          proceedsearch();
-        }
-      });
-    }
-
-    // handle and trigger popup window;
-    $('.popup-trigger').click(function(e) {
-      e.stopPropagation();
-      if (isfetched === false) {
-        searchFunc(path, 'local-search-input', 'local-search-result');
-      } else {
-        proceedsearch();
-      };
-    });
-
-    $('.popup-btn-close').click(onPopupClose);
-    $('.popup').click(function(e){
-      e.stopPropagation();
-    });
-    $(document).on('keyup', function (event) {
-      var shouldDismissSearchPopup = event.which === 27 &&
-        $('.search-popup').is(':visible');
-      if (shouldDismissSearchPopup) {
-        onPopupClose();
-      }
-    });
-  </script>
-
-
 
 
 
@@ -1112,23 +427,5 @@
 
   
 
-  
-
-  
-  
-
-  
-
-  
-
-  
-
-
-  <!-- 代码块复制功能 -->
-  <script type="text/javascript" src="/js/clipboard.min.js"></script>
-  <script type="text/javascript" src="/js/clipboard-use.js"></script>
 </body>
 </html>
-
-<!-- 页面点击小红心 -->
-<script type="text/javascript" src="../source/js/src/clicklove.js"></script>
