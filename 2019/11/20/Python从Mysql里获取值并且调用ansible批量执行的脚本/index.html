@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/chenblog.github.io/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/chenblog.github.io/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/chenblog.github.io/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/chenblog.github.io/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/chenblog.github.io/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/chenblog.github.io/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/chenblog.github.io/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="mysql,python2,ansible api," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="python是可以直接比较字符串的，如果模块在部署后，文件夹后缀是时间，那么可以直接比较文件名，取最大的值就是上一个版本，直接回滚之">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Python从Mysql里获取值并且调用ansible批量执行的脚本">
+<meta property="og:url" content="https://brucewayne2099.github.io/2019/11/20/Python%E4%BB%8EMysql%E9%87%8C%E8%8E%B7%E5%8F%96%E5%80%BC%E5%B9%B6%E4%B8%94%E8%B0%83%E7%94%A8ansible%E6%89%B9%E9%87%8F%E6%89%A7%E8%A1%8C%E7%9A%84%E8%84%9A%E6%9C%AC/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="python是可以直接比较字符串的，如果模块在部署后，文件夹后缀是时间，那么可以直接比较文件名，取最大的值就是上一个版本，直接回滚之">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/ansibleip3.png">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/ansibleip4.png">
+<meta property="article:published_time" content="2019-11-20T11:17:34.000Z">
+<meta property="article:modified_time" content="2019-11-20T11:39:26.000Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="mysql">
+<meta property="article:tag" content="python2">
+<meta property="article:tag" content="ansible api">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://brucewayne2099.github.io/images/ansibleip3.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/chenblog.github.io/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://brucewayne2099.github.io/2019/11/20/Python从Mysql里获取值并且调用ansible批量执行的脚本/"/>
+
+
+
+
+
+  <title>Python从Mysql里获取值并且调用ansible批量执行的脚本 | Hexo</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/chenblog.github.io/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/chenblog.github.io/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/chenblog.github.io/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://brucewayne2099.github.io/chenblog.github.io/2019/11/20/Python%E4%BB%8EMysql%E9%87%8C%E8%8E%B7%E5%8F%96%E5%80%BC%E5%B9%B6%E4%B8%94%E8%B0%83%E7%94%A8ansible%E6%89%B9%E9%87%8F%E6%89%A7%E8%A1%8C%E7%9A%84%E8%84%9A%E6%9C%AC/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/chenblog.github.io/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Python从Mysql里获取值并且调用ansible批量执行的脚本</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-11-20T19:17:34+08:00">
+                2019-11-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/chenblog.github.io/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index">
+                    <span itemprop="name">工作与技术</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+              <div class="post-description">
+                  python是可以直接比较字符串的，如果模块在部署后，文件夹后缀是时间，那么可以直接比较文件名，取最大的值就是上一个版本，直接回滚之
+              </div>
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>我们的服务器资产信息都是在购买的时候就记录在mysql里的，表结构如图：<br><img src="/images/ansibleip3.png" alt="akb48"></p>
+<p>可见我们的服务器命名都是有标准的，即<code>Ez4IP_地域缩写_模块名</code>，如果有T就是测试环境没有T就是正式环境，现在就是要从mysql里取出来对应的值然后再由ansible 2.7批量执行命令，脚本如下：<br>    <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># !/usr/bin/env python</span></span><br><span class="line"><span class="comment"># -*- coding:utf-8 -*-</span></span><br><span class="line"><span class="comment"># 作者：ChrisChan</span></span><br><span class="line"><span class="comment"># 用途：海外模块获取IP脚本，首先先从mysql数据库里获取对应IP，然后写上对应的命令，批量操作</span></span><br><span class="line"><span class="comment"># 注意！这里写死了Ez4ip_XX_xx的格式，如果有需要则自己手动更改</span></span><br><span class="line"><span class="keyword">import</span> pymysql, argparse, os, json, shutil</span><br><span class="line"><span class="keyword">from</span> collections <span class="keyword">import</span> namedtuple</span><br><span class="line"><span class="keyword">from</span> ansible.parsing.dataloader <span class="keyword">import</span> DataLoader</span><br><span class="line"><span class="keyword">from</span> ansible.vars.manager <span class="keyword">import</span> VariableManager</span><br><span class="line"><span class="keyword">from</span> ansible.inventory.manager <span class="keyword">import</span> InventoryManager</span><br><span class="line"><span class="keyword">from</span> ansible.playbook.play <span class="keyword">import</span> Play</span><br><span class="line"><span class="keyword">from</span> ansible.executor.playbook_executor <span class="keyword">import</span> PlaybookExecutor</span><br><span class="line"><span class="keyword">from</span> ansible.executor.task_queue_manager <span class="keyword">import</span> TaskQueueManager</span><br><span class="line"><span class="keyword">from</span> ansible.plugins.callback <span class="keyword">import</span> CallbackBase</span><br><span class="line"><span class="keyword">import</span> ansible.constants <span class="keyword">as</span> C</span><br><span class="line"></span><br><span class="line"><span class="comment"># 命令行参数</span></span><br><span class="line">parser = argparse.ArgumentParser(description=<span class="string">'本脚本先从mysql获取内网IP地址，然后回滚'</span>)</span><br><span class="line">parser.add_argument(<span class="string">'-i'</span>, <span class="string">'--iii'</span>, metavar=<span class="string">'目标模块名,如Ez4ip_FK_messagepushservice'</span>, required=<span class="literal">True</span>, dest=<span class="string">'hosts'</span>, nargs=<span class="string">'+'</span>, help=<span class="string">'请必须输入一个模块名，不然无法执行数据库查询'</span>)  <span class="comment"># required表示此字段一定需要,nargs=’+’ 表示至少一个参数</span></span><br><span class="line">args = parser.parse_args()</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">checkSQL</span><span class="params">(i)</span>:</span></span><br><span class="line">    <span class="comment"># 使用cursor()方法获取操作游标</span></span><br><span class="line">    cursor = db.cursor()</span><br><span class="line">    <span class="comment"># SQL 查询语句</span></span><br><span class="line">    sql = <span class="string">"select * from cloudresource_aws_instance where instance_name regexp '"</span> + i +<span class="string">"' and project_name regexp 'ez4ip';"</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        cursor.execute(sql)</span><br><span class="line">        results = cursor.fetchall()</span><br><span class="line">        <span class="comment"># 获取所有记录写到文件里，这个文件将来给ansible用</span></span><br><span class="line">        <span class="keyword">for</span> row <span class="keyword">in</span> results:</span><br><span class="line">            instance_name = row[<span class="number">3</span>]</span><br><span class="line">            instance_innerip = row[<span class="number">4</span>]</span><br><span class="line">            print(<span class="string">"instance_name=%s,instance_innerip=%s"</span> % (instance_name, instance_innerip))</span><br><span class="line">            f.write(<span class="string">'\n'</span>+instance_innerip)</span><br><span class="line">    <span class="keyword">except</span>:</span><br><span class="line">        print(<span class="string">"出现错误，mysql无法获取到数据！"</span>)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ResultCallback</span><span class="params">(CallbackBase)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    重构ansible输出</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, *args, **kwargs)</span>:</span></span><br><span class="line">        super(ResultCallback, self).__init__(*args, **kwargs)</span><br><span class="line">        self.host_ok = &#123;&#125;</span><br><span class="line">        self.host_unreachable = &#123;&#125;</span><br><span class="line">        self.host_failed = &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">v2_runner_on_ok</span><span class="params">(self, result, **kwargs)</span>:</span></span><br><span class="line">        <span class="string">"""成功"""</span></span><br><span class="line">        self.host_ok[result._host.name] = result._result[<span class="string">"stdout"</span>]</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">v2_runner_on_unreachable</span><span class="params">(self, result, **kwargs)</span>:</span></span><br><span class="line">        <span class="string">"""不可达"""</span></span><br><span class="line">        self.host_unreachable[result._host.name] = result._result[<span class="string">"msg"</span>]</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">v2_runner_on_failed</span><span class="params">(self, result, ignore_errors=False, **kwargs)</span>:</span></span><br><span class="line">        <span class="string">"""失败"""</span></span><br><span class="line">        self.host_failed[result._host.name] = result._result[<span class="string">"stderr"</span>]</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">runner</span><span class="params">(ansible_host_path, module, args)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    类似Ad-Hoc命令</span></span><br><span class="line"><span class="string">    :param ansible_host_path: 一个清单文件，一行一个ip就行</span></span><br><span class="line"><span class="string">    :param module:</span></span><br><span class="line"><span class="string">    :param args:</span></span><br><span class="line"><span class="string">    :return:</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    Options = namedtuple(<span class="string">'Options'</span>,</span><br><span class="line">                         [<span class="string">'connection'</span>,</span><br><span class="line">                          <span class="string">'module_path'</span>,</span><br><span class="line">                          <span class="string">'forks'</span>,</span><br><span class="line">                          <span class="string">'private_key_file'</span>,</span><br><span class="line">                          <span class="string">'remote_user'</span>,</span><br><span class="line">                          <span class="string">'become'</span>,</span><br><span class="line">                          <span class="string">'become_method'</span>,</span><br><span class="line">                          <span class="string">'become_user'</span>,</span><br><span class="line">                          <span class="string">'check'</span>,</span><br><span class="line">                          <span class="string">'diff'</span>])</span><br><span class="line">    options = Options(connection=<span class="string">'smart'</span>,</span><br><span class="line">                      module_path=<span class="literal">None</span>,</span><br><span class="line">                      forks=<span class="number">10</span>,</span><br><span class="line">                      private_key_file=<span class="string">"/root/.ssh/id_rsa"</span>, <span class="comment"># 你的私钥</span></span><br><span class="line">                      remote_user=<span class="string">"guest"</span>,      <span class="comment"># 远程用户</span></span><br><span class="line">                      become=<span class="literal">True</span>,</span><br><span class="line">                      become_method=<span class="string">"sudo"</span>,</span><br><span class="line">                      become_user=<span class="string">"root"</span>,	<span class="comment"># sudo的用户</span></span><br><span class="line">                      check=<span class="literal">False</span>,</span><br><span class="line">                      diff=<span class="literal">False</span>)</span><br><span class="line">    <span class="comment"># 主要加载设置的变量</span></span><br><span class="line">    loader = DataLoader()</span><br><span class="line">    <span class="comment"># 一个密码参数，可以设置为None，默认即可，没什么影响，我用的是秘钥登录</span></span><br><span class="line">    passwords = dict(vault_pass=<span class="string">'secret'</span>)</span><br><span class="line">    <span class="comment"># 结果回调</span></span><br><span class="line">    callback = ResultCallback()</span><br><span class="line">    <span class="comment"># 设置传入的机器清单</span></span><br><span class="line">    inventory = InventoryManager(loader=loader, sources=[ansible_host_path])</span><br><span class="line">    <span class="comment"># 加载之前的变量</span></span><br><span class="line">    variable_manager = VariableManager(loader=loader, inventory=inventory)</span><br><span class="line">    play_source = dict(</span><br><span class="line">            name=<span class="string">"Ansible Play"</span>,</span><br><span class="line">            hosts=<span class="string">"all"</span>,           <span class="comment"># all表示匹配清单所有机器，看源码发现的</span></span><br><span class="line">            gather_facts=<span class="string">"no"</span>,</span><br><span class="line">            tasks=[</span><br><span class="line">                dict(action=dict(module=module, args=args), register=<span class="string">'shell_out'</span>),</span><br><span class="line">             ]</span><br><span class="line">        )</span><br><span class="line">    play = Play().load(play_source, variable_manager=variable_manager, loader=loader)</span><br><span class="line"></span><br><span class="line">    tqm = <span class="literal">None</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        tqm = TaskQueueManager(</span><br><span class="line">                  inventory=inventory,</span><br><span class="line">                  variable_manager=variable_manager,</span><br><span class="line">                  loader=loader,</span><br><span class="line">                  options=options,</span><br><span class="line">                  passwords=passwords,</span><br><span class="line">                  stdout_callback=callback,</span><br><span class="line">              )</span><br><span class="line">        result = tqm.run(play)</span><br><span class="line">    <span class="keyword">finally</span>:</span><br><span class="line">        <span class="keyword">if</span> tqm <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:</span><br><span class="line">            tqm.cleanup()</span><br><span class="line">        shutil.rmtree(C.DEFAULT_LOCAL_TMP, <span class="literal">True</span>)</span><br><span class="line">    <span class="comment"># 重构输出</span></span><br><span class="line">    result_raw = &#123;<span class="string">'success'</span>: &#123;&#125;, <span class="string">'failed'</span>: &#123;&#125;, <span class="string">'unreachable'</span>: &#123;&#125;&#125;</span><br><span class="line">    <span class="keyword">for</span> host, result <span class="keyword">in</span> callback.host_ok.items():</span><br><span class="line">        result_raw[<span class="string">"success"</span>][host] = result</span><br><span class="line">    <span class="keyword">for</span> host, result <span class="keyword">in</span> callback.host_unreachable.items():</span><br><span class="line">        result_raw[<span class="string">'failed'</span>][host] = result</span><br><span class="line">    <span class="keyword">for</span> host, result <span class="keyword">in</span> callback.host_failed.items():</span><br><span class="line">        result_raw[<span class="string">'unreachable'</span>][host] = result</span><br><span class="line">    <span class="keyword">return</span> json.dumps(result_raw, indent=<span class="number">4</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 连接mysql</span></span><br><span class="line">db = pymysql.connect(<span class="string">"mysql连接地址"</span>, <span class="string">"mysql账号"</span>, <span class="string">"mysql密码"</span>, <span class="string">"database名称"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 打开文件                    </span></span><br><span class="line">f = open(<span class="string">'/home/chens/instance.txt'</span>,<span class="string">'a'</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># ansible文件所在的路径</span></span><br><span class="line">ansible_host_path = os.path.join(os.getcwd(), <span class="string">"instance.txt"</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    <span class="keyword">for</span> host <span class="keyword">in</span> args.hosts:</span><br><span class="line">		command = <span class="string">"hostname &amp;&amp; date &amp;&amp; whoami"</span></span><br><span class="line">        module = host.split(<span class="string">"_"</span>,<span class="number">2</span>)[<span class="number">2</span>]</span><br><span class="line">        print(<span class="string">"输入的参数是："</span> + host)</span><br><span class="line">        print(<span class="string">"对应的模块是："</span> + module)</span><br><span class="line">        chenchenchen = <span class="string">"cd /opt/"</span> + module +<span class="string">"/ &amp;&amp; ./stop.sh &amp;&amp; ./start.sh"</span></span><br><span class="line">        <span class="keyword">print</span> (<span class="string">"重启命令是："</span> +chenchenchen)</span><br><span class="line">        checkSQL(host)</span><br><span class="line"><span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">    print(<span class="string">"ansible批量执行出现错误，请检查！"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 关闭文件                              </span></span><br><span class="line">f.close()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 关闭数据库连接                        </span></span><br><span class="line">db.close()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 执行ansible</span></span><br><span class="line">data = runner(ansible_host_path, <span class="string">"shell"</span>, command)</span><br><span class="line">print(data)</span><br><span class="line"></span><br><span class="line">os.remove(ansible_host_path)</span><br></pre></td></tr></table></figure></p>
+<p>执行效果如下：<br><img src="/images/ansibleip4.png" alt="akb48" title="本脚本是可以执行多个组"></p>
+<p>上面的脚本里执行的是ansible语句，如果想要执行playbook，可以看一下<a href="https://blog.csdn.net/CCjedweat/article/details/88683152" target="_blank" rel="noopener">https://blog.csdn.net/CCjedweat/article/details/88683152</a> 这位大神的文章。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/chenblog.github.io/tags/mysql/" rel="tag"># mysql</a>
+          
+            <a href="/chenblog.github.io/tags/python2/" rel="tag"># python2</a>
+          
+            <a href="/chenblog.github.io/tags/ansible-api/" rel="tag"># ansible api</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/chenblog.github.io/2019/11/07/AWS%E9%85%8D%E7%BD%AE%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/" rel="next" title="AWS数据迁移到阿里云的一些坑">
+                <i class="fa fa-chevron-left"></i> AWS数据迁移到阿里云的一些坑
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/chenblog.github.io/2019/11/21/Ssh%E6%97%B6%E5%87%BA%E7%8E%B0Bad-protocol-version-identification%E7%9A%84%E5%9D%91/" rel="prev" title="解决Ssh时出现Connection closed by remote host的问题">
+                解决Ssh时出现Connection closed by remote host的问题 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/chenblog.github.io/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">293</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">categories</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">252</span>
+                  <span class="site-state-item-name">tags</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/chenblog.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/chenblog.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

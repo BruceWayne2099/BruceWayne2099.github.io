@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/chenblog.github.io/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/chenblog.github.io/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/chenblog.github.io/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/chenblog.github.io/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/chenblog.github.io/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/chenblog.github.io/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/chenblog.github.io/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="nginx,https," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="有了https，不用白不用">
+<meta property="og:type" content="article">
+<meta property="og:title" content="记录一次配置http跳转https的过程">
+<meta property="og:url" content="https://brucewayne2099.github.io/2018/01/18/%E8%AE%B0%E5%BD%95%E4%B8%80%E6%AC%A1%E9%85%8D%E7%BD%AEhttp%E8%B7%B3%E8%BD%AChttps%E7%9A%84%E8%BF%87%E7%A8%8B/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="有了https，不用白不用">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2018-01-18T09:33:31.000Z">
+<meta property="article:modified_time" content="2018-03-06T14:06:46.000Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="nginx">
+<meta property="article:tag" content="https">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/chenblog.github.io/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://brucewayne2099.github.io/2018/01/18/记录一次配置http跳转https的过程/"/>
+
+
+
+
+
+  <title>记录一次配置http跳转https的过程 | Hexo</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/chenblog.github.io/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/chenblog.github.io/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/chenblog.github.io/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://brucewayne2099.github.io/chenblog.github.io/2018/01/18/%E8%AE%B0%E5%BD%95%E4%B8%80%E6%AC%A1%E9%85%8D%E7%BD%AEhttp%E8%B7%B3%E8%BD%AChttps%E7%9A%84%E8%BF%87%E7%A8%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/chenblog.github.io/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">记录一次配置http跳转https的过程</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-01-18T17:33:31+08:00">
+                2018-01-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/chenblog.github.io/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index">
+                    <span itemprop="name">工作与技术</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+              <div class="post-description">
+                  有了https，不用白不用
+              </div>
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>公司最近搞了一个数据运营平台，这个平台会以web界面的形式把各个数据展示出来，这个项目是我们一个经理的重点关照项目。把平台模块部署完毕并且启动之后，又把这个平台服务器的外网IP绑定到<code>alkaid.lechange.com</code>这个域名上，在浏览器里输入<code>https://alkaid.lechange.com</code>,就看到了前端同行们写的网页。</p>
+<p>但是我们的霸气经理说这样不行，说要更多要求更高标准更好体验，于是乎提出一个需求就是：<font color=blue>在输入<code>alkaid.lechange.com</code>的时候会自动跳转到<code>https://alkaid.lechange.com</code>。</font></p>
+<p>既然如此，我们就在nginx上原有的<code>nginx.conf</code>里补充几个配置文件：<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">#include upstream</span><br><span class="line">include upstream.conf;</span><br><span class="line"># include servers</span><br><span class="line">include alkaid.conf;</span><br><span class="line">include alkaid-https.conf;</span><br></pre></td></tr></table></figure></p>
+<p>这样在执行<code>nginx.conf</code>的时候，就会调用<code>upstream.conf</code>、<code>alkaid.conf</code>和<code>alkaid-https.conf</code>，我们主要看一下这三个文件。</p>
+<p><code>alkaid.conf</code>文件如下：<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">       listen <span class="number">80</span>;</span><br><span class="line">       server_name *.lechange.com;</span><br><span class="line">       proxy_buffering off;</span><br><span class="line">       location / &#123;</span><br><span class="line">               rewrite ^<span class="regexp">/ https:/</span><span class="regexp">/alkaid.lechange.com permanent;</span></span><br><span class="line"><span class="regexp">               client_max_body_size 100m;</span></span><br><span class="line"><span class="regexp">   	    &#125;</span></span><br><span class="line"><span class="regexp">&#125;</span></span><br></pre></td></tr></table></figure></p>
+<p>这里我们监听了80端口，下面那个<code>client_max_body_size 100m</code>是用来设定<code>nginx+php</code>上传文件的大小，这里规定是100m，这个可以写进<code>nginx.conf</code>里，如果有对上传文件方面感兴趣，可以看<a href="http://www.cnblogs.com/zhwl/archive/2012/09/18/2690714.html" target="_blank" rel="noopener">http://www.cnblogs.com/zhwl/archive/2012/09/18/2690714.html</a> 。</p>
+<p>再来看看<code>alkaid-https.conf</code>，如下：<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">       listen <span class="number">10000</span>;</span><br><span class="line">       server_name *.lechange.com;</span><br><span class="line">       proxy_buffering off;</span><br><span class="line">       location / &#123;</span><br><span class="line">               proxy_pass http:<span class="comment">//alkaid_backend;</span></span><br><span class="line">               proxy_set_header   X-Real-IP        $remote_addr;</span><br><span class="line">               proxy_set_header   X-Forwarded-For  $proxy_add_x_forwarded_for;</span><br><span class="line">               proxy_redirect     off;</span><br><span class="line">   	    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这里监听了10000端口，<code>location</code>写的是<code>http://alkaid_backend</code>,这个<code>alkaid_backend</code>是啥东西?</p>
+<p>这个时候我们就需要看一下<code>upstream.conf</code>，里面内容是:<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">upstream alkaid_backend &#123;</span><br><span class="line">       server   X.X.X.X:JQK;</span><br><span class="line">       check interval=<span class="number">5000</span> rise=<span class="number">2</span> fall=<span class="number">5</span> timeout=<span class="number">1000</span> type=tcp default_down=<span class="literal">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>X.X.X.X是模块服务器的内网IP地址，而JQK是模块服务器的模块端口，这里要根据实际的情况来写。可见<code>alkaid_backend</code>对应的就是模块服务器和它的端口，下面是检查间隔等等数值。</p>
+<p>现在我们启动<code>nginx</code>，然后把nginx的外网地址绑定去<code>alkaid.lechange.com</code>这个域名，在浏览器里输入<code>alkaid.lechange.com</code>，就会达到自动跳转的目的了！</p>
+<p>这里要额外多说一下，我们这里设定了80的配置文件也设置了443的文件，但是这俩文件的转发过程却不同：<code>alkaid-https.conf</code>文件把443的请求转向了平台模块服务器的服务，而<code>alkaid.conf</code>文件把凡是从80端口进来的请求直接全部永久重定向到<code>https://alkaid.lechange.com</code> ，但是这个<code>alkaid.lechange.com</code>还是会去访问平台模块服务器的服务，也就是说<code>alkaid.conf</code>文件多了一步重定向。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/chenblog.github.io/tags/nginx/" rel="tag"># nginx</a>
+          
+            <a href="/chenblog.github.io/tags/https/" rel="tag"># https</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/chenblog.github.io/2018/01/18/%E5%B0%86%E7%94%B5%E5%95%86%E5%B9%B3%E5%8F%B0%E6%B5%8B%E8%AF%95%E7%8E%AF%E5%A2%83%E6%B7%BB%E5%8A%A0%E4%BA%86%E5%9F%9F%E5%90%8D%E5%92%8Chttps/" rel="next" title="将电商平台测试环境添加了域名和https">
+                <i class="fa fa-chevron-left"></i> 将电商平台测试环境添加了域名和https
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/chenblog.github.io/2018/01/22/%E9%98%B2%E7%9B%97%E9%93%BE%E7%9A%84%E7%AD%89%E7%AD%89%E7%9B%B8%E5%85%B3/" rel="prev" title="防盗链的等等相关">
+                防盗链的等等相关 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/chenblog.github.io/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">293</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">categories</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">252</span>
+                  <span class="site-state-item-name">tags</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/chenblog.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/chenblog.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

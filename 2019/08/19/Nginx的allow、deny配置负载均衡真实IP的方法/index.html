@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/chenblog.github.io/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/chenblog.github.io/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/chenblog.github.io/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/chenblog.github.io/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/chenblog.github.io/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/chenblog.github.io/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/chenblog.github.io/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="nginx,负载均衡," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="proxy_add_x_forwarded_for 比 http_x_forwarded_for 多了一个$remote_addr的值">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Nginx的allow、deny配置负载均衡真实IP的方法">
+<meta property="og:url" content="https://brucewayne2099.github.io/2019/08/19/Nginx%E7%9A%84allow%E3%80%81deny%E9%85%8D%E7%BD%AE%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E7%9C%9F%E5%AE%9EIP%E7%9A%84%E6%96%B9%E6%B3%95/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="proxy_add_x_forwarded_for 比 http_x_forwarded_for 多了一个$remote_addr的值">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/nginxV8.png">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/nginxV9.png">
+<meta property="article:published_time" content="2019-08-19T07:53:51.000Z">
+<meta property="article:modified_time" content="2019-08-26T05:56:12.000Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="nginx">
+<meta property="article:tag" content="负载均衡">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://brucewayne2099.github.io/images/nginxV8.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/chenblog.github.io/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://brucewayne2099.github.io/2019/08/19/Nginx的allow、deny配置负载均衡真实IP的方法/"/>
+
+
+
+
+
+  <title>Nginx的allow、deny配置负载均衡真实IP的方法 | Hexo</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/chenblog.github.io/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/chenblog.github.io/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/chenblog.github.io/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://brucewayne2099.github.io/chenblog.github.io/2019/08/19/Nginx%E7%9A%84allow%E3%80%81deny%E9%85%8D%E7%BD%AE%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E7%9C%9F%E5%AE%9EIP%E7%9A%84%E6%96%B9%E6%B3%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/chenblog.github.io/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Nginx的allow、deny配置负载均衡真实IP的方法</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-08-19T15:53:51+08:00">
+                2019-08-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/chenblog.github.io/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index">
+                    <span itemprop="name">工作与技术</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+              <div class="post-description">
+                  proxy_add_x_forwarded_for 比 http_x_forwarded_for 多了一个$remote_addr的值
+              </div>
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>先说一下故事背景：nginx前端有一个阿里云SLB，然后外界从443进入SLB，SLB将流量转到nginx的80端口，同时80做了一个反向代理到同机器的8082端口服务。8082服务的配置文件如下：<br><img src="/images/nginxV8.png" alt="抱光妹"></p>
+<p>但是这样的配置发现了一个问题：虽然已经<code>allow 127.0.0.1</code>，但是在浏览器里还是能正常打开<code>/status</code>界面，如图：<br><img src="/images/nginxV9.png" alt="抱光妹"></p>
+<p>原因是deny和allow后面跟着的IP都是<code>$remote_addr</code>，而我这个环境里后端8082的服务，看到的<code>$remote_addr</code>就是<code>127.0.0.1</code>，所以才会出现这样子。那么如何解决呢？</p>
+<p>一般来说遇到这种有代理的情况，我们都是用<code>http_x_forwarded_for</code>来获取后端的真实IP，但是如何让deny和allow去搭配<code>http_x_forwarded_for</code>呢？用<code>real_ip_header</code>。</p>
+<p>首先先<code>nginx -V</code>查看一下是否有<code>--with-http_realip_module</code>的模块，如果没有，那么需要重新编译nginx，如下：<br>    <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">./configure  --prefix=/etc/nginx --sbin-path=/usr/sbin/nginx --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --pid-path=/var/run/nginx.pid --lock-path=/var/run/nginx.lock --http-client-body-temp-path=/var/cache/nginx/client_temp --http-proxy-temp-path=/var/cache/nginx/proxy_temp --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp --http-scgi-temp-path=/var/cache/nginx/scgi_temp --user=nginx --group=nginx --<span class="keyword">with</span>-http_ssl_module --<span class="keyword">with</span>-http_realip_module --<span class="keyword">with</span>-http_addition_module --<span class="keyword">with</span>-http_sub_module --<span class="keyword">with</span>-http_dav_module --<span class="keyword">with</span>-http_flv_module --<span class="keyword">with</span>-http_mp4_module --<span class="keyword">with</span>-http_gunzip_module --<span class="keyword">with</span>-http_gzip_static_module --<span class="keyword">with</span>-http_random_index_module --<span class="keyword">with</span>-http_secure_link_module --<span class="keyword">with</span>-http_stub_status_module --<span class="keyword">with</span>-http_auth_request_module --<span class="keyword">with</span>-threads --<span class="keyword">with</span>-stream --<span class="keyword">with</span>-stream_ssl_module --<span class="keyword">with</span>-mail --<span class="keyword">with</span>-mail_ssl_module --<span class="keyword">with</span>-file-aio --<span class="keyword">with</span>-ipv6 --<span class="keyword">with</span>-http_spdy_module --<span class="keyword">with</span>-cc-opt=<span class="string">'-O2 -g'</span></span><br><span class="line">make &amp;&amp; make install</span><br></pre></td></tr></table></figure></p>
+<p>然后将上面文件的<code>status|ping</code>那段<code>location</code>改成如下：<br>    <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">location ~ ^/(status|ping)$ &#123;</span><br><span class="line">    real_ip_header X-Forwarded-For;</span><br><span class="line">    set_real_ip_from <span class="number">0.0</span><span class="number">.0</span><span class="number">.0</span>/<span class="number">0</span>;</span><br><span class="line">    real_ip_recursive on;</span><br><span class="line">    allow 准许访问的IP地址<span class="number">1</span>;</span><br><span class="line">    allow 准许访问的IP地址<span class="number">2</span>;</span><br><span class="line">    allow 准许访问的IP地址<span class="number">3</span>;</span><br><span class="line">    deny all;</span><br><span class="line">    fastcgi_pass <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span>:<span class="number">9000</span>;</span><br><span class="line">    include fastcgi.conf;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>解释一下语法：</p>
+<ol>
+<li><code>real_ip_header X-Forwarded-For</code>表示从哪个header头检索出要的IP地址；</li>
+<li><code>set_real_ip_from</code>真实服务器上一级代理的IP地址或者IP段，不过经过我的反复试验，发现这个代理地址无法确定。不过我胆子大，写了<code>0.0.0.0/0</code>，这代表所有转发的IP都会被承认；</li>
+<li><code>real_ip_recursive</code>的用途：递归的去除所配置中的可信IP，排除<code>set_real_ip_from</code>里面出现的IP。如果出现了未出现这些IP段的IP，那么这个IP将被认为是用户的IP；</li>
+</ol>
+<p>重启nginx之后，就OK了。</p>
+<p>不过问题还是有两个：</p>
+<ol>
+<li><code>http_x_forwarded_for</code>是可以伪造的，因为这个值是通过获取HTTP头的<code>X_FORWARDED_FOR</code>属性取得，那有没有比它更准确的方法？</li>
+<li><code>set_real_ip_from</code>后面填写的IP究竟是不是<code>http_x_forwarded_for</code>多个IP后面的值？</li>
+</ol>
+<p><a href="https://blog.51cto.com/wks97/2084302" target="_blank" rel="noopener">https://blog.51cto.com/wks97/2084302</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/chenblog.github.io/tags/nginx/" rel="tag"># nginx</a>
+          
+            <a href="/chenblog.github.io/tags/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" rel="tag"># 负载均衡</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/chenblog.github.io/2019/08/06/%E4%BD%BF%E7%94%A8shell%E5%81%9A%E4%B8%80%E4%B8%AA%E8%B7%B3%E6%9D%BF%E6%9C%BA%E8%8F%9C%E5%8D%95/" rel="next" title="使用Shell做一个跳板机菜单">
+                <i class="fa fa-chevron-left"></i> 使用Shell做一个跳板机菜单
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/chenblog.github.io/2019/08/21/Gitlab%E6%90%AD%E9%85%8DGitlab-runner%E5%AE%9E%E7%8E%B0%E6%B5%81%E6%B0%B4%E8%87%AA%E5%8A%A8%E5%8C%96%E9%83%A8%E7%BD%B2/" rel="prev" title="Gitlab搭配Gitlab-runner实现流水线自动化部署">
+                Gitlab搭配Gitlab-runner实现流水线自动化部署 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/chenblog.github.io/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">293</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">categories</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">252</span>
+                  <span class="site-state-item-name">tags</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/chenblog.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/chenblog.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/chenblog.github.io/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/chenblog.github.io/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/chenblog.github.io/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/chenblog.github.io/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/chenblog.github.io/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/chenblog.github.io/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/chenblog.github.io/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="django,python,html," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="使用唯一标识符将后台数据库对应输出">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Django前端输入变量通过内部脚本加工返回前端展示之二">
+<meta property="og:url" content="https://brucewayne2099.github.io/2018/09/18/Django%E9%80%9A%E8%BF%87%E5%94%AF%E4%B8%80%E6%A0%87%E8%AF%86%E7%AC%A6%E5%B0%86%E5%90%8E%E5%8F%B0%E6%95%B0%E6%8D%AE%E5%BA%93%E5%AF%B9%E5%BA%94%E8%BE%93%E5%87%BA/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="使用唯一标识符将后台数据库对应输出">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/django12.png">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/django13.gif">
+<meta property="article:published_time" content="2018-09-18T11:18:51.000Z">
+<meta property="article:modified_time" content="2018-11-29T13:42:28.000Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="django">
+<meta property="article:tag" content="python">
+<meta property="article:tag" content="html">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://brucewayne2099.github.io/images/django12.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/chenblog.github.io/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://brucewayne2099.github.io/2018/09/18/Django通过唯一标识符将后台数据库对应输出/"/>
+
+
+
+
+
+  <title>Django前端输入变量通过内部脚本加工返回前端展示之二 | Hexo</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/chenblog.github.io/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/chenblog.github.io/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/chenblog.github.io/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://brucewayne2099.github.io/chenblog.github.io/2018/09/18/Django%E9%80%9A%E8%BF%87%E5%94%AF%E4%B8%80%E6%A0%87%E8%AF%86%E7%AC%A6%E5%B0%86%E5%90%8E%E5%8F%B0%E6%95%B0%E6%8D%AE%E5%BA%93%E5%AF%B9%E5%BA%94%E8%BE%93%E5%87%BA/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/chenblog.github.io/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Django前端输入变量通过内部脚本加工返回前端展示之二</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-09-18T19:18:51+08:00">
+                2018-09-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/chenblog.github.io/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index">
+                    <span itemprop="name">工作与技术</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+              <div class="post-description">
+                  使用唯一标识符将后台数据库对应输出
+              </div>
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="背景说明"><a href="#背景说明" class="headerlink" title="背景说明"></a>背景说明</h2><p>python：<code>3.6.5</code><br>Django：<code>2.1.1</code><br>Project：<code>Kubernetes</code>，文件夹路径就是<code>/django/Kubernetes/</code><br>App：<code>createyaml</code>，文件夹路径就是<code>/django/Kubernetes/createyaml</code><br>前文地址：<a href="https://rorschachchan.github.io/2018/09/13/Django%E5%88%B6%E4%BD%9C%E5%89%8D%E7%AB%AF%E9%A1%B5%E9%9D%A2%E7%94%9F%E6%88%90yaml%E6%96%87%E4%BB%B6%E4%B9%8B%E6%94%B9%E8%BF%9B%E7%89%88/" target="_blank" rel="noopener">https://rorschachchan.github.io/2018/09/13/Django%E5%88%B6%E4%BD%9C%E5%89%8D%E7%AB%AF%E9%A1%B5%E9%9D%A2%E7%94%9F%E6%88%90yaml%E6%96%87%E4%BB%B6%E4%B9%8B%E6%94%B9%E8%BF%9B%E7%89%88/</a></p>
+<h2 id="sqlite3的用法"><a href="#sqlite3的用法" class="headerlink" title="sqlite3的用法"></a>sqlite3的用法</h2><p><code>sqlite</code>是django默认的数据库，如果只是存一点简单的数据，那么它是足够胜任的。如果在django的APP文件夹里配置了<code>models.py</code>而且执行了<code>python manage.py makemigrations</code>和<code>python manage.py migrate</code>的话，那么在project的文件夹里是会生成<code>db.sqlite3</code>这个文件的。至于如何命令行操作sqlite和python调用sqlite，请去看：<a href="http://blog.51cto.com/zengestudy/1904680" target="_blank" rel="noopener">http://blog.51cto.com/zengestudy/1904680</a> ，里面说的已经很清楚了。</p>
+<p>不过要注意的是<code>execute</code>方法得到的是一个对象，是看不到具体的sql结果。还需要<code>fetchall</code>方法进一步的解析，这样得到的是一个列表，然后取其中的具体元素，如图：<br><img src="/images/django12.png" alt="paradin"></p>
+<h2 id="使用唯一标识符"><a href="#使用唯一标识符" class="headerlink" title="使用唯一标识符"></a>使用唯一标识符</h2><p>由于yaml的参数是从前端传入的，如果同时有多个人传入数据，那么后端脚本在取参数就会出现错误：<strong>多个人在传入不同的数据之后得到的结果却是一样的，即服务器接收到的最后那个数据返回的结果</strong>。为了不出现这样的混乱，所以我们就要引入唯一标识符保证每个人得到都是他们的结果。</p>
+<p>在数据库里是有一个主键的也就是<code>id</code>，它是django生成数据库的时候自带的<code>private key</code>，每一个id都是唯一的，既然唯一那肯定就是我们选做唯一标识符的首选。至于怎么用它，其实就是在原有的<code>views.py</code>上做一点小手脚。如下：<br>    <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.shortcuts <span class="keyword">import</span> render</span><br><span class="line"><span class="keyword">from</span> django.http <span class="keyword">import</span> HttpResponse</span><br><span class="line">from .models import parameter		#引入同级的modes.py里的parameter类</span><br><span class="line"></span><br><span class="line">def create_yaml(request):</span><br><span class="line">    return render(request,'create_yaml.html')	#这个页面是用来输入各值</span><br><span class="line"></span><br><span class="line">def get_yaml(request):</span><br><span class="line">    if request.method == 'POST':		#如果是post传参，那么就记录下来</span><br><span class="line">        apiVersion = request.POST.get(<span class="string">'apiVersion'</span>,<span class="string">'v1'</span>)</span><br><span class="line">        kind = request.POST.get(<span class="string">'kind'</span>,<span class="string">'RC'</span>)</span><br><span class="line">        name = request.POST.get(<span class="string">'name'</span>)</span><br><span class="line">        replicas = request.POST.get(<span class="string">'replicas'</span>,<span class="string">'1'</span>)</span><br><span class="line">        labels_app = request.POST.get(<span class="string">'labels_app'</span>,None)</span><br><span class="line">		containers_name = request.POST.get(<span class="string">'containers_name'</span>,None)</span><br><span class="line">		containers_image = request.POST.get(<span class="string">'containers_image'</span>,None)</span><br><span class="line">		containerPort1 = request.POST.get(<span class="string">'containerPort1'</span>,None)</span><br><span class="line">		containerPort2 = request.POST.get(<span class="string">'containerPort2'</span>,None)</span><br><span class="line">       	containers_name2 = request.POST.get(<span class="string">'containers_name2'</span>,None)</span><br><span class="line">       	containers_image2 = request.POST.get(<span class="string">'containers_image2'</span>,None)</span><br><span class="line">       	containerPort2_1 = request.POST.get(<span class="string">'containerPort2_1'</span>,None)</span><br><span class="line">       	containerPort2_2 = request.POST.get(<span class="string">'containerPort2_2'</span>,None)</span><br><span class="line">       	signer = request.POST.get(<span class="string">'signer'</span>, <span class="string">'Micheal Jackson'</span>)</span><br><span class="line">   	<span class="keyword">else</span>:</span><br><span class="line">       	<span class="keyword">return</span> HttpResponse(<span class="string">'404'</span>)</span><br><span class="line"></span><br><span class="line">   	Parameter = parameter()		#将parameter实例化</span><br><span class="line">   	Parameter.apiVersion = apiVersion	#把刚刚从前端得到的值对应赋值</span><br><span class="line">   	Parameter.kind = kind</span><br><span class="line">   	Parameter.name = name</span><br><span class="line">   	Parameter.replicas = replicas</span><br><span class="line">   	Parameter.labels_app = labels_app</span><br><span class="line">   	Parameter.containers_name = containers_name</span><br><span class="line">   	Parameter.containers_image = containers_image</span><br><span class="line">   	Parameter.containerPort1 = containerPort1</span><br><span class="line">   	Parameter.containerPort2 = containerPort2</span><br><span class="line">   	Parameter.containers_name2 = containers_name2</span><br><span class="line">   	Parameter.containers_image2 = containers_image2</span><br><span class="line">   	Parameter.containerPort2_1 = containerPort2_1</span><br><span class="line">   	Parameter.containerPort2_2 = containerPort2_2</span><br><span class="line">   	Parameter.save()        #保存修改</span><br><span class="line"></span><br><span class="line">   	yaml = parameter.objects.get(id=Parameter.id)	#通过object.get方法是得到保存的所有值，但是我们只要本次的值，也就是id与private key一致的</span><br><span class="line">   	return HttpResponse('api版本:%s yaml类型:%s yaml名称:%s 副本数量:%s yaml所属APP:%s 容器名称:%s 容器镜像名:%s'  % (yaml.apiVersion,yaml.kind,yaml.name,yaml.replicas,yaml.labels_app,yaml.containers_name,yaml.containers_image)))		#输出部分刚输入的值到页面，检查一下是否正确</span><br></pre></td></tr></table></figure></p>
+<p><code>urls.py</code>如下：<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.contrib <span class="keyword">import</span> admin</span><br><span class="line"><span class="keyword">from</span> django.urls <span class="keyword">import</span> path</span><br><span class="line"><span class="keyword">from</span> createyaml <span class="keyword">import</span> views</span><br><span class="line"></span><br><span class="line">urlpatterns = [</span><br><span class="line">    path(<span class="string">'admin/'</span>, admin.site.urls),</span><br><span class="line">    path(r<span class="string">'create_yaml/'</span>, views.create_yaml),</span><br><span class="line">    path(r<span class="string">'get_yaml/'</span>, views.get_yaml),</span><br><span class="line">]</span><br></pre></td></tr></table></figure></p>
+<p>启动django，在前端页面测试一下看看是否得到的结果就是本次输入的结果，如图：<br><img src="/images/django13.gif" alt="paradin"></p>
+<p>可以看到，返回的页面正确的输出了本次各个参数！剩下还有三部分：</p>
+<ol>
+<li>做一个python脚本，把脚本加工的结果返回到前端；</li>
+<li>用css/js把界面加工一下；</li>
+<li>加入javascript，在前端输入的时候判断输入值是否合法；</li>
+</ol>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="http://blog.51cto.com/lannyma/1735751" target="_blank" rel="noopener">http://blog.51cto.com/lannyma/1735751</a><br><a href="http://www.liujiangblog.com/course/django/152" target="_blank" rel="noopener">http://www.liujiangblog.com/course/django/152</a><br><a href="https://www.jianshu.com/p/46188b39eae5" target="_blank" rel="noopener">https://www.jianshu.com/p/46188b39eae5</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/chenblog.github.io/tags/django/" rel="tag"># django</a>
+          
+            <a href="/chenblog.github.io/tags/python/" rel="tag"># python</a>
+          
+            <a href="/chenblog.github.io/tags/html/" rel="tag"># html</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/chenblog.github.io/2018/09/17/%E8%B0%83%E7%94%A8%E9%98%BF%E9%87%8C%E4%BA%91api%E5%8E%BB%E4%BF%AE%E6%94%B9%E5%9F%9F%E5%90%8D/" rel="next" title="调用阿里云api去修改域名对应IP">
+                <i class="fa fa-chevron-left"></i> 调用阿里云api去修改域名对应IP
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/chenblog.github.io/2018/09/25/Django%E5%B0%86%E6%9F%90%E4%B8%AA%E6%95%B0%E6%8D%AE%E5%BA%93%E5%AD%97%E6%AE%B5%E7%BB%99%E5%A4%9A%E4%B8%AAapp%E4%BD%BF%E7%94%A8/" rel="prev" title="Django将某个数据库字段给多个app使用">
+                Django将某个数据库字段给多个app使用 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/chenblog.github.io/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">293</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">categories</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">252</span>
+                  <span class="site-state-item-name">tags</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#背景说明"><span class="nav-number">1.</span> <span class="nav-text">背景说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sqlite3的用法"><span class="nav-number">2.</span> <span class="nav-text">sqlite3的用法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用唯一标识符"><span class="nav-number">3.</span> <span class="nav-text">使用唯一标识符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">4.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/chenblog.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/chenblog.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

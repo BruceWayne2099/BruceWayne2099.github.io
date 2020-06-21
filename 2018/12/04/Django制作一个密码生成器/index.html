@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/chenblog.github.io/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/chenblog.github.io/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/chenblog.github.io/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/chenblog.github.io/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/chenblog.github.io/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/chenblog.github.io/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/chenblog.github.io/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="django,Jquery,Ajax," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="开启随时检查，制作一个更加友好的密码生成器页面">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Django前端输入变量通过内部脚本加工返回前端展示之七">
+<meta property="og:url" content="https://brucewayne2099.github.io/2018/12/04/Django%E5%88%B6%E4%BD%9C%E4%B8%80%E4%B8%AA%E5%AF%86%E7%A0%81%E7%94%9F%E6%88%90%E5%99%A8/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="开启随时检查，制作一个更加友好的密码生成器页面">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/django28.png">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/django29.gif">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/django30.gif">
+<meta property="article:published_time" content="2018-12-04T06:23:03.000Z">
+<meta property="article:modified_time" content="2018-12-05T02:53:52.000Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="django">
+<meta property="article:tag" content="Jquery">
+<meta property="article:tag" content="Ajax">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://brucewayne2099.github.io/images/django28.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/chenblog.github.io/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://brucewayne2099.github.io/2018/12/04/Django制作一个密码生成器/"/>
+
+
+
+
+
+  <title>Django前端输入变量通过内部脚本加工返回前端展示之七 | Hexo</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/chenblog.github.io/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/chenblog.github.io/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/chenblog.github.io/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://brucewayne2099.github.io/chenblog.github.io/2018/12/04/Django%E5%88%B6%E4%BD%9C%E4%B8%80%E4%B8%AA%E5%AF%86%E7%A0%81%E7%94%9F%E6%88%90%E5%99%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/chenblog.github.io/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Django前端输入变量通过内部脚本加工返回前端展示之七</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-12-04T14:23:03+08:00">
+                2018-12-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/chenblog.github.io/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index">
+                    <span itemprop="name">工作与技术</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+              <div class="post-description">
+                  开启随时检查，制作一个更加友好的密码生成器页面
+              </div>
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="背景说明"><a href="#背景说明" class="headerlink" title="背景说明"></a>背景说明</h2><p>python：<code>3.6.5</code><br>Django：<code>2.1.1</code><br>Project：<code>Kubernetes</code>，文件夹路径就是<code>/django/Kubernetes/</code><br>App：<code>createyaml</code>，文件夹路径就是<code>/django/Kubernetes/createyaml</code><br>前文地址：<a href="https://rorschachchan.github.io/2018/12/03/%E9%A1%B5%E9%9D%A2%E5%B1%80%E9%83%A8%E5%88%B7%E6%96%B0%E5%BE%97%E5%88%B0AES%E5%8A%A0%E5%AF%86%E5%80%BC/" target="_blank" rel="noopener">https://rorschachchan.github.io/2018/12/03/%E9%A1%B5%E9%9D%A2%E5%B1%80%E9%83%A8%E5%88%B7%E6%96%B0%E5%BE%97%E5%88%B0AES%E5%8A%A0%E5%AF%86%E5%80%BC/</a></p>
+<h2 id="secrets模块"><a href="#secrets模块" class="headerlink" title="secrets模块"></a>secrets模块</h2><p>这个<code>secrets</code>模块是<code>Python 3.6</code>才有的模块，在说它之前，先看一下<code>string.ascii_letters</code>和<code>string.digits</code>，其中<code>ascii_letters</code>是生成所有字母，即a-z和A-Z,而<code>digits</code>是生成所有数字，即0-9,如下：<br><img src="/images/django28.png" alt="akb48"></p>
+<p>那么他俩搭配<code>secrets</code>模块就可以生成密码，代码如下：<br>    <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> secrets,string</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>characters = string.ascii_letters + string.digits + <span class="string">"!@#$%^&amp;*()&#123;&#125;[]~"</span>     <span class="comment">#加入特殊符号</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>password = <span class="string">''</span>.join(secrets.choice(characters) <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">20</span>))    <span class="comment">#生成一个20位的随机字符串</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>password</span><br><span class="line"><span class="string">'a%45BW5bxFlN3ylr!!IE'</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>password = <span class="string">''</span>.join(secrets.choice(characters) <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">10</span>))     <span class="comment">#生成一个10位的随机字符串</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>password</span><br><span class="line"><span class="string">')vqRWYxgxs'</span></span><br></pre></td></tr></table></figure></p>
+<p>看上去<code>secrets.choice</code>和<code>random.choice</code>的效果差不多，但是还是有差别的。因为<code>random</code>模块的官方文档清楚的写着<code>该模块完全不适合用作数据加密</code>，而<code>secrets</code>模块不但可以生成安全随机数还可以生成一个笃定长度的随机字符串—-可用作令牌和安全URL。</p>
+<p>所以与<code>random</code>模块中的默认伪随机数生成器相比，我们应该优先使用<code>secrets</code>模块！</p>
+<h2 id="后台检验输入值合法"><a href="#后台检验输入值合法" class="headerlink" title="后台检验输入值合法"></a>后台检验输入值合法</h2><p>之前的文章，曾经写过在django的<code>views.py</code>里判断输入值是否为空的方法，地址是<a href="https://rorschachchan.github.io/2018/09/26/Django%E4%BD%BF%E7%94%A8form%E8%A1%A8%E5%8D%95%E5%88%A4%E6%96%AD%E8%BE%93%E5%85%A5%E5%80%BC%E6%98%AF%E5%90%A6%E5%90%88%E6%B3%95/" target="_blank" rel="noopener">https://rorschachchan.github.io/2018/09/26/Django%E4%BD%BF%E7%94%A8form%E8%A1%A8%E5%8D%95%E5%88%A4%E6%96%AD%E8%BE%93%E5%85%A5%E5%80%BC%E6%98%AF%E5%90%A6%E5%90%88%E6%B3%95/</a> ，但是那套方法毕竟还太粗糙。这一次我们可以通过<code>jQuery+Ajax</code>获取到值，然后进行一个具体的判断，看一下这个值是否是数字，如果不是数字就直接在页面提示“输入非法”，如果是数字，就不会提示。</p>
+<p>思路就是先获取到前端传来的值，然后在<code>views.py</code>里增加一个定义，如果值满足定义，就不会有动静，如果值不满足，那么就局部刷新一个页面。</p>
+<h2 id="具体代码"><a href="#具体代码" class="headerlink" title="具体代码"></a>具体代码</h2><p>路由文件<code>urls.py</code>部分如下：<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">开头略</span><br><span class="line">   path(r<span class="string">'mkpasswd/'</span>,views.make_passwd,name=<span class="string">'mkpasswd'</span>),</span><br><span class="line">   path(r<span class="string">'get_mkpasswd/'</span>,views.get_passwd,name=<span class="string">'get_passwd'</span>),</span><br></pre></td></tr></table></figure></p>
+<p>配置文件<code>views.py</code>相关部分如下：<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">开头略</span><br><span class="line"><span class="keyword">from</span> django.views.decorators.csrf <span class="keyword">import</span> csrf_exempt</span><br><span class="line"><span class="keyword">import</span> secrets,string</span><br><span class="line"></span><br><span class="line">def make_passwd(request):</span><br><span class="line">   <span class="keyword">return</span> render(request,<span class="string">'mkpasswd.html'</span>)</span><br><span class="line"></span><br><span class="line">@csrf_exempt</span><br><span class="line">def get_passwd(request):</span><br><span class="line">	characters = string.ascii_letters + string.digits + <span class="string">"!@#$%^&amp;*()~[]&#123;&#125;=+"</span></span><br><span class="line">   	<span class="keyword">if</span> request.method == <span class="string">'POST'</span>:</span><br><span class="line">       	num = request.POST.get('number',20)		#这里得到的是str格式</span><br><span class="line">       	if str.isdigit(num) is False:	#判断是否是数字</span><br><span class="line">       	    <span class="keyword">return</span>  HttpResponse(<span class="string">"输入值不合法！必须是数字！"</span>)</span><br><span class="line">       	<span class="keyword">else</span>:</span><br><span class="line">       	    result = <span class="string">''</span>.join(secrets.choice(characters) <span class="keyword">for</span> i <span class="keyword">in</span> range(int(num)))</span><br><span class="line">       	    <span class="keyword">return</span> HttpResponse(result)</span><br><span class="line">   	<span class="keyword">else</span>:</span><br><span class="line">       	pass</span><br></pre></td></tr></table></figure></p>
+<p>前端页面<code>mkpasswd.html</code>如下：<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">&#123;% extends <span class="string">'base.html'</span> %&#125;</span><br><span class="line">&#123;% block title %&#125;</span><br><span class="line">        创建密码</span><br><span class="line">&#123;% endblock %&#125;</span><br><span class="line"></span><br><span class="line">&#123;% block content %&#125;</span><br><span class="line">                &#123;% csrf_token %&#125;</span><br><span class="line">                &lt;h2&gt;创建密码&lt;<span class="regexp">/h2&gt;</span></span><br><span class="line"><span class="regexp">                &lt;h3&gt;默认密码是20位，并且带有特殊符号&lt;/</span>h3&gt;</span><br><span class="line">                密码长度：&lt;input type=<span class="string">"text"</span> id=<span class="string">"number"</span> /&gt;<span class="xml"><span class="tag">&lt;<span class="name">br</span> /&gt;</span></span></span><br><span class="line">                &lt;button&gt;生成密码&lt;<span class="regexp">/button&gt;</span></span><br><span class="line"><span class="regexp">                &lt;div id="ask"&gt;&lt;h2&gt;&lt;/</span>h2&gt;&lt;<span class="regexp">/div&gt;</span></span><br><span class="line"><span class="regexp">                &lt;script&gt;</span></span><br><span class="line"><span class="regexp">                        $(document).ready(function()&#123;</span></span><br><span class="line"><span class="regexp">                                $("button").click(function()&#123;  </span></span><br><span class="line"><span class="regexp">                                var word=document.getElementById('number').value /</span><span class="regexp">/获取输入框的值</span></span><br><span class="line"><span class="regexp">                                        $.ajax(&#123;</span></span><br><span class="line"><span class="regexp">                                        type:"POST",</span></span><br><span class="line"><span class="regexp">                                        url:"&#123;% url "get_passwd" %&#125;",              </span></span><br><span class="line"><span class="regexp">                                        data:&#123;number:word&#125;,         /</span><span class="regexp">/传递参数</span></span><br><span class="line"><span class="regexp">                                        success:function(result)&#123;$("#ask").html(result);&#125;</span></span><br><span class="line"><span class="regexp">                                        &#125;);</span></span><br><span class="line"><span class="regexp">                                &#125;);</span></span><br><span class="line"><span class="regexp">                        &#125;);</span></span><br><span class="line"><span class="regexp">                &lt;/</span>script&gt;</span><br><span class="line">&#123;% endblock %&#125;</span><br></pre></td></tr></table></figure></p>
+<p>最后整个的过程执行效果如下：<br><img src="/images/django29.gif" alt="akb48"></p>
+<h2 id="前端检验输入值合法"><a href="#前端检验输入值合法" class="headerlink" title="前端检验输入值合法"></a>前端检验输入值合法</h2><p>俗话说得好，人生不折腾不舒服斯基。为了更好的体验，现在改一下方略：在用户输入的时候，页面要随时的判断输入值，有错误就直接提醒，这样就不用在提交的时候才告诉用户“输入值非法”了，但是这样的需求就需要更改判断逻辑—-把判断的任务交给<code>jQuery</code>而不是后台，<code>jQuery</code>判断成功了，再把值提交到后台。</p>
+<p>要在输入的时候随时判断，那么就要使用<code>jQuery</code>的<code>keydown</code>功能，然后再配上<code>each</code>功能进行遍历。<code>each</code>的用法是<code>$(selector).each(function(index,element))</code>，这里<code>index</code>是选择器的<code>index</code>位置,而<code>element</code>是当前的元素，这两个元素都是必须的！</p>
+<p>那么只需要更改的是<code>mkpasswd.html</code>，内容如下：<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">&#123;% block content %&#125;</span><br><span class="line">                &#123;% csrf_token %&#125;</span><br><span class="line">                &lt;h2 style=<span class="string">"text-align:center;"</span>&gt;创建密码&lt;<span class="regexp">/h2&gt;</span></span><br><span class="line"><span class="regexp">&#123;% endblock %&#125;</span></span><br><span class="line"><span class="regexp"></span></span><br><span class="line"><span class="regexp">&#123;% block content %&#125;</span></span><br><span class="line"><span class="regexp">                &#123;% csrf_token %&#125;</span></span><br><span class="line"><span class="regexp">				&lt;div style="text-align:center;"&gt;</span></span><br><span class="line"><span class="regexp">                &lt;h2&gt;创建密码&lt;/</span>h2&gt;		<span class="comment">//增加了居中效果</span></span><br><span class="line">                &lt;h3&gt;默认密码是<span class="number">20</span>位，并且带有特殊符号&lt;<span class="regexp">/h3&gt;</span></span><br><span class="line"><span class="regexp">                &lt;div&gt;密码长度：&lt;input style="margin: 5px; padding: 10px;" type="text" id="number" /</span>&gt;<span class="xml"><span class="tag">&lt;<span class="name">br</span> /&gt;</span></span>	<span class="comment">//调整输入框的长宽</span></span><br><span class="line">                &lt;p style=<span class="string">"color: red"</span> id=<span class="string">"error"</span>&gt;&lt;<span class="regexp">/p&gt;	/</span><span class="regexp">/这里是警告出现的位置</span></span><br><span class="line"><span class="regexp">                &lt;button &gt;生成密码&lt;/</span>button&gt;</span><br><span class="line">                &lt;div id=<span class="string">"ask"</span>&gt;<span class="xml"><span class="tag">&lt;<span class="name">h2</span>&gt;</span><span class="tag">&lt;/<span class="name">h2</span>&gt;</span></span>&lt;<span class="regexp">/div&gt;	/</span><span class="regexp">/这里是结果出现的位置</span></span><br><span class="line"><span class="regexp">				&lt;/</span>div&gt;</span><br><span class="line">                &lt;script&gt;</span><br><span class="line">                        $(<span class="built_in">document</span>).ready(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">                                $(<span class="string">"#number"</span>).bind(<span class="string">'keydown'</span>,<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;		<span class="comment">//输入就开始检查</span></span><br><span class="line">                                $(<span class="string">'input'</span>).each(<span class="function"><span class="keyword">function</span>(<span class="params">i,n</span>)</span>&#123;	<span class="comment">//进行遍历</span></span><br><span class="line">                                        <span class="keyword">var</span> isnum = n.value.match(<span class="regexp">/^\d+$/g</span>);	<span class="comment">//匹配正则表达式，是否是数字</span></span><br><span class="line">                                        <span class="keyword">if</span>(<span class="literal">null</span> != isnum)&#123;                                                </span><br><span class="line">												$(n).css(<span class="string">'border'</span>,<span class="string">'2px solid green'</span>);   <span class="comment">//是数字，边框变为绿色</span></span><br><span class="line">                                                <span class="built_in">document</span>.getElementById(<span class="string">"error"</span>).innerText=<span class="string">""</span>;</span><br><span class="line">                                                &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                                                $(n).css(<span class="string">'border'</span>,<span class="string">'2px solid red'</span>);     <span class="comment">//不是数字，边框变为红色作为警告                                           </span></span><br><span class="line">												<span class="built_in">document</span>.getElementById(<span class="string">"error"</span>).innerText=<span class="string">"输入值必须是数字！"</span>;</span><br><span class="line">                                                &#125; </span><br><span class="line">                                                &#125;);</span><br><span class="line">                                               &#125;);</span><br><span class="line">                                $(<span class="string">"button"</span>).click(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;  		<span class="comment">//配置点击动作</span></span><br><span class="line">                                <span class="keyword">var</span> word=<span class="built_in">document</span>.getElementById(<span class="string">'number'</span>).value	 <span class="comment">//获取输入框的值</span></span><br><span class="line">                                        $.ajax(&#123;</span><br><span class="line">                                        type:<span class="string">"POST"</span>,</span><br><span class="line">                                        url:<span class="string">"&#123;% url "</span>get_passwd<span class="string">" %&#125;"</span>,              </span><br><span class="line">                                        data:&#123;<span class="attr">number</span>:word&#125;,         <span class="comment">//传递参数！！！！ </span></span><br><span class="line">                                        success:<span class="function"><span class="keyword">function</span>(<span class="params">result</span>)</span>&#123;$(<span class="string">"#ask"</span>).html(result);&#125;</span><br><span class="line">                                        &#125;);</span><br><span class="line">                                &#125;);</span><br><span class="line">                        &#125;);</span><br><span class="line">                &lt;<span class="regexp">/script&gt;</span></span><br><span class="line"><span class="regexp">&#123;% endblock %&#125;</span></span><br></pre></td></tr></table></figure></p>
+<p>整改之后的效果如下：<br><img src="/images/django30.gif" alt="akb48"></p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="http://www.blog.pythonlibrary.org/2017/02/16/pythons-new-secrets-module/" target="_blank" rel="noopener">http://www.blog.pythonlibrary.org/2017/02/16/pythons-new-secrets-module/</a><br><a href="https://www.cnblogs.com/yyds/p/7072492.html" target="_blank" rel="noopener">https://www.cnblogs.com/yyds/p/7072492.html</a><br><a href="http://qindongliang.iteye.com/blog/2147336" target="_blank" rel="noopener">http://qindongliang.iteye.com/blog/2147336</a><br><a href="https://segmentfault.com/q/1010000002760528" target="_blank" rel="noopener">https://segmentfault.com/q/1010000002760528</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/chenblog.github.io/tags/django/" rel="tag"># django</a>
+          
+            <a href="/chenblog.github.io/tags/Jquery/" rel="tag"># Jquery</a>
+          
+            <a href="/chenblog.github.io/tags/Ajax/" rel="tag"># Ajax</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/chenblog.github.io/2018/12/03/%E9%A1%B5%E9%9D%A2%E5%B1%80%E9%83%A8%E5%88%B7%E6%96%B0%E5%BE%97%E5%88%B0AES%E5%8A%A0%E5%AF%86%E5%80%BC/" rel="next" title="Django前端输入变量通过内部脚本加工返回前端展示之六">
+                <i class="fa fa-chevron-left"></i> Django前端输入变量通过内部脚本加工返回前端展示之六
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/chenblog.github.io/2018/12/06/Github%E5%A6%82%E4%BD%95%E5%88%A0%E9%99%A4%E6%8E%89%E4%B8%80%E4%B8%AAcommit/" rel="prev" title="Github如何删除掉一个commit">
+                Github如何删除掉一个commit <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/chenblog.github.io/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">293</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">categories</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">252</span>
+                  <span class="site-state-item-name">tags</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#背景说明"><span class="nav-number">1.</span> <span class="nav-text">背景说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#secrets模块"><span class="nav-number">2.</span> <span class="nav-text">secrets模块</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后台检验输入值合法"><span class="nav-number">3.</span> <span class="nav-text">后台检验输入值合法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#具体代码"><span class="nav-number">4.</span> <span class="nav-text">具体代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#前端检验输入值合法"><span class="nav-number">5.</span> <span class="nav-text">前端检验输入值合法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">6.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/chenblog.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/chenblog.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

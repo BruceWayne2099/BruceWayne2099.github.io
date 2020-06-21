@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/chenblog.github.io/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/chenblog.github.io/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/chenblog.github.io/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/chenblog.github.io/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/chenblog.github.io/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/chenblog.github.io/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/chenblog.github.io/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="elk,logstash,正则表达式," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="grok里匹配的message其实是整个message这个field而不是里面message那个节点！">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用Logstash的正则匹配日志格式">
+<meta property="og:url" content="https://brucewayne2099.github.io/2019/02/15/%E4%BD%BF%E7%94%A8Logstash%E7%9A%84%E6%AD%A3%E5%88%99%E5%8C%B9%E9%85%8D%E6%97%A5%E5%BF%97%E6%A0%BC%E5%BC%8F/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="grok里匹配的message其实是整个message这个field而不是里面message那个节点！">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/grok2.png">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/grok3.png">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/grok4.png">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/grok1.png">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/grok5.png">
+<meta property="article:published_time" content="2019-02-15T09:00:13.000Z">
+<meta property="article:modified_time" content="2019-02-21T09:02:32.000Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="elk">
+<meta property="article:tag" content="logstash">
+<meta property="article:tag" content="正则表达式">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://brucewayne2099.github.io/images/grok2.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/chenblog.github.io/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://brucewayne2099.github.io/2019/02/15/使用Logstash的正则匹配日志格式/"/>
+
+
+
+
+
+  <title>使用Logstash的正则匹配日志格式 | Hexo</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/chenblog.github.io/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/chenblog.github.io/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/chenblog.github.io/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://brucewayne2099.github.io/chenblog.github.io/2019/02/15/%E4%BD%BF%E7%94%A8Logstash%E7%9A%84%E6%AD%A3%E5%88%99%E5%8C%B9%E9%85%8D%E6%97%A5%E5%BF%97%E6%A0%BC%E5%BC%8F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/chenblog.github.io/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">使用Logstash的正则匹配日志格式</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-02-15T17:00:13+08:00">
+                2019-02-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/chenblog.github.io/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index">
+                    <span itemprop="name">工作与技术</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+              <div class="post-description">
+                  grok里匹配的message其实是整个message这个field而不是里面message那个节点！
+              </div>
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="牛刀小试"><a href="#牛刀小试" class="headerlink" title="牛刀小试"></a>牛刀小试</h2><p>在ELK里经常需要写正则来匹配日志里的的具体信息，这样可以在<code>kibana</code>上更加直观的观看，<code>grok</code>就是Logstash最重要的插件。你可以在grok里预定义好命名正则表达式，在稍后(grok参数或者其他正则表达式里)引用它。</p>
+<p>grok的格式是：<code>%{SYNTAX:SEMANTIC}</code>，如果需要转义就要加上<code>\</code>。具体的grok匹配规则可以在logstash查看<code>grok-patterns</code>这个文件，如图：<br><img src="/images/grok2.png" alt="akb48"></p>
+<ol>
+<li><code>SYNTAX</code>代表匹配值的类型，例如，<code>0.11</code>可以<code>NUMBER</code>类型所匹配，<code>10.222.22.25</code>可以使用<code>IP</code>匹配。</li>
+<li><code>SEMANTIC</code>表示存储该值的一个变量声明，它会存储在<code>elasticsearch</code>当中方便<code>kibana</code>做字段搜索和统计，你可以将一个<code>IP</code>定义为客户端IP地址<code>client_ip_address</code>，eg:<code>%{IP:client_ip_address}</code>，所匹配到的值就会存储到<code>client_ip_address</code>这个字段里边，类似数据库的列名。</li>
+</ol>
+<p>而检测grok正则的网站：<a href="http://grokdebug.herokuapp.com/" target="_blank" rel="noopener">http://grokdebug.herokuapp.com/</a> 。</p>
+<p>举个例子，如果日志里是：<br>    <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">100.97</span><span class="number">.73</span><span class="number">.142</span> - - [<span class="number">15</span>/Feb/<span class="number">2019</span>:<span class="number">16</span>:<span class="number">54</span>:<span class="number">24</span> +<span class="number">0800</span>]</span><br></pre></td></tr></table></figure></p>
+<p>可以看到里面有IP、日期、时间、时区，那么对比刚才的<code>grok-patterns</code>文件，就知道要匹配IP这个字段，就是用<code>IP (?:%{IPV6}|%{IPV4})</code>，IP即包含了IPV6也有IPV4，那么具体的匹配就是<code>%{IP:client}</code>，client是自己定义名称。同理，<code>[15/Feb/2019</code>这部分是日期，可以使用如下的配置规则：<br><img src="/images/grok3.png" alt="akb48"></p>
+<p>如法炮制，匹配结果就是<code>\[%{MONTHDAY:day}/%{MONTH:month}/%{YEAR:year}</code>。</p>
+<p>拿到检测网站试一下结果：<br><img src="/images/grok4.png" alt="akb48"></p>
+<p>上面那个例子比较简单，比如匹配下面这样的一个日志：<br>    <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[<span class="number">2019</span><span class="number">-02</span><span class="number">-01</span>T08:<span class="number">59</span>:<span class="number">59.124</span>] [INFO] default - [<span class="number">115.63</span><span class="number">.121</span><span class="number">.10</span> GET /wap/_nuxt/vendor<span class="number">.61</span>a8f274bce0acb0de6d.js <span class="number">200</span> <span class="number">97</span>s][https://www.lechange.com/wap/node/goodDetail/<span class="number">264</span> HTTP/<span class="number">1.1</span> Mozilla/<span class="number">5.0</span> (Linux; Android <span class="number">8.1</span>; V1818A Build/OPM1<span class="number">.171019</span><span class="number">.026</span>; wv) AppleWebKit/<span class="number">537.36</span> (KHTML, like Gecko) Version/<span class="number">4.0</span> Chrome/<span class="number">57.0</span><span class="number">.2987</span><span class="number">.132</span> MQQBrowser/<span class="number">6.2</span> TBS/<span class="number">044409</span> Mobile Safari/<span class="number">537.36</span>]</span><br></pre></td></tr></table></figure></p>
+<p>那么写法就是：<br>    <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">20%&#123;YEAR:year&#125;-%&#123;MONTHNUM:month&#125;-%&#123;MONTHDAY:day&#125;T%&#123;HOUR:hour&#125;:?%&#123;MINUTE:minutes&#125;(?::?%&#123;SECOND:second&#125;)] \[%&#123;LOGLEVEL:level&#125;\] default - \[%&#123;IP:client&#125; %&#123;WORD:method&#125; %&#123;URIPATHPARAM:request&#125; %&#123;NUMBER:status&#125; %&#123;NUMBER:duration&#125;s\]\[%&#123;DATA:data&#125;\]</span><br></pre></td></tr></table></figure></p>
+<p>效果如图:<br><img src="/images/grok1.png" alt="akb48"></p>
+<p><font color=red>但是要注意!</font>在网站上的匹配可能是OK的，但是在logstash的grok里是不可以有<code>-、&#39;、&quot;</code>等这样的字符出现，比如下面这个日志：<br>    <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">100.97</span><span class="number">.73</span><span class="number">.232</span> - - [<span class="number">15</span>/Feb/<span class="number">2019</span>:<span class="number">16</span>:<span class="number">54</span>:<span class="number">24</span> +<span class="number">0800</span>] <span class="string">"GET /public/app/site/statics/favicon.ico HTTP/1.1"</span> <span class="number">200</span> <span class="number">4286</span> <span class="string">"https://www.lechange.com/wap/"</span> <span class="string">"Mozilla/5.0 (Linux; Android 7.1.1; OPPO R11 Build/NMF26X; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/57.0.2987.132 MQQBrowser/6.2 TBS/044409 Mobile Safari/537.36 Imou"</span></span><br></pre></td></tr></table></figure></p>
+<p>虽然下面的规则是可以正确匹配的：<br>    <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">%&#123;IP:client&#125; - - \[%&#123;MONTHDAY:day&#125;/%&#123;MONTH:month&#125;/%&#123;YEAR:year&#125;:%&#123;HOUR:hour&#125;:%&#123;MINUTE:minutes&#125;:%&#123;SECOND:second&#125; \+<span class="number">0800</span>] \<span class="string">"%&#123;WORD:method&#125; %&#123;URIPATH:request&#125; HTTP/%&#123;NUMBER:httpversion&#125;"</span> %&#123;NUMBER:status&#125; %&#123;NUMBER:bytes&#125; <span class="string">"%&#123;DATA:website&#125;"</span> <span class="string">"%&#123;DATA:data&#125;"</span></span><br></pre></td></tr></table></figure></p>
+<p>但是当你把这个配置复制到logstash.conf里的时候，启动logstash就会有参数不合法的报错：<br>    <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[<span class="number">2019</span><span class="number">-02</span><span class="number">-18</span>T17:<span class="number">33</span>:<span class="number">52</span>,<span class="number">060</span>][FATAL][logstash.runner          ] The given configuration <span class="keyword">is</span> invalid. Reason: Expected one of <span class="comment">#, &#123;, -, ", ', &#125; at line 32, column 218 (byte 1226) 。</span></span><br></pre></td></tr></table></figure></p>
+<p>应该改成这样：<br>    <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">%&#123;IPORHOST:client_ip&#125; %&#123;USER:ident&#125; %&#123;USER:auth&#125; \[%&#123;HTTPDATE:timestamp&#125;\] "(?:%&#123;WORD:verb&#125; %&#123;NOTSPACE:request&#125;(?: HTTP/%&#123;NUMBER:http_version&#125;)?|-)" %&#123;NUMBER:response&#125; (?:%&#123;NUMBER:bytes&#125;|-) %&#123;QUOTEDSTRING:domain&#125; %&#123;QUOTEDSTRING:data&#125;</span><br></pre></td></tr></table></figure></p>
+<p>一般来说对于字符串，有双引号包含的用QS，没有的用DATA类型，如<code>%{DATA:request_body}</code>。</p>
+<h2 id="grok配置到logstash"><a href="#grok配置到logstash" class="headerlink" title="grok配置到logstash"></a>grok配置到logstash</h2><p>假设这个服务的日志输入到kafka里的topic叫<code>lcshop-log</code>，那么对应的logstash如下：<br>    <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">input &#123;</span><br><span class="line">        kafka&#123;</span><br><span class="line">                bootstrap_servers=&gt;"172.31.0.84:9092"	#这里写的是kafka的ip和端口</span><br><span class="line">                topics=&gt;["lcshop-log","lcshop-errorlog"]	#这里是对应的topic</span><br><span class="line">                decorate_events=&gt;"true"</span><br><span class="line">                codec=&gt;plain</span><br><span class="line">        &#125;       </span><br><span class="line">&#125;   </span><br><span class="line"></span><br><span class="line">filter &#123;</span><br><span class="line">	<span class="keyword">if</span> [@metadata][kafka][topic] == <span class="string">"lcshop-log"</span> &#123;</span><br><span class="line">      mutate &#123;</span><br><span class="line">         add_field =&gt; &#123;"[@metadata][index]" =&gt; "lcshop-log-%&#123;+YYYY-MM&#125;"&#125;</span><br><span class="line">      &#125;  </span><br><span class="line">      grok &#123;	</span><br><span class="line">         match =&gt; &#123; "message" =&gt; "%&#123;IPORHOST:client_ip&#125; %&#123;USER:ident&#125; %&#123;USER:auth&#125; \[%&#123;HTTPDATE:timestamp&#125;\] \"(?:%&#123;WORD:verb&#125; %&#123;NOTSPACE:request&#125;(?: HTTP/%&#123;NUMBER:http_version&#125;)?|-)\" %&#123;NUMBER:response&#125; (?:%&#123;NUMBER:bytes&#125;|-) %&#123;QUOTEDSTRING:domain&#125; %&#123;QUOTEDSTRING:data&#125;"&#125;</span><br><span class="line">         remove_field =&gt; ["message"]</span><br><span class="line">		<span class="comment">#这里对双引号增加了转义符</span></span><br><span class="line">      &#125;</span><br><span class="line">   &#125; <span class="keyword">else</span> <span class="keyword">if</span> [@metadata][kafka][topic] == <span class="string">"lcshop-errorlog"</span> &#123;</span><br><span class="line">      mutate &#123;</span><br><span class="line">         add_field =&gt; &#123;"[@metadata][index]" =&gt; "lcshop-errorlog-%&#123;+YYYY-MM&#125;"&#125;</span><br><span class="line">      &#125;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">output &#123;</span><br><span class="line">    stdout &#123;</span><br><span class="line">               codec =&gt; rubydebug		#日志输出，这个看情况开启，生成日志量非常可观！</span><br><span class="line">       &#125;</span><br><span class="line">       elasticsearch &#123;</span><br><span class="line">               hosts=&gt;["172.31.0.76:9200"]		#这里是es的ip和端口</span><br><span class="line">               index=&gt;"%&#123;[@metadata][index]&#125;"		#这里对不同的topic分配不同的index</span><br><span class="line">       &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>然后去kibana里查看结果,然而会发现这是失败的。</p>
+<p>为什么明明在grok的测试网站里通过了，但是在实际的kibana里却失败？这是因为在kibana里会自动给双引号添加一个转义符！正式因为多了这个转义符，所以整段正则都不匹配了，自然grok无法生效了。</p>
+<p>这个时候需要改成这样：<br>    <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">%&#123;IPORHOST:clientip&#125; - %&#123;NOTSPACE:remote_user&#125; \[%&#123;HTTPDATE:timestamp&#125;\] \\<span class="string">"%&#123;DATA:request&#125;\\"</span> %&#123;NUMBER:response&#125; %&#123;NUMBER:bytes&#125; %&#123;DATA:data&#125; \\<span class="string">"%&#123;DATA:detail&#125;\\"</span></span><br></pre></td></tr></table></figure></p>
+<p>重启logstash之后，再去kibana里看结果：<br><img src="/images/grok5.png" alt="akb48"></p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://doc.yonyoucloud.com/doc/logstash-best-practice-cn/filter/date.html" target="_blank" rel="noopener">https://doc.yonyoucloud.com/doc/logstash-best-practice-cn/filter/date.html</a><br><a href="https://segmentfault.com/q/1010000003801260" target="_blank" rel="noopener">https://segmentfault.com/q/1010000003801260</a><br><a href="https://www.cnblogs.com/Orgliny/p/5592186.html" target="_blank" rel="noopener">https://www.cnblogs.com/Orgliny/p/5592186.html</a><br><a href="http://kuring.me/post/elk_nginx/" target="_blank" rel="noopener">http://kuring.me/post/elk_nginx/</a><br><a href="http://blog.51cto.com/seekerwolf/2106509" target="_blank" rel="noopener">http://blog.51cto.com/seekerwolf/2106509</a><br><a href="http://blog.51cto.com/liqingbiao/1928653" target="_blank" rel="noopener">http://blog.51cto.com/liqingbiao/1928653</a><br><a href="https://www.jianshu.com/p/d46b911fb83e" target="_blank" rel="noopener">https://www.jianshu.com/p/d46b911fb83e</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/chenblog.github.io/tags/elk/" rel="tag"># elk</a>
+          
+            <a href="/chenblog.github.io/tags/logstash/" rel="tag"># logstash</a>
+          
+            <a href="/chenblog.github.io/tags/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F/" rel="tag"># 正则表达式</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/chenblog.github.io/2019/02/13/Linux%E8%BF%90%E7%BB%B4%E5%B7%A5%E7%A8%8B%E5%B8%88%E7%AC%94%E8%AF%95%E9%A2%98%E7%AC%AC%E5%8D%81%E5%85%AD%E5%A5%97/" rel="next" title="Linux运维工程师笔试题第十六套">
+                <i class="fa fa-chevron-left"></i> Linux运维工程师笔试题第十六套
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/chenblog.github.io/2019/02/19/Linux%E8%BF%90%E7%BB%B4%E5%B7%A5%E7%A8%8B%E5%B8%88%E7%AC%94%E8%AF%95%E9%A2%98%E7%AC%AC%E5%8D%81%E4%B8%83%E5%A5%97/" rel="prev" title="Linux运维工程师笔试题第十七套">
+                Linux运维工程师笔试题第十七套 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/chenblog.github.io/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">293</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">categories</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">252</span>
+                  <span class="site-state-item-name">tags</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#牛刀小试"><span class="nav-number">1.</span> <span class="nav-text">牛刀小试</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#grok配置到logstash"><span class="nav-number">2.</span> <span class="nav-text">grok配置到logstash</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">3.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/chenblog.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/chenblog.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

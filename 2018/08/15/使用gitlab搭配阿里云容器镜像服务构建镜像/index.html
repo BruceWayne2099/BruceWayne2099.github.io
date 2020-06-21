@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/chenblog.github.io/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/chenblog.github.io/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/chenblog.github.io/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/chenblog.github.io/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/chenblog.github.io/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/chenblog.github.io/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/chenblog.github.io/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="gitlab,持续集成,阿里云,docker镜像," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="出去参加交流才发现，我们的运维简直就是手工作坊...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用gitlab搭配阿里云容器镜像服务构建镜像">
+<meta property="og:url" content="https://brucewayne2099.github.io/2018/08/15/%E4%BD%BF%E7%94%A8gitlab%E6%90%AD%E9%85%8D%E9%98%BF%E9%87%8C%E4%BA%91%E5%AE%B9%E5%99%A8%E9%95%9C%E5%83%8F%E6%9C%8D%E5%8A%A1%E6%9E%84%E5%BB%BA%E9%95%9C%E5%83%8F/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="出去参加交流才发现，我们的运维简直就是手工作坊...">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/aliyungitlab7.png">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/aliyungitlab1.png">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/aliyungitlab2.png">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/aliyungitlab3.png">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/aliyungitlab4.png">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/aliyungitlab5.png">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/aliyungitlab8.png">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/aliyungitlab6.png">
+<meta property="article:published_time" content="2018-08-15T02:15:44.000Z">
+<meta property="article:modified_time" content="2018-08-23T06:42:56.000Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="gitlab">
+<meta property="article:tag" content="持续集成">
+<meta property="article:tag" content="阿里云">
+<meta property="article:tag" content="docker镜像">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://brucewayne2099.github.io/images/aliyungitlab7.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/chenblog.github.io/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://brucewayne2099.github.io/2018/08/15/使用gitlab搭配阿里云容器镜像服务构建镜像/"/>
+
+
+
+
+
+  <title>使用gitlab搭配阿里云容器镜像服务构建镜像 | Hexo</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/chenblog.github.io/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/chenblog.github.io/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/chenblog.github.io/archives/%20" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://brucewayne2099.github.io/chenblog.github.io/2018/08/15/%E4%BD%BF%E7%94%A8gitlab%E6%90%AD%E9%85%8D%E9%98%BF%E9%87%8C%E4%BA%91%E5%AE%B9%E5%99%A8%E9%95%9C%E5%83%8F%E6%9C%8D%E5%8A%A1%E6%9E%84%E5%BB%BA%E9%95%9C%E5%83%8F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/chenblog.github.io/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">使用gitlab搭配阿里云容器镜像服务构建镜像</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-08-15T10:15:44+08:00">
+                2018-08-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/chenblog.github.io/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index">
+                    <span itemprop="name">工作与技术</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+              <div class="post-description">
+                  出去参加交流才发现，我们的运维简直就是手工作坊...
+              </div>
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="工作思路"><a href="#工作思路" class="headerlink" title="工作思路"></a>工作思路</h2><p>本次北京AWS技术峰会里看到了很多公司在运维上使用容器部署和扩容的实例，一天下来感受良多。现在比较流行部署办法就是“云镜像”：<strong>即开发把新的代码提交到gitlab上，然后gitlab与云厂家的镜像服务相关联，然后每一次commit提交都会触发一次镜像的构建，然后再根据这个镜像部署到实际的服务器里，同时将此服务器作一个快照，同时再搭配上容器监控，如果服务吃紧，就用此快照购买实例扩容；如果服务闲余，那么也会自动将最老的服务器实例关机，进而释放退款。</strong></p>
+<p>用图像来说就是这个意思：<br><img src="/images/aliyungitlab7.png" alt="paradin" title="也可以gitlab触发jenkins，用jenkins构建镜像并且把镜像推送到阿里云容器仓库去"></p>
+<h2 id="勾连gitlab与云镜像"><a href="#勾连gitlab与云镜像" class="headerlink" title="勾连gitlab与云镜像"></a>勾连gitlab与云镜像</h2><p>本文使用的镜像厂家是阿里云，gitlab版本是<code>10.7.3</code>。</p>
+<p>进入阿里云的“容器镜像”页面，如果你是第一次使用这个产品需要先建立一个仓库密码，然后点击左侧的代码源，如图：<br><img src="/images/aliyungitlab1.png" alt="paradin"></p>
+<p>在gitlab地方选择“绑定账号”，就需要填写对应的栏目：<br><img src="/images/aliyungitlab2.png" alt="paradin"></p>
+<p>前两项很好写，最后一个token需要在gitlab里创建：在gitlab的页面，点击个人的头像，然后<code>settings</code>—<code>Access Tokens</code>，填写好名字（生产环境一般都是填运维的账号）然后在<code>api</code>处打勾，生成的那个东东就是token，直接复制填写到阿里云的页面即可。如图：<br><img src="/images/aliyungitlab3.png" alt="paradin"></p>
+<h2 id="配置镜像仓库"><a href="#配置镜像仓库" class="headerlink" title="配置镜像仓库"></a>配置镜像仓库</h2><p>在阿里云容器镜像界面点击“创建镜像仓库”，填写好名字摘要仓库类型之后，在代码源里选择gitlab，由于刚刚填写了token所以是可以看得到gitlab用户下所有的project名的，如图：<br><img src="/images/aliyungitlab4.png" alt="paradin"></p>
+<p>然后点击新创建的那个仓库，在构建一栏默认已经选择好了“代码变更时自动构建镜像”，点击“添加规则”，如图：<br><img src="/images/aliyungitlab5.png" alt="paradin"></p>
+<p>这里我选择了master分支，然后指明了dockerfile文件名和路径，最后版本号就先写一个version，这个可以通过gitlab在commit时特殊指定。</p>
+<p>右侧栏里的Webhook是用来发送提示的，可以在钉钉里创建一个机器人，在创建机器人时会生成webhook，然后把机器人的webhook添加到这个webhook即可。如果在添加的时候提示“当前请求失败，请重试”，这个情况是因为Webhook的名称里有中文，要全英文才可以。<br><img src="/images/aliyungitlab8.png" alt="paradin"></p>
+<h2 id="编写dockerfile"><a href="#编写dockerfile" class="headerlink" title="编写dockerfile"></a>编写dockerfile</h2><p>如果没有dockerfile是无法构建镜像的，于是就在上面“规则”的目录里创建对应的dockerfile文件，<font color=red>注意!“规则”里的根目录就是代码文件夹的顶目录，而不是整个服务器的根目录</font>。写dockerfile的基础知识和语法这里不多说了，网络上有的是，我就随便写一个nginx dockerfile，内容如下：<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">############################################################</span><br><span class="line"># Dockerfile to build Nginx container images</span><br><span class="line"># Based on Debian</span><br><span class="line">############################################################</span><br><span class="line">FROM    debian:latest</span><br><span class="line">MAINTAINER      ChrisChan <span class="string">"Chris@jjfjj.com"</span></span><br><span class="line">RUN     apt-<span class="keyword">get</span> update</span><br><span class="line">RUN     apt-<span class="keyword">get</span> install -y nginx	</span><br><span class="line">RUN     apt-<span class="keyword">get</span> install -y vim	</span><br><span class="line">RUN     apt-<span class="keyword">get</span> install -y procps	#安装ps命令</span><br><span class="line">RUN     echo 'HI!WARRIOR is the champion!!!' &gt; /var/www/html/index.nginx-debian.html</span><br><span class="line">EXPOSE  8080	#开放8080端口</span><br><span class="line">COPY    /file/kubernetes.tar.gz /mnt/</span><br><span class="line">#CMD    service nginx start &amp;&amp; nginx -g "daemon off;"</span><br><span class="line">ENTRYPOINT [ "/usr/sbin/nginx", "-g", "daemon off;" ]</span><br></pre></td></tr></table></figure></p>
+<p><font color=red>注意！使用上面注释的CMD语句作为结尾的话，那么这个镜像docker run的时候就会马上退出，这是因为把command做为容器内部命令，那么nginx程序将后台运行，这个时候nginx并不是pid为1的程序，而是执行的bash，这个bash执行了nginx指令后就挂了，所以容器也就退出了。</font>简而言之，Docker容器后台运行,就必须有一个前台进程。因为Docker容器仅在它的1号进程（PID为1）运行时，会保持运行。如果1号进程退出了，Docker容器也就退出了。</p>
+<p>在gitlab触发之后，阿里云就自动把这个dockerfile build成了镜像保存在阿里云的容器仓库里，如图：<br><img src="/images/aliyungitlab6.png" alt="paradin"></p>
+<p>想用这个镜像就可以直接去阿里云的仓库里下载并启动，这样就节省了本地的硬盘容量。最后就是把这个镜像部署到对应的kubernetes集群里，这样就完成了“gitlab代码提交触发阿里云构建镜像”的过程，而如何使用kubernetes的内容将在以后细说。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/chenblog.github.io/tags/gitlab/" rel="tag"># gitlab</a>
+          
+            <a href="/chenblog.github.io/tags/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90/" rel="tag"># 持续集成</a>
+          
+            <a href="/chenblog.github.io/tags/%E9%98%BF%E9%87%8C%E4%BA%91/" rel="tag"># 阿里云</a>
+          
+            <a href="/chenblog.github.io/tags/docker%E9%95%9C%E5%83%8F/" rel="tag"># docker镜像</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/chenblog.github.io/2018/08/13/%E9%98%BF%E9%87%8C%E4%BA%91Centos7%E5%BC%80%E5%90%AFswap%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98/" rel="next" title="阿里云Centos7开启swap虚拟内存">
+                <i class="fa fa-chevron-left"></i> 阿里云Centos7开启swap虚拟内存
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/chenblog.github.io/2018/08/22/%E5%AE%89%E8%A3%85%E5%B9%B6%E4%B8%94%E9%85%8D%E7%BD%AEkubectl/" rel="prev" title="Kubectl使用的简单举例">
+                Kubectl使用的简单举例 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/chenblog.github.io/archives/%20%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">293</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">categories</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">252</span>
+                  <span class="site-state-item-name">tags</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#工作思路"><span class="nav-number">1.</span> <span class="nav-text">工作思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#勾连gitlab与云镜像"><span class="nav-number">2.</span> <span class="nav-text">勾连gitlab与云镜像</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置镜像仓库"><span class="nav-number">3.</span> <span class="nav-text">配置镜像仓库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编写dockerfile"><span class="nav-number">4.</span> <span class="nav-text">编写dockerfile</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/chenblog.github.io/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/chenblog.github.io/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/chenblog.github.io/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/chenblog.github.io/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
