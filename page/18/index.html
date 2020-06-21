@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="https://brucewayne2099.github.io/page/18/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:locale" content="en_US">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/chenblog.github.io/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/chenblog.github.io/css/style.css">
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/chenblog.github.io/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/chenblog.github.io/">Home</a>
+        
+          <a class="main-nav-link" href="/chenblog.github.io/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/chenblog.github.io/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://brucewayne2099.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main">
+  
+    <article id="post-创建Mysql容器过程" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/chenblog.github.io/2018/05/12/%E5%88%9B%E5%BB%BAMysql%E5%AE%B9%E5%99%A8%E8%BF%87%E7%A8%8B/" class="article-date">
+  <time datetime="2018-05-12T02:28:46.000Z" itemprop="datePublished">2018-05-12</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/chenblog.github.io/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/">工作与技术</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/chenblog.github.io/2018/05/12/%E5%88%9B%E5%BB%BAMysql%E5%AE%B9%E5%99%A8%E8%BF%87%E7%A8%8B/">创建Mysql容器过程</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="过程记录"><a href="#过程记录" class="headerlink" title="过程记录"></a>过程记录</h2><p>先<code>docker pull mysql</code>，当前最近的版本是8.0，然后<code>docker images</code>查看一下效果。</p>
+<p>然后就是启动一个容器，命令是：<code>docker run --name test-mysql -p 3306:3306 -e MYSQL\_ROOT\_PASSWORD=123456 -d mysql</code>,这句话的意思是：启动一个叫test-mysql的容器， 端口影射是3306到宿主机的3306，同时设置root的密码是123456，然后以守护进程的形式启动。</p>
+<p>但是如果在宿主机上使用<code>mysql -h127.0.0.1 -uroot -p123456</code>可能会报错，报错内容是：<code>Authentication plugin ‘caching_sha2_password’ cannot be loaded:</code></p>
+<p>那么就<code>docker exec -it 容器ID号 env LANG=C.UTF-8 /bin/bash</code>进入到容器里，使用<code>mysql -uroot -p123456</code>，看一下在容器里是否可以正常登录，如果可以的话，那么就在mysql的命令行里执行<code>ALTER USER &#39;root&#39;@&#39;%&#39; IDENTIFIED WITH mysql_native_password BY &#39;123456&#39;;</code>。  </p>
+<p>退出容器在宿主机上重新连接，这样就OK了。至于原因就是，mysql的客户端是yum安装的，虽然是centos 7，但是安装的版本也是5.5版本的，所以8.0的客户端有一个新的密码加密方式：<code>caching_sha2_password</code>，客户端不支持，所以需要手动到命令行里更改一下。</p>
+<h2 id="mysql存储的坑"><a href="#mysql存储的坑" class="headerlink" title="mysql存储的坑"></a>mysql存储的坑</h2><p>先思考一个问题：假如某mysql容器里存储了100G的数据，那么这个容器关闭了，这100G的数据还在么？从宿主机是可以找到这100G的数据么？</p>
+<p><code>docker inspect mysql-container-id</code>，找到里面的volume字段，这里也显示挂载的host路径，可以通过这个路径来备份数据。或者使用<code>docker cp mysql-container-id:/path/to/db-backup-file ./</code>，把容器内数据放到当前目录下。如果是生产环境，必须使用Volume或数据容器。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="http://binary-space.iteye.com/blog/2412769" target="_blank" rel="noopener">http://binary-space.iteye.com/blog/2412769</a><br><a href="http://dockone.io/question/108" target="_blank" rel="noopener">http://dockone.io/question/108</a><br><img src="/images/rondopass1.gif" alt="paradin"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://brucewayne2099.github.io/2018/05/12/%E5%88%9B%E5%BB%BAMysql%E5%AE%B9%E5%99%A8%E8%BF%87%E7%A8%8B/" data-id="ckbnyllzh00stjj6u9b9q9jn4" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/chenblog.github.io/tags/docker%E5%AE%B9%E5%99%A8/" rel="tag">docker容器</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/chenblog.github.io/tags/mysql/" rel="tag">mysql</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-python报错：&#39;importError-No-module-named-bz2&#39;" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/chenblog.github.io/2018/05/12/python%E6%8A%A5%E9%94%99%EF%BC%9A'importError-No-module-named-bz2'/" class="article-date">
+  <time datetime="2018-05-12T02:08:07.000Z" itemprop="datePublished">2018-05-12</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/chenblog.github.io/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/">工作与技术</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/chenblog.github.io/2018/05/12/python%E6%8A%A5%E9%94%99%EF%BC%9A'importError-No-module-named-bz2'/">python报错：importError: No module named bz2</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>每日统计阿里云同步延迟的邮件早就编写完毕了，现在要放到专门跑脚本的服务器里，进去到这个服务器里发现这个机器已经被人装了两个python，分别是python 2.7.5（默认路径）和python 2.7.13（路径是<code>/usr/local/python/bin/python</code>），说实话我个人不太明白这么做的原因何在。</p>
+<p>但是既然已经被人搞成这样了，那就适应环境吧，把脚本拷贝过来，把依赖库都安装好，但是在执行<code>matplotlib</code>的库的时候，爆了一个错误：<code>ImportError: No module named bz2</code>。</p>
+<p>这就是因为两个python，但是启动的那个python文件夹里面是没有<code>bz2.so</code>这个文件的，于是就需要把系统里默认的2.7.5的<code>bz2.so</code>拷贝到2.7.13的lib路径里。</p>
+<p>首先<code>find / -name bz2.so</code>找一下文件，如下：<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@dvl-stun-002 GETDTS]# find / -name bz2.so</span><br><span class="line">/usr/local/aegis/PythonLoader/lib/python2<span class="number">.7</span>/lib-dynload/bz2.so</span><br><span class="line">/usr/local/aegis/SecureCheck/lib/python2<span class="number">.7</span>/lib-dynload/bz2.so</span><br><span class="line">/usr/lib64/python2<span class="number">.7</span>/lib-dynload/bz2.so</span><br></pre></td></tr></table></figure></p>
+<p>然后<code>cd /usr/local/python/lib/python2.7/</code>，把<code>/usr/lib64/python2.7/lib-dynload/bz2.so</code>复制到这个文件夹里即可。<br><img src="/images/rubio3kill.gif" alt="paradin"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://brucewayne2099.github.io/2018/05/12/python%E6%8A%A5%E9%94%99%EF%BC%9A'importError-No-module-named-bz2'/" data-id="ckbnyllvg00aajj6u05taaac1" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/chenblog.github.io/tags/python/" rel="tag">python</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-在已经运行的docker容器里面使用中文" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/chenblog.github.io/2018/05/10/%E5%9C%A8%E5%B7%B2%E7%BB%8F%E8%BF%90%E8%A1%8C%E7%9A%84docker%E5%AE%B9%E5%99%A8%E9%87%8C%E9%9D%A2%E4%BD%BF%E7%94%A8%E4%B8%AD%E6%96%87/" class="article-date">
+  <time datetime="2018-05-10T14:52:57.000Z" itemprop="datePublished">2018-05-10</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/chenblog.github.io/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/">工作与技术</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/chenblog.github.io/2018/05/10/%E5%9C%A8%E5%B7%B2%E7%BB%8F%E8%BF%90%E8%A1%8C%E7%9A%84docker%E5%AE%B9%E5%99%A8%E9%87%8C%E9%9D%A2%E4%BD%BF%E7%94%A8%E4%B8%AD%E6%96%87/">在已经运行的docker容器里面使用中文</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="配置ldap"><a href="#配置ldap" class="headerlink" title="配置ldap"></a>配置ldap</h2><p>公司搭建的gitlab现在需要开启ldap服务，也就是这样就可以用公司的域账号登陆gitlab，而不用开发一个一个去注册账号了。</p>
+<p>开启ldap登陆的任务光荣的落到了我身上，于是我就登陆到gitlab服务器一看，嚯，这还是在容器下启动的，如图：<br><img src="/images/gitlab2.png" alt="paradin"></p>
+<p>于是我就<code>docker exec -it 容器ID号 /bin/bash</code>登陆到这个容器里，编辑<code>/opt/gitlab/embedded/service/gitlab-rails/config/gitlab.yml</code>，如下：<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">ldap:    </span><br><span class="line">  enabled: <span class="literal">true</span></span><br><span class="line">  sync_time:</span><br><span class="line">  host: <span class="string">'公司域账号服务器IP地址'</span></span><br><span class="line">  port: <span class="number">389</span></span><br><span class="line">  uid: <span class="string">'sAMAccountName'</span></span><br><span class="line">  method: 'plain' # "tls" or "ssl" or "plain"</span><br><span class="line">  bind_dn: <span class="string">'dahuatech\Ldap_System'</span></span><br><span class="line">  password: <span class="string">'对应的密码'</span></span><br><span class="line">  active_directory:</span><br><span class="line">  allow_username_or_email_login:    </span><br><span class="line">  lowercase_usernames:</span><br><span class="line">  base: </span><br><span class="line">  user_filter:</span><br></pre></td></tr></table></figure></p>
+<p>但是在填写到base的时候发现了一个问题，公司的base是中文的，是<code>&#39;OU=大数据研究院,OU=研发中心,OU=大华技术,DC=dahuatech,DC=com&#39;</code>，但是在文件里输入中文却是乱码，如图：<br><img src="/images/gitlab3.png" alt="paradin"></p>
+<p>容器默认是不支持中文的，在容器里的命令行输入中文也是空白。那么面对一个已经运行的容器，如何正常的输入中文呢？</p>
+<p>答案是：使用<code>docker exec -it 容器ID号 env LANG=C.UTF-8 /bin/bash</code>登陆，这样就能正常使用中文了，如图：<br><img src="/images/gitlab1.png" alt="paradin"></p>
+<p><code>gitlab-ctl restart</code>之后，登陆到gitlab页面一看，已经添加ldap访问方式：<br><img src="/images/gitlab4.png" alt="paradin"></p>
+<h2 id="取消“注册”功能"><a href="#取消“注册”功能" class="headerlink" title="取消“注册”功能"></a>取消“注册”功能</h2><p>修改好配置文件<code>gitlab.yml</code>之后，现在就要把“注册”功能去掉，这样以后都统一用公司的域账号登陆，避免一些乱七八糟的用户来注册乱七八糟的账号。</p>
+<p>首先用root账号登陆到<code>gitlab</code>里，在网页里进入到<code>admin area</code>，如图：<br><img src="/images/gitlab8.png" alt="paradin"></p>
+<p>然后再点击最下面的<code>settings</code>，选择<code>Sign-up restrictions</code>，然后把<code>Sign-up enabled</code>前面的勾点掉，如图：<br><img src="/images/gitlab9.png" alt="paradin"></p>
+<p>保存改变之后，退出root账号，重新看一下，gitlab的注册功能就暂时被取消了，需要的时候再开即可。</p>
+<h2 id="配置域名"><a href="#配置域名" class="headerlink" title="配置域名"></a>配置域名</h2><p>为了方便记忆，给gitlab服务配置一个域名，在阿里云的域名解析控制台给gitlab配置了域名之后，还要在<code>gitlab.yml</code>手动更改hostname，把hostname改成域名的样子，如图：<br><img src="/images/gitlab5.jpg" alt="paradin"></p>
+<p>这样没有结束，因为网页里的url还是显示外网IP而非域名,如下：<br><img src="/images/gitlab7.png" alt="paradin"></p>
+<p>此时需要重启，重启的命令是<code>gitlab-ctl restart</code>，重启完了之后url也会发生变化。这样才算完整的配置了域名：<br><img src="/images/gitlab6.jpg" alt="paradin"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://brucewayne2099.github.io/2018/05/10/%E5%9C%A8%E5%B7%B2%E7%BB%8F%E8%BF%90%E8%A1%8C%E7%9A%84docker%E5%AE%B9%E5%99%A8%E9%87%8C%E9%9D%A2%E4%BD%BF%E7%94%A8%E4%B8%AD%E6%96%87/" data-id="ckbnyllzv00u8jj6u0fnpfb75" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/chenblog.github.io/tags/docker/" rel="tag">docker</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-通过阿里云服务器ID添加服务器资料到django的脚本" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/chenblog.github.io/2018/05/07/%E9%80%9A%E8%BF%87%E9%98%BF%E9%87%8C%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8ID%E6%B7%BB%E5%8A%A0%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%B5%84%E6%96%99%E5%88%B0django%E7%9A%84%E8%84%9A%E6%9C%AC/" class="article-date">
+  <time datetime="2018-05-07T13:48:29.000Z" itemprop="datePublished">2018-05-07</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/chenblog.github.io/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/">工作与技术</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/chenblog.github.io/2018/05/07/%E9%80%9A%E8%BF%87%E9%98%BF%E9%87%8C%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8ID%E6%B7%BB%E5%8A%A0%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%B5%84%E6%96%99%E5%88%B0django%E7%9A%84%E8%84%9A%E6%9C%AC/">通过阿里云服务器ID添加服务器资料到django的脚本</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>本文的环境是：<code>centos 7</code> + <code>django 2.0</code> + <code>python 3.6</code></p>
+<p>先给django里的project创建了<code>models.py</code>，里面内容如下：<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.db <span class="keyword">import</span> models</span><br><span class="line"></span><br><span class="line"># Create your models here.</span><br><span class="line">class ecs(models.Model):</span><br><span class="line">    name = models.CharField(verbose_name=<span class="string">'云服务器名称'</span>,max_length=<span class="number">30</span>)</span><br><span class="line">    ecsid = models.CharField(verbose_name=<span class="string">'云服务器ID'</span>,max_length=<span class="number">30</span>,<span class="keyword">default</span>=<span class="string">''</span>)</span><br><span class="line">    inIP = models.GenericIPAddressField(verbose_name=<span class="string">'云服务器内网地址'</span>)</span><br><span class="line">    outIP = models.GenericIPAddressField(verbose_name=<span class="string">'云服务器外网地址'</span>)</span><br><span class="line">    osname = models.CharField(verbose_name=<span class="string">'操作系统'</span>,max_length=<span class="number">50</span>,<span class="keyword">default</span>=<span class="string">''</span>)</span><br><span class="line">    networktype = models.CharField(verbose_name=<span class="string">'网络类型'</span>,max_length=<span class="number">20</span>)</span><br><span class="line">    CPU = models.IntegerField(verbose_name=<span class="string">'云服务器CPU'</span>,<span class="keyword">default</span>=<span class="string">'2'</span>)</span><br><span class="line">    memory = models.IntegerField(verbose_name=<span class="string">'云服务器内存'</span>,<span class="keyword">default</span>=<span class="string">'2048'</span>)</span><br><span class="line">    netwidth = models.IntegerField(verbose_name=<span class="string">'云服务器外网带宽'</span>,<span class="keyword">default</span>=<span class="string">'0M'</span>)</span><br><span class="line">    signtime = models.DateField(auto_now_add=True)</span><br><span class="line">    remark = models.CharField(verbose_name=<span class="string">'备注'</span>,max_length=<span class="number">255</span>,blank=True)</span><br></pre></td></tr></table></figure></p>
+<p>可以看出这个就是一个很简单的云服务器的配置统计，但是要录入的阿里云服务器很多，一个一个手动输入实在太累，于是就要写一个脚本来达到django同步的效果！</p>
+<p>脚本内容如下：<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/usr/bin/env python</span></span><br><span class="line">#coding=utf-8</span><br><span class="line">#这个脚本通过查询阿里云服务器ID来达到同步django的目的</span><br><span class="line"><span class="keyword">import</span> json,pymysql</span><br><span class="line"><span class="keyword">from</span> aliyunsdkcore <span class="keyword">import</span> client</span><br><span class="line"><span class="keyword">from</span> aliyunsdkecs.request.v20140526 <span class="keyword">import</span> DescribeInstancesRequest</span><br><span class="line"></span><br><span class="line">clt = client.AcsClient(<span class="string">'这里是ak'</span>,<span class="string">'这里是sk'</span>,<span class="string">'这里是地域名'</span>)</span><br><span class="line"></span><br><span class="line"># 设置参数</span><br><span class="line">request = DescribeInstancesRequest.DescribeInstancesRequest()</span><br><span class="line">request.set_accept_format(<span class="string">'json'</span>)</span><br><span class="line"></span><br><span class="line">request.add_query_param(<span class="string">'RegionId'</span>, <span class="string">'cn-hangzhou'</span>)</span><br><span class="line">request.add_query_param('InstanceIds', ['这里是服务器ID'])	#如果是多个服务器ID，可以继续往下写</span><br><span class="line"></span><br><span class="line"># 发起请求</span><br><span class="line">response = clt.do_action(request)</span><br><span class="line"></span><br><span class="line">#print(response)	#这里可以看一下返回的response，但是它是byte格式的</span><br><span class="line">data=str(response, encoding = <span class="string">"utf-8"</span>)</span><br><span class="line">ecs = json.loads(data)	#转换成str格式</span><br><span class="line">name = str(ecs[<span class="string">'Instances'</span>][<span class="string">'Instance'</span>][<span class="number">0</span>][<span class="string">'InstanceName'</span>])</span><br><span class="line">ecsid = str(ecs[<span class="string">'Instances'</span>][<span class="string">'Instance'</span>][<span class="number">0</span>][<span class="string">'InstanceId'</span>])</span><br><span class="line">inIP = str(ecs['Instances']['Instance'][0]['VpcAttributes']['PrivateIpAddress']['IpAddress'])[1:-1]	#如果不加[1:-1]的话，得到的是一个IP外面还有中括号</span><br><span class="line">outIP = str(ecs[<span class="string">'Instances'</span>][<span class="string">'Instance'</span>][<span class="number">0</span>][<span class="string">'PublicIpAddress'</span>][<span class="string">'IpAddress'</span>])[<span class="number">1</span>:<span class="number">-1</span>]</span><br><span class="line">networktype = str(ecs[<span class="string">'Instances'</span>][<span class="string">'Instance'</span>][<span class="number">0</span>][<span class="string">'InstanceNetworkType'</span>])</span><br><span class="line">CPU = int(ecs[<span class="string">'Instances'</span>][<span class="string">'Instance'</span>][<span class="number">0</span>][<span class="string">'Cpu'</span>])</span><br><span class="line">memory = int(ecs[<span class="string">'Instances'</span>][<span class="string">'Instance'</span>][<span class="number">0</span>][<span class="string">'Memory'</span>])</span><br><span class="line">osname = str(ecs[<span class="string">'Instances'</span>][<span class="string">'Instance'</span>][<span class="number">0</span>][<span class="string">'OSName'</span>])</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">#创建数据库连接，注意这里我加入了charset和cursorclass参数</span><br><span class="line">conn = pymysql.connect(</span><br><span class="line">    host = <span class="string">"127.0.0.1"</span>,</span><br><span class="line">    user = <span class="string">"数据库账号"</span>,</span><br><span class="line">    password = <span class="string">"数据库密码"</span>,</span><br><span class="line">    database = <span class="string">"数据库名称"</span>,</span><br><span class="line">    charset = <span class="string">'utf8'</span>,</span><br><span class="line">    cursorclass = pymysql.cursors.DictCursor)</span><br><span class="line">#获取游标</span><br><span class="line">cursor = conn.cursor()</span><br><span class="line"></span><br><span class="line">#三个引号里如何加入变量</span><br><span class="line">sql = <span class="string">""</span><span class="string">"INSERT INTO ecs_ecs (name,ecsid,inIP,outIP,networktype,CPU,memory,netwidth,signtime,osname) VALUES (%(name)s,%(ecsid)s,%(inIP)s,%(outIP)s,%(networktype)s,%(CPU)d,%(memory)d,%(netwidth)d,NOW(),%(osname)s);"</span><span class="string">""</span> % dict(name=<span class="string">'\''</span>+name+<span class="string">'\''</span>,ecsid= <span class="string">'\''</span>+ecsid+<span class="string">'\''</span>,inIP=inIP,outIP=outIP,networktype=<span class="string">'\''</span>+networktype+<span class="string">'\''</span>,CPU=CPU,memory=memory,netwidth=<span class="number">1</span>,osname=<span class="string">'\''</span>+osname+<span class="string">'\''</span>)</span><br><span class="line"></span><br><span class="line">#print (sql)	#在这里可以先看看sql输出的是否正确</span><br><span class="line">cursor.execute(sql)</span><br><span class="line"></span><br><span class="line"># 关闭数据库连接</span><br><span class="line">conn.close()</span><br></pre></td></tr></table></figure></p>
+<p>正常来说应该是先建立一个def来获取阿里云服务器配置，再来一个def来将各配置录入到数据库里，同时让阿里云服务器的id作为变量，而且还要加上如果sql执行失败就回滚的语句。而我由于是临时使用，所以这个脚本按照流水式写下来的，不过不影响阅读。</p>
+<p>ps.进化之后的脚本在我的github里，地址是： <a href="https://github.com/RorschachChan/chenWORK/blob/master/通过阿里云ID号将服务器信息同步到django.py" target="_blank" rel="noopener">https://github.com/RorschachChan/chenWORK/blob/master/通过阿里云ID号将服务器信息同步到django.py</a></p>
+<p>比如现在要添加一个服务器，这个服务器的id是：<code>i-bp12ego6x9srzsytxeqo</code>，如图：<br><img src="/images/django3.png" alt="akb48"></p>
+<p>那么对应填写好脚本里的ak/sk之后，就把<code>i-bp12ego6x9srzsytxeqo</code>填写到“服务器ID”的位置 ，执行这个脚本，结果如下：<br><img src="/images/django5.png" alt="akb48"></p>
+<p>不过这个脚本有两个缺点：<br>第一：如果阿里云服务器是中文名称，那么使用api查询出现的是十六进制的符号；<br>第二：如果服务器里没有外网IP或者是后开的临时带宽，那么在outIP的地方得到的值是空，sql语句会因为少一项而报错；<br>第三：这个api没有查询服务器带宽值的功能，还需要另外写一个脚本搭配。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://brucewayne2099.github.io/2018/05/07/%E9%80%9A%E8%BF%87%E9%98%BF%E9%87%8C%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8ID%E6%B7%BB%E5%8A%A0%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%B5%84%E6%96%99%E5%88%B0django%E7%9A%84%E8%84%9A%E6%9C%AC/" data-id="ckbnylm28011njj6uf3y2f9r0" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/chenblog.github.io/tags/django2/" rel="tag">django2</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/chenblog.github.io/tags/python3/" rel="tag">python3</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-记一次nginx负载均衡配置问题" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/chenblog.github.io/2018/04/28/%E8%AE%B0%E4%B8%80%E6%AC%A1nginx%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E9%85%8D%E7%BD%AE%E9%97%AE%E9%A2%98/" class="article-date">
+  <time datetime="2018-04-28T13:48:40.000Z" itemprop="datePublished">2018-04-28</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/chenblog.github.io/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/">工作与技术</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/chenblog.github.io/2018/04/28/%E8%AE%B0%E4%B8%80%E6%AC%A1nginx%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E9%85%8D%E7%BD%AE%E9%97%AE%E9%A2%98/">记一次nginx负载均衡配置问题</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="故障背景"><a href="#故障背景" class="headerlink" title="故障背景"></a>故障背景</h2><p>公司有三个实体服务器，内网IP分别是<code>10.1.82.83</code>、<code>10.1.82.84</code>、<code>10.1.82.113</code>，这三个作为源站使用专线连接到了阿里云的一台nginx服务器上，并且通过这个nginx做负载均衡展示这三个服务器里面的网页。负载均衡使用的是<code>nginx 1.12</code>版本，最外面在上一个CDN起到静态页面加速的作用。整个架构如图：<br><img src="/images/aliCDN2.png" alt="paradin"></p>
+<p>CDN的配置界面如下：<br><img src="/images/aliCDN6.png" alt="paradin"></p>
+<p>但是现在很奇怪的是，所有节点启动之后，外网用户通过负载后访问均指向了<code>10.1.82.84</code>这一台服务器，<code>nginx.conf</code>配置是<code>最小连接数</code>的配置，如下：<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">upstream eln.dahuatech.com &#123;</span><br><span class="line">      #ip_hash;</span><br><span class="line">      #hash $http_x_forwarded_for;</span><br><span class="line">      #sticky;</span><br><span class="line">      least_conn;</span><br><span class="line">      server  <span class="number">10.1</span><span class="number">.82</span><span class="number">.83</span> max_fails=<span class="number">2</span> fail_timeout=<span class="number">30</span>s;</span><br><span class="line">      server  <span class="number">10.1</span><span class="number">.82</span><span class="number">.84</span> max_fails=<span class="number">2</span> fail_timeout=<span class="number">30</span>s;</span><br><span class="line">      server  <span class="number">10.1</span><span class="number">.82</span><span class="number">.113</span> max_fails=<span class="number">2</span> fail_timeout=<span class="number">30</span>s;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">server &#123;</span><br><span class="line">        server_name  eln.dahuatech.com;</span><br><span class="line">            listen     <span class="number">80</span>;</span><br><span class="line">            listen     <span class="number">443</span> ssl;</span><br><span class="line"></span><br><span class="line">        access_log logs/eln.dahuatech.com.access.log main;</span><br><span class="line">        error_log  logs/eln.dahuatech.com.error.log;</span><br><span class="line"></span><br><span class="line">        proxy_set_header Host $host:$server_port;</span><br><span class="line">        proxy_set_header X-Real-IP $remote_addr;</span><br><span class="line">        proxy_set_header REMOTE-HOST $remote_addr;</span><br><span class="line">        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;</span><br><span class="line"></span><br><span class="line">   location / &#123;</span><br><span class="line">            proxy_pass http:<span class="comment">//eln.dahuatech.com;</span></span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>测试的时候发现，即使绑定美国和香港的节点去<code>curl</code>，是能正常解析到其他机器上的。如下：<br><img src="/images/aliCDN3.png" alt="paradin"></p>
+<p>然而源站过来的请求IP集中到了只有一个，这太奇怪了。</p>
+<h2 id="故障解决"><a href="#故障解决" class="headerlink" title="故障解决"></a>故障解决</h2><p>后来发现<font color=red>ngnix后端会把http1.1转换成1.0变成短连接</font>，这个连接存在的时间非常短，因为后端响应非常快。所以即使配上了<code>least_conn</code>，其实是没有任何效果的。这样负载均衡的nginx看到所有源站其实一直都是没有连接的，所以也就一直在给第一个转。</p>
+<p>既然这样，就取消了<code>least_conn</code>改用轮询，nginx.conf也改成如下的样子：<br><img src="/images/aliCDN1.png" alt="paradin"></p>
+<p>最后终于均衡了，大功告成！<br><img src="/images/aliCDN5.png" alt="paradin"></p>
+<p>后来琢磨了一下，是用sticky其实也是OK的。</p>
+<p>所以说，有些情景使用域名不通的情况下，可以考虑直接使用IP，这样就绕过nginx了，不会破坏原来的长连接。</p>
+<h2 id="几个主流负载均衡软件配置cookie的方法"><a href="#几个主流负载均衡软件配置cookie的方法" class="headerlink" title="几个主流负载均衡软件配置cookie的方法"></a>几个主流负载均衡软件配置cookie的方法</h2><p>1.Apache的话首先打开<code>httpd.conf</code>配置文件，确保如下配置没有被注释。<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LoadModule usertrack_module modules/mod_usertrack.so</span><br></pre></td></tr></table></figure></p>
+<p>再在<code>virtual host</code>中添加以下配置。<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">CookieName name</span><br><span class="line">CookieExpires <span class="string">"1 days"</span></span><br><span class="line">CookieStyle Cookie</span><br><span class="line">CookieTracking on</span><br></pre></td></tr></table></figure></p>
+<p>2.Nginx参考以下配置，设置Cookie。<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    listen <span class="number">8080</span>;</span><br><span class="line">    server_name wqwq.example.com;</span><br><span class="line">    location / &#123;</span><br><span class="line">      add_header <span class="built_in">Set</span>-Cookie name=xxxx;</span><br><span class="line">        root   html;</span><br><span class="line">        index  index.html index.htm;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>3.Lighttpd参考以下配置，设置Cookie。<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">server.modules  = ( <span class="string">"mod_setenv"</span> )</span><br><span class="line">$HTTP[<span class="string">"host"</span>] == <span class="string">"test.example.com"</span> &#123;</span><br><span class="line">      server.document-root = <span class="string">"/var/www/html/"</span></span><br><span class="line">      setenv.add-response-header = ( <span class="string">"Set-Cookie"</span> =&gt; <span class="string">"name=XXXXXX"</span>      &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="扩展阅读"><a href="#扩展阅读" class="headerlink" title="扩展阅读"></a>扩展阅读</h2><p><a href="https://cloud.tencent.com/document/product/214/2736" target="_blank" rel="noopener">https://cloud.tencent.com/document/product/214/2736</a><br><a href="http://blog.text.wiki/2015/08/01/nginx-sticky-problem.html" target="_blank" rel="noopener">http://blog.text.wiki/2015/08/01/nginx-sticky-problem.html</a><br><a href="https://cloud.tencent.com/developer/article/1004547" target="_blank" rel="noopener">https://cloud.tencent.com/developer/article/1004547</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://brucewayne2099.github.io/2018/04/28/%E8%AE%B0%E4%B8%80%E6%AC%A1nginx%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E9%85%8D%E7%BD%AE%E9%97%AE%E9%A2%98/" data-id="ckbnylm1i00znjj6uh53v1mdg" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/chenblog.github.io/tags/nginx/" rel="tag">nginx</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/chenblog.github.io/tags/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" rel="tag">负载均衡</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-记一次阿里云oss云存储删除失败的问题" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/chenblog.github.io/2018/04/27/%E8%AE%B0%E4%B8%80%E6%AC%A1%E9%98%BF%E9%87%8C%E4%BA%91oss%E4%BA%91%E5%AD%98%E5%82%A8%E5%88%A0%E9%99%A4%E5%A4%B1%E8%B4%A5%E7%9A%84%E9%97%AE%E9%A2%98/" class="article-date">
+  <time datetime="2018-04-27T14:24:58.000Z" itemprop="datePublished">2018-04-27</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/chenblog.github.io/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/">工作与技术</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/chenblog.github.io/2018/04/27/%E8%AE%B0%E4%B8%80%E6%AC%A1%E9%98%BF%E9%87%8C%E4%BA%91oss%E4%BA%91%E5%AD%98%E5%82%A8%E5%88%A0%E9%99%A4%E5%A4%B1%E8%B4%A5%E7%9A%84%E9%97%AE%E9%A2%98/">记一次阿里云oss云存储删除失败的问题</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>公司每天云存储都要删除过期的内容，工作细节是这样的：每天零点，采集模块开始收集应该删除掉的内容，然后把这个消息传给阿里云MQ，阿里云MQ又把消息传给删除模块，删除模块拿到名单之后，开始调用阿里云OSS的删除API进行删除。架构如图：<br><img src="/images/oss6.png" alt="paradin"></p>
+<p>但是今天登陆监控平台发现，昨天oss没有删除，上涨了80多个T，如图：<br><img src="/images/oss1.png" alt="paradin"></p>
+<p>老板一看，卧槽这怎么可以，80多个T的云存储费用可是不容小视的，于是责令追查一下为啥会发生这样的情况。</p>
+<p>昨天我的手机又没有收到任何阿里云消息队列告警的信息，可见MQ应该是没问题的，查看一下是否有MQ的产生和消费情况，如下图：<br><img src="/images/oss2.png" alt="paradin" title="这个是消息产生情况"></p>
+<p><img src="/images/oss3.png" alt="paradin" title="这个是消息消费情况"></p>
+<p>产生的消息基本都消费掉了，由此推断之前的过程都应该是OK的。再查看一下会不会是删除模块外网带宽到期的问题，此时发现两天的流量有显著的不同：<br><img src="/images/oss7.png" alt="paradin" title="这个是正常的流量情况"></p>
+<p><img src="/images/oss8.png" alt="paradin" title="这个是异常的流量情况"></p>
+<p>流量明显减少，可以说是删除模块执行任务少了。于是到执行OSS删除API的模块上去抓了几个包，里面情况如下：<br><img src="/images/oss4.png" alt="paradin"></p>
+<p>但是跑到阿里云对应的bucket里看一下文件情况，比如<code>https://lechangecloud.oss-cn-hangzhou.aliyuncs.com/lechange/4B01F1FPAGE4E9D_img/Alarm/20180427000913997_0_fa62bec6dee24cc0bee42e1ee3e75743_thumb_qcif.dav</code>这个文件，这个文件明明还在里面躺着好好的。如图：<br><img src="/images/oss5.png" alt="paradin"></p>
+<p>文件00：27的时候就在了，但是2：53分的时候调用阿里云OSS的API去删除，明明返回了200，但是文件却没有真正的从OSS删除掉。</p>
+<p>我觉得这样就拿去跟阿里云撕逼还是有点不太妥当，又回到刚刚的那个包里，我发现里面还有一些返回的内容是这样的：<br><img src="/images/oss9.png" alt="paradin"></p>
+<p>这个图跟之前的图明显路径上不同，而这些文件在OSS上确认是被成功删除掉的，可见的确是文件路径的问题：失败的文件路径是完全路径，而成功的都是相对路径。于是就告诉开发赶快整改代码，把路径统一…</p>
+<p><img src="/images/%E6%9C%9D%E9%9F%A9%E4%BC%9A%E9%9D%A2.png" alt="paradin" title="历史性的会面"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://brucewayne2099.github.io/2018/04/27/%E8%AE%B0%E4%B8%80%E6%AC%A1%E9%98%BF%E9%87%8C%E4%BA%91oss%E4%BA%91%E5%AD%98%E5%82%A8%E5%88%A0%E9%99%A4%E5%A4%B1%E8%B4%A5%E7%9A%84%E9%97%AE%E9%A2%98/" data-id="ckbnylm1g00zjjj6u3i1e3be0" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/chenblog.github.io/tags/%E9%98%BF%E9%87%8C%E4%BA%91/" rel="tag">阿里云</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-在安装docker私有仓库的时候遇到的openssl问题" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/chenblog.github.io/2018/04/21/%E5%9C%A8%E5%AE%89%E8%A3%85docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93%E7%9A%84%E6%97%B6%E5%80%99%E9%81%87%E5%88%B0%E7%9A%84openssl%E9%97%AE%E9%A2%98/" class="article-date">
+  <time datetime="2018-04-20T16:45:39.000Z" itemprop="datePublished">2018-04-21</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/chenblog.github.io/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/">工作与技术</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/chenblog.github.io/2018/04/21/%E5%9C%A8%E5%AE%89%E8%A3%85docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93%E7%9A%84%E6%97%B6%E5%80%99%E9%81%87%E5%88%B0%E7%9A%84openssl%E9%97%AE%E9%A2%98/">在安装docker私有仓库的时候遇到的openssl问题</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>按照<a href="http://wiki.jikexueyuan.com/project/docker-technology-and-combat/local_repo.html" target="_blank" rel="noopener">http://wiki.jikexueyuan.com/project/docker-technology-and-combat/local_repo.html</a> 的方法本地安装一个私有仓库，在执行<code>sudo pip install docker-registry</code>这一步的时候，出现了这样的一个错误：<br><img src="/images/openssl1.png" alt="paradin"></p>
+<p>既然说我没有swig，于是我<code>yum install swig -y</code>，安装的是<code>2.0.10-5.el7</code>版本。然后再次<code>pip install docker-registry</code>，一顿噼里啪啦之后，这次成了这样：<br><img src="/images/openssl2.png" alt="paradin"></p>
+<p>又说没有openssl的文件，那执行<code>yum install openssl-devel</code>，OK了之后再次<code>pip install docker-registry</code>，再一次噼里啪啦，如下：<br><img src="/images/openssl3.png" alt="paradin"></p>
+<p>反馈我：<code>/usr/include/openssl/opensslconf.h:44: Error: CPP #error &quot;&quot;This openssl-devel package does not work your architecture?&quot;&quot;. Use the -cpperraswarn option to continue swig processing.</code>,这个提示大意是说openssl-devel版本不适合你的系统架构，也就是x86的去找x86的头文件，x86_64的去找x86_64文件，但现在是互相找不到对方。</p>
+<p>既然说<code>/usr/include/openssl/opensslconf.h</code>这个第44行有错误，那我们就打开这个文件去看看第44行写的是啥：<br>    <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">41 #elif defined(__x86_64__)</span><br><span class="line">42 #include "opensslconf-x86_64.h"</span><br><span class="line">43 #else</span><br><span class="line">44 #error "This openssl-devel package does not work your architecture?"</span><br><span class="line">45 #endif</span><br><span class="line"><span class="number">46</span> </span><br><span class="line">47 #undef openssl_opensslconf_multilib_redirection_h</span><br></pre></td></tr></table></figure></p>
+<p>这里我把第44行改成了这样：<br>    <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">41 #elif defined(__x86_64__)</span><br><span class="line">42 #include &quot;opensslconf-x86_64.h&quot;</span><br><span class="line">43 #else</span><br><span class="line">44 #include &quot;opensslconf.h&quot;    #去掉了原来的error提示，改成了安装opensslconf.h文件。</span><br><span class="line">45 #endif</span><br><span class="line">46 </span><br><span class="line">47 #undef openssl_opensslconf_multilib_redirection_h</span><br></pre></td></tr></table></figure></p>
+<p>这一次重新执行<code>sudo pip install docker-registry</code>，终于成功…<br><img src="/images/openssl4.png" alt="paradin"></p>
+<p><img src="/images/agirl.gif" alt="akb48"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://brucewayne2099.github.io/2018/04/21/%E5%9C%A8%E5%AE%89%E8%A3%85docker%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93%E7%9A%84%E6%97%B6%E5%80%99%E9%81%87%E5%88%B0%E7%9A%84openssl%E9%97%AE%E9%A2%98/" data-id="ckbnyllzv00u5jj6ufq6icazb" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/chenblog.github.io/tags/docker/" rel="tag">docker</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/chenblog.github.io/tags/%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF/" rel="tag">容器技术</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-在国王杯前夕评巴萨" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/chenblog.github.io/2018/04/21/%E5%9C%A8%E5%9B%BD%E7%8E%8B%E6%9D%AF%E5%89%8D%E5%A4%95%E8%AF%84%E5%B7%B4%E8%90%A8/" class="article-date">
+  <time datetime="2018-04-20T16:44:17.000Z" itemprop="datePublished">2018-04-21</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/chenblog.github.io/categories/%E5%9D%A0%E4%B9%B1%E8%8A%B1%E5%A4%A9/">坠乱花天</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/chenblog.github.io/2018/04/21/%E5%9C%A8%E5%9B%BD%E7%8E%8B%E6%9D%AF%E5%89%8D%E5%A4%95%E8%AF%84%E5%B7%B4%E8%90%A8/">在国王杯前夕评巴萨</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>今天凌晨的马竞在西甲意外输给了皇家社会，巴萨的积分优势扩大到了12分。这个周末巴萨要跟塞维利亚打国王杯决赛，4月30号对拉科鲁尼亚的西甲联赛巴萨只要获胜，就会拿到今年的西甲联赛冠军，从而以冠军姿态在诺坎普迎接本赛季第二场国家德比。</p>
+<h2 id="巴尔韦德的困境"><a href="#巴尔韦德的困境" class="headerlink" title="巴尔韦德的困境"></a>巴尔韦德的困境</h2><p>巴萨今年可以说是低姿态开始：从内马尔突然的离开到西超杯被皇马灌了5个，不可为说不惨。但是巴尔韦德在联赛却目前保持不败，这个成绩单可以说是相当不错的，这中间还有在伯纳乌的三球胜利。</p>
+<p>赛季中前段，巴萨三线顺风顺水，前有塞梅多惊艳开场，后有大祭司维尔马伦扎实顶上，主教练巴尔韦德也给了阿奈斯这样小将出场机会，哪怕登贝莱那时候养伤，报纸媒体一片其乐融融。如果保利尼奥再有进球，更是一片狂欢。</p>
+<p>然后巴尔韦德的保守开始慢慢让人所诟病，他是一个重视防守的教练，这很好，但是他有了库迪尼奥也有了归来的登贝莱，结果反而不敢搞轮换，甚至坚持让布教授打封闭出场，虽然不少人抱怨，但是由于球队整体战绩还算平稳，所以没有大规模的重视。可是巴萨欧冠的结果跟恩里克的第二个赛季一样，倒在了与罗马的第二回合比赛里，连续三年没有闯入欧冠四强。</p>
+<p>其实对战罗马的第一回合，巴萨的4：1已经是靠意志拼下来的比赛，球员难免在第二回合的心态上有所轻敌，这种心态上的轻敌难免会影响到身体，但是巴尔韦德的临场指挥也让人严重不满。落下这耻辱一战，媒体和球迷之前的“忍气吞声”一并爆发，狂轰滥炸，直到现在依旧有人说“哪怕真的赛季双冠，也会因为欧冠的失利而让那两冠索然无味”。<br><img src="/images/fcb4.png" alt="paradin"></p>
+<p>所以，巴尔韦德要在这个周日的国王杯决赛和对阵拉科鲁尼亚的西甲联赛里稳扎稳打，把国王杯和西甲冠军彻底拿到手里，这样整个人也能轻松一些。可是说来说去罗马一役这一个跟头摔得太疼了，在那么重大的比赛里失败，肯定需要在一个同样重大的比赛里胜利以挽回颜面，第二回合的国家德比无疑就是一个好的机会，如果巴尔韦德成功捍卫了诺坎普，“联赛双杀皇马+国内双冠”也能成为一个功劳。但是如果那场比赛，一心要打破巴萨不败金身的皇马真的成功了，那巴尔韦德势必在巴萨主帅的位置上也是飘摇。</p>
+<p>所以巴帅，请务必要拿下国王杯冠军+西甲冠军！在第二个国家德比里也请拼尽全力！这样才能多少挽回一点“罗马之耻”的颜面。<br><img src="/images/fcb1.png" alt="paradin"></p>
+<h2 id="夏季转会展望"><a href="#夏季转会展望" class="headerlink" title="夏季转会展望"></a>夏季转会展望</h2><p>我个人认为，巴萨很有可能在今年夏天卖掉如下几个人：西莱森、戈麦斯、小苏亚雷斯、艾尔卡塞尔、比达尔，自由走人的可能会是小白。这些人能套现7000万应该就满足了。</p>
+<p>巴萨后卫现在四个人皮克和维尔马伦属于潜藏的伤员病号，米纳技术还是太糙，稍微让人放心的就是乌姆蒂蒂，他的续约问题肯定是休赛期的一个大事。不过我觉得米纳其实可以再留一年看看，他身体素质很好，而且人还年轻没伤病，只要心态练得沉稳，当一个合格的中后卫不难。</p>
+<p>至于中场，个人希望小白再踢一年，现在我也觉得一个满血的小白应付普通的联赛、欧冠小组赛和杯赛都不是什么难事。但是目前的媒体趋势是小白赛季结束会来中超重庆队，即使这样巴萨也需要一个山寨的坎特和一个山寨的埃里克森，而罗贝托集这两个属性于一身，所以他就是一个“奉献的砖”，但是这样如果比达尔真的不留下来的话，巴萨还需要补进一个右后卫跟塞梅多良性竞争，这个右后卫的人选就比较挠头了。贝莱林？或许是一个选择，但是这个选择跟当年小法一样—要是双输就不好了。</p>
+<p>前场如果能拿下格里兹曼肯定是好的，艾尔卡塞尔这种“躲着后卫”的踢法，虽然进球效率可以，但是没有真正起到轮换苏亚雷斯的作用。这样巴萨还需要在板凳上补充一个中锋（不用多能进球，哪怕搅屎棍也可以），同时也做好登贝莱/苏亚雷斯/梅西/格里兹曼（假设他真的来）的轮换。</p>
+<p>总而言之，现在巴萨还是回归433比较好，配合442和4312的变化。那么休赛期最重要的补强就是格里兹曼+能抗中卫的前锋+一个中场+一个优秀的边后卫。</p>
+<p>我个人希望的引援名单如下：<br>中场是魏格尔和B队的阿莱尼亚，埃里克森、博格巴和维拉蒂这三个不算是好的选择，要么太贵，要么节奏太慢。至于伊斯科、大卫席尔瓦、皮亚尼奇，那想都别想了，母队不会放人的。至于格雷茨卡，拜仁不是善茬；<br>边后卫可以考虑贝莱林，这个要看一下阿森纳的新教练是谁，摩纳哥的法比尼奥也可以，我知道他现在改中场了，也不耽误来一下跟罗贝托交叉换位…<br>前锋的话，我个人推荐B队阿奈斯试试看，其他的人选估计就是在西甲联赛内部找了；<br>这几个位置，最重要就是中场！梅西当初在哈白布的配合下威力无穷，一旦巴萨的中场重新掌握了控制力，不用频繁回撤的梅西依旧会进球如麻，这一点毋庸置疑。<br><img src="/images/fcb3.png" alt="paradin"></p>
+<h2 id="温格会来？"><a href="#温格会来？" class="headerlink" title="温格会来？"></a>温格会来？</h2><p>我个人首先不希望巴尔韦德下课，毕竟现在巴萨联赛冠军十拿九稳，国王杯如果也揽入怀中，这样一个成绩单也是一个80分，如果这个分数都炒掉主教练，那么继任者的压力势必很大，所以我个人倾向巴尔韦德留任，好好想一下，等阿图尔以及可能会来的格里兹曼到位了，巴萨应该怎么打。</p>
+<p>不过如果温格真的来了，我个人也是赞成的，因为阿森纳的球风本来跟巴萨相似，相信温格跟梅西等人也会无缝接入，到时候教授或许真的可以在巴萨圆了欧冠梦想，不过这个想法成真的可能性低于5%，想想就得了。</p>
+<h2 id="下赛季的任务"><a href="#下赛季的任务" class="headerlink" title="下赛季的任务"></a>下赛季的任务</h2><p>1.进攻体系依旧围绕梅西建队，让梅西继续火力全开的同时保证休息，欧冠要他有大用；<br>2.新球员（包括库蒂尼奥和登贝莱）适应巴萨的风格和体系，让皮克和布教授也能轮换得到休息；<br>3.欧冠一定要进入四强；<br>4.欧冠四强的基础上，西甲联赛冠军和国王杯能拿还是要拿，同时最好也能阻击皇马；<br><img src="/images/fcb2.png" alt="paradin"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://brucewayne2099.github.io/2018/04/21/%E5%9C%A8%E5%9B%BD%E7%8E%8B%E6%9D%AF%E5%89%8D%E5%A4%95%E8%AF%84%E5%B7%B4%E8%90%A8/" data-id="ckbnyllzt00tyjj6u012pcttp" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/chenblog.github.io/tags/%E5%9B%BD%E9%99%85%E8%B6%B3%E5%9D%9B/" rel="tag">国际足坛</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/chenblog.github.io/tags/%E5%B7%B4%E5%A1%9E%E7%BD%97%E9%82%A3/" rel="tag">巴塞罗那</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-国内Docker的加速方法" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/chenblog.github.io/2018/04/20/%E5%9B%BD%E5%86%85Docker%E7%9A%84%E5%8A%A0%E9%80%9F%E6%96%B9%E6%B3%95/" class="article-date">
+  <time datetime="2018-04-19T16:00:04.000Z" itemprop="datePublished">2018-04-20</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/chenblog.github.io/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/">工作与技术</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/chenblog.github.io/2018/04/20/%E5%9B%BD%E5%86%85Docker%E7%9A%84%E5%8A%A0%E9%80%9F%E6%96%B9%E6%B3%95/">国内Docker的加速方法</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>由于大陆政府的特殊政策，国内想访问一些国外的资源是非常的曲折和痛苦，比较有代表性的就是亚马逊的云存储以及docker，尤其在<code>docker pull</code>一些镜像的时候，更是心惊胆战，祈求不要出现timout，然而现实往往很骨感。如下图：<br><img src="/images/jiasu.png" alt="paradin"></p>
+<p>那么应该如何达到加速的效果呢？</p>
+<p>在<code>CentOS 7</code>里，对于使用<code>systemd</code>的系统，请在<code>/etc/docker/daemon.json</code>中写入如下内容：（如果文件不存在请新建该文件）<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="string">"registry-mirrors"</span>: [</span><br><span class="line">    <span class="string">"https://registry.docker-cn.com"</span></span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>注意，一定要保证该文件符合 json 规范，否则 Docker 将不能启动。</p>
+<p>之后重新启动服务。<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ sudo systemctl daemon-reload</span><br><span class="line">$ sudo systemctl restart docker</span><br></pre></td></tr></table></figure></p>
+<p>注意：如果您之前查看旧教程，修改了<code>docker.service</code>文件内容，请去掉您添加的内容（–registry-mirror=<a href="https://registry.docker-cn.com）。" target="_blank" rel="noopener">https://registry.docker-cn.com）。</a></p>
+<p>配置加速之后，如果拉取镜像仍然十分缓慢，请手动检查加速器配置是否生效，在命令行执行<code>docker info |grep &#39;Registry Mirrors&#39; -A</code>，如果从结果中看到了如下内容，说明配置成功。<br><img src="/images/jiasu2.png" alt="paradin"></p>
+<p>现在再重新尝试一下<code>docker pull training/webapp</code>，看看效果：<br><img src="/images/jiasu3.png" alt="paradin"></p>
+<p>仅用17秒就pull了几乎400MB的镜像，高下立判！</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://brucewayne2099.github.io/2018/04/20/%E5%9B%BD%E5%86%85Docker%E7%9A%84%E5%8A%A0%E9%80%9F%E6%96%B9%E6%B3%95/" data-id="ckbnyllzq00tkjj6u2rppbmw2" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/chenblog.github.io/tags/docker/" rel="tag">docker</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-在Grafana里添加worldping插件" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/chenblog.github.io/2018/04/19/%E5%9C%A8Grafana%E9%87%8C%E6%B7%BB%E5%8A%A0worldping%E6%8F%92%E4%BB%B6/" class="article-date">
+  <time datetime="2018-04-19T02:41:18.000Z" itemprop="datePublished">2018-04-19</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/chenblog.github.io/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/">工作与技术</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/chenblog.github.io/2018/04/19/%E5%9C%A8Grafana%E9%87%8C%E6%B7%BB%E5%8A%A0worldping%E6%8F%92%E4%BB%B6/">在Grafana里添加worldping插件</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="安装插件"><a href="#安装插件" class="headerlink" title="安装插件"></a>安装插件</h2><p>worldping是一个监控网站的dns、ping、http响应、https响应的插件，要安装它很简单，在granafa服务器里执行如下命令：<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">grafana-cli plugins install raintank-worldping-app</span><br><span class="line">systemctl restart grafana-server.service</span><br></pre></td></tr></table></figure></p>
+<p>执行完毕之后在grafana的界面里选择<code>Plugins</code>，然后在<code>APP</code>里找到<code>worldping</code>，启动它，但是此时发现需要一个api，如图：<br><img src="/images/worldping.png" alt="paradin"></p>
+<p>此时你需要登录grafana的官网，然后点击<code>api keys</code>和<code>ADD API KEY</code>，就可以生成一个<code>API KEY</code>，名字可以随便起，如下：<br><img src="/images/worldping2.png" alt="paradin"></p>
+<p>将生成的api key保存好，并且填回到grafana的api key里，这样worldping插件就可以使用了，如图：<br><img src="/images/worldping3.png" alt="paradin"></p>
+<h2 id="监控网站节点"><a href="#监控网站节点" class="headerlink" title="监控网站节点"></a>监控网站节点</h2><p>此时点击黄色旋涡，发现多了worldping的选项，点击<code>worldping Home</code>，如图：<br><img src="/images/worldping4.png" alt="paradin"></p>
+<p>然后点击<code>+ New Endpoint</code>，这里我输入我公司的官网域名，然后<code>begin auto-discovery</code>，如图：<br><img src="/images/worldping5.png" alt="paradin"></p>
+<p>生成了结果之后，点击add，此时开始检查几个大城市，如芝加哥、东京、纽约、巴黎等大城市连接到刚刚输入的域名的情况，如图：<br><img src="/images/worldping6.png" alt="paradin"></p>
+<p>大约需要1~2分钟后，数据检查完成，可以点击<code>GO to Summary Dashboard</code>，就会看到图像了：<br><img src="/images/worldping7.png" alt="paradin"></p>
+<p>为什么我这个图里没有http?因为在nginx里我们做了http强制rewrite跳转到https，所以是读不到值的。</p>
+<h2 id="删除网站节点"><a href="#删除网站节点" class="headerlink" title="删除网站节点"></a>删除网站节点</h2><p>如果要删除网站节点，还是在worldping里点击要删除网站后面的齿轮图标，如图：<br><img src="/images/worldping8.png" alt="paradin"></p>
+<p>然后选择<code>configuration</code>，这里可以修改网站域名，要删除的话，选择最下面的<code>destory</code>，输入DELETE确认，然后就可以点击<code>DELETE</code>删除了，如图：<br><img src="/images/worldping9.png" alt="paradin"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://brucewayne2099.github.io/2018/04/19/%E5%9C%A8Grafana%E9%87%8C%E6%B7%BB%E5%8A%A0worldping%E6%8F%92%E4%BB%B6/" data-id="ckbnyllzr00trjj6uht34ff7o" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/chenblog.github.io/tags/grafana/" rel="tag">grafana</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/chenblog.github.io/tags/%E5%9B%BE%E5%83%8F%E7%9B%91%E6%8E%A7/" rel="tag">图像监控</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+
+
+  <nav id="page-nav">
+    
+    <a class="extend prev" rel="prev" href="/chenblog.github.io/page/17/">&amp;laquo; Prev</a><a class="page-number" href="/chenblog.github.io/">1</a><span class="space">&hellip;</span><a class="page-number" href="/chenblog.github.io/page/16/">16</a><a class="page-number" href="/chenblog.github.io/page/17/">17</a><span class="page-number current">18</span><a class="page-number" href="/chenblog.github.io/page/19/">19</a><a class="page-number" href="/chenblog.github.io/page/20/">20</a><span class="space">&hellip;</span><a class="page-number" href="/chenblog.github.io/page/30/">30</a><a class="extend next" rel="next" href="/chenblog.github.io/page/19/">Next &amp;raquo;</a>
+  </nav>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/chenblog.github.io/categories/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/">博客搭建</a></li><li class="category-list-item"><a class="category-list-link" href="/chenblog.github.io/categories/%E5%9D%A0%E4%B9%B1%E8%8A%B1%E5%A4%A9/">坠乱花天</a></li><li class="category-list-item"><a class="category-list-link" href="/chenblog.github.io/categories/%E5%A4%A7%E7%89%9B%E4%B9%8B%E8%B7%AF/">大牛之路</a></li><li class="category-list-item"><a class="category-list-link" href="/chenblog.github.io/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E5%8E%9F%E7%90%86/">工作与原理</a></li><li class="category-list-item"><a class="category-list-link" href="/chenblog.github.io/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/">工作与技术</a></li><li class="category-list-item"><a class="category-list-link" href="/chenblog.github.io/categories/%E6%8A%80%E6%9C%AF%E4%B8%8E%E5%B7%A5%E4%BD%9C/">技术与工作</a></li><li class="category-list-item"><a class="category-list-link" href="/chenblog.github.io/categories/%E7%94%A8%E6%9D%A5%E4%BF%9D%E6%8A%A4%E8%A7%86%E5%8A%9B%E7%9A%84%E5%9B%BE%E7%89%87/">用来保护视力的图片</a></li><li class="category-list-item"><a class="category-list-link" href="/chenblog.github.io/categories/%E7%9B%91%E6%8E%A7%E4%B8%8E%E6%8A%80%E6%9C%AF/">监控与技术</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/AWS/" rel="tag">AWS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/Ajax/" rel="tag">Ajax</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/Ansible/" rel="tag">Ansible</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/Awk/" rel="tag">Awk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/BBR/" rel="tag">BBR</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/CDN/" rel="tag">CDN</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/CI-CD/" rel="tag">CI/CD</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/Django/" rel="tag">Django</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/Docker/" rel="tag">Docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/ELK/" rel="tag">ELK</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/Excel/" rel="tag">Excel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/Github/" rel="tag">Github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/Gitlab/" rel="tag">Gitlab</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/Golang/" rel="tag">Golang</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/HTTP/" rel="tag">HTTP</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/Hadoop/" rel="tag">Hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/Hexo/" rel="tag">Hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/Jenkins/" rel="tag">Jenkins</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/Jquery/" rel="tag">Jquery</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/Linux/" rel="tag">Linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/MySQL/" rel="tag">MySQL</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/Mysql/" rel="tag">Mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/NBA/" rel="tag">NBA</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/Next/" rel="tag">Next</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/Nginx/" rel="tag">Nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/Prometheus/" rel="tag">Prometheus</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/Python-2-7/" rel="tag">Python 2.7</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/Qtunnel/" rel="tag">Qtunnel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/RDS/" rel="tag">RDS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/RabbitMQ/" rel="tag">RabbitMQ</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/SRE/" rel="tag">SRE</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/Shell/" rel="tag">Shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/UTC%E6%97%B6%E9%97%B4/" rel="tag">UTC时间</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/Uwsgi/" rel="tag">Uwsgi</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/Zabbix/" rel="tag">Zabbix</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/activemq/" rel="tag">activemq</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/ansible/" rel="tag">ansible</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/ansible-api/" rel="tag">ansible api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/anymail/" rel="tag">anymail</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/api/" rel="tag">api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/apple/" rel="tag">apple</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/atlas/" rel="tag">atlas</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/aws/" rel="tag">aws</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/celery/" rel="tag">celery</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/centos/" rel="tag">centos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/centos-6-5/" rel="tag">centos 6.5</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/checkbox/" rel="tag">checkbox</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/ci-cd/" rel="tag">ci/cd</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/crontab/" rel="tag">crontab</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/css/" rel="tag">css</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/curl/" rel="tag">curl</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/django/" rel="tag">django</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/django2/" rel="tag">django2</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/docker/" rel="tag">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/docker%E5%AE%B9%E5%99%A8/" rel="tag">docker容器</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/docker%E9%95%9C%E5%83%8F/" rel="tag">docker镜像</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/echart/" rel="tag">echart</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/elk/" rel="tag">elk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/enumerate/" rel="tag">enumerate</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/excel/" rel="tag">excel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/expect/" rel="tag">expect</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/filebeat/" rel="tag">filebeat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/gateone/" rel="tag">gateone</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/gc/" rel="tag">gc++</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/git/" rel="tag">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/github/" rel="tag">github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/gitlab/" rel="tag">gitlab</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/gitlab-runner/" rel="tag">gitlab-runner</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/go/" rel="tag">go</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/golang/" rel="tag">golang</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/grafana/" rel="tag">grafana</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/gtid/" rel="tag">gtid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/gui/" rel="tag">gui</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/harbor/" rel="tag">harbor</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/hexo/" rel="tag">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/html/" rel="tag">html</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/html5/" rel="tag">html5</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/http/" rel="tag">http</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/httpd/" rel="tag">httpd</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/https/" rel="tag">https</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/https%E8%AF%81%E4%B9%A6/" rel="tag">https证书</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/http%E5%8D%8F%E8%AE%AE/" rel="tag">http协议</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/http%E7%BD%91%E7%BB%9C/" rel="tag">http网络</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/intellij-idea/" rel="tag">intellij idea</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/iptables/" rel="tag">iptables</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/itables/" rel="tag">itables</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/java/" rel="tag">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/jenkins/" rel="tag">jenkins</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/js/" rel="tag">js</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/jumpserver%E5%A0%A1%E5%9E%92%E6%9C%BA/" rel="tag">jumpserver堡垒机</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/k8s/" rel="tag">k8s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/kafka/" rel="tag">kafka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/kibana/" rel="tag">kibana</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/kubenetes/" rel="tag">kubenetes</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/kubernetes/" rel="tag">kubernetes</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/linux/" rel="tag">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/logrotate/" rel="tag">logrotate</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/logstash/" rel="tag">logstash</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/lsattr/" rel="tag">lsattr</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/memcached/" rel="tag">memcached</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/mycat/" rel="tag">mycat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/mysql/" rel="tag">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/mysql%E4%B8%BB%E4%BB%8E/" rel="tag">mysql主从</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/nba/" rel="tag">nba</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/nessus/" rel="tag">nessus</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/nginx/" rel="tag">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/nodejs/" rel="tag">nodejs</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/pandas/" rel="tag">pandas</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/paramiko/" rel="tag">paramiko</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/php/" rel="tag">php</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/php-fpm/" rel="tag">php-fpm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/proxy-pass/" rel="tag">proxy_pass</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/proxysql/" rel="tag">proxysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/python/" rel="tag">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/python2/" rel="tag">python2</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/python3/" rel="tag">python3</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/python3-6/" rel="tag">python3.6</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/raid/" rel="tag">raid</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/rancher/" rel="tag">rancher</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/redhat/" rel="tag">redhat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/redis/" rel="tag">redis</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/restfulapi/" rel="tag">restfulapi</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/s6-svscan/" rel="tag">s6-svscan</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/sftp/" rel="tag">sftp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/shell/" rel="tag">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/ssh/" rel="tag">ssh</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/ssh-keys/" rel="tag">ssh keys</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/ssl%E5%8A%A0%E5%AF%86/" rel="tag">ssl加密</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/ssr/" rel="tag">ssr</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/storm/" rel="tag">storm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/tcp%E8%BF%9E%E6%8E%A5/" rel="tag">tcp连接</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/tcp%E9%93%BE%E6%8E%A5/" rel="tag">tcp链接</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/tkinter/" rel="tag">tkinter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/tomcat/" rel="tag">tomcat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/top/" rel="tag">top</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/tps/" rel="tag">tps</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/url%E6%8B%A6%E6%88%AA/" rel="tag">url拦截</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/uwsgi/" rel="tag">uwsgi</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/v2ray/" rel="tag">v2ray</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/web%E7%9B%91%E6%8E%A7/" rel="tag">web监控</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/xshell/" rel="tag">xshell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/yum/" rel="tag">yum</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/yum%E6%BA%90/" rel="tag">yum源</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/zabbix/" rel="tag">zabbix</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/zookeeper/" rel="tag">zookeeper</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E4%B8%96%E7%95%8C%E6%9D%AF/" rel="tag">世界杯</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E4%B8%AD%E5%9B%BD%E6%94%BF%E6%B2%BB/" rel="tag">中国政治</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E4%B8%BB%E4%BB%8E%E5%90%8C%E6%AD%A5/" rel="tag">主从同步</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E4%BA%91%E5%8E%9F%E7%94%9F/" rel="tag">云原生</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E4%BA%9A%E6%B4%B2%E6%B0%91%E4%B8%BB/" rel="tag">亚洲民主</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E4%BA%B2%E6%83%85/" rel="tag">亲情</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E4%BC%A6%E6%95%A6/" rel="tag">伦敦</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%85%A8%E9%93%BE%E8%B7%AF%E5%8E%8B%E6%B5%8B/" rel="tag">全链路压测</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%85%B6%E4%BB%96%E8%BD%AF%E4%BB%B6/" rel="tag">其他软件</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F/" rel="tag">内存泄漏</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%86%85%E6%A0%B8/" rel="tag">内核</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%86%85%E6%A0%B8%E4%BC%98%E5%8C%96/" rel="tag">内核优化</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%88%97%E8%A1%A8%E5%8A%A0%E5%B7%A5/" rel="tag">列表加工</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%89%8D%E7%AB%AFnode/" rel="tag">前端node</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%89%8D%E7%AB%AFpm2/" rel="tag">前端pm2</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%89%8D%E7%AB%AF%E6%8A%80%E6%9C%AF/" rel="tag">前端技术</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%8A%A0%E5%AF%86%E6%8A%80%E6%9C%AF/" rel="tag">加密技术</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/" rel="tag">博客搭建</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%8D%9A%E5%AE%A2%E7%BE%8E%E5%8C%96/" rel="tag">博客美化</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%8F%8C%E5%8D%81%E4%B8%80/" rel="tag">双十一</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%8F%AF%E8%A7%86%E5%8C%96/" rel="tag">可视化</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%90%8E%E9%97%A8%E8%BD%AF%E4%BB%B6/" rel="tag">后门软件</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%9B%BD%E5%BA%86/" rel="tag">国庆</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%9B%BD%E9%99%85%E8%B6%B3%E5%9D%9B/" rel="tag">国际足坛</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%9B%BE%E5%83%8F%E7%9B%91%E6%8E%A7/" rel="tag">图像监控</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%9B%BE%E7%89%87/" rel="tag">图片</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/" rel="tag">基础知识</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/" rel="tag">多线程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%A4%A7%E4%BF%83/" rel="tag">大促</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE/" rel="tag">大数据</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90/" rel="tag">大数据分析</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%A4%A7%E7%89%9B%E4%B9%8B%E8%B7%AF/" rel="tag">大牛之路</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%AE%89%E5%85%A8/" rel="tag">安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%AE%B9%E5%99%A8/" rel="tag">容器</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF/" rel="tag">容器技术</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%B7%B4%E5%A1%9E%E7%BD%97%E9%82%A3/" rel="tag">巴塞罗那</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%BC%82%E6%AD%A5%E4%BB%BB%E5%8A%A1/" rel="tag">异步任务</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%BD%B1%E8%AF%84/" rel="tag">影评</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%BE%AE%E4%BF%A1/" rel="tag">微信</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E5%BF%83%E6%83%85/" rel="tag">心情</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E6%84%9F%E6%82%9F/" rel="tag">感悟</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E6%89%B9%E9%87%8F%E9%83%A8%E7%BD%B2/" rel="tag">批量部署</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90/" rel="tag">持续集成</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E6%94%BF%E6%B2%BB/" rel="tag">政治</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E6%95%B0%E6%8D%AE%E5%A4%87%E4%BB%BD/" rel="tag">数据备份</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag">数据库</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E4%B8%AD%E9%97%B4%E4%BB%B6/" rel="tag">数据库中间件</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/" rel="tag">文件上传</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E6%96%87%E4%BB%B6%E8%AF%BB%E5%86%99/" rel="tag">文件读写</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E6%97%85%E6%B8%B8/" rel="tag">旅游</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E6%97%A5%E5%BF%97%E7%BB%9F%E8%AE%A1/" rel="tag">日志统计</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E6%97%A5%E6%9C%AC/" rel="tag">日本</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E6%97%B6%E5%8C%BA%E8%BD%AC%E6%8D%A2/" rel="tag">时区转换</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E6%98%A5%E8%8A%82/" rel="tag">春节</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%9B%91%E6%8E%A7/" rel="tag">服务器监控</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F/" rel="tag">正则表达式</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E6%AD%A6%E6%B1%89/" rel="tag">武汉</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/" rel="tag">消息队列</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E7%88%AC%E8%99%AB/" rel="tag">爬虫</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E7%94%B5%E5%95%86/" rel="tag">电商</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E7%99%BD%E5%90%8D%E5%8D%95/" rel="tag">白名单</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E7%9B%91%E6%8E%A7/" rel="tag">监控</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E7%9B%91%E6%8E%A7%E6%8A%80%E6%9C%AF/" rel="tag">监控技术</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E7%A3%81%E7%9B%98%E9%98%B5%E5%88%97/" rel="tag">磁盘阵列</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/" rel="tag">私有仓库</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E7%AB%AF%E5%8F%A3%E6%8E%A2%E6%B5%8B/" rel="tag">端口探测</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E7%BC%96%E7%A8%8B/" rel="tag">编程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E7%BC%96%E8%BE%91%E5%99%A8/" rel="tag">编辑器</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E7%BD%91%E7%AB%99%E6%8A%80%E6%9C%AF/" rel="tag">网站技术</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/" rel="tag">网络基础</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E7%BD%91%E7%BB%9C%E7%9B%B8%E5%85%B3/" rel="tag">网络相关</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E7%BE%8E%E5%A5%B3/" rel="tag">美女</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E7%BF%BB%E5%A2%99/" rel="tag">翻墙</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E8%81%8C%E5%9C%BA/" rel="tag">职场</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E8%87%AA%E5%8A%A8%E5%8C%96%E9%83%A8%E7%BD%B2/" rel="tag">自动化部署</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E8%8A%82%E7%82%B9%E8%B0%83%E5%BA%A6/" rel="tag">节点调度</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E8%8B%8F%E5%B7%9E/" rel="tag">苏州</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98/" rel="tag">虚拟内存</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E8%AE%A4%E8%AF%81%E9%89%B4%E6%9D%83/" rel="tag">认证鉴权</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E8%AF%BB%E4%B9%A6/" rel="tag">读书</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB/" rel="tag">读写分离</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB%E4%B8%AD%E9%97%B4%E4%BB%B6/" rel="tag">读写分离中间件</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" rel="tag">负载均衡</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E8%B6%B3%E7%90%83/" rel="tag">足球</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E8%B7%A8%E5%9F%9F/" rel="tag">跨域</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E8%BF%90%E7%BB%B4/" rel="tag">运维</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E8%BF%90%E7%BB%B4%E4%B8%8E%E7%9B%91%E6%8E%A7/" rel="tag">运维与监控</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E8%BF%90%E7%BB%B4%E5%AE%89%E5%85%A8/" rel="tag">运维安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E8%BF%90%E7%BB%B4%E6%8A%80%E6%9C%AF/" rel="tag">运维技术</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E8%BF%90%E7%BB%B4%E7%9B%91%E6%8E%A7/" rel="tag">运维监控</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E8%BF%9B%E5%BA%A6%E6%9D%A1/" rel="tag">进度条</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E9%87%91%E5%B1%B1%E4%BA%91/" rel="tag">金山云</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E9%92%89%E9%92%89/" rel="tag">钉钉</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E9%95%BF%E6%B2%99/" rel="tag">长沙</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E9%98%B2%E7%9B%97%E9%93%BE/" rel="tag">防盗链</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E9%98%BF%E6%A0%B9%E5%BB%B7/" rel="tag">阿根廷</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E9%98%BF%E9%87%8C%E4%BA%91/" rel="tag">阿里云</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E9%98%BF%E9%87%8C%E4%BA%91OSS/" rel="tag">阿里云OSS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E9%98%BF%E9%87%8C%E4%BA%91api/" rel="tag">阿里云api</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E9%98%BF%E9%87%8C%E4%BA%91oss/" rel="tag">阿里云oss</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E9%98%BF%E9%87%8C%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8/" rel="tag">阿里云服务器</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E9%9D%A2%E8%AF%95/" rel="tag">面试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E9%9D%A2%E8%AF%95%E7%AC%94%E8%AF%95/" rel="tag">面试笔试</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E9%9D%A2%E8%AF%95%E7%BB%8F%E9%AA%8C/" rel="tag">面试经验</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E9%9F%B3%E4%B9%90/" rel="tag">音乐</a></li><li class="tag-list-item"><a class="tag-list-link" href="/chenblog.github.io/tags/%E9%AD%94%E5%85%BD%E4%B8%96%E7%95%8C/" rel="tag">魔兽世界</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/chenblog.github.io/tags/AWS/" style="font-size: 10.67px;">AWS</a> <a href="/chenblog.github.io/tags/Ajax/" style="font-size: 11.33px;">Ajax</a> <a href="/chenblog.github.io/tags/Ansible/" style="font-size: 10px;">Ansible</a> <a href="/chenblog.github.io/tags/Awk/" style="font-size: 10px;">Awk</a> <a href="/chenblog.github.io/tags/BBR/" style="font-size: 10px;">BBR</a> <a href="/chenblog.github.io/tags/CDN/" style="font-size: 10.67px;">CDN</a> <a href="/chenblog.github.io/tags/CI-CD/" style="font-size: 10px;">CI/CD</a> <a href="/chenblog.github.io/tags/Django/" style="font-size: 14.67px;">Django</a> <a href="/chenblog.github.io/tags/Docker/" style="font-size: 10.67px;">Docker</a> <a href="/chenblog.github.io/tags/ELK/" style="font-size: 10px;">ELK</a> <a href="/chenblog.github.io/tags/Excel/" style="font-size: 10px;">Excel</a> <a href="/chenblog.github.io/tags/Github/" style="font-size: 10px;">Github</a> <a href="/chenblog.github.io/tags/Gitlab/" style="font-size: 10px;">Gitlab</a> <a href="/chenblog.github.io/tags/Golang/" style="font-size: 10px;">Golang</a> <a href="/chenblog.github.io/tags/HTTP/" style="font-size: 10px;">HTTP</a> <a href="/chenblog.github.io/tags/Hadoop/" style="font-size: 10px;">Hadoop</a> <a href="/chenblog.github.io/tags/Hexo/" style="font-size: 10px;">Hexo</a> <a href="/chenblog.github.io/tags/Jenkins/" style="font-size: 11.33px;">Jenkins</a> <a href="/chenblog.github.io/tags/Jquery/" style="font-size: 11.33px;">Jquery</a> <a href="/chenblog.github.io/tags/Linux/" style="font-size: 13.33px;">Linux</a> <a href="/chenblog.github.io/tags/MySQL/" style="font-size: 10px;">MySQL</a> <a href="/chenblog.github.io/tags/Mysql/" style="font-size: 11.33px;">Mysql</a> <a href="/chenblog.github.io/tags/NBA/" style="font-size: 10px;">NBA</a> <a href="/chenblog.github.io/tags/Next/" style="font-size: 10px;">Next</a> <a href="/chenblog.github.io/tags/Nginx/" style="font-size: 11.33px;">Nginx</a> <a href="/chenblog.github.io/tags/Prometheus/" style="font-size: 11.33px;">Prometheus</a> <a href="/chenblog.github.io/tags/Python-2-7/" style="font-size: 10px;">Python 2.7</a> <a href="/chenblog.github.io/tags/Qtunnel/" style="font-size: 10px;">Qtunnel</a> <a href="/chenblog.github.io/tags/RDS/" style="font-size: 10px;">RDS</a> <a href="/chenblog.github.io/tags/RabbitMQ/" style="font-size: 10px;">RabbitMQ</a> <a href="/chenblog.github.io/tags/SRE/" style="font-size: 10px;">SRE</a> <a href="/chenblog.github.io/tags/Shell/" style="font-size: 10px;">Shell</a> <a href="/chenblog.github.io/tags/UTC%E6%97%B6%E9%97%B4/" style="font-size: 10px;">UTC时间</a> <a href="/chenblog.github.io/tags/Uwsgi/" style="font-size: 10px;">Uwsgi</a> <a href="/chenblog.github.io/tags/Zabbix/" style="font-size: 10.67px;">Zabbix</a> <a href="/chenblog.github.io/tags/activemq/" style="font-size: 10.67px;">activemq</a> <a href="/chenblog.github.io/tags/ansible/" style="font-size: 13.33px;">ansible</a> <a href="/chenblog.github.io/tags/ansible-api/" style="font-size: 10px;">ansible api</a> <a href="/chenblog.github.io/tags/anymail/" style="font-size: 10px;">anymail</a> <a href="/chenblog.github.io/tags/api/" style="font-size: 10px;">api</a> <a href="/chenblog.github.io/tags/apple/" style="font-size: 10px;">apple</a> <a href="/chenblog.github.io/tags/atlas/" style="font-size: 10.67px;">atlas</a> <a href="/chenblog.github.io/tags/aws/" style="font-size: 10px;">aws</a> <a href="/chenblog.github.io/tags/celery/" style="font-size: 10px;">celery</a> <a href="/chenblog.github.io/tags/centos/" style="font-size: 10.67px;">centos</a> <a href="/chenblog.github.io/tags/centos-6-5/" style="font-size: 10px;">centos 6.5</a> <a href="/chenblog.github.io/tags/checkbox/" style="font-size: 10px;">checkbox</a> <a href="/chenblog.github.io/tags/ci-cd/" style="font-size: 10px;">ci/cd</a> <a href="/chenblog.github.io/tags/crontab/" style="font-size: 10.67px;">crontab</a> <a href="/chenblog.github.io/tags/css/" style="font-size: 10px;">css</a> <a href="/chenblog.github.io/tags/curl/" style="font-size: 10px;">curl</a> <a href="/chenblog.github.io/tags/django/" style="font-size: 19.33px;">django</a> <a href="/chenblog.github.io/tags/django2/" style="font-size: 10px;">django2</a> <a href="/chenblog.github.io/tags/docker/" style="font-size: 18px;">docker</a> <a href="/chenblog.github.io/tags/docker%E5%AE%B9%E5%99%A8/" style="font-size: 10px;">docker容器</a> <a href="/chenblog.github.io/tags/docker%E9%95%9C%E5%83%8F/" style="font-size: 10px;">docker镜像</a> <a href="/chenblog.github.io/tags/echart/" style="font-size: 10px;">echart</a> <a href="/chenblog.github.io/tags/elk/" style="font-size: 14px;">elk</a> <a href="/chenblog.github.io/tags/enumerate/" style="font-size: 10px;">enumerate</a> <a href="/chenblog.github.io/tags/excel/" style="font-size: 10.67px;">excel</a> <a href="/chenblog.github.io/tags/expect/" style="font-size: 10px;">expect</a> <a href="/chenblog.github.io/tags/filebeat/" style="font-size: 10px;">filebeat</a> <a href="/chenblog.github.io/tags/gateone/" style="font-size: 10px;">gateone</a> <a href="/chenblog.github.io/tags/gc/" style="font-size: 10px;">gc++</a> <a href="/chenblog.github.io/tags/git/" style="font-size: 12.67px;">git</a> <a href="/chenblog.github.io/tags/github/" style="font-size: 10.67px;">github</a> <a href="/chenblog.github.io/tags/gitlab/" style="font-size: 14.67px;">gitlab</a> <a href="/chenblog.github.io/tags/gitlab-runner/" style="font-size: 10px;">gitlab-runner</a> <a href="/chenblog.github.io/tags/go/" style="font-size: 10px;">go</a> <a href="/chenblog.github.io/tags/golang/" style="font-size: 10.67px;">golang</a> <a href="/chenblog.github.io/tags/grafana/" style="font-size: 12px;">grafana</a> <a href="/chenblog.github.io/tags/gtid/" style="font-size: 10px;">gtid</a> <a href="/chenblog.github.io/tags/gui/" style="font-size: 10px;">gui</a> <a href="/chenblog.github.io/tags/harbor/" style="font-size: 10px;">harbor</a> <a href="/chenblog.github.io/tags/hexo/" style="font-size: 10.67px;">hexo</a> <a href="/chenblog.github.io/tags/html/" style="font-size: 12px;">html</a> <a href="/chenblog.github.io/tags/html5/" style="font-size: 10px;">html5</a> <a href="/chenblog.github.io/tags/http/" style="font-size: 10.67px;">http</a> <a href="/chenblog.github.io/tags/httpd/" style="font-size: 10px;">httpd</a> <a href="/chenblog.github.io/tags/https/" style="font-size: 10.67px;">https</a> <a href="/chenblog.github.io/tags/https%E8%AF%81%E4%B9%A6/" style="font-size: 10.67px;">https证书</a> <a href="/chenblog.github.io/tags/http%E5%8D%8F%E8%AE%AE/" style="font-size: 11.33px;">http协议</a> <a href="/chenblog.github.io/tags/http%E7%BD%91%E7%BB%9C/" style="font-size: 10px;">http网络</a> <a href="/chenblog.github.io/tags/intellij-idea/" style="font-size: 10.67px;">intellij idea</a> <a href="/chenblog.github.io/tags/iptables/" style="font-size: 10px;">iptables</a> <a href="/chenblog.github.io/tags/itables/" style="font-size: 10px;">itables</a> <a href="/chenblog.github.io/tags/java/" style="font-size: 10px;">java</a> <a href="/chenblog.github.io/tags/jenkins/" style="font-size: 11.33px;">jenkins</a> <a href="/chenblog.github.io/tags/js/" style="font-size: 10px;">js</a> <a href="/chenblog.github.io/tags/jumpserver%E5%A0%A1%E5%9E%92%E6%9C%BA/" style="font-size: 10px;">jumpserver堡垒机</a> <a href="/chenblog.github.io/tags/k8s/" style="font-size: 12.67px;">k8s</a> <a href="/chenblog.github.io/tags/kafka/" style="font-size: 11.33px;">kafka</a> <a href="/chenblog.github.io/tags/kibana/" style="font-size: 10px;">kibana</a> <a href="/chenblog.github.io/tags/kubenetes/" style="font-size: 10px;">kubenetes</a> <a href="/chenblog.github.io/tags/kubernetes/" style="font-size: 10px;">kubernetes</a> <a href="/chenblog.github.io/tags/linux/" style="font-size: 16px;">linux</a> <a href="/chenblog.github.io/tags/logrotate/" style="font-size: 10px;">logrotate</a> <a href="/chenblog.github.io/tags/logstash/" style="font-size: 10.67px;">logstash</a> <a href="/chenblog.github.io/tags/lsattr/" style="font-size: 10px;">lsattr</a> <a href="/chenblog.github.io/tags/memcached/" style="font-size: 10px;">memcached</a> <a href="/chenblog.github.io/tags/mycat/" style="font-size: 11.33px;">mycat</a> <a href="/chenblog.github.io/tags/mysql/" style="font-size: 17.33px;">mysql</a> <a href="/chenblog.github.io/tags/mysql%E4%B8%BB%E4%BB%8E/" style="font-size: 10px;">mysql主从</a> <a href="/chenblog.github.io/tags/nba/" style="font-size: 10px;">nba</a> <a href="/chenblog.github.io/tags/nessus/" style="font-size: 10px;">nessus</a> <a href="/chenblog.github.io/tags/nginx/" style="font-size: 18.67px;">nginx</a> <a href="/chenblog.github.io/tags/nodejs/" style="font-size: 10px;">nodejs</a> <a href="/chenblog.github.io/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/chenblog.github.io/tags/paramiko/" style="font-size: 10px;">paramiko</a> <a href="/chenblog.github.io/tags/php/" style="font-size: 10.67px;">php</a> <a href="/chenblog.github.io/tags/php-fpm/" style="font-size: 10px;">php-fpm</a> <a href="/chenblog.github.io/tags/proxy-pass/" style="font-size: 10px;">proxy_pass</a> <a href="/chenblog.github.io/tags/proxysql/" style="font-size: 10.67px;">proxysql</a> <a href="/chenblog.github.io/tags/python/" style="font-size: 20px;">python</a> <a href="/chenblog.github.io/tags/python2/" style="font-size: 10px;">python2</a> <a href="/chenblog.github.io/tags/python3/" style="font-size: 14.67px;">python3</a> <a href="/chenblog.github.io/tags/python3-6/" style="font-size: 10px;">python3.6</a> <a href="/chenblog.github.io/tags/raid/" style="font-size: 10px;">raid</a> <a href="/chenblog.github.io/tags/rancher/" style="font-size: 10.67px;">rancher</a> <a href="/chenblog.github.io/tags/redhat/" style="font-size: 10px;">redhat</a> <a href="/chenblog.github.io/tags/redis/" style="font-size: 13.33px;">redis</a> <a href="/chenblog.github.io/tags/restfulapi/" style="font-size: 10px;">restfulapi</a> <a href="/chenblog.github.io/tags/s6-svscan/" style="font-size: 10px;">s6-svscan</a> <a href="/chenblog.github.io/tags/sftp/" style="font-size: 10px;">sftp</a> <a href="/chenblog.github.io/tags/shell/" style="font-size: 14px;">shell</a> <a href="/chenblog.github.io/tags/ssh/" style="font-size: 12px;">ssh</a> <a href="/chenblog.github.io/tags/ssh-keys/" style="font-size: 10px;">ssh keys</a> <a href="/chenblog.github.io/tags/ssl%E5%8A%A0%E5%AF%86/" style="font-size: 10px;">ssl加密</a> <a href="/chenblog.github.io/tags/ssr/" style="font-size: 10px;">ssr</a> <a href="/chenblog.github.io/tags/storm/" style="font-size: 10px;">storm</a> <a href="/chenblog.github.io/tags/tcp%E8%BF%9E%E6%8E%A5/" style="font-size: 10px;">tcp连接</a> <a href="/chenblog.github.io/tags/tcp%E9%93%BE%E6%8E%A5/" style="font-size: 10px;">tcp链接</a> <a href="/chenblog.github.io/tags/tkinter/" style="font-size: 10px;">tkinter</a> <a href="/chenblog.github.io/tags/tomcat/" style="font-size: 10px;">tomcat</a> <a href="/chenblog.github.io/tags/top/" style="font-size: 10px;">top</a> <a href="/chenblog.github.io/tags/tps/" style="font-size: 10px;">tps</a> <a href="/chenblog.github.io/tags/url%E6%8B%A6%E6%88%AA/" style="font-size: 10px;">url拦截</a> <a href="/chenblog.github.io/tags/uwsgi/" style="font-size: 10.67px;">uwsgi</a> <a href="/chenblog.github.io/tags/v2ray/" style="font-size: 10px;">v2ray</a> <a href="/chenblog.github.io/tags/web%E7%9B%91%E6%8E%A7/" style="font-size: 10px;">web监控</a> <a href="/chenblog.github.io/tags/xshell/" style="font-size: 10px;">xshell</a> <a href="/chenblog.github.io/tags/yum/" style="font-size: 10.67px;">yum</a> <a href="/chenblog.github.io/tags/yum%E6%BA%90/" style="font-size: 10px;">yum源</a> <a href="/chenblog.github.io/tags/zabbix/" style="font-size: 18.67px;">zabbix</a> <a href="/chenblog.github.io/tags/zookeeper/" style="font-size: 11.33px;">zookeeper</a> <a href="/chenblog.github.io/tags/%E4%B8%96%E7%95%8C%E6%9D%AF/" style="font-size: 10.67px;">世界杯</a> <a href="/chenblog.github.io/tags/%E4%B8%AD%E5%9B%BD%E6%94%BF%E6%B2%BB/" style="font-size: 10px;">中国政治</a> <a href="/chenblog.github.io/tags/%E4%B8%BB%E4%BB%8E%E5%90%8C%E6%AD%A5/" style="font-size: 10.67px;">主从同步</a> <a href="/chenblog.github.io/tags/%E4%BA%91%E5%8E%9F%E7%94%9F/" style="font-size: 11.33px;">云原生</a> <a href="/chenblog.github.io/tags/%E4%BA%9A%E6%B4%B2%E6%B0%91%E4%B8%BB/" style="font-size: 10px;">亚洲民主</a> <a href="/chenblog.github.io/tags/%E4%BA%B2%E6%83%85/" style="font-size: 10px;">亲情</a> <a href="/chenblog.github.io/tags/%E4%BC%A6%E6%95%A6/" style="font-size: 10px;">伦敦</a> <a href="/chenblog.github.io/tags/%E5%85%A8%E9%93%BE%E8%B7%AF%E5%8E%8B%E6%B5%8B/" style="font-size: 10px;">全链路压测</a> <a href="/chenblog.github.io/tags/%E5%85%B6%E4%BB%96%E8%BD%AF%E4%BB%B6/" style="font-size: 10px;">其他软件</a> <a href="/chenblog.github.io/tags/%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F/" style="font-size: 10px;">内存泄漏</a> <a href="/chenblog.github.io/tags/%E5%86%85%E6%A0%B8/" style="font-size: 10.67px;">内核</a> <a href="/chenblog.github.io/tags/%E5%86%85%E6%A0%B8%E4%BC%98%E5%8C%96/" style="font-size: 10px;">内核优化</a> <a href="/chenblog.github.io/tags/%E5%88%97%E8%A1%A8%E5%8A%A0%E5%B7%A5/" style="font-size: 10px;">列表加工</a> <a href="/chenblog.github.io/tags/%E5%89%8D%E7%AB%AF/" style="font-size: 10.67px;">前端</a> <a href="/chenblog.github.io/tags/%E5%89%8D%E7%AB%AFnode/" style="font-size: 10px;">前端node</a> <a href="/chenblog.github.io/tags/%E5%89%8D%E7%AB%AFpm2/" style="font-size: 10px;">前端pm2</a> <a href="/chenblog.github.io/tags/%E5%89%8D%E7%AB%AF%E6%8A%80%E6%9C%AF/" style="font-size: 10px;">前端技术</a> <a href="/chenblog.github.io/tags/%E5%8A%A0%E5%AF%86%E6%8A%80%E6%9C%AF/" style="font-size: 10px;">加密技术</a> <a href="/chenblog.github.io/tags/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/" style="font-size: 10.67px;">博客搭建</a> <a href="/chenblog.github.io/tags/%E5%8D%9A%E5%AE%A2%E7%BE%8E%E5%8C%96/" style="font-size: 10px;">博客美化</a> <a href="/chenblog.github.io/tags/%E5%8F%8C%E5%8D%81%E4%B8%80/" style="font-size: 10px;">双十一</a> <a href="/chenblog.github.io/tags/%E5%8F%AF%E8%A7%86%E5%8C%96/" style="font-size: 10px;">可视化</a> <a href="/chenblog.github.io/tags/%E5%90%8E%E9%97%A8%E8%BD%AF%E4%BB%B6/" style="font-size: 10px;">后门软件</a> <a href="/chenblog.github.io/tags/%E5%9B%BD%E5%BA%86/" style="font-size: 10px;">国庆</a> <a href="/chenblog.github.io/tags/%E5%9B%BD%E9%99%85%E8%B6%B3%E5%9D%9B/" style="font-size: 10px;">国际足坛</a> <a href="/chenblog.github.io/tags/%E5%9B%BE%E5%83%8F%E7%9B%91%E6%8E%A7/" style="font-size: 10px;">图像监控</a> <a href="/chenblog.github.io/tags/%E5%9B%BE%E7%89%87/" style="font-size: 10px;">图片</a> <a href="/chenblog.github.io/tags/%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/" style="font-size: 10px;">基础知识</a> <a href="/chenblog.github.io/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/" style="font-size: 10px;">多线程</a> <a href="/chenblog.github.io/tags/%E5%A4%A7%E4%BF%83/" style="font-size: 10px;">大促</a> <a href="/chenblog.github.io/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE/" style="font-size: 10.67px;">大数据</a> <a href="/chenblog.github.io/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90/" style="font-size: 12px;">大数据分析</a> <a href="/chenblog.github.io/tags/%E5%A4%A7%E7%89%9B%E4%B9%8B%E8%B7%AF/" style="font-size: 12.67px;">大牛之路</a> <a href="/chenblog.github.io/tags/%E5%AE%89%E5%85%A8/" style="font-size: 10.67px;">安全</a> <a href="/chenblog.github.io/tags/%E5%AE%B9%E5%99%A8/" style="font-size: 14px;">容器</a> <a href="/chenblog.github.io/tags/%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF/" style="font-size: 10px;">容器技术</a> <a href="/chenblog.github.io/tags/%E5%B7%B4%E5%A1%9E%E7%BD%97%E9%82%A3/" style="font-size: 10px;">巴塞罗那</a> <a href="/chenblog.github.io/tags/%E5%BC%82%E6%AD%A5%E4%BB%BB%E5%8A%A1/" style="font-size: 10px;">异步任务</a> <a href="/chenblog.github.io/tags/%E5%BD%B1%E8%AF%84/" style="font-size: 10px;">影评</a> <a href="/chenblog.github.io/tags/%E5%BE%AE%E4%BF%A1/" style="font-size: 10px;">微信</a> <a href="/chenblog.github.io/tags/%E5%BF%83%E6%83%85/" style="font-size: 10.67px;">心情</a> <a href="/chenblog.github.io/tags/%E6%84%9F%E6%82%9F/" style="font-size: 10px;">感悟</a> <a href="/chenblog.github.io/tags/%E6%89%B9%E9%87%8F%E9%83%A8%E7%BD%B2/" style="font-size: 10px;">批量部署</a> <a href="/chenblog.github.io/tags/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90/" style="font-size: 11.33px;">持续集成</a> <a href="/chenblog.github.io/tags/%E6%94%BF%E6%B2%BB/" style="font-size: 10.67px;">政治</a> <a href="/chenblog.github.io/tags/%E6%95%B0%E6%8D%AE%E5%A4%87%E4%BB%BD/" style="font-size: 10px;">数据备份</a> <a href="/chenblog.github.io/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" style="font-size: 10.67px;">数据库</a> <a href="/chenblog.github.io/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E4%B8%AD%E9%97%B4%E4%BB%B6/" style="font-size: 11.33px;">数据库中间件</a> <a href="/chenblog.github.io/tags/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/" style="font-size: 10px;">文件上传</a> <a href="/chenblog.github.io/tags/%E6%96%87%E4%BB%B6%E8%AF%BB%E5%86%99/" style="font-size: 10px;">文件读写</a> <a href="/chenblog.github.io/tags/%E6%97%85%E6%B8%B8/" style="font-size: 12.67px;">旅游</a> <a href="/chenblog.github.io/tags/%E6%97%A5%E5%BF%97%E7%BB%9F%E8%AE%A1/" style="font-size: 10px;">日志统计</a> <a href="/chenblog.github.io/tags/%E6%97%A5%E6%9C%AC/" style="font-size: 10.67px;">日本</a> <a href="/chenblog.github.io/tags/%E6%97%B6%E5%8C%BA%E8%BD%AC%E6%8D%A2/" style="font-size: 10px;">时区转换</a> <a href="/chenblog.github.io/tags/%E6%98%A5%E8%8A%82/" style="font-size: 10px;">春节</a> <a href="/chenblog.github.io/tags/%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%9B%91%E6%8E%A7/" style="font-size: 10px;">服务器监控</a> <a href="/chenblog.github.io/tags/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F/" style="font-size: 10px;">正则表达式</a> <a href="/chenblog.github.io/tags/%E6%AD%A6%E6%B1%89/" style="font-size: 10px;">武汉</a> <a href="/chenblog.github.io/tags/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/" style="font-size: 10.67px;">消息队列</a> <a href="/chenblog.github.io/tags/%E7%88%AC%E8%99%AB/" style="font-size: 11.33px;">爬虫</a> <a href="/chenblog.github.io/tags/%E7%94%B5%E5%95%86/" style="font-size: 10.67px;">电商</a> <a href="/chenblog.github.io/tags/%E7%99%BD%E5%90%8D%E5%8D%95/" style="font-size: 10px;">白名单</a> <a href="/chenblog.github.io/tags/%E7%9B%91%E6%8E%A7/" style="font-size: 13.33px;">监控</a> <a href="/chenblog.github.io/tags/%E7%9B%91%E6%8E%A7%E6%8A%80%E6%9C%AF/" style="font-size: 10.67px;">监控技术</a> <a href="/chenblog.github.io/tags/%E7%A3%81%E7%9B%98%E9%98%B5%E5%88%97/" style="font-size: 10px;">磁盘阵列</a> <a href="/chenblog.github.io/tags/%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/" style="font-size: 10px;">私有仓库</a> <a href="/chenblog.github.io/tags/%E7%AB%AF%E5%8F%A3%E6%8E%A2%E6%B5%8B/" style="font-size: 10px;">端口探测</a> <a href="/chenblog.github.io/tags/%E7%BC%96%E7%A8%8B/" style="font-size: 10px;">编程</a> <a href="/chenblog.github.io/tags/%E7%BC%96%E8%BE%91%E5%99%A8/" style="font-size: 10px;">编辑器</a> <a href="/chenblog.github.io/tags/%E7%BD%91%E7%AB%99%E6%8A%80%E6%9C%AF/" style="font-size: 10px;">网站技术</a> <a href="/chenblog.github.io/tags/%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/" style="font-size: 10px;">网络基础</a> <a href="/chenblog.github.io/tags/%E7%BD%91%E7%BB%9C%E7%9B%B8%E5%85%B3/" style="font-size: 10px;">网络相关</a> <a href="/chenblog.github.io/tags/%E7%BE%8E%E5%A5%B3/" style="font-size: 10px;">美女</a> <a href="/chenblog.github.io/tags/%E7%BF%BB%E5%A2%99/" style="font-size: 10px;">翻墙</a> <a href="/chenblog.github.io/tags/%E8%81%8C%E5%9C%BA/" style="font-size: 10.67px;">职场</a> <a href="/chenblog.github.io/tags/%E8%87%AA%E5%8A%A8%E5%8C%96%E9%83%A8%E7%BD%B2/" style="font-size: 10.67px;">自动化部署</a> <a href="/chenblog.github.io/tags/%E8%8A%82%E7%82%B9%E8%B0%83%E5%BA%A6/" style="font-size: 10px;">节点调度</a> <a href="/chenblog.github.io/tags/%E8%8B%8F%E5%B7%9E/" style="font-size: 10px;">苏州</a> <a href="/chenblog.github.io/tags/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98/" style="font-size: 10px;">虚拟内存</a> <a href="/chenblog.github.io/tags/%E8%AE%A4%E8%AF%81%E9%89%B4%E6%9D%83/" style="font-size: 10px;">认证鉴权</a> <a href="/chenblog.github.io/tags/%E8%AF%BB%E4%B9%A6/" style="font-size: 10px;">读书</a> <a href="/chenblog.github.io/tags/%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB/" style="font-size: 14px;">读写分离</a> <a href="/chenblog.github.io/tags/%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB%E4%B8%AD%E9%97%B4%E4%BB%B6/" style="font-size: 10px;">读写分离中间件</a> <a href="/chenblog.github.io/tags/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" style="font-size: 10.67px;">负载均衡</a> <a href="/chenblog.github.io/tags/%E8%B6%B3%E7%90%83/" style="font-size: 10.67px;">足球</a> <a href="/chenblog.github.io/tags/%E8%B7%A8%E5%9F%9F/" style="font-size: 10px;">跨域</a> <a href="/chenblog.github.io/tags/%E8%BF%90%E7%BB%B4/" style="font-size: 15.33px;">运维</a> <a href="/chenblog.github.io/tags/%E8%BF%90%E7%BB%B4%E4%B8%8E%E7%9B%91%E6%8E%A7/" style="font-size: 10px;">运维与监控</a> <a href="/chenblog.github.io/tags/%E8%BF%90%E7%BB%B4%E5%AE%89%E5%85%A8/" style="font-size: 10px;">运维安全</a> <a href="/chenblog.github.io/tags/%E8%BF%90%E7%BB%B4%E6%8A%80%E6%9C%AF/" style="font-size: 16.67px;">运维技术</a> <a href="/chenblog.github.io/tags/%E8%BF%90%E7%BB%B4%E7%9B%91%E6%8E%A7/" style="font-size: 10px;">运维监控</a> <a href="/chenblog.github.io/tags/%E8%BF%9B%E5%BA%A6%E6%9D%A1/" style="font-size: 10px;">进度条</a> <a href="/chenblog.github.io/tags/%E9%87%91%E5%B1%B1%E4%BA%91/" style="font-size: 10px;">金山云</a> <a href="/chenblog.github.io/tags/%E9%92%89%E9%92%89/" style="font-size: 10.67px;">钉钉</a> <a href="/chenblog.github.io/tags/%E9%95%BF%E6%B2%99/" style="font-size: 10px;">长沙</a> <a href="/chenblog.github.io/tags/%E9%98%B2%E7%9B%97%E9%93%BE/" style="font-size: 10px;">防盗链</a> <a href="/chenblog.github.io/tags/%E9%98%BF%E6%A0%B9%E5%BB%B7/" style="font-size: 10px;">阿根廷</a> <a href="/chenblog.github.io/tags/%E9%98%BF%E9%87%8C%E4%BA%91/" style="font-size: 16px;">阿里云</a> <a href="/chenblog.github.io/tags/%E9%98%BF%E9%87%8C%E4%BA%91OSS/" style="font-size: 10px;">阿里云OSS</a> <a href="/chenblog.github.io/tags/%E9%98%BF%E9%87%8C%E4%BA%91api/" style="font-size: 10px;">阿里云api</a> <a href="/chenblog.github.io/tags/%E9%98%BF%E9%87%8C%E4%BA%91oss/" style="font-size: 10px;">阿里云oss</a> <a href="/chenblog.github.io/tags/%E9%98%BF%E9%87%8C%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8/" style="font-size: 10px;">阿里云服务器</a> <a href="/chenblog.github.io/tags/%E9%9D%A2%E8%AF%95/" style="font-size: 12px;">面试</a> <a href="/chenblog.github.io/tags/%E9%9D%A2%E8%AF%95%E7%AC%94%E8%AF%95/" style="font-size: 10px;">面试笔试</a> <a href="/chenblog.github.io/tags/%E9%9D%A2%E8%AF%95%E7%BB%8F%E9%AA%8C/" style="font-size: 10.67px;">面试经验</a> <a href="/chenblog.github.io/tags/%E9%9F%B3%E4%B9%90/" style="font-size: 10px;">音乐</a> <a href="/chenblog.github.io/tags/%E9%AD%94%E5%85%BD%E4%B8%96%E7%95%8C/" style="font-size: 10px;">魔兽世界</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2020/06/">June 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2020/05/">May 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2020/04/">April 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2020/03/">March 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2020/02/">February 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2020/01/">January 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2019/12/">December 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2019/11/">November 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2019/10/">October 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2019/09/">September 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2019/08/">August 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2019/07/">July 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2019/06/">June 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2019/05/">May 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2019/04/">April 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2019/03/">March 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2019/02/">February 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2019/01/">January 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2018/12/">December 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2018/11/">November 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2018/08/">August 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2018/07/">July 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2018/06/">June 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2018/02/">February 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/chenblog.github.io/archives/2017/12/">December 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/chenblog.github.io/2020/06/01/Uwsgi-nginx%E8%BF%90%E8%A1%8CDjango%E5%B9%B6%E4%B8%94%E8%A7%A3%E5%86%B3%E8%B7%A8%E5%9F%9F/">Uwsgi+nginx运行Django并且解决跨域</a>
+          </li>
+        
+          <li>
+            <a href="/chenblog.github.io/2020/05/27/%E4%BD%BF%E7%94%A8Django%E7%BC%96%E5%86%99restful-API/">使用Django编写restful API</a>
+          </li>
+        
+          <li>
+            <a href="/chenblog.github.io/2020/04/26/Django%E5%89%8D%E7%AB%AF%E4%BC%A0%E5%85%A5excel%E5%B9%B6%E5%B0%86%E5%AD%97%E6%AE%B5%E4%BF%9D%E5%AD%98MySQL/">Django前端传入excel表格并将表格数据记录到MySQL里</a>
+          </li>
+        
+          <li>
+            <a href="/chenblog.github.io/2020/04/24/Mysql%E5%A6%82%E4%BD%95%E5%88%A4%E6%96%AD%E4%B8%A4%E4%B8%AA%E8%A1%8C%E9%83%BD%E4%B8%8D%E5%90%8C%E4%B8%BA%E4%B8%8D%E4%B8%80%E8%87%B4/">Mysql如何判断多列组合起来不重复</a>
+          </li>
+        
+          <li>
+            <a href="/chenblog.github.io/2020/03/27/%E7%94%B5%E5%95%86%E7%A8%B3%E5%AE%9A%E6%80%A7%E7%9A%84%E4%B8%AA%E4%BA%BA%E6%84%9F%E6%82%9F/">电商稳定性的个人感悟</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2020 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/chenblog.github.io/" class="mobile-nav-link">Home</a>
+  
+    <a href="/chenblog.github.io/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  
+<link rel="stylesheet" href="/chenblog.github.io/fancybox/jquery.fancybox.css">
+
+  
+<script src="/chenblog.github.io/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/chenblog.github.io/js/script.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>
