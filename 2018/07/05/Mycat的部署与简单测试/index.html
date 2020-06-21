@@ -36,8 +36,8 @@
 <meta property="article:modified_time" content="2018-07-10T06:17:34.000Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="读写分离">
-<meta property="article:tag" content="mycat">
 <meta property="article:tag" content="数据库中间件">
+<meta property="article:tag" content="mycat">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://brucewayne2099.github.io/images/mycat1.png">
 
@@ -364,8 +364,8 @@
       <footer class="post-footer">
           <div class="post-tags">
               <a href="/chenblog.github.io/tags/%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB/" rel="tag"><i class="fa fa-tag"></i> 读写分离</a>
-              <a href="/chenblog.github.io/tags/mycat/" rel="tag"><i class="fa fa-tag"></i> mycat</a>
               <a href="/chenblog.github.io/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E4%B8%AD%E9%97%B4%E4%BB%B6/" rel="tag"><i class="fa fa-tag"></i> 数据库中间件</a>
+              <a href="/chenblog.github.io/tags/mycat/" rel="tag"><i class="fa fa-tag"></i> mycat</a>
           </div>
 
         
@@ -595,6 +595,26 @@ NexT.utils.loadComments(document.querySelector('#lv-container'), () => {
   })(document, 'script');
 });
 </script>
+
+  
+  <script type="text/javascript">
+    function isPC() {
+      var userAgentInfo = navigator.userAgent;
+      var agents = ["Android", "iPhone", "SymbianOS", "Windows Phone", "iPad", "iPod"];
+      for (var i = 0; i < agents.length; i++) {
+        if (userAgentInfo.indexOf(agents[i]) > 0) {
+          return false;
+        }
+      }
+      return true;
+    }
+    var showOnMobile = false;
+    var openOnPC = isPC();
+
+    
+      if (openOnPC || showOnMobile) $.getScript("/js/src/love.js");
+    
+  </script>
 
 <script src="/chenblog.github.io/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
 </html>

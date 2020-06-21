@@ -589,5 +589,25 @@ NexT.utils.loadComments(document.querySelector('#lv-container'), () => {
 });
 </script>
 
+  
+  <script type="text/javascript">
+    function isPC() {
+      var userAgentInfo = navigator.userAgent;
+      var agents = ["Android", "iPhone", "SymbianOS", "Windows Phone", "iPad", "iPod"];
+      for (var i = 0; i < agents.length; i++) {
+        if (userAgentInfo.indexOf(agents[i]) > 0) {
+          return false;
+        }
+      }
+      return true;
+    }
+    var showOnMobile = false;
+    var openOnPC = isPC();
+
+    
+      if (openOnPC || showOnMobile) $.getScript("/js/src/love.js");
+    
+  </script>
+
 <script src="/chenblog.github.io/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
 </html>

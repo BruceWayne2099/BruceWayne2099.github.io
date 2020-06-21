@@ -33,8 +33,8 @@
 <meta property="article:published_time" content="2018-02-08T13:48:37.000Z">
 <meta property="article:modified_time" content="2018-02-08T13:55:56.000Z">
 <meta property="article:author" content="Chris Chan">
-<meta property="article:tag" content="crontab">
 <meta property="article:tag" content="linux">
+<meta property="article:tag" content="crontab">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://brucewayne2099.github.io/images/vc15.jpg">
 
@@ -315,8 +315,8 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/chenblog.github.io/tags/crontab/" rel="tag"><i class="fa fa-tag"></i> crontab</a>
               <a href="/chenblog.github.io/tags/linux/" rel="tag"><i class="fa fa-tag"></i> linux</a>
+              <a href="/chenblog.github.io/tags/crontab/" rel="tag"><i class="fa fa-tag"></i> crontab</a>
           </div>
 
         
@@ -546,6 +546,26 @@ NexT.utils.loadComments(document.querySelector('#lv-container'), () => {
   })(document, 'script');
 });
 </script>
+
+  
+  <script type="text/javascript">
+    function isPC() {
+      var userAgentInfo = navigator.userAgent;
+      var agents = ["Android", "iPhone", "SymbianOS", "Windows Phone", "iPad", "iPod"];
+      for (var i = 0; i < agents.length; i++) {
+        if (userAgentInfo.indexOf(agents[i]) > 0) {
+          return false;
+        }
+      }
+      return true;
+    }
+    var showOnMobile = false;
+    var openOnPC = isPC();
+
+    
+      if (openOnPC || showOnMobile) $.getScript("/js/src/love.js");
+    
+  </script>
 
 <script src="/chenblog.github.io/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
 </html>

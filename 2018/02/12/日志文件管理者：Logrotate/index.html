@@ -37,8 +37,8 @@
 <meta property="article:published_time" content="2018-02-12T11:57:18.000Z">
 <meta property="article:modified_time" content="2019-02-15T07:44:36.000Z">
 <meta property="article:author" content="Chris Chan">
-<meta property="article:tag" content="运维技术">
 <meta property="article:tag" content="linux">
+<meta property="article:tag" content="运维技术">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://brucewayne2099.github.io/images/logrotate1.png">
 
@@ -338,8 +338,8 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/chenblog.github.io/tags/%E8%BF%90%E7%BB%B4%E6%8A%80%E6%9C%AF/" rel="tag"><i class="fa fa-tag"></i> 运维技术</a>
               <a href="/chenblog.github.io/tags/linux/" rel="tag"><i class="fa fa-tag"></i> linux</a>
+              <a href="/chenblog.github.io/tags/%E8%BF%90%E7%BB%B4%E6%8A%80%E6%9C%AF/" rel="tag"><i class="fa fa-tag"></i> 运维技术</a>
           </div>
 
         
@@ -569,6 +569,26 @@ NexT.utils.loadComments(document.querySelector('#lv-container'), () => {
   })(document, 'script');
 });
 </script>
+
+  
+  <script type="text/javascript">
+    function isPC() {
+      var userAgentInfo = navigator.userAgent;
+      var agents = ["Android", "iPhone", "SymbianOS", "Windows Phone", "iPad", "iPod"];
+      for (var i = 0; i < agents.length; i++) {
+        if (userAgentInfo.indexOf(agents[i]) > 0) {
+          return false;
+        }
+      }
+      return true;
+    }
+    var showOnMobile = false;
+    var openOnPC = isPC();
+
+    
+      if (openOnPC || showOnMobile) $.getScript("/js/src/love.js");
+    
+  </script>
 
 <script src="/chenblog.github.io/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
 </html>
