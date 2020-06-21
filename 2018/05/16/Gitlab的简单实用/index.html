@@ -430,7 +430,7 @@
 <h2 id="在windows里使用gitlab"><a href="#在windows里使用gitlab" class="headerlink" title="在windows里使用gitlab"></a>在windows里使用gitlab</h2><p>首先先安装git，然后在目标文件夹里点击右键—<code>Git Bash Here</code>，在命令行里输入<code>git clone 远程目标.git</code>。同时在project页面里的develop分支（开发分支）里新开一个分支比如叫<code>feature/chenshuo</code>。待目标全部下载完毕之后，cd到代码文件夹里：<br>    <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">git branch -a		<span class="comment">#此时应该是master分支</span></span><br><span class="line">git checkout -b feature/chenshuo origin/feature/chenshuo		<span class="comment">#将本地的分支feature/chenshuo与远程的分支origin/feature/chenshuo关联</span></span><br><span class="line">git branch -a 		<span class="comment">#此时应该由master切换到了本地分支</span></span><br><span class="line">...修改代码...</span><br><span class="line">git add .</span><br><span class="line">   git commit -m <span class="string">"提交信息"</span>		<span class="comment">#将代码提交到本地分支</span></span><br><span class="line">   git push 		<span class="comment">#将本地分支push到远程</span></span><br></pre></td></tr></table></figure></p>
 <p>如果在git clone那一步密码输入错误了，可以在<code>我的电脑</code>–<code>控制面板</code>–<code>用户账户</code>–<code>管理您的凭据</code> 里面修改。</p>
 <h2 id="普通用户访问docker"><a href="#普通用户访问docker" class="headerlink" title="普通用户访问docker"></a>普通用户访问docker</h2><p>让普通用户访问docker的方法其实就是把该用户添加到docker组里即可。</p>
-<p>先切换root用户给予普通用户（比如叫lcshop）免sudo权限：使用<code>sudoedit /etc/sudoers</code>添加这样的语句：<br>    <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lcshop  ALL&#x3D;(ALL)       ALL</span><br></pre></td></tr></table></figure></p>
+<p>先切换root用户给予普通用户（比如叫lcshop）免sudo权限：使用<code>sudoedit /etc/sudoers</code>添加这样的语句：<br>    <figure class="highlight ada"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lcshop  <span class="keyword">ALL</span>=(<span class="keyword">ALL</span>)       <span class="keyword">ALL</span></span><br></pre></td></tr></table></figure></p>
 <p>然后还是root状态下，执行<code>gpasswd -a lcshop docker</code>，将lcshop添加到docker组里，此时应该若反馈<code>Adding user lcshop to group docker</code>则添加成功。</p>
 <p>然后就是重启一下docker进程，同时lcshop也重新连接ssh，此时lcshop就可以正常使用<code>docker ps -a</code>等命令了。若要查看某个用户组下有哪些用户，可以通过<code>grep &#39;组名&#39; /etc/group</code>获取。</p>
 <h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://blog.cnbluebox.com/blog/2014/04/15/gitlabde-shi-yong/" target="_blank" rel="noopener">https://blog.cnbluebox.com/blog/2014/04/15/gitlabde-shi-yong/</a><br><a href="https://zhang759740844.github.io/2016/08/27/git%E6%8A%80%E5%B7%A7/" target="_blank" rel="noopener">https://zhang759740844.github.io/2016/08/27/git%E6%8A%80%E5%B7%A7/</a><br><a href="https://www.restran.net/2016/02/23/git-and-gitlab-guide/" target="_blank" rel="noopener">https://www.restran.net/2016/02/23/git-and-gitlab-guide/</a><br><a href="https://www.jianshu.com/p/f54053afecf2" target="_blank" rel="noopener">https://www.jianshu.com/p/f54053afecf2</a></p>
@@ -573,10 +573,10 @@
               
               
               <div class="site-state-item site-state-categories">
-                
+                <a href="/chenblog.github.io/tags/index.html">
                   <span class="site-state-item-count">8</span>
                   <span class="site-state-item-name">分类</span>
-                
+                </a>
               </div>
             
 
@@ -584,10 +584,10 @@
               
               
               <div class="site-state-item site-state-tags">
-                
+                <a href="/chenblog.github.io/categories/index.html">
                   <span class="site-state-item-count">252</span>
                   <span class="site-state-item-name">标签</span>
-                
+                </a>
               </div>
             
 
@@ -823,7 +823,7 @@
     var isfetched = false;
     var isXml = true;
     // Search DB path;
-    var search_path = "./public/search.xml";
+    var search_path = "search.xml";
     if (search_path.length === 0) {
       search_path = "search.xml";
     } else if (/json$/i.test(search_path)) {

@@ -440,7 +440,7 @@
 </ol>
 <p>在宿主机上看也是能看到这个进程的：<br><img src="/images/docker16.png" alt="akb48" title="容器与宿主机时差相差8小时"></p>
 <ol start="17">
-<li>有时候是需要用一个脚本来启动镜像进程的，但是要知道容器只能管理一个主进程，当脚本执行完毕了，容器也会EXIT，所以我们需要在启动脚本后面添加<code>tail -f /dev/null</code>让这个启动脚本永远执行不结束。举个例子：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run --name XXX -dit -v &#x2F;data&#x2F;httpd&#x2F;yii_ecadmin&#x2F;:&#x2F;var&#x2F;www -w &#x2F;var&#x2F;www --restart&#x3D;always registry.cn-hangzhou.aliyuncs.com&#x2F;lechangeshop&#x2F;ecadmin:20190520 .&#x2F;start.sh</span><br></pre></td></tr></table></figure>
+<li>有时候是需要用一个脚本来启动镜像进程的，但是要知道容器只能管理一个主进程，当脚本执行完毕了，容器也会EXIT，所以我们需要在启动脚本后面添加<code>tail -f /dev/null</code>让这个启动脚本永远执行不结束。举个例子：<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run --name XXX -dit -v <span class="regexp">/data/</span>httpd<span class="regexp">/yii_ecadmin/</span>:<span class="regexp">/var/</span>www -w <span class="regexp">/var/</span>www --restart=always registry.cn-hangzhou.aliyuncs.com<span class="regexp">/lechangeshop/</span><span class="string">ecadmin:</span><span class="number">20190520</span> ./start.sh</span><br></pre></td></tr></table></figure>
 
 
 </li>
@@ -587,10 +587,10 @@
               
               
               <div class="site-state-item site-state-categories">
-                
+                <a href="/chenblog.github.io/tags/index.html">
                   <span class="site-state-item-count">8</span>
                   <span class="site-state-item-name">分类</span>
-                
+                </a>
               </div>
             
 
@@ -598,10 +598,10 @@
               
               
               <div class="site-state-item site-state-tags">
-                
+                <a href="/chenblog.github.io/categories/index.html">
                   <span class="site-state-item-count">252</span>
                   <span class="site-state-item-name">标签</span>
-                
+                </a>
               </div>
             
 
@@ -837,7 +837,7 @@
     var isfetched = false;
     var isXml = true;
     // Search DB path;
-    var search_path = "./public/search.xml";
+    var search_path = "search.xml";
     if (search_path.length === 0) {
       search_path = "search.xml";
     } else if (/json$/i.test(search_path)) {

@@ -406,7 +406,7 @@
 <p>至于“使用ldap方式登录”、“配置域名”和“关闭注册功能”请移步去看：<a href="https://rorschachchan.github.io/2018/05/10/在已经运行的docker容器里面使用中文/" target="_blank" rel="noopener">https://rorschachchan.github.io/2018/05/10/在已经运行的docker容器里面使用中文/</a> 。</p>
 <h2 id="gitlab的汉化方法"><a href="#gitlab的汉化方法" class="headerlink" title="gitlab的汉化方法"></a>gitlab的汉化方法</h2><p>汉化之前，要确定gitlab的版本，先<code>docker exec -it 容器ID env LANG=C.UTF-8 /bin/bash</code>登陆到容器里，执行<code>cat /opt/gitlab/embedded/service/gitlab-rails/VERSION</code>，由于当时镜像是最新的，所以gitlab的版本是<code>10.7.3</code>。</p>
 <p>还是在容器里，执行<code>git clone https://gitlab.com/xhang/gitlab.git</code>，克隆获取汉化版本库(这里要感谢辛苦的汉化工作者，向你们致敬！)，默认是获取最新的。如果需要下载老版本的汉化包，则要加上老版本的分支，如：<code>git clone https://gitlab.com/xhang/gitlab.git -b v10.2.5-zh</code>。</p>
-<p>然后<code>gitlab-ctl stop</code>先停止gitlab服务，<code>cd gitlab/</code>进入到刚刚下载的那个git包里，执行如下代码：<br>    <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">root@10 gitlab]# git fetch</span><br><span class="line">root@10 gitlab]# git diff v10.7.3 v10.7.3-zh &gt; ..&#x2F;10.7.3-zh.diff</span><br><span class="line">root@10 gitlab]# cd ..</span><br><span class="line">root@10 ~]# patch -d &#x2F;opt&#x2F;gitlab&#x2F;embedded&#x2F;service&#x2F;gitlab-rails -p1 &lt; 10.7.3-zh.diff</span><br><span class="line">root@10 ~]# #如果提示没有patch，请执行apt-get update &amp;&amp; apt-get install patch</span><br><span class="line">root@10 ~]# gitlab-ctl start</span><br></pre></td></tr></table></figure></p>
+<p>然后<code>gitlab-ctl stop</code>先停止gitlab服务，<code>cd gitlab/</code>进入到刚刚下载的那个git包里，执行如下代码：<br>    <figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">root@</span><span class="number">10</span> gitlab]# git fetch</span><br><span class="line"><span class="symbol">root@</span><span class="number">10</span> gitlab]# git diff v10<span class="number">.7</span><span class="number">.3</span> v10<span class="number">.7</span><span class="number">.3</span>-zh &gt; ../<span class="number">10.7</span><span class="number">.3</span>-zh.diff</span><br><span class="line"><span class="symbol">root@</span><span class="number">10</span> gitlab]# cd ..</span><br><span class="line"><span class="symbol">root@</span><span class="number">10</span> ~]# patch -d /opt/gitlab/embedded/service/gitlab-rails -p1 &lt; <span class="number">10.7</span><span class="number">.3</span>-zh.diff</span><br><span class="line"><span class="symbol">root@</span><span class="number">10</span> ~]# #如果提示没有patch，请执行apt-<span class="keyword">get</span> update &amp;&amp; apt-<span class="keyword">get</span> install patch</span><br><span class="line"><span class="symbol">root@</span><span class="number">10</span> ~]# gitlab-ctl start</span><br></pre></td></tr></table></figure></p>
 <p>重新返回到浏览器里，就能看到汉化后的gitlab了，大功告成！<br><img src="/images/gitlab12.png" alt="paradin"></p>
 <h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://xuanwo.org/2016/04/13/gitlab-install-intro/" target="_blank" rel="noopener">https://xuanwo.org/2016/04/13/gitlab-install-intro/</a><br><a href="https://www.jianshu.com/p/6606aed59a56" target="_blank" rel="noopener">https://www.jianshu.com/p/6606aed59a56</a><br><a href="http://adairjun.github.io/2016/12/20/gitlab/" target="_blank" rel="noopener">http://adairjun.github.io/2016/12/20/gitlab/</a><br><a href="https://github.com/marbleqi/gitlab-ce-zh/blob/v10.5.1-zh-patch/Nginx.md" target="_blank" rel="noopener">https://github.com/marbleqi/gitlab-ce-zh/blob/v10.5.1-zh-patch/Nginx.md</a><br><img src="/images/kdshotharden.gif" alt="paradin"></p>
 
@@ -548,10 +548,10 @@
               
               
               <div class="site-state-item site-state-categories">
-                
+                <a href="/chenblog.github.io/tags/index.html">
                   <span class="site-state-item-count">8</span>
                   <span class="site-state-item-name">分类</span>
-                
+                </a>
               </div>
             
 
@@ -559,10 +559,10 @@
               
               
               <div class="site-state-item site-state-tags">
-                
+                <a href="/chenblog.github.io/categories/index.html">
                   <span class="site-state-item-count">252</span>
                   <span class="site-state-item-name">标签</span>
-                
+                </a>
               </div>
             
 
@@ -798,7 +798,7 @@
     var isfetched = false;
     var isXml = true;
     // Search DB path;
-    var search_path = "./public/search.xml";
+    var search_path = "search.xml";
     if (search_path.length === 0) {
       search_path = "search.xml";
     } else if (/json$/i.test(search_path)) {

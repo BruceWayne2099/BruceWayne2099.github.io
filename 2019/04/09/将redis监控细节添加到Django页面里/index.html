@@ -403,7 +403,7 @@
         <p>Redis的监控一直是重点中的重点，市面上开源的Redis界面监控也不在少数了，但是自己做一个监控页面更加有针对性，而且更加有逼格。我们主要监控redis除了常规的cpu、内存、Key数之外，还有如下几个方面：阻塞客户端数量、使用内存峰值、内存碎片率、缓存命中率、失效KEY、慢日志和连接数。这里挑几个简单的说。</p>
 <h2 id="获取连接细节情况"><a href="#获取连接细节情况" class="headerlink" title="获取连接细节情况"></a>获取连接细节情况</h2><p>首先先来搞定“获取redis的连接细节”。在django里先做一个model,如下：<br>    <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">redisconnection</span><span class="params">(models.Model)</span>:</span></span><br><span class="line">	rank = models.CharField(verbose_name=<span class="string">'排名'</span>,max_length=<span class="number">10</span>)</span><br><span class="line">    num = models.CharField(verbose_name=<span class="string">'服务器连接数'</span>,max_length=<span class="number">50</span>)</span><br><span class="line">    ip = models.GenericIPAddressField(verbose_name=<span class="string">'服务器内网IP地址'</span>)</span><br><span class="line">    date = models.DateField(auto_now_add=<span class="literal">True</span>)</span><br><span class="line">    time = models.TimeField(auto_now_add=<span class="literal">False</span>, auto_now=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__unicode__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> self.host</span><br></pre></td></tr></table></figure></p>
 <p>可见我们只是需要排名、具体的IP、当时有多少连接以及当时时间这4个指标而已。</p>
-<p>我承认我道行不够，捅咕两个小时也没有研究出来怎么用python2.7去获取redis的连接数细节，于是乎就用shell写了一个简单的脚本。如下：<br>    <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">#!&#x2F;bin&#x2F;bash</span><br><span class="line">#获取当前连接最多的前五个IP地址和数量到Mysql</span><br><span class="line">redis-cli -h redis地址 -p 6379 -a redis密码 client list | awk &#39;&#123;print $2&#125;&#39;| cut -d &#x3D; -f 2| cut -d : -f 1 | sort | uniq -c | sort -rn |head -5 &gt; clientip.txt</span><br><span class="line">MYSQL&#x3D;&quot;mysql -h数据库地址 -u数据库账号 -p数据库密码 --default-character-set&#x3D;utf8 -A -N&quot;</span><br><span class="line">cat -n clientip.txt | while read rank num IP</span><br><span class="line">do</span><br><span class="line">        echo $&#123;num&#125;</span><br><span class="line">        echo $&#123;IP&#125; </span><br><span class="line">        sql&#x3D;&quot;insert into databases.table(num,ip,date,time,rank) values(&#39;$&#123;num&#125;&#39;,&#39;$&#123;IP&#125;&#39;,curdate(),now(),&#39;$&#123;rank&#125;&#39;);&quot;</span><br><span class="line">        $MYSQL -e &quot;$sql&quot;</span><br><span class="line">done</span><br></pre></td></tr></table></figure></p>
+<p>我承认我道行不够，捅咕两个小时也没有研究出来怎么用python2.7去获取redis的连接数细节，于是乎就用shell写了一个简单的脚本。如下：<br>    <figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/bin/bash</span></span><br><span class="line"><span class="comment">#获取当前连接最多的前五个IP地址和数量到Mysql</span></span><br><span class="line">redis-cli -h redis地址 -p 6379 -a redis密码<span class="built_in"> client </span>list | awk <span class="string">'&#123;print $2&#125;'</span>| cut -d = -f 2| cut -d : -f 1 | sort | uniq -c | sort -rn |head -5 &gt; clientip.txt</span><br><span class="line"><span class="attribute">MYSQL</span>=<span class="string">"mysql -h数据库地址 -u数据库账号 -p数据库密码 --default-character-set=utf8 -A -N"</span></span><br><span class="line">cat -n clientip.txt | <span class="keyword">while</span> read rank num IP</span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">        echo <span class="variable">$&#123;num&#125;</span></span><br><span class="line">        echo <span class="variable">$&#123;IP&#125;</span> </span><br><span class="line">        <span class="attribute">sql</span>=<span class="string">"insert into databases.table(num,ip,date,time,rank) values('<span class="variable">$&#123;num&#125;</span>','<span class="variable">$&#123;IP&#125;</span>',curdate(),now(),'<span class="variable">$&#123;rank&#125;</span>');"</span></span><br><span class="line">        <span class="variable">$MYSQL</span> -e <span class="string">"<span class="variable">$sql</span>"</span></span><br><span class="line">done</span><br></pre></td></tr></table></figure></p>
 <p>这里先简单解释一下：<br>1.<code>client list</code>是查看redis连接细节的命令，然后通过awk获取第二列，再分别通过“=”和“，”来分割两次，排序去重统计个数最后取出前五名输入到<code>clientip.txt</code>这个文件里；<br>2.连接mysql，-A的含义是不去预读全部数据表信息；-N的含义是获取数据信息省去列名称;<br>3.使用<code>cat -n</code>自动获取到行号当做排名，循环赋值；<br>4.<code>curdate()</code>,<code>now()</code>这俩是sql，但是需要shell里正确使用sql就要<code>-e</code>;</p>
 <p>执行效果如下：<br><img src="/images/gateone12.png" alt="akb48"></p>
 <p>剩下的内容就是在<code>views.py</code>里拿值然后通过<code>render</code>反馈到前端页面，这里不说了。</p>
@@ -560,10 +560,10 @@
               
               
               <div class="site-state-item site-state-categories">
-                
+                <a href="/chenblog.github.io/tags/index.html">
                   <span class="site-state-item-count">8</span>
                   <span class="site-state-item-name">分类</span>
-                
+                </a>
               </div>
             
 
@@ -571,10 +571,10 @@
               
               
               <div class="site-state-item site-state-tags">
-                
+                <a href="/chenblog.github.io/categories/index.html">
                   <span class="site-state-item-count">252</span>
                   <span class="site-state-item-name">标签</span>
-                
+                </a>
               </div>
             
 
@@ -810,7 +810,7 @@
     var isfetched = false;
     var isXml = true;
     // Search DB path;
-    var search_path = "./public/search.xml";
+    var search_path = "search.xml";
     if (search_path.length === 0) {
       search_path = "search.xml";
     } else if (/json$/i.test(search_path)) {

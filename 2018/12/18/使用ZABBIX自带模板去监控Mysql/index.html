@@ -401,7 +401,7 @@
       
         <h2 id="事前准备"><a href="#事前准备" class="headerlink" title="事前准备"></a>事前准备</h2><p>Zabbix-agent:<code>3.0.8</code>，安装路径是<code>/etc/zabbix/</code><br>Mysql:<code>5.7.10</code>，安装路径是<code>/opt/mysql/</code><br>配置<code>/etc/sudoers</code>让zabbix用户可以使用sudo，如下：<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">## Allow root to run any commands anywhere</span><br><span class="line">root    ALL=(ALL)       ALL</span><br><span class="line">zabbix  ALL=(ALL)       NOPASSWD:ALL</span><br><span class="line">Defaults:zabbix !requiretty</span><br></pre></td></tr></table></figure></p>
 <h2 id="配置-my-cnf"><a href="#配置-my-cnf" class="headerlink" title="配置.my.cnf"></a>配置.my.cnf</h2><p>众所周知，Zabbix官方提供了自带监控Mysql的模板，但是这个模板并不能直接使用。所以我们需要有如下的改动：</p>
-<p>首先，先在mysql目录下的etc文件夹里先创建一个<code>.my.cnf</code>文件，全路径是<code>/opt/mysql/etc/.my.cnf</code>，这个文件是zabbix要求的用于存放连接mysql数据库的账户信息的隐藏文件，这样可以避免在命令行里输入密码。整个<code>.my.cnf</code>文件内容如下：<br>    <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[mysql]                     #mysql程序要使用的账户信息</span><br><span class="line">host&#x3D;localhost</span><br><span class="line">user&#x3D;用户名</span><br><span class="line">password&#x3D;&quot;密码&quot;   #此处的密码强烈建议加上引号</span><br><span class="line">socket&#x3D;&#x2F;tmp&#x2F;mysql.sock  #确认mysql的sock文件路径</span><br><span class="line"></span><br><span class="line">[mysqladmin]             #mysqladmin程序要使用的账户信息</span><br><span class="line">host&#x3D;localhost</span><br><span class="line">user&#x3D;用户名</span><br><span class="line">password&#x3D;&quot;密码&quot;</span><br><span class="line">socket&#x3D;&#x2F;tmp&#x2F;mysql.sock</span><br></pre></td></tr></table></figure></p>
+<p>首先，先在mysql目录下的etc文件夹里先创建一个<code>.my.cnf</code>文件，全路径是<code>/opt/mysql/etc/.my.cnf</code>，这个文件是zabbix要求的用于存放连接mysql数据库的账户信息的隐藏文件，这样可以避免在命令行里输入密码。整个<code>.my.cnf</code>文件内容如下：<br>    <figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">[mysql]</span>                     <span class="comment">#mysql程序要使用的账户信息</span></span><br><span class="line"><span class="attr">host</span>=localhost</span><br><span class="line"><span class="attr">user</span>=用户名</span><br><span class="line"><span class="attr">password</span>=<span class="string">"密码"</span>   <span class="comment">#此处的密码强烈建议加上引号</span></span><br><span class="line"><span class="attr">socket</span>=/tmp/mysql.sock  <span class="comment">#确认mysql的sock文件路径</span></span><br><span class="line"></span><br><span class="line"><span class="section">[mysqladmin]</span>             <span class="comment">#mysqladmin程序要使用的账户信息</span></span><br><span class="line"><span class="attr">host</span>=localhost</span><br><span class="line"><span class="attr">user</span>=用户名</span><br><span class="line"><span class="attr">password</span>=<span class="string">"密码"</span></span><br><span class="line"><span class="attr">socket</span>=/tmp/mysql.sock</span><br></pre></td></tr></table></figure></p>
 <p>这里建议在mysql里插入一个叫zabbix的用户，密码自己设定，然后在<code>.my.cnf</code>里就是用这个用户即可。此时，在命令行直接输入<code>HOME=/opt/mysql/etc/ mysql</code>和<code>HOME=/opt/mysql/etc/ mysqladmin ping</code>都应该是直接出结果，而不是用输入账号和密码，如图：<br><img src="/images/mysql-sock4.png" alt="akb48"></p>
 <p><font color=red>注意!</font>这个<code>.my.cnf</code>的权限是644，用户和用户组是root，如果权限过大，那么启动mysql时就会报错：<code>Warning: World-writable config file &#39;/opt/mysql/etc/.my.cnf&#39; is ignored</code>。</p>
 <h2 id="修改userparameter-mysql-conf"><a href="#修改userparameter-mysql-conf" class="headerlink" title="修改userparameter_mysql.conf"></a>修改userparameter_mysql.conf</h2><p>然后在<code>zabbix-agent</code>配置文件的文件夹<code>/etc/zabbix/zabbix_agentd.d/</code>里，会发现一个叫<code>userparameter_mysql.conf</code>的文件，把里面的内容改成如下样子:<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># For all the following commands HOME should be set to the directory that has .my.cnf file with password information.</span><br><span class="line"></span><br><span class="line"># Flexible parameter to grab global variables. On the frontend side, use keys like mysql.status[Com_insert].</span><br><span class="line"># Key syntax is mysql.status[variable].</span><br><span class="line">UserParameter=mysql.status[*],echo <span class="string">"show global status where Variable_name='$1';"</span> | sudo HOME=<span class="regexp">/opt/my</span>sql/etc /opt/mysql/bin/mysql -N | awk <span class="string">'&#123;print $$2&#125;'</span></span><br><span class="line">UserParameter=mysql.ping,sudo HOME=<span class="regexp">/opt/my</span>sql/etc/ <span class="regexp">/opt/my</span>sql/bin/mysqladmin ping | grep -c alive</span><br><span class="line">UserParameter=mysql.version,/opt/mysql/bin/mysql -V</span><br></pre></td></tr></table></figure></p>
@@ -561,10 +561,10 @@
               
               
               <div class="site-state-item site-state-categories">
-                
+                <a href="/chenblog.github.io/tags/index.html">
                   <span class="site-state-item-count">8</span>
                   <span class="site-state-item-name">分类</span>
-                
+                </a>
               </div>
             
 
@@ -572,10 +572,10 @@
               
               
               <div class="site-state-item site-state-tags">
-                
+                <a href="/chenblog.github.io/categories/index.html">
                   <span class="site-state-item-count">252</span>
                   <span class="site-state-item-name">标签</span>
-                
+                </a>
               </div>
             
 
@@ -811,7 +811,7 @@
     var isfetched = false;
     var isXml = true;
     // Search DB path;
-    var search_path = "./public/search.xml";
+    var search_path = "search.xml";
     if (search_path.length === 0) {
       search_path = "search.xml";
     } else if (/json$/i.test(search_path)) {

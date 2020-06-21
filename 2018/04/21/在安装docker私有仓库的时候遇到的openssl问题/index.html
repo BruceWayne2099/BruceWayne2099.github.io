@@ -405,7 +405,7 @@
 <p>又说没有openssl的文件，那执行<code>yum install openssl-devel</code>，OK了之后再次<code>pip install docker-registry</code>，再一次噼里啪啦，如下：<br><img src="/images/openssl3.png" alt="paradin"></p>
 <p>反馈我：<code>/usr/include/openssl/opensslconf.h:44: Error: CPP #error &quot;&quot;This openssl-devel package does not work your architecture?&quot;&quot;. Use the -cpperraswarn option to continue swig processing.</code>,这个提示大意是说openssl-devel版本不适合你的系统架构，也就是x86的去找x86的头文件，x86_64的去找x86_64文件，但现在是互相找不到对方。</p>
 <p>既然说<code>/usr/include/openssl/opensslconf.h</code>这个第44行有错误，那我们就打开这个文件去看看第44行写的是啥：<br>    <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">41 #elif defined(__x86_64__)</span><br><span class="line">42 #include "opensslconf-x86_64.h"</span><br><span class="line">43 #else</span><br><span class="line">44 #error "This openssl-devel package does not work your architecture?"</span><br><span class="line">45 #endif</span><br><span class="line"><span class="number">46</span> </span><br><span class="line">47 #undef openssl_opensslconf_multilib_redirection_h</span><br></pre></td></tr></table></figure></p>
-<p>这里我把第44行改成了这样：<br>    <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">41 #elif defined(__x86_64__)</span><br><span class="line">42 #include &quot;opensslconf-x86_64.h&quot;</span><br><span class="line">43 #else</span><br><span class="line">44 #include &quot;opensslconf.h&quot;    #去掉了原来的error提示，改成了安装opensslconf.h文件。</span><br><span class="line">45 #endif</span><br><span class="line">46 </span><br><span class="line">47 #undef openssl_opensslconf_multilib_redirection_h</span><br></pre></td></tr></table></figure></p>
+<p>这里我把第44行改成了这样：<br>    <figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">41 </span>#elif defined(__x86_64__)</span><br><span class="line"><span class="symbol">42 </span>#include <span class="string">"opensslconf-x86_64.h"</span></span><br><span class="line"><span class="symbol">43 </span>#<span class="keyword">else</span></span><br><span class="line"><span class="symbol">44 </span>#include <span class="string">"opensslconf.h"</span>    #去掉了原来的<span class="keyword">error</span>提示，改成了安装opensslconf.h文件。</span><br><span class="line"><span class="symbol">45 </span>#endif</span><br><span class="line"><span class="symbol">46 </span></span><br><span class="line"><span class="symbol">47 </span>#undef openssl_opensslconf_multilib_redirection_h</span><br></pre></td></tr></table></figure></p>
 <p>这一次重新执行<code>sudo pip install docker-registry</code>，终于成功…<br><img src="/images/openssl4.png" alt="paradin"></p>
 <p><img src="/images/agirl.gif" alt="akb48"></p>
 
@@ -540,10 +540,10 @@
               
               
               <div class="site-state-item site-state-categories">
-                
+                <a href="/chenblog.github.io/tags/index.html">
                   <span class="site-state-item-count">8</span>
                   <span class="site-state-item-name">分类</span>
-                
+                </a>
               </div>
             
 
@@ -551,10 +551,10 @@
               
               
               <div class="site-state-item site-state-tags">
-                
+                <a href="/chenblog.github.io/categories/index.html">
                   <span class="site-state-item-count">252</span>
                   <span class="site-state-item-name">标签</span>
-                
+                </a>
               </div>
             
 
@@ -774,7 +774,7 @@
     var isfetched = false;
     var isXml = true;
     // Search DB path;
-    var search_path = "./public/search.xml";
+    var search_path = "search.xml";
     if (search_path.length === 0) {
       search_path = "search.xml";
     } else if (/json$/i.test(search_path)) {

@@ -405,7 +405,7 @@
 <p>先把老的时间文件备份，然后把UTC文件做一个软连接过来即可。我们所熟悉的<code>date</code>命令就是<code>/etc/localtime</code>的输出结果。</p>
 <p>现在去<code>date</code>一下，看看结果，果然改成了<code>UTC</code>：<br><img src="/images/time3.png" alt="goodbye,Kobe"></p>
 <p>这个时候，如果你服务器里装的是nginx的话，就会发现nginx日志里的时间也会变成<code>UTC</code>而不会再是<code>CST</code>了。</p>
-<h2 id="更改系统时间"><a href="#更改系统时间" class="headerlink" title="更改系统时间"></a>更改系统时间</h2><p>云服务器一般来说系统时间都是正确的，但是自己的服务器可能在安装系统之后的时间是不统一的，这样可能在集群里就会出问题。时间同步的步骤如下：<br>    <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">yum install -y ntpdate		#下载ntp同步工具</span><br><span class="line">mv &#x2F;etc&#x2F;localtime &#x2F;etc&#x2F;localtime-bak		#备份原有文件</span><br><span class="line">cp &#x2F;usr&#x2F;share&#x2F;zoneinfo&#x2F;Asia&#x2F;Shanghai &#x2F;etc&#x2F;localtime		#时区调整为上海</span><br><span class="line">ntpdate us.pool.ntp.org		#与时区服务器同步时间</span><br></pre></td></tr></table></figure></p>
+<h2 id="更改系统时间"><a href="#更改系统时间" class="headerlink" title="更改系统时间"></a>更改系统时间</h2><p>云服务器一般来说系统时间都是正确的，但是自己的服务器可能在安装系统之后的时间是不统一的，这样可能在集群里就会出问题。时间同步的步骤如下：<br>    <figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">yum install -y ntpdate		<span class="meta">#下载ntp同步工具</span></span><br><span class="line">mv <span class="meta-keyword">/etc/</span>localtime <span class="meta-keyword">/etc/</span>localtime-bak		<span class="meta">#备份原有文件</span></span><br><span class="line">cp <span class="meta-keyword">/usr/</span>share<span class="meta-keyword">/zoneinfo/</span>Asia/Shanghai <span class="meta-keyword">/etc/</span>localtime		<span class="meta">#时区调整为上海</span></span><br><span class="line">ntpdate us.pool.ntp.org		<span class="meta">#与时区服务器同步时间</span></span><br></pre></td></tr></table></figure></p>
 <p>然后在crontab里添加一个每10分钟同步时间的命令：<code>*/10 * * * * /usr/sbin/ntpdate us.pool.ntp.org | logger -t NTP</code>。</p>
 <p>如果服务器是没有公网的，那么也就无法下载ntpdate，此时只能用<code>date -s</code>命令手动更改时间，比如：<code>date -s 23:40:00</code>、<code>date -s 20180703</code>。</p>
 
@@ -549,10 +549,10 @@
               
               
               <div class="site-state-item site-state-categories">
-                
+                <a href="/chenblog.github.io/tags/index.html">
                   <span class="site-state-item-count">8</span>
                   <span class="site-state-item-name">分类</span>
-                
+                </a>
               </div>
             
 
@@ -560,10 +560,10 @@
               
               
               <div class="site-state-item site-state-tags">
-                
+                <a href="/chenblog.github.io/categories/index.html">
                   <span class="site-state-item-count">252</span>
                   <span class="site-state-item-name">标签</span>
-                
+                </a>
               </div>
             
 
@@ -799,7 +799,7 @@
     var isfetched = false;
     var isXml = true;
     // Search DB path;
-    var search_path = "./public/search.xml";
+    var search_path = "search.xml";
     if (search_path.length === 0) {
       search_path = "search.xml";
     } else if (/json$/i.test(search_path)) {

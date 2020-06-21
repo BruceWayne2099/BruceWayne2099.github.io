@@ -410,7 +410,7 @@
 <p>安装完毕，再用<code>rpm -ivh --force yum-*</code>安装后面的内容。如图:<br><img src="/images/yum4.png" alt="akb48"></p>
 <h2 id="无法解析yum源"><a href="#无法解析yum源" class="headerlink" title="无法解析yum源"></a>无法解析yum源</h2><p>如果在<code>yum makecache</code>的时候出现了<code>http://mirrors.163.com/centos/6/os/x86_64/repodata/repomd.xml: [Errno 14] PYCURL ERROR 6 - &quot;Couldn&#39;t resolve host &#39;mirrors.163.com&#39;&quot;</code>的错误，如图：<br><img src="/images/yum3.png" alt="akb48"></p>
 <p>就修改一下<code>/etc/resolv.conf</code>，然后在里面添加一句<code>nameserver 8.8.8.8</code>，保存即可。</p>
-<h2 id="NOKEY？？？"><a href="#NOKEY？？？" class="headerlink" title="NOKEY？？？"></a>NOKEY？？？</h2><p>如果出现<code>Header V3 RSA/SHA1 Signature, key ID c105b9de: NOKEY</code>，可以使用如下方法解决：<br>    <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cd &#x2F;etc&#x2F;pki&#x2F;rpm-gpg&#x2F; </span><br><span class="line">wget http:&#x2F;&#x2F;mirrors.163.com&#x2F;centos&#x2F;RPM-GPG-KEY-CentOS-6 </span><br><span class="line">rpm --import &#x2F;etc&#x2F;pki&#x2F;rpm-gpg&#x2F;RPM-GPG-KEY-CentOS-6</span><br></pre></td></tr></table></figure></p>
+<h2 id="NOKEY？？？"><a href="#NOKEY？？？" class="headerlink" title="NOKEY？？？"></a>NOKEY？？？</h2><p>如果出现<code>Header V3 RSA/SHA1 Signature, key ID c105b9de: NOKEY</code>，可以使用如下方法解决：<br>    <figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cd <span class="regexp">/etc/</span>pki<span class="regexp">/rpm-gpg/</span> </span><br><span class="line">wget <span class="string">http:</span><span class="comment">//mirrors.163.com/centos/RPM-GPG-KEY-CentOS-6 </span></span><br><span class="line">rpm --<span class="keyword">import</span> <span class="regexp">/etc/</span>pki<span class="regexp">/rpm-gpg/</span>RPM-GPG-KEY-CentOS<span class="number">-6</span></span><br></pre></td></tr></table></figure></p>
 
       
     </div>
@@ -552,10 +552,10 @@
               
               
               <div class="site-state-item site-state-categories">
-                
+                <a href="/chenblog.github.io/tags/index.html">
                   <span class="site-state-item-count">8</span>
                   <span class="site-state-item-name">分类</span>
-                
+                </a>
               </div>
             
 
@@ -563,10 +563,10 @@
               
               
               <div class="site-state-item site-state-tags">
-                
+                <a href="/chenblog.github.io/categories/index.html">
                   <span class="site-state-item-count">252</span>
                   <span class="site-state-item-name">标签</span>
-                
+                </a>
               </div>
             
 
@@ -802,7 +802,7 @@
     var isfetched = false;
     var isXml = true;
     // Search DB path;
-    var search_path = "./public/search.xml";
+    var search_path = "search.xml";
     if (search_path.length === 0) {
       search_path = "search.xml";
     } else if (/json$/i.test(search_path)) {
