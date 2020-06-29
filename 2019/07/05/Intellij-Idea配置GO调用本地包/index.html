@@ -37,8 +37,8 @@
 <meta property="article:published_time" content="2019-07-05T07:56:16.000Z">
 <meta property="article:modified_time" content="2019-07-08T13:04:44.000Z">
 <meta property="article:author" content="Chris Chan">
-<meta property="article:tag" content="intellij idea">
 <meta property="article:tag" content="golang">
+<meta property="article:tag" content="intellij idea">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://brucewayne2099.github.io/images/go4.png">
 
@@ -342,8 +342,8 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/intellij-idea/" rel="tag"><i class="fa fa-tag"></i> intellij idea</a>
               <a href="/tags/golang/" rel="tag"><i class="fa fa-tag"></i> golang</a>
+              <a href="/tags/intellij-idea/" rel="tag"><i class="fa fa-tag"></i> intellij idea</a>
           </div>
 
         
@@ -552,9 +552,14 @@ setInterval("createtime()",250);
                 console.error('Failed to save visitor count', error);
               });
           } else {
-              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
-              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
-            
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
           }
         })
         .catch(error => {
@@ -581,7 +586,7 @@ setInterval("createtime()",250);
         });
     }
 
-    let { app_id, app_key, server_url } = {"enable":true,"app_id":"AiDjHC7wEwetLRd5XcWOIHHW-gzGzoHsz","app_key":"DNqGFHw3ihwD4viuyQM5xHvE","server_url":null,"security":true};
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"AiDjHC7wEwetLRd5XcWOIHHW-gzGzoHsz","app_key":"DNqGFHw3ihwD4viuyQM5xHvE","server_url":null,"security":false};
     function fetchData(api_server) {
       var Counter = (method, url, data) => {
         return fetch(`${api_server}/1.1${url}`, {

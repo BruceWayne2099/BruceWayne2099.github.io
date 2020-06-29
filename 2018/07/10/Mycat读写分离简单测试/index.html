@@ -37,8 +37,8 @@
 <meta property="article:modified_time" content="2018-07-10T08:48:00.000Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="读写分离">
-<meta property="article:tag" content="数据库中间件">
 <meta property="article:tag" content="mycat">
+<meta property="article:tag" content="数据库中间件">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://brucewayne2099.github.io/images/mycat12.png">
 
@@ -350,8 +350,8 @@
       <footer class="post-footer">
           <div class="post-tags">
               <a href="/tags/%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB/" rel="tag"><i class="fa fa-tag"></i> 读写分离</a>
-              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E4%B8%AD%E9%97%B4%E4%BB%B6/" rel="tag"><i class="fa fa-tag"></i> 数据库中间件</a>
               <a href="/tags/mycat/" rel="tag"><i class="fa fa-tag"></i> mycat</a>
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E4%B8%AD%E9%97%B4%E4%BB%B6/" rel="tag"><i class="fa fa-tag"></i> 数据库中间件</a>
           </div>
 
         
@@ -561,9 +561,14 @@ setInterval("createtime()",250);
                 console.error('Failed to save visitor count', error);
               });
           } else {
-              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
-              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
-            
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
           }
         })
         .catch(error => {
@@ -590,7 +595,7 @@ setInterval("createtime()",250);
         });
     }
 
-    let { app_id, app_key, server_url } = {"enable":true,"app_id":"AiDjHC7wEwetLRd5XcWOIHHW-gzGzoHsz","app_key":"DNqGFHw3ihwD4viuyQM5xHvE","server_url":null,"security":true};
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"AiDjHC7wEwetLRd5XcWOIHHW-gzGzoHsz","app_key":"DNqGFHw3ihwD4viuyQM5xHvE","server_url":null,"security":false};
     function fetchData(api_server) {
       var Counter = (method, url, data) => {
         return fetch(`${api_server}/1.1${url}`, {
