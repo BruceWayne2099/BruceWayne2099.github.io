@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://brucewayne2099.github.io/"/>
-  <updated>2020-07-14T12:38:47.937Z</updated>
+  <updated>2020-07-31T08:59:17.455Z</updated>
   <id>https://brucewayne2099.github.io/</id>
   
   <author>
@@ -15,6 +15,31 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Mysql判断不存在则插入，存在则更新或忽略</title>
+    <link href="https://brucewayne2099.github.io/2020/07/31/Mysql%E5%88%A4%E6%96%AD%E4%B8%8D%E5%AD%98%E5%9C%A8%E5%88%99%E6%8F%92%E5%85%A5%EF%BC%8C%E5%AD%98%E5%9C%A8%E5%88%99%E6%9B%B4%E6%96%B0%E6%88%96%E5%BF%BD%E7%95%A5/"/>
+    <id>https://brucewayne2099.github.io/2020/07/31/Mysql%E5%88%A4%E6%96%AD%E4%B8%8D%E5%AD%98%E5%9C%A8%E5%88%99%E6%8F%92%E5%85%A5%EF%BC%8C%E5%AD%98%E5%9C%A8%E5%88%99%E6%9B%B4%E6%96%B0%E6%88%96%E5%BF%BD%E7%95%A5/</id>
+    <published>2020-07-31T08:18:01.000Z</published>
+    <updated>2020-07-31T08:59:17.455Z</updated>
+    
+    <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><h2 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h2><p>我有一个数据库，每天都要从公司的数据库同步一些数据。但是这样就遇到一个问题：希望先判断数据是否相同，如果相同就跳过，不同就更新或者新增。那么比较笨的方法就是先取到要插入的数据，判断一下<code>select count(*) from 表 where XXX=&quot;要插入的数据的某一列&quot;</code>，如果返回的值是0就是<code>insert</code>，如果返回的不是0那就<code>update</code>。</p><p>但是这样的方法比较low，而且还有一定的性能隐患，其实这个需求可以用一句MySQL语句来实现，但是前提是该表里有唯一键。</p><p>举个例子，比如我有一个这样的表，表里面记录了一些球员的基础信息，如图：<br>![akb48](/images/mysql replace1.png “数据库的结构和数据”)</p><p>现在我要插入一条如下的语句：<br>insert into players(name,team,number) values (“james”,”cavaliers”,”23”)</p><p>可见新插的数据里，<code>name</code>列和<code>number</code>列一致，但是<code>team</code>不一致，那么要达到目标可以使用<code>replace into</code>语句，但是需要表里有<code>UNIQUE KEY</code>。什么是<code>UNIQUE KEY</code>(唯一键)等等再说，我先<code>alter table</code>players<code>ADD unique (</code>name<code>);</code>如图：<br>![akb48](/images/mysql replace2.png “name列多了UNI”)</p><p>这样就指定了name是唯一键，即球员的名称不可以出现重复，此时使用：<br>    <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">replace</span> <span class="keyword">into</span> players(<span class="keyword">name</span>,team,<span class="built_in">number</span>) <span class="keyword">values</span> (<span class="string">"james"</span>,<span class="string">"cavaliers"</span>,<span class="string">"23"</span>);</span><br></pre></td></tr></table></figure></p><p>效果如图：<br>![akb48](/images/mysql replace3.png)</p><p>但是这个时候不可以用<code>insert ingore</code>，因为是name为UNIQUE KEY，那么新插入的语句name是相同的，则不会插入，反而会爆出一个warning，使用show warnnings一看，提示name重复了，插入失败，但是语句是执行OK的，不会报error。如图：<br>![akb48](/images/mysql replace4.png)</p><h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://blog.csdn.net/t894690230/article/details/77996355" target="_blank" rel="noopener">https://blog.csdn.net/t894690230/article/details/77996355</a><br><a href="https://blog.csdn.net/BuptZhengChaoJie/article/details/50992923" target="_blank" rel="noopener">https://blog.csdn.net/BuptZhengChaoJie/article/details/50992923</a></p>]]></content>
+    
+    <summary type="html">
+    
+      如果想要把MySQL的数据四舍五入的展示到Django的前端页面上，在html界面直接配置{{ value | floatformat }}即可
+    
+    </summary>
+    
+    
+      <category term="工作与技术" scheme="https://brucewayne2099.github.io/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/"/>
+    
+    
+      <category term="Django" scheme="https://brucewayne2099.github.io/tags/Django/"/>
+    
+      <category term="平台搭建" scheme="https://brucewayne2099.github.io/tags/%E5%B9%B3%E5%8F%B0%E6%90%AD%E5%BB%BA/"/>
+    
+  </entry>
   
   <entry>
     <title>Django前端实现数据库删除修改操作</title>
@@ -71,9 +96,9 @@
     <link href="https://brucewayne2099.github.io/2020/07/02/%E8%B5%84%E6%8D%9F%E9%98%B2%E6%8E%A7%E7%9A%84%E6%84%9F%E6%82%9F/"/>
     <id>https://brucewayne2099.github.io/2020/07/02/%E8%B5%84%E6%8D%9F%E9%98%B2%E6%8E%A7%E7%9A%84%E6%84%9F%E6%82%9F/</id>
     <published>2020-07-02T07:47:59.000Z</published>
-    <updated>2020-07-15T03:46:14.220Z</updated>
+    <updated>2020-07-15T03:49:16.152Z</updated>
     
-    <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><p>资损是电商平台永远绕不开的话题，如果是平台（X宝、X东、X多多）的资损那会给平台减少收益，如果是店铺或者买家的资损（买家因为红包等权益失败导致多掏钱），那么这样会带来大量的舆情，甚至是合同上的纠纷，最后靠公关团队来安抚和赔付收场。所以说搞资损防控虽然是一个高收益的方向（目前国内关于资损的专家并不多），但是也是一个高风险的任务。简而言之，搞资损防控第一要对业务流程十分的理解，同时对玩法术语要明白，同时对技术（重试机制、锁机制、幂等性等等）也要有足够的沉淀。</p><p>本文主要就是我个人作为资损小白的一点关于资损防控的感悟，偏方法论，这里面并没有什么平台的介绍。</p><h2 id="什么是资损"><a href="#什么是资损" class="headerlink" title="什么是资损"></a>什么是资损</h2><p>资损事件指的是导致“平台多出钱和少收钱”的事件。但是引起这个事件的原因有很多种，我粗略统计了一下，主要分为如下几个类型：<br><img src="/images/%E8%B5%84%E6%8D%9F%E9%98%B2%E6%8E%A71.png" alt="akb48" title="除了商家人为过错，其他基本都要平台方解决"></p><p>从上面可以看出，作为一个技术人员主要面对的资损场景有很多，但是可以解决的主要就四大类，不要小看这四大类。比如最后一个“商家人为差错”，曾经有真实的案例：平台的产品在策略的说明比较复杂（写代码的人还能写明白文档的一定要好好对待），商家因为理解错误，原本的机票88折设成了减88%，遭到客户疯抢刷单，损失惨重。自己有可能会彻底葬送了维持生计的成本…</p><p>说到这里，想起来其实有些商家宣传语也是很模糊的。比如“XXX活动，不花一分钱买云服务器建平台”，但是没说截止日期，也不主动让客户指定额度告警。一个月下来，客户收到账单一看数字吓死人！</p><h2 id="如何梳理资损"><a href="#如何梳理资损" class="headerlink" title="如何梳理资损"></a>如何梳理资损</h2><p>一般来说如果是平台代销场景，商家跟平台在合约里是会有一个容忍buffer的条款，举个例子：某批货如果完美出售，可以卖1000万，那么设定buffer是10万，即990万以上就算平台成功完成任务。如果超出这个buffer，那么多出来的那部分就是商家资损了,可以去找平台赔偿。当然也有平台资损，比如平台多分钱给商家，或者优惠券红包设置成无门槛等等导致自己少收钱的行为。资损有两个数值，一个是<code>理论资损</code>一个是<code>实际资损</code>:理论资损指的是故障导致理论上的损失，比如X东去年的空调和烤箱被人薅羊毛事件，新闻标题是损失了几千万，其实这“几千万”是理论资损。实际资损是远远不会这么大的，因为会有售后介入，统一话术来安抚“薅羊毛”的用户，让他们放弃该订单，最后赔付红包了事。如果是ToB，那么也会有结算的同事去向多打款的商家追款，那么实际资损就是无法追回的那部分了。</p><p>虽然实际资损才是真实的损失，但是这绝不是代表“理论资损”不重要！相反理论资损非常重要，它才是衡量漏洞严重性的标准。</p><p>资损的防控主要还是“事前查—监控盯—快回血”这几part，这几个part的价值也是递减的。“事前查”这一块主要考验项目立项的时候，业务在prd文档里是否考虑周全。我曾经看过一个业务场景：“平台跟商家结算的时候会取单据的最新合同，但是这期间商家的合同是会发生变化的。原来可能是货入仓了就直接结算，但是后来变成了时销时算（可能商家资金比较紧张，不能接受每月结算，而是卖出后马上就跟平台分钱）。这样就会有的货物在入仓的时候平台就已经给商家结算过一次钱了，但是随着合同的变化，在商品卖出去的时候又重复结算一次。”这种产品问题其实是可以避免的，但是这种问题由于产品人员更迭，经常漏洞发现的时候已经漏水许久了，无论是找商家追债和内部追责都很不方便。</p><p>“快回血”这部分主要考验的是开发同学预案覆盖度和兜底逻辑是否合理，当发现了对账出现了异常，可以迅速止血，甚至不惜熔断的手法。“快回血”和“事前查”这个不是本文重点讨论的范围，因为这两个场景涉及到很多的“具体事情具体分析”。这里主要是说一下“监控盯”。</p><p>资损故障如果技术型问题，除了产品BUG之外那就是数据核对不一致。举个例子，某些产品由于仓覆盖的关系只能是在特定的某些区域可售的，比如说某些奢侈品只能在北上广深等一线城市才有货，那么这种货品肯定有一个商品标来体现它的特别性。在链路中，如果这个标丢失了，就成了“全国可售”，这样非可售区域的用户下了单，却拿不到货，就会出现超卖的问题。那么就会产生舆情，最后靠售后安抚了事，赔付不少的红包。</p><p>那么如何能比较全面的梳理全资损点呢？我觉得分两个方法，一个是通过以往的资损事故，让产品、开发和测试的同学枚举资损场景。还有一种方法，就是反推。</p><p>反推是什么意思？就是从结算的角度出发，因为结算才是钱出去的最后一环，为了钱不出差错，那么一切到结算这块的数字一定要是准确无误的。一般来说，结算都是自己有一套公式的，可以根据公式来逐级的拆解，这样落实到具体的各个部门。让对应的接口人来把监控补齐。如图：</p><p><img src="/images/%E8%B5%84%E6%8D%9F%E9%98%B2%E6%8E%A72.png" alt="akb48" title="通过结算因子来反推到上游"></p><p>这样是不是看起来清晰多了，也方便让各部门快速定位到自己负责的一part有哪些因素是下游强感知的，这样上游在修改他们的时候也要考虑到他们。</p><p>最后注意一种情况，那就是隐藏的资损，这种主要体现在“时效表达”上。比如“仓定位错误”，即顾客是杭州的，但是仓关系错误，定位商品需要在北京发货，到杭州是2天之后了。那么对于急需该产品的客户来说，他的心智就会去转投另外的电商APP购买同款商品了。这种情况虽然没有造成实际的金额往来，但是也要列入到整治的范围里。</p><p>至于如何整治，其实除了监控之外还需要一个强力的核对平台。通过两两核对或者什么手段，保证上游的数据在流到下游的时候不会发生丢失甚至是变化。</p><p>不过目前业界在监控的时候只能应对传入“值”类型错误、为空或者上下幅度较大这几个场景。而由于电商玩法很多，具体一些配置，比如优惠券或者加价购场景，可能就需要一些极低的价格。那么这种情况还是要人工去double-check，这一部分一直都没有一个好的解法。</p><h2 id="工作安排的几条军规"><a href="#工作安排的几条军规" class="headerlink" title="工作安排的几条军规"></a>工作安排的几条军规</h2><p>这一part跟资损没直接关系，但是有些公司比较喜欢搞运动、搞集中战役。那么面对这种情况，恰巧老板又抓你来当leader，你应该做到如下几点：<br>1.第一时间明确战役目标，制定战役的里程碑，将目标拆解到周维度。拿着这个目标和里程碑去找各位老板说明战役的重要性（公司高层非要搞，我也没办法），再要具体干活的人力。同时让老板对参与战役的同事减少当前的任务，让这些同事可以更充足的精力投入到战役里；<br>2.让具体干活的同事认同战役里程碑，同时让他们自己拿出来一份自己分内任务的具体可行性计划，大家一起评估；<br>3.制定一个日报/周报的模板，要求同事按期汇报工作进展。同时一定要注明有无风险，因为战役的第一负责人是你，如果战役没有达到预期效果，那么被问责的人也是你。所以一定要对风险了如指掌，出现了delay的风险要第一时间出面解决；<br>4.切忌中途改变目标和加入新目标！这必然会引起同事的反弹，不过难免会遇到“官大一级压死人”的场面，负责战役的领导突然脑抽风，要加XXX任务或者改变XXX的验收标准。那就要你顶住，哪怕是标准与现在实际情况偏离不多，实在顶不住就只能靠话术或者干脆升级到高一层，继续调人力过来支持了；<br>5.要对战役中的目标过程有一个比较清晰的认识，能合并的地方尽量合并。各部门在战役里有交集的地方需要拉齐时间线，统一确定产出的形式，同时这个形式也是领导所认可的；<br>6.如果有的team leader比较难搞怎么办？那你就拉一个跟他比较熟的人进入你的战役队伍，让他去搞定这个team leader…</p>]]></content>
+    <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><p>资损是电商平台永远绕不开的话题，如果是平台（X宝、X东、X多多）的资损那会给平台减少收益，如果是店铺或者买家的资损（买家因为红包等权益失败导致多掏钱），那么这样会带来大量的舆情，甚至是合同上的纠纷，最后靠公关团队来安抚和赔付收场。所以说搞资损防控虽然是一个高收益的方向（目前国内关于资损的专家并不多），但是也是一个高风险的任务。简而言之，搞资损防控第一要对业务流程十分的理解，同时对玩法术语要明白，同时对技术（重试机制、锁机制、幂等性等等）也要有足够的沉淀。</p><p>本文主要就是我个人作为资损小白的一点关于资损防控的感悟，偏方法论，这里面并没有什么平台的介绍。</p><h2 id="什么是资损"><a href="#什么是资损" class="headerlink" title="什么是资损"></a>什么是资损</h2><p>资损事件指的是导致“平台多出钱和少收钱”的事件。但是引起这个事件的原因有很多种，我粗略统计了一下，主要分为如下几个类型：<br><img src="/images/%E8%B5%84%E6%8D%9F%E9%98%B2%E6%8E%A71.png" alt="akb48" title="除了商家人为过错，其他基本都要平台方解决"></p><p>从上面可以看出，作为一个技术人员主要面对的资损场景有很多，但是可以解决的主要就四大类，不要小看这四大类。比如最后一个“商家人为差错”，曾经有真实的案例：平台的产品在策略的说明比较复杂（写代码的人还能写明白文档的一定要好好对待），商家因为理解错误，原本的机票88折设成了减88%，遭到客户疯抢刷单，损失惨重。自己有可能会彻底葬送了维持生计的成本…</p><p>说到这里，想起来其实有些商家宣传语也是很模糊的。比如“XXX活动，不花一分钱买云服务器建平台”，但是没说截止日期，也不主动让客户指定额度告警。一个月下来，客户收到账单一看数字吓死人！</p><h2 id="如何梳理资损"><a href="#如何梳理资损" class="headerlink" title="如何梳理资损"></a>如何梳理资损</h2><p>一般来说如果是平台代销场景，商家跟平台在合约里是会有一个容忍buffer的条款，举个例子：某批货如果完美出售，可以卖1000万，那么设定buffer是10万，即990万以上就算平台成功完成任务。如果超出这个buffer，那么多出来的那部分就是商家资损了,可以去找平台赔偿。当然也有平台资损，比如平台多分钱给商家，或者优惠券红包设置成无门槛等等导致自己少收钱的行为。资损有两个数值，一个是<code>理论资损</code>一个是<code>实际资损</code>:理论资损指的是故障导致理论上的损失，比如X东去年的空调和烤箱被人薅羊毛事件，新闻标题是损失了几千万，其实这“几千万”是理论资损。实际资损是远远不会这么大的，因为会有售后介入，统一话术来安抚“薅羊毛”的用户，让他们放弃该订单，最后赔付红包了事。如果是ToB，那么也会有结算的同事去向多打款的商家追款，那么实际资损就是无法追回的那部分了。</p><p>虽然实际资损才是真实的损失，但是这绝不是代表“理论资损”不重要！相反理论资损非常重要，它才是衡量漏洞严重性的标准。</p><p>资损的防控主要还是“事前查—监控盯—快回血”这几part，这几个part的价值也是递减的。“事前查”这一块主要考验项目立项的时候，业务在prd文档里是否考虑周全。我曾经看过一个业务场景：“平台跟商家结算的时候会取单据的最新合同，但是这期间商家的合同是会发生变化的。原来可能是货入仓了就直接结算，但是后来变成了时销时算（可能商家资金比较紧张，不能接受每月结算，而是卖出后马上就跟平台分钱）。这样就会有的货物在入仓的时候平台就已经给商家结算过一次钱了，但是随着合同的变化，在商品卖出去的时候又重复结算一次。”这种产品问题其实是可以避免的，但是这种问题由于产品人员更迭，经常漏洞发现的时候已经漏水许久了，无论是找商家追债和内部追责都很不方便。</p><p>“快回血”这部分主要考验的是开发同学预案覆盖度和兜底逻辑是否合理，当发现了对账出现了异常，可以迅速止血，甚至不惜熔断的手法。“快回血”和“事前查”这个不是本文重点讨论的范围，因为这两个场景涉及到很多的“具体事情具体分析”。这里主要是说一下“监控盯”。</p><p>资损故障如果技术型问题，除了产品BUG之外那就是数据核对不一致。举个例子，某些产品由于仓覆盖的关系只能是在特定的某些区域可售的，比如说某些奢侈品只能在北上广深等一线城市才有货，那么这种货品肯定有一个商品标来体现它的特别性。在链路中，如果这个标丢失了，就成了“全国可售”，这样非可售区域的用户下了单，却拿不到货，就会出现超卖的问题。那么就会产生舆情，最后靠售后安抚了事，赔付不少的红包。</p><p>那么如何能比较全面的梳理全资损点呢？我觉得分两个方法，一个是通过以往的资损事故，让产品、开发和测试的同学枚举资损场景。还有一种方法，就是反推。</p><p>反推是什么意思？就是从结算的角度出发，因为结算才是钱出去的最后一环，为了钱不出差错，那么一切到结算这块的数字一定要是准确无误的。一般来说，结算都是自己有一套公式的，可以根据公式来逐级的拆解，这样落实到具体的各个部门。让对应的接口人来把监控补齐。如图：</p><p><img src="/images/%E8%B5%84%E6%8D%9F%E9%98%B2%E6%8E%A72.png" alt="akb48" title="通过结算因子来反推到上游"></p><p>这样是不是看起来清晰多了，也方便让各部门快速定位到自己负责的一part有哪些因素是下游强感知的，这样上游在修改他们的时候也要考虑到他们。</p><p>最后注意一种情况，那就是隐藏的资损，这种主要体现在“时效表达”上。比如“仓定位错误”，即顾客是杭州的，但是仓关系错误，定位商品需要在北京发货，到杭州是2天之后了。那么对于急需该产品的客户来说，他的心智就会去转投另外的电商APP购买同款商品了。这种情况虽然没有造成实际的金额往来，但是也要列入到整治的范围里。</p><p>至于如何整治，其实除了监控之外还需要一个强力的核对平台。通过两两核对或者什么手段，保证上游的数据在流到下游的时候不会发生丢失甚至是变化。</p><p>不过目前业界在监控的时候只能应对传入“值”类型错误、为空或者上下幅度较大这几个场景。而由于电商玩法很多，具体一些配置，比如优惠券或者加价购场景，可能就需要一些极低的价格。那么这种情况还是要人工去double-check，这一部分一直都没有一个好的解法。</p><h2 id="工作安排的几条军规"><a href="#工作安排的几条军规" class="headerlink" title="工作安排的几条军规"></a>工作安排的几条军规</h2><p>这一part跟资损没直接关系，但是有些公司比较喜欢搞运动、搞集中战役。那么面对这种情况，恰巧老板又抓你来当战役的leader，你应该做到如下几点：<br>1.第一时间明确战役目标，制定战役的里程碑，将目标拆解到周维度。拿着这个目标和里程碑去找各位老板说明战役的重要性（公司高层非要搞，我也没办法），再要具体干活的人力。同时让老板对参与战役的同事减少当前的任务，让这些同事可以更充足的精力投入到战役里；<br>2.让具体干活的同事认同战役里程碑，同时让他们自己拿出来一份自己分内任务的具体可行性计划，大家一起评估；<br>3.制定一个日报/周报的模板，要求同事按期汇报工作进展。同时一定要注明有无风险，因为战役的第一负责人是你，如果战役没有达到预期效果，那么被问责的人也是你。所以一定要对风险了如指掌，出现了delay的风险要第一时间出面解决；<br>4.切忌中途改变目标和加入新目标！这必然会引起同事的反弹，不过难免会遇到“官大一级压死人”的场面，负责战役的领导突然脑抽风，要加XXX任务或者改变XXX的验收标准。那就要你顶住，哪怕是标准与现在实际情况偏离不多，实在顶不住就只能靠话术或者干脆升级到高一层，继续调人力过来支持了；<br>5.要对战役中的目标过程有一个比较清晰的认识，能合并的地方尽量合并。各部门在战役里有交集的地方需要拉齐时间线，统一确定产出的形式，同时这个形式也是领导所认可的；<br>6.如果有的team leader比较难搞怎么办？那你就拉一个跟他比较熟的人进入你的战役队伍，让他去搞定这个team leader…</p>]]></content>
     
     <summary type="html">
     
@@ -443,9 +468,9 @@
       <category term="工作与技术" scheme="https://brucewayne2099.github.io/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/"/>
     
     
-      <category term="zabbix" scheme="https://brucewayne2099.github.io/tags/zabbix/"/>
-    
       <category term="监控" scheme="https://brucewayne2099.github.io/tags/%E7%9B%91%E6%8E%A7/"/>
+    
+      <category term="zabbix" scheme="https://brucewayne2099.github.io/tags/zabbix/"/>
     
   </entry>
   
@@ -498,31 +523,6 @@
       <category term="python2" scheme="https://brucewayne2099.github.io/tags/python2/"/>
     
       <category term="ansible api" scheme="https://brucewayne2099.github.io/tags/ansible-api/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>AWS数据迁移到阿里云的一些坑</title>
-    <link href="https://brucewayne2099.github.io/2019/11/07/AWS%E9%85%8D%E7%BD%AE%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/"/>
-    <id>https://brucewayne2099.github.io/2019/11/07/AWS%E9%85%8D%E7%BD%AE%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/</id>
-    <published>2019-11-07T09:16:29.000Z</published>
-    <updated>2019-11-08T06:41:18.000Z</updated>
-    
-    <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><p>最近在忙AWS迁移阿里云的事情，在这之中发现了也解决了很多坑，这里记录一下。</p><h2 id="只读RDS修改配置组无效果"><a href="#只读RDS修改配置组无效果" class="headerlink" title="只读RDS修改配置组无效果"></a>只读RDS修改配置组无效果</h2><p>我们这一次数据库的迁移是重点任务，考虑到AWS的源库都是无公网访问权限的，于是就创建一个有公网权限的只读库（read replica），然后在阿里云是用DTS，以这个只读库作为源库，然后进行数据的<code>增量同步</code>。这里有一点：“源库”的binlog必须是ROW模式，而默认的AWS创建的源库是MIX模式，于是就需要修改一下参数组（parameter group），将其改成ROW：<br><img src="/images/aws1.png" alt="akb48"></p><p>然后配置只读实例引用这个参数组，但是要等待参数组状态是（pending reboot），重启。</p><p>但是这里有一个大坑！那么就是<code>read replica</code>的<code>Backup retention period</code>值不可以是0，不然参数组即使重启了是不会生效的！<br><img src="/images/aws2.png" alt="akb48"></p><p>当然直接使用DTS并不是一个好方案，因为即使是同一个可用区，比如都在法兰克福，但是不同厂商还是会有网络影响，所以更加推荐就是搭一个专线，然后走专线同步。而且DTS的时候，切忌目标库发生与源库不同的操作造成数据错乱，那样就前功尽弃了。</p><p>DTS的原理就是不断的读取binlog然后执行binlog，但是row模式的binlog特别巨大，再加上网络有波动或者源库有跟主库名称一样但是内容不一致的数据导致所有唯一主键都要报错一遍，那么延迟可能就是一辈子的事儿…</p><h2 id="无公网ec2访问外网"><a href="#无公网ec2访问外网" class="headerlink" title="无公网ec2访问外网"></a>无公网ec2访问外网</h2><p>本次迁移数据除了mysql还有redis，但是AWS的redis也都是内网服务器，于是这样我们就做了外网NLB，在阿里云的redis上做主从配置，并且在阿里云的redis.conf里把主写成了NLB的域名，这里如果担心NLB域名后面的IP发生变化而故障，那么可以事先在aws里购买弹性IP，然后将域名绑定死对应的IP就不怕了。</p><p>但是如果想要返回来，让阿里云的redis做主，AWS这个无公网的ec2 redis做从的话，用外网NLB就不行了。不过AWS比较好，就是ec2虽然表面没有公网IP，但是它有一个<code>隐藏的公网</code>，比如我这个ec2:<br><img src="/images/aws3.png" alt="akb48"></p><p>可见它没有公网IP，但是在服务器里使用<code>curl myip.ipip.net</code>可以获取到它的公网出口IP：<br><img src="/images/aws4.png" alt="akb48"></p><p>将这个IP写到阿里云的安全组就可以在ec2这边访问到阿里云的公网了！</p><h2 id="DMS白名单问题"><a href="#DMS白名单问题" class="headerlink" title="DMS白名单问题"></a>DMS白名单问题</h2><p>AWS的数据迁移叫DMS，这个地方也有一个坑，就是<code>Replication instances</code>的公网IP可能是不对的，如图：<br><img src="/images/aws5.png" alt="akb48"></p><p>我把图中的<code>Public IP address</code>填写到了阿里云对应数据库的白名单里但是test无法成功，后来改成<code>0.0.0.0/0</code>之后登陆上去一看，连接的IP并不是图中的IP，这真的是一个大坑！</p>]]></content>
-    
-    <summary type="html">
-    
-      AWS的change_resource_record_sets是不能直接更改解析方式的，如果想要从A记录改成CNAME记录，那就要先把原来的删除，再重新建立
-    
-    </summary>
-    
-    
-      <category term="工作与技术" scheme="https://brucewayne2099.github.io/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/"/>
-    
-    
-      <category term="aws" scheme="https://brucewayne2099.github.io/tags/aws/"/>
-    
-      <category term="运维" scheme="https://brucewayne2099.github.io/tags/%E8%BF%90%E7%BB%B4/"/>
     
   </entry>
   
