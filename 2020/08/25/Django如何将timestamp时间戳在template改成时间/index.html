@@ -36,7 +36,7 @@
 <meta property="og:image" content="https://brucewayne2099.github.io/images/%E8%87%AA%E5%AE%9A%E4%B9%89%E8%BF%87%E6%BB%A4%E5%99%A8.png">
 <meta property="og:image" content="https://brucewayne2099.github.io/images/%E8%87%AA%E5%AE%9A%E4%B9%89%E8%BF%87%E6%BB%A4%E5%99%A82.png">
 <meta property="article:published_time" content="2020-08-25T15:53:31.000Z">
-<meta property="article:modified_time" content="2020-08-26T04:05:47.855Z">
+<meta property="article:modified_time" content="2020-08-26T06:03:17.220Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="Django">
 <meta property="article:tag" content="平台搭建">
@@ -232,7 +232,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-08-26 12:05:47" itemprop="dateModified" datetime="2020-08-26T12:05:47+08:00">2020-08-26</time>
+                <time title="修改时间：2020-08-26 14:03:17" itemprop="dateModified" datetime="2020-08-26T14:03:17+08:00">2020-08-26</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -281,7 +281,7 @@
         <p>先说一下配置：<br>Django:<code>2.1.8</code><br>Python:<code>3.6.4</code><br>project的名称是:<code>naxx</code><br>APP的名称是:<code>naxxramas</code></p>
 <h2 id="template的除法与as"><a href="#template的除法与as" class="headerlink" title="template的除法与as"></a>template的除法与as</h2><p>我们在用Django搭配平台API的时候，经常会得到各种各样形式的数据。那么<code>views.py</code>获取到这些数据之后，需要通过<code>template</code>向前端展示。但是往往由于API数据的格式多种多样，比如API提供的是时间戳timestamp，而前端需要展示的是可读的时间，这种变化怎么办？</p>
 <p>比如我们公司的一个监控系统，对外暴露的API格式如下：<br>    <figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;<span class="attr">"data"</span>:&#123;<span class="attr">"attends"</span>:<span class="literal">null</span>,<span class="attr">"metadata"</span>:<span class="literal">null</span>,<span class="attr">"result"</span>:[&#123;<span class="attr">"timestamp"</span>:<span class="number">1598369220000</span>,<span class="attr">"avg_cpu"</span>:<span class="number">1.6593</span>&#125;,&#123;<span class="attr">"timestamp"</span>:<span class="number">1598369280000</span>,<span class="attr">"avg_cpu"</span>:<span class="number">1.6854</span>&#125;,&#123;<span class="attr">"timestamp"</span>:<span class="number">1598369340000</span>,<span class="attr">"avg_cpu"</span>:<span class="number">1.6552</span>&#125;,&#123;<span class="attr">"timestamp"</span>:<span class="number">1598369400000</span>,<span class="attr">"avg_cpu"</span>:<span class="number">1.7705</span>&#125;]&#125;,<span class="attr">"message"</span>:<span class="string">""</span>,<span class="attr">"success"</span>:<span class="literal">true</span>,<span class="attr">"totalCount"</span>:<span class="literal">null</span>&#125;</span><br></pre></td></tr></table></figure></p>
-<p>可以看出返回的是某个应用最近5分钟的CPU情况。那么如果要展示到前端，就需要对<code>timestamp</code>进行二次加工。原来的代码是：<br>    <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;% <span class="keyword">for</span> app <span class="keyword">in</span> data %&#125;</span><br><span class="line">&#123;&#123; app.timestamp &#125;&#125;</span><br><span class="line">&#123;&#123; app.avg_cpu &#125;&#125;</span><br><span class="line">&#123;% endfor %&#125;</span><br></pre></td></tr></table></figure></p>
+<p>可以看出返回的是某个应用最近5分钟的CPU情况。那么如果要展示到前端，就需要对<code>timestamp</code>进行二次加工。原来的代码是：<br>    <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;% <span class="keyword">for</span> app <span class="keyword">in</span> data %&#125;</span><br><span class="line">	&#123;&#123; app.timestamp &#125;&#125;</span><br><span class="line">	&#123;&#123; app.avg_cpu &#125;&#125;</span><br><span class="line">&#123;% endfor %&#125;</span><br></pre></td></tr></table></figure></p>
 <p>首先第一步，<code>timestamp</code>这个值并不是一个正确的时间戳，如图：<br><img src="/images/%E9%94%99%E8%AF%AF%E7%9A%84%E6%97%B6%E9%97%B4%E6%88%B3.png" alt="akb48" title="这都5万多年了..."></p>
 <p>可见它是真实时间戳的1000倍，所以我们要先将其除以1000。那么更改代码如下：<br><img src="/images/widthratio.png" alt="akb48" title="hexo识别widthratio报错，只能用图片了"></p>
 <p>这里就达到了将原来<code>app.timestamp</code>除以1000的效果。但是要注意，这样就不能继续加工了，即在后面加上<code>|date:&quot;D d M Y&quot; %}</code>这个过滤器是会报错的，因为<code>widthratio</code>只能接受int类型。</p>
