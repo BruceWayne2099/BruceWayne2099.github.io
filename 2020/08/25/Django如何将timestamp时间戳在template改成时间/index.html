@@ -36,7 +36,7 @@
 <meta property="og:image" content="https://brucewayne2099.github.io/images/%E8%87%AA%E5%AE%9A%E4%B9%89%E8%BF%87%E6%BB%A4%E5%99%A8.png">
 <meta property="og:image" content="https://brucewayne2099.github.io/images/%E8%87%AA%E5%AE%9A%E4%B9%89%E8%BF%87%E6%BB%A4%E5%99%A82.png">
 <meta property="article:published_time" content="2020-08-25T15:53:31.000Z">
-<meta property="article:modified_time" content="2020-08-26T03:45:59.390Z">
+<meta property="article:modified_time" content="2020-08-26T04:05:47.855Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="Django">
 <meta property="article:tag" content="平台搭建">
@@ -232,7 +232,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-08-26 11:45:59" itemprop="dateModified" datetime="2020-08-26T11:45:59+08:00">2020-08-26</time>
+                <time title="修改时间：2020-08-26 12:05:47" itemprop="dateModified" datetime="2020-08-26T12:05:47+08:00">2020-08-26</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -258,7 +258,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>1.9k</span>
+              <span>2k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -284,7 +284,7 @@
 <p>可以看出返回的是某个应用最近5分钟的CPU情况。那么如果要展示到前端，就需要对<code>timestamp</code>进行二次加工。原来的代码是：<br>    <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;% <span class="keyword">for</span> app <span class="keyword">in</span> data %&#125;</span><br><span class="line">&#123;&#123; app.timestamp &#125;&#125;</span><br><span class="line">&#123;&#123; app.avg_cpu &#125;&#125;</span><br><span class="line">&#123;% endfor %&#125;</span><br></pre></td></tr></table></figure></p>
 <p>首先第一步，<code>timestamp</code>这个值并不是一个正确的时间戳，如图：<br><img src="/images/%E9%94%99%E8%AF%AF%E7%9A%84%E6%97%B6%E9%97%B4%E6%88%B3.png" alt="akb48" title="这都5万多年了..."></p>
 <p>可见它是真实时间戳的1000倍，所以我们要先将其除以1000。那么更改代码如下：<br><img src="/images/widthratio.png" alt="akb48" title="hexo识别widthratio报错，只能用图片了"></p>
-<p>这里就达到了将原来<code>app.timestamp</code>除以1000的效果。但是要注意，这样就不能继续加工了，即   是会报错的，因为<code>widthratio</code>只能接受int类型。</p>
+<p>这里就达到了将原来<code>app.timestamp</code>除以1000的效果。但是要注意，这样就不能继续加工了，即在后面加上<code>|date:&quot;D d M Y&quot; %}</code>这个过滤器是会报错的，因为<code>widthratio</code>只能接受int类型。</p>
 <p>既然这样，我们就中转一下使用<code>as</code>，改成这样:<br><img src="/images/widthratio2.png" alt="akb48" title="hexo识别widthratio报错，只能用图片了"></p>
 <p>这里通过<code>as</code>来解决问题，先用除法将结果赋予<code>timestamp</code>，然后再对<code>timestamp</code>进行<code>print_timestamp</code>的加工展示。</p>
 <h2 id="自定义template过滤器"><a href="#自定义template过滤器" class="headerlink" title="自定义template过滤器"></a>自定义template过滤器</h2><p>在上面那个例子里，我用了<code>print_timestamp</code>这个模板过滤器，这是一个自定义的过滤器，因为Django2目前没有官方的时间戳转时间的过滤器。所以就要手写一个，手写的过程如下：</p>
