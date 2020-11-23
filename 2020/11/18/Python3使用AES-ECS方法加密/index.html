@@ -32,7 +32,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://brucewayne2099.github.io/images/%E8%AF%BA%E4%BC%8A%E5%B0%94%E8%A2%AB%E8%B8%A2%E5%82%BB%E4%BA%86.JPG">
 <meta property="article:published_time" content="2020-11-18T03:28:16.000Z">
-<meta property="article:modified_time" content="2020-11-18T06:03:27.168Z">
+<meta property="article:modified_time" content="2020-11-23T09:02:17.338Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="Django">
 <meta property="article:tag" content="平台搭建">
@@ -220,10 +220,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2020-11-18 11:28:16 / 修改时间：14:03:27" itemprop="dateCreated datePublished" datetime="2020-11-18T11:28:16+08:00">2020-11-18</time>
+              <time title="创建时间：2020-11-18 11:28:16" itemprop="dateCreated datePublished" datetime="2020-11-18T11:28:16+08:00">2020-11-18</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-11-23 17:02:17" itemprop="dateModified" datetime="2020-11-23T17:02:17+08:00">2020-11-23</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -248,7 +254,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>1.8k</span>
+              <span>2.5k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -269,9 +275,10 @@
 
       
         <p>突然发现好久没有更新了，主要是前段时间忙双十一太忙了，通宵压测几乎15次，可以说从国庆放假回来不是在压测就是在补觉，然后公司的夜宵吃几次也就腻了，所以全链路压测的新鲜感一消失就会很迷茫。不过每次看到那些大佬们也都熬夜压测，心里还多少平衡一点…</p>
-<p>在公司的一部分产品的API中，有接口是使用AES对称加解密方法来实现，并且采用ECB模式，是链接内部工具的，但是这个API的demo是用python2来写的，由于我的Django是python3.8，于是就要自己手改。代码如下，这里没有加上加解密的部分。</p>
+<h2 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h2><p>在公司的一部分产品的API中，有接口是使用AES对称加解密方法来实现，并且采用ECB模式，是链接内部工具的，但是这个API的demo是用python2来写的，由于我的Django是python3.8，于是就要自己手改。代码如下，这里没有加上加解密的部分。</p>
 <pre><code><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#引入依赖包</span></span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">import</span> base64</span><br><span class="line"><span class="keyword">from</span> Crypto.Cipher <span class="keyword">import</span> AES</span><br><span class="line"></span><br><span class="line">appname = <span class="string">"这里是应用名称"</span></span><br><span class="line">timestamp = int(time.time() * <span class="number">1000</span>)</span><br><span class="line">print(<span class="string">"当前时间戳是:"</span> + str(timestamp))</span><br><span class="line"></span><br><span class="line"><span class="comment">#封装AECS</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">prpcrypt</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, key)</span>:</span></span><br><span class="line">        self.key = key</span><br><span class="line">        self.mode = AES.MODE_ECB</span><br><span class="line">        self.BS = len(key)</span><br><span class="line">        <span class="comment"># 如果刚好是s是BS的倍数，那么补一组</span></span><br><span class="line">        self.pad = <span class="keyword">lambda</span> s: s + (self.BS - len(s) % self.BS) * chr(self.BS - len(s) % self.BS).encode()</span><br><span class="line">        <span class="comment"># python3这里多了一个encode，python2的写法是self.pad = lambda s: s + (self.BS - len(s) % self.BS) * chr(self.BS - len(s) % self.BS)</span></span><br><span class="line">        self.unpad = <span class="keyword">lambda</span> s: s[<span class="number">0</span>:-s[<span class="number">-1</span>]]  <span class="comment"># python2的写法是：self.unpad = lambda s : s[0:-ord(s[-1])]，这里把ord去掉了</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#  加密</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">Encrypt</span><span class="params">(self,text)</span>:</span></span><br><span class="line">        text = self.pad(text)</span><br><span class="line">        cryptor = AES.new(self.key,self.mode, <span class="string">b'0000000000000000'</span>) <span class="comment">#必须16位</span></span><br><span class="line">        ciphertext = cryptor.encrypt(text)</span><br><span class="line">        <span class="keyword">return</span> ciphertext</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">#签名计算</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sign</span><span class="params">(timestamp)</span>:</span></span><br><span class="line">    content = format(<span class="string">"appName=%s;timestamp=%s"</span> % (appname, timestamp))</span><br><span class="line">    print(<span class="string">"传入的动态值："</span>, content)</span><br><span class="line">    key = base64.decodebytes(<span class="string">b'1234567890abcdefghijkl=='</span>)       <span class="comment"># 这里是secret，我这里是24位</span></span><br><span class="line">    ciphertext = prpcrypt(key).Encrypt(content.encode(<span class="string">'utf-8'</span>))  <span class="comment"># utf8编码</span></span><br><span class="line">    endata = base64.urlsafe_b64encode(ciphertext).decode().rstrip(<span class="string">'='</span>)  <span class="comment"># 必须urlsafe格式后，tstrip掉"="，这里python3，需要添加一个decode()，这样就可以由bytes转str了</span></span><br><span class="line">    print(<span class="string">'加密签名是：'</span>,endata)</span><br><span class="line">    <span class="keyword">return</span> endata</span><br><span class="line">    <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    signature = sign(timestamp)  <span class="comment"># 这里通过时间戳的变化和不同的appname，来得到加密签名</span></span><br></pre></td></tr></table></figure></code></pre><p>其实这比较恶心的地方就是Python3.x和Python2.x在一些类型上不同，比如长类型和bytes的用法上，总结一下，Python3.x和Python2.x在套接字返回值解码上有区别:<br>python bytes和str两种类型可以通过函数<code>encode()</code>和<code>decode()</code>相互转换，<br><code>str→bytes</code>：<code>encode()</code>方法。<code>str</code>通过<code>encode()</code>方法可以转换为<code>bytes</code>。<br><code>bytes→str</code>：<code>decode()</code>方法。如果我们从网络或磁盘上读取了字节流，那么读到的数据就是<code>bytes</code>。要把<code>bytes</code>变为<code>str</code>，就需要用<code>decode()</code>方法。</p>
-<p><img src="/images/%E8%AF%BA%E4%BC%8A%E5%B0%94%E8%A2%AB%E8%B8%A2%E5%82%BB%E4%BA%86.JPG" alt="akb48" title="6比0，看看勒夫啥时候下课"></p>
+<h2 id="hex加密的python2-gt-3"><a href="#hex加密的python2-gt-3" class="headerlink" title="hex加密的python2-&gt;3"></a>hex加密的python2-&gt;3</h2><p>python2的脚本是这样的：<br>    <figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">#根据你申请的账号和对应的key,加上当前的时间戳,得到一个秘钥</span><br><span class="line"><span class="keyword">import</span> md5</span><br><span class="line"></span><br><span class="line">account="test-skyline";</span><br><span class="line">key = "myPrivateKey";</span><br><span class="line"><span class="type">timeStamp</span> = <span class="number">1531310369</span>L;</span><br><span class="line">toEncrypt = account+key+str(<span class="type">timeStamp</span>);</span><br><span class="line">signature=md5.<span class="built_in">new</span>(toEncrypt).digest().encode(<span class="string">'hex'</span>)</span><br><span class="line"># 结果: (<span class="string">'5fbd62ee4cf62c503ec8e417d7289816'</span>, &lt;<span class="keyword">type</span> <span class="string">'str'</span>&gt;)</span><br></pre></td></tr></table></figure></p>
+<p>而python3的版本就是这样了:<br>    <figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 原脚本是python2的，现在要转成python3版本,https://yuque.antfin-inc.com/at7ocb/qbn0oy/cahbgn</span></span><br><span class="line"></span><br><span class="line">from hashlib <span class="built_in">import</span> md5</span><br><span class="line"><span class="built_in">import</span> binascii</span><br><span class="line"></span><br><span class="line"><span class="attr">account</span> = <span class="string">"test-skyline"</span></span><br><span class="line"><span class="attr">key</span> = <span class="string">"myPrivateKey"</span></span><br><span class="line"></span><br><span class="line"><span class="attr">timeStamp</span> = <span class="number">1531310369</span>  <span class="comment"># python3直接这么写就行，不用带L</span></span><br><span class="line"><span class="attr">en_data</span> = account+key+str(timeStamp)</span><br><span class="line"><span class="attr">toEncrypt</span> = md5(en_data.encode(<span class="string">"utf-8"</span>))  <span class="comment"># python3的写法</span></span><br><span class="line"><span class="attr">signature</span> = binascii.b2a_hex(toEncrypt.digest())</span><br><span class="line"></span><br><span class="line">print(signature,type(signature))</span><br><span class="line"><span class="comment"># 结果：b'5fbd62ee4cf62c503ec8e417d7289816' &lt;class 'bytes'&gt;</span></span><br></pre></td></tr></table></figure><br><img src="/images/%E8%AF%BA%E4%BC%8A%E5%B0%94%E8%A2%AB%E8%B8%A2%E5%82%BB%E4%BA%86.JPG" alt="akb48" title="6比0，看看勒夫啥时候下课"></p>
 
     </div>
 
@@ -405,6 +412,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#正文"><span class="nav-number">1.</span> <span class="nav-text">正文</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#hex加密的python2-gt-3"><span class="nav-number">2.</span> <span class="nav-text">hex加密的python2-&gt;3</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -475,12 +483,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">766k</span>
+    <span title="站点总字数">767k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">11:36</span>
+    <span title="站点阅读时长">11:37</span>
 </div>
 
 <div>
