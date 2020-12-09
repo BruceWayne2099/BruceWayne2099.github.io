@@ -32,9 +32,9 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://brucewayne2099.github.io/images/%E9%A3%8E%E9%99%A9%E5%A4%A7%E7%9B%98%E9%A6%96%E9%A1%B5.png">
 <meta property="og:image" content="https://brucewayne2099.github.io/images/bootstrap%E9%BB%98%E8%AE%A4%E4%B8%8B%E6%8B%89%E6%95%88%E6%9E%9C.png">
-<meta property="og:image" content="https://brucewayne2099.github.io/images/%E6%B1%89%E6%B5%B7%E5%85%AC%E5%9B%AD%E5%BC%82%E5%9E%8B%E6%88%98%E5%A3%AB.png">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/%E6%B1%89%E6%B5%B7%E5%85%AC%E5%9B%AD%E5%BC%82%E5%9E%8B%E6%88%98%E5%A3%AB.jpg">
 <meta property="article:published_time" content="2020-12-09T09:45:35.000Z">
-<meta property="article:modified_time" content="2020-12-09T12:04:36.621Z">
+<meta property="article:modified_time" content="2020-12-09T12:08:06.044Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="Django2">
 <meta property="article:tag" content="Python3">
@@ -224,7 +224,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2020-12-09 17:45:35 / 修改时间：20:04:36" itemprop="dateCreated datePublished" datetime="2020-12-09T17:45:35+08:00">2020-12-09</time>
+              <time title="创建时间：2020-12-09 17:45:35 / 修改时间：20:08:06" itemprop="dateCreated datePublished" datetime="2020-12-09T17:45:35+08:00">2020-12-09</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -287,7 +287,7 @@
 <p>这样直接点击就OK了。</p>
 <p>补充一下，如果使用Django的ORM实现，以某列为准，某行出现的次序排序的语句是：<br>    <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Risk.objects.filter(risk_stat=<span class="string">'未达标'</span>).values(<span class="string">'risk_domain'</span>).annotate(total=Count(<span class="string">'risk_domain'</span>)).order_by(<span class="string">'-total'</span>)[<span class="number">0</span>:<span class="number">3</span>]</span><br></pre></td></tr></table></figure></p>
 <p>这句话的意思是：在<code>Risk</code>数据表里，以<code>risk_stat=&#39;未达标&#39;</code>为准找出<code>risk_domain</code>出现的从高到低最多的列，同时只截取了前三名。</p>
-<p><img src="/images/%E6%B1%89%E6%B5%B7%E5%85%AC%E5%9B%AD%E5%BC%82%E5%9E%8B%E6%88%98%E5%A3%AB.png" alt="akb48" title="重庆汉海海洋公园的异型战士雕塑"></p>
+<p><img src="/images/%E6%B1%89%E6%B5%B7%E5%85%AC%E5%9B%AD%E5%BC%82%E5%9E%8B%E6%88%98%E5%A3%AB.jpg" alt="akb48" title="重庆汉海海洋公园的异型战士雕塑"></p>
 
     </div>
 
