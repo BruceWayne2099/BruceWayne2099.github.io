@@ -25,7 +25,7 @@
 
   <meta name="description" content="MySQL 5.7是EXPLAIN EXTENDED+SHOW WARNINGS，而MySQL 8就是EXPLAIN +SHOW WARNINGS了">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Mysql的truncate引发的BUG故障">
+<meta property="og:title" content="Mysql的强制类型转换导致全表扫描">
 <meta property="og:url" content="https://brucewayne2099.github.io/2021/02/19/Mysql%E7%9A%84%E5%BC%BA%E5%88%B6%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2%E5%AF%BC%E8%87%B4%E5%85%A8%E8%A1%A8%E6%89%AB%E6%8F%8F/index.html">
 <meta property="og:site_name" content="石锤淡啤酒">
 <meta property="og:description" content="MySQL 5.7是EXPLAIN EXTENDED+SHOW WARNINGS，而MySQL 8就是EXPLAIN +SHOW WARNINGS了">
@@ -38,7 +38,7 @@
 <meta property="og:image" content="https://brucewayne2099.github.io/images/mysql%E5%85%A8%E8%A1%A8%E6%89%AB%E6%8F%8F6.png">
 <meta property="og:image" content="https://brucewayne2099.github.io/images/mysql%E5%85%A8%E8%A1%A8%E6%89%AB%E6%8F%8F7.png">
 <meta property="article:published_time" content="2021-02-19T14:31:25.000Z">
-<meta property="article:modified_time" content="2021-02-20T09:32:05.496Z">
+<meta property="article:modified_time" content="2021-02-20T09:36:55.025Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="Mysql">
 <meta name="twitter:card" content="summary">
@@ -57,7 +57,7 @@
   };
 </script>
 
-  <title>Mysql的truncate引发的BUG故障 | 石锤淡啤酒</title>
+  <title>Mysql的强制类型转换导致全表扫描 | 石锤淡啤酒</title>
   
 
 
@@ -216,7 +216,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          Mysql的truncate引发的BUG故障
+          Mysql的强制类型转换导致全表扫描
         </h1>
 
         <div class="post-meta">
@@ -233,7 +233,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-02-20 17:32:05" itemprop="dateModified" datetime="2021-02-20T17:32:05+08:00">2021-02-20</time>
+                <time title="修改时间：2021-02-20 17:36:55" itemprop="dateModified" datetime="2021-02-20T17:36:55+08:00">2021-02-20</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -246,7 +246,7 @@
             </span>
 
           
-            <span id="/2021/02/19/Mysql%E7%9A%84%E5%BC%BA%E5%88%B6%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2%E5%AF%BC%E8%87%B4%E5%85%A8%E8%A1%A8%E6%89%AB%E6%8F%8F/" class="post-meta-item leancloud_visitors" data-flag-title="Mysql的truncate引发的BUG故障" title="当前热度">
+            <span id="/2021/02/19/Mysql%E7%9A%84%E5%BC%BA%E5%88%B6%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2%E5%AF%BC%E8%87%B4%E5%85%A8%E8%A1%A8%E6%89%AB%E6%8F%8F/" class="post-meta-item leancloud_visitors" data-flag-title="Mysql的强制类型转换导致全表扫描" title="当前热度">
               <span class="post-meta-item-icon">
                 <i class="fa fa-eye"></i>
               </span>
@@ -280,9 +280,9 @@
 
       
         <p>MySQL在查询的时候要注意“强制类型转换导致死锁”的case，这里的强制类型转换主要有如下几种：</p>
-<h2 id="列类型与where值类型不符"><a href="#列类型与where值类型不符" class="headerlink" title="列类型与where值类型不符"></a>列类型与where值类型不符</h2><p>我们先创建一个表，比如叫article:<br>    <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE IF NOT EXISTS article( </span><br><span class="line">	`aid` INT UNSIGNED AUTO_INCREMENT, </span><br><span class="line">	`title` VARCHAR(<span class="number">100</span>) NOT NULL, </span><br><span class="line">	`content` VARCHAR(<span class="number">2000</span>) NOT NULL,</span><br><span class="line">	`categories` NVARCHAR(<span class="number">2000</span>) NOT NULL,</span><br><span class="line">	`uid` INT NOT NULL,</span><br><span class="line">	`tid` INT NOT NULL,</span><br><span class="line"> 	PRIMARY KEY ( `aid` )</span><br><span class="line">)ENGINE=InnoDB DEFAULT CHARSET=utf8;</span><br></pre></td></tr></table></figure></p>
-<p>我们都知道mysql自增的字段必须是主键,而表的主键一般都要使用自增id，不建议使用业务id，是因为使用自增id可以避免页分裂。创建表之后，<code>CREATE INDEX titleindex ON article (title)</code>，给title字段设定成索引。</p>
-<p>再插入一点数据，数据如下：<br><img src="/images/mysql%E5%85%A8%E8%A1%A8%E6%89%AB%E6%8F%8F1.png" alt=""></p>
+<h2 id="列类型与where值类型不符"><a href="#列类型与where值类型不符" class="headerlink" title="列类型与where值类型不符"></a>列类型与where值类型不符</h2><p>我们先创建一个表，比如叫<code>article</code>:<br>    <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE IF NOT EXISTS article( </span><br><span class="line">	`aid` INT UNSIGNED AUTO_INCREMENT, </span><br><span class="line">	`title` VARCHAR(<span class="number">100</span>) NOT NULL, </span><br><span class="line">	`content` VARCHAR(<span class="number">2000</span>) NOT NULL,</span><br><span class="line">	`categories` NVARCHAR(<span class="number">2000</span>) NOT NULL,</span><br><span class="line">	`uid` INT NOT NULL,</span><br><span class="line">	`tid` INT NOT NULL,</span><br><span class="line"> 	PRIMARY KEY ( `aid` )</span><br><span class="line">)ENGINE=InnoDB DEFAULT CHARSET=utf8;</span><br></pre></td></tr></table></figure></p>
+<p>我们都知道mysql自增的字段必须是主键,而表的主键一般都要使用自增id，不建议使用业务id，是因为使用自增id可以避免页分裂。创建表之后，<code>CREATE INDEX titleindex ON article (title)</code>，给<code>title</code>字段设定成索引。</p>
+<p>再往表里插入一点数据，数据如下：<br><img src="/images/mysql%E5%85%A8%E8%A1%A8%E6%89%AB%E6%8F%8F1.png" alt="" title="插入索引成功"></p>
 <p>这是测试一下如下语句：<br>    <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">explain select uid,tid <span class="keyword">from</span> article where title = <span class="string">'bbb'</span>;	<span class="comment">#'bbb'是字符串跟title的varchar一致</span></span><br><span class="line">explain select uid,tid <span class="keyword">from</span> article where title = <span class="number">123</span>;	<span class="comment">#123是int与title的varchar不一致</span></span><br></pre></td></tr></table></figure></p>
 <p>测试效果：<br><img src="/images/mysql%E5%85%A8%E8%A1%A8%E6%89%AB%E6%8F%8F2.png" alt=""></p>
 <p>title是我们设定的索引列，第一个情况where的值与title类型相同，成功命中索引。第二个SQL就要面临强制类型转换，没有命中索引，扫描了全表。</p>
@@ -334,7 +334,7 @@
   </li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="https://brucewayne2099.github.io/2021/02/19/Mysql%E7%9A%84%E5%BC%BA%E5%88%B6%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2%E5%AF%BC%E8%87%B4%E5%85%A8%E8%A1%A8%E6%89%AB%E6%8F%8F/" title="Mysql的truncate引发的BUG故障">https://brucewayne2099.github.io/2021/02/19/Mysql的强制类型转换导致全表扫描/</a>
+    <a href="https://brucewayne2099.github.io/2021/02/19/Mysql%E7%9A%84%E5%BC%BA%E5%88%B6%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2%E5%AF%BC%E8%87%B4%E5%85%A8%E8%A1%A8%E6%89%AB%E6%8F%8F/" title="Mysql的强制类型转换导致全表扫描">https://brucewayne2099.github.io/2021/02/19/Mysql的强制类型转换导致全表扫描/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
