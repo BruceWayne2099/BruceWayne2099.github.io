@@ -41,7 +41,7 @@
 <meta property="og:image" content="https://brucewayne2099.github.io/images/switch%E5%8A%A0%E9%80%9F8.jpg">
 <meta property="og:image" content="https://brucewayne2099.github.io/images/switch%E5%8A%A0%E9%80%9F9.jpg">
 <meta property="article:published_time" content="2021-02-22T02:24:23.000Z">
-<meta property="article:modified_time" content="2021-02-22T03:42:27.543Z">
+<meta property="article:modified_time" content="2021-02-22T03:44:39.136Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="翻墙">
 <meta property="article:tag" content="switch">
@@ -232,7 +232,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2021-02-22 10:24:23 / 修改时间：11:42:27" itemprop="dateCreated datePublished" datetime="2021-02-22T10:24:23+08:00">2021-02-22</time>
+              <time title="创建时间：2021-02-22 10:24:23 / 修改时间：11:44:39" itemprop="dateCreated datePublished" datetime="2021-02-22T10:24:23+08:00">2021-02-22</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -258,14 +258,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>1.6k</span>
+              <span>1.7k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
+              <span>2 分钟</span>
             </span>
             <div class="post-description">翻墙这个技术纯属是自己人祸害自己人搞出来的</div>
 
@@ -283,7 +283,7 @@
 <p>先下载一个游戏试试手吧，在MAC上先到任天堂港区网站注册账号，然后 <a href="https://store.nintendo.com.hk/70010000009642" target="_blank" rel="noopener">https://store.nintendo.com.hk/70010000009642</a> 买了游戏<code>Splatoon™ 2</code>在支付宝页面付了钱，等了大约5分钟，拿到了下载代码，如图：<br><img src="/images/switch%E5%8A%A0%E9%80%9F1.png" alt="" title="299港币兑换人民币是250块"></p>
 <p>在switch使用港区账号登录eshop，输入下载代码就可以下载游戏了，但是发现下载速度奇慢，6.1G的内容下载需要40多个小时。</p>
 <p>为啥这么慢？这就是要感谢国家政策了。一个游戏下载就要两天，换谁都受不了。遇到这种恶心问题我们得解决它，这里就需要一个ios小火箭程序，还有一个梯子服务器。如何搭建梯子服务器可以去看<a href="https://github.com/233boy/v2ray/wiki/V2Ray%E4%B8%80%E9%94%AE%E5%AE%89%E8%A3%85%E8%84%9A%E6%9C%AC" target="_blank" rel="noopener">https://github.com/233boy/v2ray/wiki/V2Ray%E4%B8%80%E9%94%AE%E5%AE%89%E8%A3%85%E8%84%9A%E6%9C%AC</a> 这篇文章。<br><img src="/images/switch%E5%8A%A0%E9%80%9F2.jpg" alt="" title="我这个小火箭是2.1.21版本，略老，但是大概意思是一样的"></p>
-<h2 id="实战配置"><a href="#实战配置" class="headerlink" title="实战配置"></a>实战配置</h2><p>先确认你的小火箭开关是打开的，可以正常翱翔。在switch的home页面里，选择配置–&gt;互联网配置–&gt;WiFi，这里需要手机端跟switch链接上同一个wifi。如图：<br><img src="/images/switch%E5%8A%A0%E9%80%9F3.jpg" alt="" title="这里是配置，点进去左侧菜单有互联网配置"></p>
+<h2 id="实战配置"><a href="#实战配置" class="headerlink" title="实战配置"></a>实战配置</h2><p>先确认你的梯子服务器是ok的，小火箭的开关是打开的，手机端可以正常翱翔。在switch的home页面里，<code>配置</code>–&gt;<code>互联网配置</code>–&gt;<code>WiFi</code>，这里需要手机端跟switch链接上同一个wifi。如图：<br><img src="/images/switch%E5%8A%A0%E9%80%9F3.jpg" alt="" title="这里是配置，点进去左侧菜单有互联网配置"></p>
 <p>然后我们需要给swtich配置一个静态IP，因为我这个版本的小火箭是需要添加IP白名单来鉴权的。配置静态IP的方法很简单，静态IP写死一个当前网段的IP即可，我这里写的是<code>192.168.1.7</code>。如果你是tplink，那么就192.168.1.1登录tplink的客户端，找到LAN口设置，把IP地址填写到switch配置wifi的网关里，把掩码也写到掩码的位置上。如图：<br><img src="/images/switch%E5%8A%A0%E9%80%9F4.png" alt="" title="网关就是你的wifi路由器当前的IP地址"></p>
 <p>DNS服务器也是需要从tplink的web端获取，一模一样的填写到对应的switch栏里：<br><img src="/images/switch%E5%8A%A0%E9%80%9F5.jpg" alt="" title="这几个必须填写，不然无法保存"></p>
 <p>此时先连接一下这个wifi，看看switch是否可以正常连接，可以正常连接了才可以往下一步走，不然就要排查当前问题!</p>
