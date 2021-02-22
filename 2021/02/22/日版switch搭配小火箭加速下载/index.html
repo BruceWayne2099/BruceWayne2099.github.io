@@ -41,7 +41,7 @@
 <meta property="og:image" content="https://brucewayne2099.github.io/images/switch%E5%8A%A0%E9%80%9F8.jpg">
 <meta property="og:image" content="https://brucewayne2099.github.io/images/switch%E5%8A%A0%E9%80%9F9.jpg">
 <meta property="article:published_time" content="2021-02-22T02:24:23.000Z">
-<meta property="article:modified_time" content="2021-02-22T03:47:28.361Z">
+<meta property="article:modified_time" content="2021-02-22T03:51:46.050Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="翻墙">
 <meta property="article:tag" content="switch">
@@ -232,7 +232,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2021-02-22 10:24:23 / 修改时间：11:47:28" itemprop="dateCreated datePublished" datetime="2021-02-22T10:24:23+08:00">2021-02-22</time>
+              <time title="创建时间：2021-02-22 10:24:23 / 修改时间：11:51:46" itemprop="dateCreated datePublished" datetime="2021-02-22T10:24:23+08:00">2021-02-22</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -286,11 +286,11 @@
 <h2 id="实战配置"><a href="#实战配置" class="headerlink" title="实战配置"></a>实战配置</h2><p>先确认你的梯子服务器是ok的，小火箭的开关是打开的，手机端可以正常翱翔。在switch的home页面里，<code>配置</code>–&gt;<code>互联网配置</code>–&gt;<code>WiFi</code>，这里需要手机端跟switch链接上同一个wifi。如图：<br><img src="/images/switch%E5%8A%A0%E9%80%9F3.jpg" alt="" title="这里是配置，点进去左侧菜单有互联网配置"></p>
 <p>然后我们需要给swtich配置一个静态IP，因为我这个版本的小火箭是需要添加IP白名单来鉴权的。配置静态IP的方法很简单，直接写死一个当前网段的IP即可，我这里写的是<code>192.168.1.7</code>。如果你是tplink，那么就在浏览器的地址栏输入<code>192.168.1.1</code>登录tplink的客户端，找到LAN口设置，把IP地址填写到switch配置wifi的网关里，把掩码也写到掩码的位置上。如图：<br><img src="/images/switch%E5%8A%A0%E9%80%9F4.png" alt="" title="网关就是你的wifi路由器当前的IP地址"></p>
 <p>DNS服务器也是需要从tplink的web端获取，一模一样的填写到对应的switch栏里：<br><img src="/images/switch%E5%8A%A0%E9%80%9F5.jpg" alt="" title="这几个必须填写，不然无法保存"></p>
-<p>此时先连接一下这个wifi，看看switch是否可以正常连接，可以正常连接了才可以往下一步走，不然就要排查当前问题!</p>
+<p>此时先连接一下这个wifi，看看switch是否可以正常连接，正常连接了才可以往下一步走，不然就要排查当前存在的问题!</p>
 <p>然后在小火箭手机客户端，点击下面的<code>设置</code>，在tunnel里点击<code>代理</code>，<code>代理</code>页面里地址<code>127.0.0.1</code>不要动，端口可以自己改，建议大于8000，我这里改成了<code>8520</code>。如图：<br><img src="/images/switch%E5%8A%A0%E9%80%9F6.jpg" alt=""></p>
 <p>然后点击<code>代理共享</code>，打开<code>启用共享</code>，记住你的地址，它是以<code>IP:端口</code>的形式出现的，然后在下面<code>允许的IP地址</code>里填写刚刚你手动写死的switch静态地址<code>192.168.1.7</code>，如图:<br><img src="/images/switch%E5%8A%A0%E9%80%9F7.jpg" alt="" title="红色的IP要记住"></p>
 <p>返回到switch，还是在WiFi配置页面，<code>代理服务器</code>设置成启用，然后IP就是写上面红色盖住的IP，端口就是小火箭里的那个8520，自动验证选择<code>不启用</code>，如图：<br><img src="/images/switch%E5%8A%A0%E9%80%9F8.jpg" alt=""></p>
-<p>此时保存，再次尝试一下是否可以通过wifi连接到互联网，如果可以，那就大功告成了！</p>
+<p>确认其他的东西都是原状，比如<code>MTU</code>什么的都不要更改。此时保存，再次尝试一下是否可以通过wifi连接到互联网，如果可以，那就大功告成了！</p>
 <p>此时你返回到switch的home页面，再次尝试下载游戏，就会看到耗时会明显降低，具体的速度在switch看不出来，但是可以通过小火箭的工作台来看，我这个服务器是曼谷的服务器（只是旗帜默认是美国），跟香港有一定的地理距离，速度基本维持在100K~700K左右，6.1G的需要大约3个小时就可以下载完了。如图：<br><img src="/images/switch%E5%8A%A0%E9%80%9F9.jpg" alt="" title="400多K能解渴了"></p>
 <p>这里要注意，一定要让switch跟手机端保持在通一个WiFi下，不然链接就会断开！</p>
 <h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://sspai.com/post/58543" target="_blank" rel="noopener">https://sspai.com/post/58543</a><br><a href="https://zankyo.cc/2845/" target="_blank" rel="noopener">https://zankyo.cc/2845/</a><br><a href="https://www.nintendoswitch.com.cn/support/faq/410.html" target="_blank" rel="noopener">https://www.nintendoswitch.com.cn/support/faq/410.html</a><br><a href="https://freewechat.com/a/MzI2NjY1MTMyMA==/2247484618/1" target="_blank" rel="noopener">https://freewechat.com/a/MzI2NjY1MTMyMA==/2247484618/1</a></p>
