@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://brucewayne2099.github.io/"/>
-  <updated>2021-03-03T09:06:26.307Z</updated>
+  <updated>2021-03-03T06:24:18.991Z</updated>
   <id>https://brucewayne2099.github.io/</id>
   
   <author>
@@ -15,28 +15,6 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
-  
-  <entry>
-    <title>每两周执行一次定时任务</title>
-    <link href="https://brucewayne2099.github.io/2021/03/03/%E6%AF%8F%E4%B8%A4%E5%91%A8%E6%89%A7%E8%A1%8C%E4%B8%80%E6%AC%A1%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/"/>
-    <id>https://brucewayne2099.github.io/2021/03/03/%E6%AF%8F%E4%B8%A4%E5%91%A8%E6%89%A7%E8%A1%8C%E4%B8%80%E6%AC%A1%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/</id>
-    <published>2021-03-03T09:06:26.000Z</published>
-    <updated>2021-03-03T09:06:26.307Z</updated>
-    
-    <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;/assets/css/APlayer.min.css&quot;&gt;&lt;script src=&quot;/assets/js/APlayer.min.js&quot; cla
-      
-    
-    </summary>
-    
-    
-    
-  </entry>
   
   <entry>
     <title>【印象】吴孟达</title>
@@ -329,6 +307,31 @@
       <category term="Django" scheme="https://brucewayne2099.github.io/tags/Django/"/>
     
       <category term="平台搭建" scheme="https://brucewayne2099.github.io/tags/%E5%B9%B3%E5%8F%B0%E6%90%AD%E5%BB%BA/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>每两周执行一次定时任务</title>
+    <link href="https://brucewayne2099.github.io/2020/09/12/%E6%AF%8F%E4%B8%A4%E5%91%A8%E6%89%A7%E8%A1%8C%E4%B8%80%E6%AC%A1%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/"/>
+    <id>https://brucewayne2099.github.io/2020/09/12/%E6%AF%8F%E4%B8%A4%E5%91%A8%E6%89%A7%E8%A1%8C%E4%B8%80%E6%AC%A1%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/</id>
+    <published>2020-09-12T09:06:26.000Z</published>
+    <updated>2021-03-03T09:31:40.721Z</updated>
+    
+    <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><p>crontab这个定时工具单对于日期默认颗粒度是“单”，也就是单天，单周，单月等等，但是如果需要每双周发送一次消息，那么原生态的crontab就做不到了。</p><p>正确的写法是：<br>    <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">59</span> <span class="number">11</span> * * <span class="number">5</span> expr `date +\%W` \% <span class="number">2</span> &gt; /dev/null || cd /opt/golangproject &amp;&amp; ./DingdingBot &gt; golang钉钉机器人.log <span class="number">2</span>&gt;&amp;<span class="number">1</span></span><br></pre></td></tr></table></figure></p><p>这个规则的意思就是每双周的周五11点59分，启动DINGdingBot这个脚本。</p><p>先说<code>expr</code>,这是一个计算命令，一般用于整数值，比如<code>expr 14 % 9</code>，返回就是5。那么这个脚本的意思就很明白了，先用<code>date +\%W</code>获取当前的周数，如果可以被2整除，就是0，0可以执行后面的语句，如果不能被2整除，那么后面的语句也就不会执行。其实说白了，就是每周五的11点59分，判断一下当前周数是否是2的倍数，如果是就可以去执行脚本，如果不是就无视掉。</p><p>最后推荐一个好网站可以查看crontab的效果：<a href="https://www.matools.com/crontab" target="_blank" rel="noopener">https://www.matools.com/crontab</a> ，不过这个网站只能看基础的crontab配置，想玩花就不行了。<br><img src="/images/%E5%8F%8C%E9%AC%BC%E5%A4%B9%E9%97%A8.jpg" alt=""></p>]]></content>
+    
+    <summary type="html">
+    
+      这样就不怕双周报漏掉了
+    
+    </summary>
+    
+    
+      <category term="工作与技术" scheme="https://brucewayne2099.github.io/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/"/>
+    
+    
+      <category term="Crontab" scheme="https://brucewayne2099.github.io/tags/Crontab/"/>
+    
+      <category term="定时任务" scheme="https://brucewayne2099.github.io/tags/%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/"/>
     
   </entry>
   
