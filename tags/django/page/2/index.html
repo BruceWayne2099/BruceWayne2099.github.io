@@ -209,6 +209,26 @@
 
       <div class="post-meta">
         <time itemprop="dateCreated"
+              datetime="2019-06-06T14:16:24+08:00"
+              content="2019-06-06">
+          06-06
+        </time>
+      </div>
+
+      <div class="post-title">
+          <a class="post-title-link" href="/2019/06/06/%E8%B0%83%E6%95%B4Django%E4%BD%BF%E5%85%B6%E5%8F%AF%E4%BB%A5%E4%B8%8A%E4%BC%A0%E5%A4%A7%E6%96%87%E4%BB%B6%E5%92%8C%E5%A4%9A%E6%96%87%E4%BB%B6/" itemprop="url">
+            <span itemprop="name">调整Django使其可以上传大文件和多文件</span>
+          </a>
+      </div>
+
+    </header>
+  </article>
+
+  <article itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      <div class="post-meta">
+        <time itemprop="dateCreated"
               datetime="2019-03-22T11:39:14+08:00"
               content="2019-03-22">
           03-22
@@ -383,7 +403,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">322</span>
+          <span class="site-state-item-count">323</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -438,12 +458,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">807k</span>
+    <span title="站点总字数">816k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">12:14</span>
+    <span title="站点阅读时长">12:22</span>
 </div>
 
 <div>
@@ -642,27 +662,7 @@ setInterval("createtime()",250);
 </html>
 <!--崩溃欺骗-->
 <script type="text/javascript" src="/js/crash_cheat.js"></script>
- .then(response => response.json())
-                .then(() => {
-                  leancloudSelector(url).innerText = 1;
-                })
-                .catch(error => {
-                  console.error('Failed to create', error);
-                });
-          }
-        })
-        .catch(error => {
-          console.error('LeanCloud Counter Error', error);
-        });
-    }
-
-    function showTime(Counter) {
-      var visitors = document.querySelectorAll('.leancloud_visitors');
-      var entries = [...visitors].map(element => {
-        return decodeURI(element.id);
-      });
-
-      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+ies } })))
         .then(response => response.json())
         .then(({ results }) => {
           for (let url of entries) {
