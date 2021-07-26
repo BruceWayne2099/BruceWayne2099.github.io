@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://brucewayne2099.github.io/"/>
-  <updated>2021-07-23T03:02:37.730Z</updated>
+  <updated>2021-07-26T10:12:05.677Z</updated>
   <id>https://brucewayne2099.github.io/</id>
   
   <author>
@@ -15,6 +15,35 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>肝通了《刺客信条起源》</title>
+    <link href="https://brucewayne2099.github.io/2021/07/26/%E8%82%9D%E9%80%9A%E4%BA%86%E3%80%8A%E5%88%BA%E5%AE%A2%E4%BF%A1%E6%9D%A1%E8%B5%B7%E6%BA%90%E3%80%8B/"/>
+    <id>https://brucewayne2099.github.io/2021/07/26/%E8%82%9D%E9%80%9A%E4%BA%86%E3%80%8A%E5%88%BA%E5%AE%A2%E4%BF%A1%E6%9D%A1%E8%B5%B7%E6%BA%90%E3%80%8B/</id>
+    <published>2021-07-26T09:18:58.000Z</published>
+    <updated>2021-07-26T10:12:05.677Z</updated>
+    
+    <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><p>周末说会有台风登陆杭州，于是老老实实的在家里蹲，也利用这个周末彻底打穿了《刺客信条 起源》。</p><p>玩《起源》之前，我就打通了同系列的《刺客信条 奥德赛》，男号一遍女号一遍，累计玩了200多小时。说实话，我个人觉得《奥德赛》全家死光光的结局才应该是正规的结局，因为古希腊很多的故事都是伦理故事而且悲剧结尾。不过也正是先玩的《奥德赛》后玩的《起源》，所以从操作的角度来说，《奥德赛》更爽，格挡比起源的盾挡更加轻松。缺点就是后期打一下好几十万乃至上亿的伤害…这一点《起源》的伤害和等级控制更合理。</p><p>这种开放RPG游戏，玩着玩着跟《魔兽世界》差不多，接到任务–&gt;看地图找目标–&gt;下马杀杀杀然后拿东西走人，主线做完之后就一路看风景咔嚓照相。不过我个人比较喜欢古希腊和古埃及，觉得很神秘，所以这俩游戏的故事背景看得我还挺津津有味的。尤其是《法老诅咒》这个DLC，我个人觉得比《奥德赛》的DLC做的更好，尤其是那几个法老死后世界的刻画是在太漂亮了。但是我个人觉得玩《奥德赛》的好像更多，对比一下B站的视频，《奥德赛》的视频数远多于《起源》，更远多于《英灵殿》。</p><p>来上几幅图，感受一下《起源》，反正现在也不能出过，只能云旅游古埃及：<br><img src="/images/%E5%88%BA%E5%AE%A2%E4%BF%A1%E6%9D%A1%E8%B5%B7%E6%BA%901.png" alt=""><br><img src="/images/%E5%88%BA%E5%AE%A2%E4%BF%A1%E6%9D%A1%E8%B5%B7%E6%BA%902.png" alt=""><br><img src="/images/%E5%88%BA%E5%AE%A2%E4%BF%A1%E6%9D%A1%E8%B5%B7%E6%BA%903.png" alt=""><br><img src="/images/%E5%88%BA%E5%AE%A2%E4%BF%A1%E6%9D%A1%E8%B5%B7%E6%BA%904.png" alt=""><br><img src="/images/%E5%88%BA%E5%AE%A2%E4%BF%A1%E6%9D%A1%E8%B5%B7%E6%BA%905.png" alt=""></p>]]></content>
+    
+    <summary type="html">
+    
+      如果中国要有刺客信条系列，我觉得还是放在明末比较合适，多主角模式，一边去跟吴三桂当兵，一边当刺客搞暗杀
+    
+    </summary>
+    
+    
+      <category term="坠乱花天" scheme="https://brucewayne2099.github.io/categories/%E5%9D%A0%E4%B9%B1%E8%8A%B1%E5%A4%A9/"/>
+    
+    
+      <category term="育碧" scheme="https://brucewayne2099.github.io/tags/%E8%82%B2%E7%A2%A7/"/>
+    
+      <category term="开放" scheme="https://brucewayne2099.github.io/tags/%E5%BC%80%E6%94%BE/"/>
+    
+      <category term="RPG" scheme="https://brucewayne2099.github.io/tags/RPG/"/>
+    
+      <category term="游戏" scheme="https://brucewayne2099.github.io/tags/%E6%B8%B8%E6%88%8F/"/>
+    
+  </entry>
   
   <entry>
     <title>使用Django搭建项目室预定功能</title>
@@ -482,31 +511,6 @@
       <category term="Django" scheme="https://brucewayne2099.github.io/tags/Django/"/>
     
       <category term="平台搭建" scheme="https://brucewayne2099.github.io/tags/%E5%B9%B3%E5%8F%B0%E6%90%AD%E5%BB%BA/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Mysql根据某几列过滤重复项</title>
-    <link href="https://brucewayne2099.github.io/2020/10/30/Mysql%E6%A0%B9%E6%8D%AE%E6%9F%90%E4%B8%80%E5%88%97%E8%BF%87%E6%BB%A4%E9%87%8D%E5%A4%8D%E9%A1%B9/"/>
-    <id>https://brucewayne2099.github.io/2020/10/30/Mysql%E6%A0%B9%E6%8D%AE%E6%9F%90%E4%B8%80%E5%88%97%E8%BF%87%E6%BB%A4%E9%87%8D%E5%A4%8D%E9%A1%B9/</id>
-    <published>2020-10-30T03:35:15.000Z</published>
-    <updated>2021-03-02T13:15:11.307Z</updated>
-    
-    <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><h2 id="把无用的字段去重掉"><a href="#把无用的字段去重掉" class="headerlink" title="把无用的字段去重掉"></a>把无用的字段去重掉</h2><p>Mysql里难保每一行不出现部分列内容重复，比如学生叫“杨洋”这种重名情况很常见，但是往往这种“脏数据”会导致同步任务出现错误，所以我们就要根据某一列去过滤重复项，举个例子，比如有这样一个表<code>rule_case</code>，表细节如下：<br>    <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; select * <span class="keyword">from</span> rule_case;</span><br><span class="line">+----+---------+---------------+-----+-----------------+---------------------+--------------------------------+</span><br><span class="line">| id | deleted | rule_name     | app | product_line_id | gmt_create          | comment                        |</span><br><span class="line">+----+---------+---------------+-----+-----------------+---------------------+--------------------------------+</span><br><span class="line">|  <span class="number">1</span> |       <span class="number">0</span> | 库存规则<span class="number">1</span> | aaa | <span class="number">1</span>               | <span class="number">2021</span><span class="number">-03</span><span class="number">-02</span> <span class="number">15</span>:<span class="number">02</span>:<span class="number">44</span> | 这是很正常的一个备注 |</span><br><span class="line">|  <span class="number">2</span> |       <span class="number">0</span> | 库存规则<span class="number">2</span> | aaa | <span class="number">1</span>               | <span class="number">2021</span><span class="number">-03</span><span class="number">-02</span> <span class="number">15</span>:<span class="number">02</span>:<span class="number">44</span> | 这是很正常的一个备注 |</span><br><span class="line">|  <span class="number">3</span> |       <span class="number">0</span> | 履约规则<span class="number">1</span> | bbb | <span class="number">3</span>               | <span class="number">2021</span><span class="number">-03</span><span class="number">-02</span> <span class="number">15</span>:<span class="number">02</span>:<span class="number">44</span> | 这是很正常的一个备注 |</span><br><span class="line">|  <span class="number">4</span> |       <span class="number">0</span> | 履约规则<span class="number">2</span> | bbb | <span class="number">3</span>               | <span class="number">2021</span><span class="number">-03</span><span class="number">-02</span> <span class="number">15</span>:<span class="number">02</span>:<span class="number">44</span> | 这是很正常的一个备注 |</span><br><span class="line">|  <span class="number">5</span> |       <span class="number">0</span> | 财务规则<span class="number">1</span> | ccc | <span class="number">5</span>               | <span class="number">2021</span><span class="number">-03</span><span class="number">-02</span> <span class="number">15</span>:<span class="number">02</span>:<span class="number">44</span> | 这是很正常的一个备注 |</span><br><span class="line">|  <span class="number">6</span> |       <span class="number">0</span> | 财务规则<span class="number">2</span> | ccc | <span class="number">5</span>               | <span class="number">2021</span><span class="number">-03</span><span class="number">-02</span> <span class="number">15</span>:<span class="number">02</span>:<span class="number">44</span> | 这是很正常的一个备注 |</span><br><span class="line">|  <span class="number">7</span> |       <span class="number">0</span> | 会员规则<span class="number">1</span> | xxx | <span class="number">10</span>              | <span class="number">2021</span><span class="number">-03</span><span class="number">-02</span> <span class="number">15</span>:<span class="number">02</span>:<span class="number">44</span> | 这是很正常的一个备注 |</span><br><span class="line">|  <span class="number">8</span> |       <span class="number">0</span> | 财务规则<span class="number">3</span> | ccc | <span class="number">5</span>               | <span class="number">2021</span><span class="number">-03</span><span class="number">-02</span> <span class="number">15</span>:<span class="number">02</span>:<span class="number">44</span> | 这是很正常的一个备注 |</span><br><span class="line">|  <span class="number">9</span> |       <span class="number">0</span> | 库存规则<span class="number">1</span> | aaa | <span class="number">1</span>               | <span class="number">2021</span><span class="number">-03</span><span class="number">-01</span> <span class="number">20</span>:<span class="number">02</span>:<span class="number">44</span> | 这是重复的记录<span class="number">1</span>         |</span><br><span class="line">| <span class="number">10</span> |       <span class="number">0</span> | 库存规则<span class="number">1</span> | aaa | <span class="number">1</span>               | <span class="number">2021</span><span class="number">-03</span><span class="number">-01</span> <span class="number">15</span>:<span class="number">02</span>:<span class="number">44</span> | 这是重复的记录<span class="number">2</span>         |</span><br><span class="line">+----+---------+---------------+-----+-----------------+---------------------+--------------------------------+</span><br></pre></td></tr></table></figure></p><p>可以看出第1条记录和9、10这俩记录其实就是重复记录，他们的很多信息相同，仅仅是创建时间和comment不同，如果这俩不是想要的信息，在二次加工的时候就应该去重。</p><p>去重的语句常见的有俩，一个是<code>distinct</code>，另一个是<code>group by</code>，但是他俩有各自的用法。</p><p><code>distinct</code>只能放在查询字段的最前面，而且他对后面所有的字段都起作用，即去重掉查询的所有字段完全重复的数据，而不是只对链接的单个字段重复的数据，拿上面的表实验一下：<br><img src="/images/mysql%E5%8E%BB%E9%87%8D1.png" alt=""></p><p>可见<code>select distinct rule_name,app,product_line_id from rule_case;</code>是对后面的<code>rule_name,app,product_line_id</code>都不同的情况列出来，而第9和10跟第一条的<code>rule_name,app,product_line_id</code>是一样的，就被去重掉，只保留第一个记录。</p><p>所以结论：要查询多个字段，但只针对一个字段去重，使用distinct去重的话是无法实现的。</p><p>再说<code>group by</code>,<code>group by</code>有一点跟<code>distinct</code>一样：也是对后面所有的字段均起作用，即 去重是查询的所有字段完全重复的数据，而不是只对<code>group by</code>后面连接的单个字段重复的数据。而返回结果排列不同，<code>distinct</code>会按数据存放顺序一条条显示，而<code>group by</code>会做个排序（一般是asc）。比如：<br><img src="/images/mysql%E5%8E%BB%E9%87%8D2.png" alt="" title="可以明显的看出对比"></p><p><code>group by</code>的结果可以根据<code>having</code>条件字段进行进一步的过滤，以及再加上<code>order by</code>进行排序和<code>limit</code>限制输出个数。格式是：where xxx,group by xxx,order by xxx,limit xxx。</p><p>那<code>distinct</code>和<code>group by</code>哪个效率更高？</p><p><code>distinct</code>操作只需要找出所有不同的值就可以了。而<code>group by</code>操作还要为其他聚集函数进行准备工作。从这一点上将，<code>group by</code>操作做的工作应该比<code>distinct</code>所做的工作要多一些。  </p><p>但实际上，<code>group by</code>效率会更高点，为什么呢？对于<code>distinct</code>操作，它会读取了所有记录，而<code>group by</code>需要读取的记录数量与分组的组数量一样多，也就是说比实际存在的记录数目要少很多。</p><h2 id="注意在MaxCompute-写法"><a href="#注意在MaxCompute-写法" class="headerlink" title="注意在MaxCompute 写法"></a>注意在MaxCompute 写法</h2><p>阿里云的MaxCompute是不支持使用<code>group by</code>的，会爆<code>FAILED: ODPS-0130071:[1,8] Semantic analysis exception - column reference 表.XXX列 should appear in GROUP BY key</code>这个错误，这里就直接用<code>select distinct key1,key2,key3 from 对应表;</code>来直接获取去重的行即可。</p><p>而且再补充一下，阿里云的MaxCompute的<code>INSERT OVERWRITE</code>不支持指定列插入功能，也就是说对应值只能按照表列的顺序插入，不能指定。据说INSERT INTO可以使用，但是它后面只能写值，不支持后面写<code>select XXX</code>的语句，所以为了避免麻烦，我个人都是在MaxCompute只建有用的列，然后用<code>insert overwrite table XXX.XXX SELECT DISTINCT A，B,C,D from XXX.AAA WHERE 具体条件;</code>来写入值。</p><h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="http://php-note.com/article/1753.html" target="_blank" rel="noopener">http://php-note.com/article/1753.html</a></p><p><img src="/images/%E5%AD%97%E6%AF%8D%E5%93%A5%E7%A6%81%E5%8C%BA%E6%89%A3%E7%AF%AE.gif" alt="" title="我直呼好家伙！"></p>]]></content>
-    
-    <summary type="html">
-    
-      mysql只输出某列是英文的语句：SELECT * from 表名 where `字段名` REGEXP &#39;[a-z]+&#39;
-    
-    </summary>
-    
-    
-      <category term="工作与技术" scheme="https://brucewayne2099.github.io/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/"/>
-    
-    
-      <category term="数据库" scheme="https://brucewayne2099.github.io/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/"/>
-    
-      <category term="Mysql5.7" scheme="https://brucewayne2099.github.io/tags/Mysql5-7/"/>
     
   </entry>
   
