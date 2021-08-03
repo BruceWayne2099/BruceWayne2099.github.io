@@ -201,6 +201,29 @@
 
       
     <div class="collection-year">
+      <span class="collection-header">2020</span>
+    </div>
+
+  <article itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      <div class="post-meta">
+        <time itemprop="dateCreated"
+              datetime="2020-04-24T20:11:54+08:00"
+              content="2020-04-24">
+          04-24
+        </time>
+      </div>
+
+      <div class="post-title">
+          <a class="post-title-link" href="/2020/04/24/Mysql%E5%A6%82%E4%BD%95%E5%88%A4%E6%96%AD%E4%B8%A4%E4%B8%AA%E8%A1%8C%E9%83%BD%E4%B8%8D%E5%90%8C%E4%B8%BA%E4%B8%8D%E4%B8%80%E8%87%B4/" itemprop="url">
+            <span itemprop="name">Mysql如何判断多列组合起来不重复</span>
+          </a>
+      </div>
+
+    </header>
+  </article>
+    <div class="collection-year">
       <span class="collection-header">2019</span>
     </div>
 
@@ -403,7 +426,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">324</span>
+          <span class="site-state-item-count">325</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -415,7 +438,7 @@
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
-        <span class="site-state-item-count">278</span>
+        <span class="site-state-item-count">279</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -458,12 +481,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">817k</span>
+    <span title="站点总字数">818k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">12:23</span>
+    <span title="站点阅读时长">12:24</span>
 </div>
 
 <div>
@@ -662,26 +685,7 @@ setInterval("createtime()",250);
 </html>
 <!--崩溃欺骗-->
 <script type="text/javascript" src="/js/crash_cheat.js"></script>
-ies } })))
-        .then(response => response.json())
-        .then(({ results }) => {
-          for (let url of entries) {
-            let target = results.find(item => item.url === url);
-            leancloudSelector(url).innerText = target ? target.time : 0;
-          }
-        })
-        .catch(error => {
-          console.error('LeanCloud Counter Error', error);
-        });
-    }
-
-    let { app_id, app_key, server_url } = {"enable":true,"app_id":"YwCmnGyEX7a7KI3mRI4XK4Mq-gzGzoHsz","app_key":"kgqGgAPqi8cB6vTBYU05Xbx0","server_url":null,"security":false};
-    function fetchData(api_server) {
-      var Counter = (method, url, data) => {
-        return fetch(`${api_server}/1.1${url}`, {
-          method,
-          headers: {
-            'X-LC-Id'     : app_id,
+_id,
             'X-LC-Key'    : app_key,
             'Content-Type': 'application/json',
           },
