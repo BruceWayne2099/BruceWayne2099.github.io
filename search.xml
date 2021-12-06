@@ -4,6 +4,35 @@
   
     
     <entry>
+      <title>Mysql里UNION ALL要注意的地方</title>
+      <link href="/2021/12/03/UNION-ALL%E9%87%8C%E7%9A%84%E5%9D%91/"/>
+      <url>/2021/12/03/UNION-ALL%E9%87%8C%E7%9A%84%E5%9D%91/</url>
+      
+        <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>比如我有一个表A：<br>    +——+——–+——-+<br>    | name | code   | num   |<br>    +——+——–+——-+<br>    | A    | no1    | 300   |<br>    | A    | no2    | 100   |<br>    +——+——–+——-+</p><p>我还有一个表B：<br>    +——+——–+——-+<br>    | name | code   | num   |<br>    +——+——–+——-+<br>    | A    | no1    | -100  |<br>    | A    | no5    | 77    |<br>    | B    | no7    | 2     |<br>    +——+——–+——-+</p><p>现在我想要两个表相加，不存在的列补全，得到一个表C：<br>    +——+——–+——-+<br>    | name | code   | num   |<br>    +——+——–+——-+<br>    | A    | no1    | 200   |<br>    | A    | no2    | 100   |<br>    | A    | no5    | 77    |<br>    | B    | no7    | 2     |<br>    +——+——–+——-+</p><p>请问怎么做？</p><p>答案是：<br>    <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">u.name,</span><br><span class="line">u.code,</span><br><span class="line"><span class="keyword">SUM</span>(u.num),</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">(</span><br><span class="line"><span class="keyword">SELECT</span> <span class="keyword">name</span>, code, <span class="keyword">num</span> <span class="keyword">FROM</span> tableA</span><br><span class="line"><span class="keyword">UNION</span> <span class="keyword">ALL</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="keyword">name</span>, code, <span class="keyword">num</span> <span class="keyword">FROM</span> tableB</span><br><span class="line">) u</span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> u.name, u.code;</span><br></pre></td></tr></table></figure></p><p>因为表A，表B的列是一模一样的，所以可以通过<code>UNION ALL</code>来整合成一个大表，然后去重再求和达到这个目的，而不是死磕join。</p><h2 id=""><a href="#" class="headerlink" title="##"></a>##</h2>]]></content>
+      
+      
+      <categories>
+          
+          <category> 工作与技术 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> MySQL </tag>
+            
+            <tag> 多表合并 </tag>
+            
+            <tag> 联合查询 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>双十一的个人感悟</title>
       <link href="/2021/11/15/%E5%8F%8C%E5%8D%81%E4%B8%80%E7%9A%84%E4%B8%AA%E4%BA%BA%E6%84%9F%E6%82%9F/"/>
       <url>/2021/11/15/%E5%8F%8C%E5%8D%81%E4%B8%80%E7%9A%84%E4%B8%AA%E4%BA%BA%E6%84%9F%E6%82%9F/</url>
