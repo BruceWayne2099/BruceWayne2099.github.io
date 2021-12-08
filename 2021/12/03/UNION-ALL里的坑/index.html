@@ -31,8 +31,9 @@
 <meta property="og:description" content="Django的批量插入bulk_create不可以跟create混合搭配，会爆主键重复的错误，要去掉create">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://brucewayne2099.github.io/images/unionall.png">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/%E7%BD%97%E6%96%AF%E7%A7%92%E4%BC%A0.webp">
 <meta property="article:published_time" content="2021-12-03T09:31:23.000Z">
-<meta property="article:modified_time" content="2021-12-07T09:57:26.866Z">
+<meta property="article:modified_time" content="2021-12-08T06:36:40.441Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="MySQL">
 <meta property="article:tag" content="多表合并">
@@ -229,7 +230,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-12-07 17:57:26" itemprop="dateModified" datetime="2021-12-07T17:57:26+08:00">2021-12-07</time>
+                <time title="修改时间：2021-12-08 14:36:40" itemprop="dateModified" datetime="2021-12-08T14:36:40+08:00">2021-12-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -255,7 +256,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>1.8k</span>
+              <span>2.1k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -289,6 +290,8 @@
 <p>这就是UNION ALL的问题，它在CPU表去拼接MEMORY表的时候，会多出一倍，也就是笛卡尔积的时候，这个临时表里有一遍CPU的记录二遍memory的记录，所以memory就会多出来一倍的值，同理，disk就会多出来两倍的值。订正的结果自然不正确。</p>
 <p>正确的做法就是上面那个引子那样：<code>cpu收入表 union all 减掉cpu转出表 UNION ALL 订正cpu表 group by 去重列</code> left join <code>memory收入表 union all 减掉memory转出表 UNION ALL 订正memory表 group by 去重列</code> on 条件 left join <code>disk收入表 union all 减掉disk转出表 UNION ALL 订正disk表 group by 去重列 on 条件</code>。</p>
 <p>这样各自的元素表通过两个union all链接成一个大表，通过group by去重在SUM取和，就会得到很干净的底表，如此将三张表再通过<code>LEFT JOIN</code>链接起来就大功告成了！</p>
+<h2 id="Django执行复杂SQL"><a href="#Django执行复杂SQL" class="headerlink" title="Django执行复杂SQL"></a>Django执行复杂SQL</h2><p>上面这个SQL后来写出来非常的复杂，如果用django自带的orm来写会特别的累，所以最省事的方法就直接用SQL原生句来在Django里执行，执行方法如下：<br>    <figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.db <span class="keyword">import</span> <span class="keyword">connection</span>, <span class="keyword">transaction</span></span><br><span class="line"></span><br><span class="line">   <span class="keyword">cursor</span> = <span class="keyword">connection</span>.<span class="keyword">cursor</span>()		# 它会直接拿到django的数据库链接信息</span><br><span class="line">   <span class="keyword">sql</span> = <span class="string">''' </span></span><br><span class="line"><span class="string">   	那个非常复杂的语句 </span></span><br><span class="line"><span class="string">   	’‘’</span></span><br><span class="line"><span class="string">   cursor.execute(sql)</span></span><br><span class="line"><span class="string">   transaction.commit()  # 执行到数据库里</span></span><br></pre></td></tr></table></figure></p>
+<p><img src="/images/%E7%BD%97%E6%96%AF%E7%A7%92%E4%BC%A0.webp" alt="" title="曾经风之子玫瑰的滞空秒传"></p>
 
     </div>
 
@@ -423,7 +426,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实际例子"><span class="nav-number">2.</span> <span class="nav-text">实际例子</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实际例子"><span class="nav-number">2.</span> <span class="nav-text">实际例子</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Django执行复杂SQL"><span class="nav-number">3.</span> <span class="nav-text">Django执行复杂SQL</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
