@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://brucewayne2099.github.io/"/>
-  <updated>2022-04-10T14:23:10.489Z</updated>
+  <updated>2022-04-13T16:17:22.172Z</updated>
   <id>https://brucewayne2099.github.io/</id>
   
   <author>
@@ -15,6 +15,33 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>浏览器首页被劫持</title>
+    <link href="https://brucewayne2099.github.io/2022/04/13/%E6%B5%8F%E8%A7%88%E5%99%A8%E9%A6%96%E9%A1%B5%E8%A2%AB%E5%8A%AB%E6%8C%81/"/>
+    <id>https://brucewayne2099.github.io/2022/04/13/%E6%B5%8F%E8%A7%88%E5%99%A8%E9%A6%96%E9%A1%B5%E8%A2%AB%E5%8A%AB%E6%8C%81/</id>
+    <published>2022-04-13T15:57:41.000Z</published>
+    <updated>2022-04-13T16:17:22.172Z</updated>
+    
+    <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><p>前几天突然想玩红警2，就在网上找了一个下载地址，但是下载下来是一个代理软件，然后再通过这个代理软件下载游戏本体。但是也顺便把老子的浏览器首页劫持了，我明明选择了“开启继续浏览上次网页”，但是每次打开都是神马“桔梗网”，上面一堆自媒体的消息，假的要死还推送。<br><img src="/images/%E6%B5%8F%E8%A7%88%E5%99%A8%E9%A6%96%E9%A1%B5%E5%8A%AB%E6%8C%81.png" alt=""></p><p>于是乎，老子要干掉他！</p><p>首先鼠标右键点击chrome，先把<code>常规</code>标签页的<code>只读</code>属性勾掉，不然的话会爆“无法将所做的改动保存到‘Google Chrome.Ink’拒绝访问”的错误。<br><img src="/images/" alt=""></p><p>然后切换到<code>快捷方式</code>标签页，将目标后面的桔梗网网址删干净，只保留干净的chrome.exe路径即可。然后保存，再打开浏览器看看吧！<br><img src="/images/%E6%B5%8F%E8%A7%88%E5%99%A8%E9%A6%96%E9%A1%B5%E5%8A%AB%E6%8C%813.png" alt=""></p><p><img src="/images/%E6%9D%8E%E6%B2%81.webp" alt=""></p>]]></content>
+    
+    <summary type="html">
+    
+      APP开启的时候看广告是不是国内厂家的独家操作？外国软件从没见过...
+    
+    </summary>
+    
+    
+      <category term="工作与技术" scheme="https://brucewayne2099.github.io/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/"/>
+    
+    
+      <category term="Python" scheme="https://brucewayne2099.github.io/tags/Python/"/>
+    
+      <category term="Chrome" scheme="https://brucewayne2099.github.io/tags/Chrome/"/>
+    
+      <category term="浏览器" scheme="https://brucewayne2099.github.io/tags/%E6%B5%8F%E8%A7%88%E5%99%A8/"/>
+    
+  </entry>
   
   <entry>
     <title>俄乌之战碎碎念2</title>
@@ -506,29 +533,6 @@
       <category term="Excel" scheme="https://brucewayne2099.github.io/tags/Excel/"/>
     
       <category term="Office" scheme="https://brucewayne2099.github.io/tags/Office/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Mysql删除某几个字段重复的行</title>
-    <link href="https://brucewayne2099.github.io/2021/04/21/Mysql%E5%88%A0%E9%99%A4%E6%9F%90%E5%87%A0%E4%B8%AA%E5%AD%97%E6%AE%B5%E9%87%8D%E5%A4%8D%E7%9A%84%E8%A1%8C/"/>
-    <id>https://brucewayne2099.github.io/2021/04/21/Mysql%E5%88%A0%E9%99%A4%E6%9F%90%E5%87%A0%E4%B8%AA%E5%AD%97%E6%AE%B5%E9%87%8D%E5%A4%8D%E7%9A%84%E8%A1%8C/</id>
-    <published>2021-04-21T07:36:56.000Z</published>
-    <updated>2021-06-16T08:56:07.135Z</updated>
-    
-    <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><p>脏数据是一个比较恶心的事情，每次处理都很麻烦。如果只是找以单字段重复的行，那还比较简单，可以看 <a href="https://www.yiibai.com/mysql/delete-duplicate-rows.html" target="_blank" rel="noopener">https://www.yiibai.com/mysql/delete-duplicate-rows.html</a> 即可。但是实际工作中会有这样的情况：“找到按某几个字段的重复的行并且删除”。</p><p>举个例子：<br><img src="/images/%E5%88%A0%E9%99%A4%E9%87%8D%E5%A4%8D%E8%A1%8C.png" alt="" title="MYSQL上已经清理了，这个是odps的例子，他同步到mysql上会生成不重复的id"></p><p>上面那个例子里<code>cluster_name</code>和<code>num</code>这两个字段相同才算是一个重复行，而<code>env</code>和<code>dt_date</code>是可以不同的。那么首先先获取到重复的列的方法：<br>    <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">SELECT p1.id </span><br><span class="line">from &#96;naxxramas_slowsql_status&#96; p1,&#96;naxxramas_slowsql_status&#96; p2 </span><br><span class="line">where p1.dt_date &#x3D;&#39;20210419&#39; and p1.id&lt;&gt;p2.id and p1.cluster_name &#x3D; p2.cluster_name and p1.num &#x3D; p2.num and p1.dt_date &#x3D; p2.dt_date </span><br><span class="line">group by p1.cluster_name;</span><br></pre></td></tr></table></figure></p><p>上面那个语句很简单，就是取出<code>id</code>不同但是<code>cluster_name</code>和<code>num</code>又相同的单列，而不是把所有的列都取出来。</p><p>那么如果要删除对应的行的语句如下：<br>    <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">DELETE FROM &#96;naxxramas_slowsql_status&#96; </span><br><span class="line">where id IN (SELECT id FROM </span><br><span class="line">(SELECT p1.id from &#96;naxxramas_slowsql_status&#96; p1,&#96;naxxramas_slowsql_status&#96; p2 where p1.dt_date &#x3D;&#39;20210330&#39; and p1.id&lt;&gt;p2.id and p1.cluster_name &#x3D; p2.cluster_name and p1.num &#x3D; p2.num and p1.dt_date &#x3D; p2.dt_date </span><br><span class="line">group by p1.cluster_name) </span><br><span class="line">AS temp);</span><br></pre></td></tr></table></figure></p><p>这里要注意一下，不可以这么写：<br>    <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">DELETE FROM &#96;naxxramas_slowsql_status&#96; </span><br><span class="line">where id IN (</span><br><span class="line">SELECT p1.id </span><br><span class="line">from &#96;naxxramas_slowsql_status&#96; p1,&#96;naxxramas_slowsql_status&#96; p2 </span><br><span class="line">where p1.dt_date &#x3D;&#39;20210330&#39; and p1.id&lt;&gt;p2.id and p1.cluster_name &#x3D; p2.cluster_name and p1.num &#x3D; p2.num and p1.dt_date &#x3D; p2.dt_date </span><br><span class="line">group by p1.cluster_name);</span><br></pre></td></tr></table></figure></p><p>这么写会报错：<code>You can&#39;t specify target table &#39;naxxramas_slowsql_status&#39; for update in FROM clause</code>。这句话的意思是“不能在同一语句中更新select出的同一张表元组的属性值”，所以就要用上面的方法：将select出的结果通过中间表再select一遍。</p><p>或者使用<code>left join</code>, 比如要update，使用：<br>    <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">update x set available_material_id &#x3D; null </span><br><span class="line">where id not in </span><br><span class="line">(select id from x where additional_info &#x3D; 1);</span><br></pre></td></tr></table></figure></p><p>就会报错：<code>You can&#39;t specify target table &#39;x&#39; for update in FROM clause</code>。使用<code>left join</code>的sql就是：<br>    <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">update x left join</span><br><span class="line">       x xx</span><br><span class="line">       on x.id &#x3D; xx.id and xx.additional_info &#x3D; 1</span><br><span class="line">    set available_material_id &#x3D; null</span><br><span class="line">    where xx.id is null;</span><br></pre></td></tr></table></figure><br><img src="/images/%E5%9B%BD%E7%8E%8B%E6%9D%AF%E5%B0%8F%E9%BB%91%E4%BC%99.gif" alt="" title="来之不易的冠军"></p>]]></content>
-    
-    <summary type="html">
-    
-      迪士尼就是那种“不去的时候想，去了一次之后一年内都不想再去”的地方
-    
-    </summary>
-    
-    
-      <category term="工作与技术" scheme="https://brucewayne2099.github.io/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/"/>
-    
-    
-      <category term="MySQL" scheme="https://brucewayne2099.github.io/tags/MySQL/"/>
     
   </entry>
   
