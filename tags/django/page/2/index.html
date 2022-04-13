@@ -209,6 +209,26 @@
 
       <div class="post-meta">
         <time itemprop="dateCreated"
+              datetime="2020-04-26T16:48:55+08:00"
+              content="2020-04-26">
+          04-26
+        </time>
+      </div>
+
+      <div class="post-title">
+          <a class="post-title-link" href="/2020/04/26/Django%E5%89%8D%E7%AB%AF%E4%BC%A0%E5%85%A5excel%E5%B9%B6%E5%B0%86%E5%AD%97%E6%AE%B5%E4%BF%9D%E5%AD%98MySQL/" itemprop="url">
+            <span itemprop="name">Django前端传入excel表格并将表格数据记录到MySQL里</span>
+          </a>
+      </div>
+
+    </header>
+  </article>
+
+  <article itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      <div class="post-meta">
+        <time itemprop="dateCreated"
               datetime="2020-04-24T20:11:54+08:00"
               content="2020-04-24">
           04-24
@@ -426,7 +446,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">340</span>
+          <span class="site-state-item-count">341</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -438,7 +458,7 @@
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
-        <span class="site-state-item-count">297</span>
+        <span class="site-state-item-count">298</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -481,12 +501,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">859k</span>
+    <span title="站点总字数">861k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">13:01</span>
+    <span title="站点阅读时长">13:02</span>
 </div>
 
 <div>
@@ -685,27 +705,7 @@ setInterval("createtime()",250);
 </html>
 <!--崩溃欺骗-->
 <script type="text/javascript" src="/js/crash_cheat.js"></script>
-_id,
-            'X-LC-Key'    : app_key,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(data)
-        });
-      };
-      if (CONFIG.page.isPost) {
-        if (CONFIG.hostname !== location.hostname) return;
-        addCount(Counter);
-      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
-        showTime(Counter);
-      }
-    }
-
-    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
-
-    if (api_server) {
-      fetchData(api_server);
-    } else {
-      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+id)
         .then(response => response.json())
         .then(({ api_server }) => {
           fetchData('https://' + api_server);
