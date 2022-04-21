@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://brucewayne2099.github.io/"/>
-  <updated>2022-04-19T06:28:21.483Z</updated>
+  <updated>2022-04-21T15:13:54.830Z</updated>
   <id>https://brucewayne2099.github.io/</id>
   
   <author>
@@ -15,6 +15,31 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Pycharm项目的文件夹突然消失了</title>
+    <link href="https://brucewayne2099.github.io/2022/04/21/Pycharm%E9%A1%B9%E7%9B%AE%E7%9A%84%E6%96%87%E4%BB%B6%E5%A4%B9%E7%AA%81%E7%84%B6%E6%B6%88%E5%A4%B1%E4%BA%86/"/>
+    <id>https://brucewayne2099.github.io/2022/04/21/Pycharm%E9%A1%B9%E7%9B%AE%E7%9A%84%E6%96%87%E4%BB%B6%E5%A4%B9%E7%AA%81%E7%84%B6%E6%B6%88%E5%A4%B1%E4%BA%86/</id>
+    <published>2022-04-21T14:47:48.000Z</published>
+    <updated>2022-04-21T15:13:54.830Z</updated>
+    
+    <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><h2 id="项目的文件夹都没了！"><a href="#项目的文件夹都没了！" class="headerlink" title="项目的文件夹都没了！"></a>项目的文件夹都没了！</h2><p>今天在搞pycharm的时候，打开了另一个项目，结果返回原来的项目的时候，意外的发现原来的项目里的文件夹都没了：<br><img src="/images/django%E6%96%87%E4%BB%B6%E5%A4%B9%E6%B2%A1%E4%BA%86.jpg" alt=""></p><p>不过文件夹并没丢，代码没丢是一个好消息。但是pycharm的Django也无法启动，在Preferences里的<code>语言与框架</code>里的Django也是空：<br><img src="/images/django%E6%96%87%E4%BB%B6%E5%A4%B9%E6%B2%A1%E4%BA%862.png" alt=""></p><p>查了很久，发现了解法：那就是退出pycharm，删除项目文件夹里的<code>.idea</code>文件夹，然后再打开pycharm就恢复原样了。这个文件夹的主要作用在于存放项目的控制信息，包括版本信息，历史记录等等。删除它是不会影响代码的正常使用的，但是如果删除就不能使用pycharm进行回溯和复原了。</p><p>不过为啥会让整个项目文件夹没变化却能让整个django的项目文件夹不展示以及让django的配置为空，那就不得而知了…</p><h2 id="启动Django后发现setting不对的问题"><a href="#启动Django后发现setting不对的问题" class="headerlink" title="启动Django后发现setting不对的问题"></a>启动Django后发现setting不对的问题</h2><p>我的Pycharm版本由原来的2021.3版本升级到2022.1版本，但是启动django的时候，爆这个错误<code>You must either define the environment variable DJANGO_SETTINGS_MODULE or call settings.configure() before accessing settings.</code>：<br><img src="/images/django%E6%96%87%E4%BB%B6%E5%A4%B9%E6%B2%A1%E4%BA%863.png" alt=""></p><p>这是因为你的片及配置里没有配置<code>settings</code>的路径，首先打开编辑配置：<br><img src="/images/django%E6%96%87%E4%BB%B6%E5%A4%B9%E6%B2%A1%E4%BA%864.png" alt=""></p><p>在如图的地方加上<code>djangoproject.settings</code>就行了：<br><img src="/images/django%E6%96%87%E4%BB%B6%E5%A4%B9%E6%B2%A1%E4%BA%865.png" alt=""></p><p>唉，这种稀奇古怪的问题竟然耽误了老子2个小时…</p>]]></content>
+    
+    <summary type="html">
+    
+      有时候手就不小心的贱了一下
+    
+    </summary>
+    
+    
+      <category term="工作与技术" scheme="https://brucewayne2099.github.io/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/"/>
+    
+    
+      <category term="Django" scheme="https://brucewayne2099.github.io/tags/Django/"/>
+    
+      <category term="PyCharm" scheme="https://brucewayne2099.github.io/tags/PyCharm/"/>
+    
+  </entry>
   
   <entry>
     <title>使用django-crontab创建定时任务</title>
@@ -510,31 +535,6 @@
     
     
       <category term="MySQL" scheme="https://brucewayne2099.github.io/tags/MySQL/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Excel根据相同的列合并两个sheet的内容</title>
-    <link href="https://brucewayne2099.github.io/2021/05/24/Excel%E6%A0%B9%E6%8D%AE%E7%9B%B8%E5%90%8C%E7%9A%84%E5%88%97%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AAsheet/"/>
-    <id>https://brucewayne2099.github.io/2021/05/24/Excel%E6%A0%B9%E6%8D%AE%E7%9B%B8%E5%90%8C%E7%9A%84%E5%88%97%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AAsheet/</id>
-    <published>2021-05-24T07:44:01.000Z</published>
-    <updated>2021-06-28T11:53:17.689Z</updated>
-    
-    <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><h2 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h2><p>假设我有个excel，想从两个不同的sheet里，根据相同的列合并这两部分的内容，怎么办？办法就是<code>vlookup</code>。</p><p>比如我第一个sheet的内容如下：<br><img src="/images/Excel%E5%90%88%E5%B9%B61.png" alt="" title="这个就叫sheet1"></p><p>而第二个sheet的内容如下<br><img src="/images/Excel%E5%90%88%E5%B9%B62.png" alt="" title="这个就叫sheet2"></p><p>现在需要根据相同的<code>应用名</code>这一列，合并两个sheet，这样可以在一个表里看到应用对应的owner、git库和是否开源。遇到这种情况时，我们可以使用Excel内置的<code>VLOOKUP</code> 功能来实现数据的查找与引用。</p><p><code>VLOOKUP</code>的语法很简单，翻译成一眼就能看明白的话就是——<code>VLOOKUP</code>函数需要有 4 个部分：「需要查什么、查哪个区域、第几列、是否返回近似值」。</p><p>这个式子中的最后一个值是选填的，0（False）是精确，1（True）是近似。</p><p>实际使用时只要记住最简单的 <code>=VLOOKUP(查什么,区域,第几列,0)</code>这样一个式子，就能顺利地使用<code>VLOOKUP</code>函数了。</p><p>说回上面这个例子，如何合并这两个sheet呢？</p><p>先把光标定位在需要展示数据的单元格中，也就是sheet1的D列，如图：<br><img src="/images/Excel%E5%90%88%E5%B9%B63.png" alt=""></p><p>在单元格中输入”=vl”，然后会自动提示出VLOOKUP函数，双击蓝色的函数部分，就可以看到单元格中显示出的完整的VLOOKUP函数。选择第一列中需要匹配数据的单元格，只选中一个就可以，然后再英文状态下输入逗号”,”，如图：<br><img src="/images/Excel%E5%90%88%E5%B9%B64.png" alt=""></p><p>因为我们要返回的信息是sheet2中第2列的“代码库”信息，所以在公式中再输入”,2,”，这时Excel提示信息让我们选择<code>TRUE</code>或<code>FLASE</code>，选不选都行，默认是<code>TRUE</code>，直接回车即可。</p><p>可以看到，我们的公式就是<code>=VLOOKUP(A:A,Sheet2!A:C,2,FALSE)</code>,此时这个函数已经得到了值，如图：<br><img src="/images/Excel%E5%90%88%E5%B9%B66.png" alt=""></p><p>然后“是否开源”这一列也是一样的方法，公式是<code>=VLOOKUP(A:A,Sheet2!A:C,3,)</code> 直接拉下来就把剩下的值都获取到了，如图：<br><img src="/images/Excel%E5%90%88%E5%B9%B67.png" alt="" title="WDK在sheet2里就是没有对应的行，所以N/A"></p><p>这里要注意！我们获取到的列内容是函数，如果sheet2的内容发生了变化，那么sheet1也要变更的，这个时候，我们只需要获取到对应的值就行，“值”选择的方法如下：<br><img src="/images/Excel%E5%90%88%E5%B9%B68.png" alt="" title="新开一列来复制值"></p><p>vlookup里还有几个地方需要注意，首先’需要查的内容’必须是’查哪个区域’第一列。很多时候查不出数据，就是因为没有遵守这个规则。</p><p>第二条，选择寻找的区域的时候，不要点击左上角的三角来获取全部，一定要像例子写的那样，选择对应的列来作为目标范围，不然会有<code>#ERF</code>的错误。</p><h2 id="参考内容"><a href="#参考内容" class="headerlink" title="参考内容"></a>参考内容</h2><p><a href="https://www.zhihu.com/question/38606861" target="_blank" rel="noopener">https://www.zhihu.com/question/38606861</a><br><a href="https://sspai.com/post/53242" target="_blank" rel="noopener">https://sspai.com/post/53242</a><br><a href="https://blog.csdn.net/laobai1015/article/details/85248125" target="_blank" rel="noopener">https://blog.csdn.net/laobai1015/article/details/85248125</a></p>]]></content>
-    
-    <summary type="html">
-    
-      使用vlookup，达到MySQL的join效果
-    
-    </summary>
-    
-    
-      <category term="工作与技术" scheme="https://brucewayne2099.github.io/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/"/>
-    
-    
-      <category term="Excel" scheme="https://brucewayne2099.github.io/tags/Excel/"/>
-    
-      <category term="Office" scheme="https://brucewayne2099.github.io/tags/Office/"/>
     
   </entry>
   
