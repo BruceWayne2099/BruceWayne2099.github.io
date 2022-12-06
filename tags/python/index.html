@@ -423,7 +423,7 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">13:22</span>
+    <span title="站点阅读时长">13:23</span>
 </div>
 
 <div>
@@ -622,11 +622,7 @@ setInterval("createtime()",250);
 </html>
 <!--崩溃欺骗-->
 <script type="text/javascript" src="/js/crash_cheat.js"></script>
-rs.dataset.flagTitle;
-
-      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
-        .then(response => response.json())
-        .then(({ results }) => {
+   .then(({ results }) => {
           if (results.length > 0) {
             var counter = results[0];
             leancloudSelector(url).innerText = counter.time + 1;
