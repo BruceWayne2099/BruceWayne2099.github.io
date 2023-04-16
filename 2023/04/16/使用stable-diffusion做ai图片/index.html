@@ -37,7 +37,7 @@
 <meta property="og:image" content="https://brucewayne2099.github.io/images/ai%E7%94%BB%E5%9B%BE5.JPG">
 <meta property="og:image" content="https://brucewayne2099.github.io/images/ai%E7%94%BB%E5%9B%BE3.JPG">
 <meta property="article:published_time" content="2023-04-16T12:26:24.000Z">
-<meta property="article:modified_time" content="2023-04-16T16:35:36.189Z">
+<meta property="article:modified_time" content="2023-04-16T16:42:00.323Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="Python">
 <meta property="article:tag" content="AI">
@@ -234,7 +234,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-04-17 00:35:36" itemprop="dateModified" datetime="2023-04-17T00:35:36+08:00">2023-04-17</time>
+                <time title="修改时间：2023-04-17 00:42:00" itemprop="dateModified" datetime="2023-04-17T00:42:00+08:00">2023-04-17</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -285,7 +285,7 @@
 <p>此时在浏览器里打开<code>127.0.0.1:7860</code>就会看到<code>stable-diffusion-webui</code>这个WEB页面，也就是生成AI图片的控制台。</p>
 <p>注意！<code>webui.bat</code>不要关闭，这个是UI的后台。</p>
 <p>然后我们可以去<code>civitai.com</code>去下载<code>lora</code>和<code>stable-diffusion</code>，这里要先做一个普及：<br>    <figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">stable</span>-diffusion：这个是模型（<span class="keyword">checkpoint</span>），也就是作画的画风，比如写实风，或者动漫风，古典风。这些都是网友自己做的，目前比较火的几个是chillmix、dosmix、perfectWorld等等。</span><br><span class="line">lora：微调，如果你有一些效果，用语言描述又比较麻烦，那么可以搭配这个lora，比如一个模仿逆转裁判著名手势的lora，搭配了这个lora之后，你用上面<span class="keyword">stable</span>-diffusion风格画出来的画都会搭配上lora这个动作。</span><br></pre></td></tr></table></figure></p>
-<p>那么我们先去<code>https://civitai.com/models/8281/perfect-world</code> 下载一个这个叫<code>perfect-world</code>的stable-diffusion，如图：<br><img src="/images/ai%E7%94%BB%E5%9B%BE.JPG" alt=""></p>
+<p>那么我们先去<code>https://civitai.com/models/8281/perfect-world</code> 下载一个这个叫<code>perfect-world</code>的<code>stable-diffusion</code>，如图：<br><img src="/images/ai%E7%94%BB%E5%9B%BE.JPG" alt=""></p>
 <p>下载到的地址一定要是<code>你的文件夹/stable-diffusion-webui/models/stable-diffusion</code>。这个文件很大，要下一会。</p>
 <h2 id="界面介绍"><a href="#界面介绍" class="headerlink" title="界面介绍"></a>界面介绍</h2><p>下载完毕之后，我们来到<code>127.0.0.1:7860</code>,此时刷新一下左上角的<code>stable diffusion checkout</code>，就会看到<code>perfect-world</code>已经能成功被发现了。然后我们就直接用<code>txt2img</code>这个标签页，这个标签页主要就是用文字来描述图片，目前只能支持英文。</p>
 <p>这里上面是写prompt（正向提示符），也就是你希望出现的元素，比如有阳光，有沙滩，人穿什么衣服，长头发短头发，头发是湿的是干的等等。下面是写negative prompt(反向提示符)避免的东西，AI不善于画手是出名的，现在用<code>stable-diffusion-webui</code>依旧不善于画手，所以很多人都会在这里写上<code>too many fingers</code>、<code>long neck</code>、<code>missing arms</code>、<code>extra arms</code>这样的词，其实没啥用，即使你写了，AI依旧有可能把手画成六指、猪蹄子甚至八臂哪吒…所以有些人就干脆在prompt里写<code>arms behind back</code>。</p>
@@ -295,8 +295,8 @@
 <p>再看一下搭配lora的场景，我们下载一个<code>https://civitai.com/models/7692/objection-ace-attorney-lora</code> 的lora。使用这个lora，你生成的图片都会是这个《逆转裁判》里“异议”指人的造型。把这个lora下载到<code>你的文件夹/stable-diffusion-webui/models/Lora</code>这个文件夹里。<br><img src="/images/ai%E7%94%BB%E5%9B%BE2.JPG" alt=""></p>
 <p>此时我们的promot改成：batman,objection,countroom,pointing。同时点击这个红色的图标，选择LORA，点击一下refresh就会扫描出来刚刚下载的objectionAceAttorney,如图：<br><img src="/images/ai%E7%94%BB%E5%9B%BE5.JPG" alt=""></p>
 <p>当你点击它的时候，就发现上面的promot变成了<code>batman,objection,countroom,pointing，&lt;lora:objectionAceAttorney_objection:1&gt;</code>,多了后面这个lora，这里的1就是权重，lora在promot是可以多个的，用权重来突出重点。点击Generate，产出图片如图：<br><img src="/images/ai%E7%94%BB%E5%9B%BE3.JPG" alt=""></p>
-<p>如果你有比较不错的prompt，可以点击generate下面的保存图标，然后起一个名，这个prompt就被保存了。如果同名就是覆盖，这里不会有提示，直接覆盖。</p>
-<p>这样，当你搭配lora和stable-diffusion以及其他的参数就可以随心所欲的创作了。如果觉得英文吃力，可以用chatgpt来帮忙写prompt。如果你有搞lora和stable-diffusion的想法，那么可以去huggingface.co里找到素材。</p>
+<p>如果你有比较不错的prompt，可以点击<code>generate</code>下面的保存图标，然后起一个名，这个prompt就被保存了。如果同名就是覆盖，这里不会有提示，直接覆盖。</p>
+<p>这样，当你搭配<code>lora</code>和<code>stable-diffusio</code>n以及其他的参数就可以随心所欲的创作了。如果觉得英文吃力，可以用<code>chatgpt</code>来帮忙写prompt。如果你有搞<code>lora</code>和<code>stable-diffusion</code>的想法，那么可以去<code>huggingface.co</code>里找到素材。</p>
 <p>AI产出的图是默认存储到<code>你的文件夹/stable-diffusion-webui/out-put/tet2img-images/今天日期</code>的文件夹里。然后你可以上传到<code>civitai.com</code>给大伙看看，给你点个赞或者求你晒一下prompt。</p>
 <h2 id="未来展望"><a href="#未来展望" class="headerlink" title="未来展望"></a>未来展望</h2><p>AI画图目前惊艳了不少人，很多插画师因此感受到了饭碗不保，但是如果说艺术性，那AI还是跟人没法比。现在AI的作品是批量的，流水线的，而画家们虽然风格会固定，但是每一幅画都是一副新画，会有小心思在里面。所以说如果画家技术够牛逼、有思想、有人文精神，肯定是不怕AI的。</p>
 <p>而且AI目前虽然能作画，但是学习的例子还是比较依赖人为性的输入，还没有自主学习的意识。而且AI画图目前来看还缺乏做动态视频的能力，就比如<code>civitai.com</code>现在完全就是一个18禁的画廊了，图看多了，对脸盲患者来说就麻木了。说实话我玩了一下午，觉得用prompt学英语单词还是挺不错的。而且一个图一个图的还挺上瘾，而且<code>civitai.com</code>练爬虫估计是一个不错的选择。但是要吐槽的是<code>civitai.com</code>总挂，估计是小团队维护，经费不足。</p>
