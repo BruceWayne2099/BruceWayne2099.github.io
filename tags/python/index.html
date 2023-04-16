@@ -201,6 +201,29 @@
 
       
     <div class="collection-year">
+      <span class="collection-header">2023</span>
+    </div>
+
+  <article itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      <div class="post-meta">
+        <time itemprop="dateCreated"
+              datetime="2023-04-16T20:26:24+08:00"
+              content="2023-04-16">
+          04-16
+        </time>
+      </div>
+
+      <div class="post-title">
+          <a class="post-title-link" href="/2023/04/16/%E4%BD%BF%E7%94%A8stable-diffusion%E5%81%9Aai%E5%9B%BE%E7%89%87/" itemprop="url">
+            <span itemprop="name">使用stable diffusion做ai图片</span>
+          </a>
+      </div>
+
+    </header>
+  </article>
+    <div class="collection-year">
       <span class="collection-header">2022</span>
     </div>
 
@@ -363,7 +386,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">357</span>
+          <span class="site-state-item-count">359</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -375,7 +398,7 @@
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
-        <span class="site-state-item-count">311</span>
+        <span class="site-state-item-count">313</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -418,12 +441,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">893k</span>
+    <span title="站点总字数">894k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">13:32</span>
+    <span title="站点阅读时长">13:33</span>
 </div>
 
 <div>
@@ -622,22 +645,7 @@ setInterval("createtime()",250);
 </html>
 <!--崩溃欺骗-->
 <script type="text/javascript" src="/js/crash_cheat.js"></script>
-   .then(({ results }) => {
-          if (results.length > 0) {
-            var counter = results[0];
-            leancloudSelector(url).innerText = counter.time + 1;
-            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
-              .catch(error => {
-                console.error('Failed to save visitor count', error);
-              });
-          } else {
-              Counter('post', '/classes/Counter', { title, url, time: 1 })
-                .then(response => response.json())
-                .then(() => {
-                  leancloudSelector(url).innerText = 1;
-                })
-                .catch(error => {
-                  console.error('Failed to create', error);
+                console.error('Failed to create', error);
                 });
           }
         })

@@ -4,6 +4,48 @@
   
     
     <entry>
+      <title>使用stable diffusion做ai图片</title>
+      <link href="/2023/04/16/%E4%BD%BF%E7%94%A8stable-diffusion%E5%81%9Aai%E5%9B%BE%E7%89%87/"/>
+      <url>/2023/04/16/%E4%BD%BF%E7%94%A8stable-diffusion%E5%81%9Aai%E5%9B%BE%E7%89%87/</url>
+      
+        <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><p>先说环境<br>Python 3.10.11,这里Python的大版本必须是3.10，不然就会出现<code>https://github.com/AUTOMATIC1111/stable-diffusion-webui/issues/7166</code> 这个错误。</p><p>stable-diffusion-webui的git地址是 <code>https://github.com/AUTOMATIC1111/stable-diffusion-webui</code>,clone 到本地解压缩就行。解压缩之后，执行<code>你的文件夹/stable-diffusion-webui/webui.bat</code>，这里需要一个翻墙的网络，不然的话安装起来就会很痛苦，需要一会时间，把需要的配件全部<code>pip install</code>之后，就会看到在本地启动了7860端口。此时在浏览器里打开<code>127.0.0.1:7860</code>就会看到<code>stable-diffusion-webui</code>这个WEB页面，也就是生成AI图片的地方。</p><p>然后我们可以去civitai.com去下载<code>lora</code>和<code>stable-diffusion</code>，这里要先做一个普及：<br>    <figure class="highlight mercury"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">stable</span>-diffusion：这个是模型，也就是作画的画风，比如写实风，或者动漫风，古典风。这些都是网友自己做的，目前比较火的几个是chillmix、dosmix、perfectWorld等等。</span><br><span class="line">lora：微调，如果你有一些效果，用语言描述又比较麻烦，那么可以搭配这个lora，比如一个模仿逆转裁判著名手势的lora，搭配了这个lora之后，你用上面<span class="meta">stable</span>-diffusion风格画出来的画都会搭配上lora这个动作。</span><br></pre></td></tr></table></figure></p><p>那么我们先去<code>https://civitai.com/models/8281/perfect-world</code> 下载一个这个叫perfect-world的stable-diffusion，如图：<br><img src="/images/ai%E7%94%BB%E5%9B%BE.JPG" alt=""></p><p>下载到的地址一定要是<code>你的文件夹/stable-diffusion-webui/models/stable-diffusion</code>。这个文件很大，要下一会。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 坠乱花天 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> Python </tag>
+            
+            <tag> AI </tag>
+            
+            <tag> 人工智能 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>35岁的男人买衣服好痛苦</title>
+      <link href="/2023/02/26/35%E5%B2%81%E7%9A%84%E7%94%B7%E4%BA%BA%E4%B9%B0%E8%A1%A3%E6%9C%8D%E5%A5%BD%E7%97%9B%E8%8B%A6/"/>
+      <url>/2023/02/26/35%E5%B2%81%E7%9A%84%E7%94%B7%E4%BA%BA%E4%B9%B0%E8%A1%A3%E6%9C%8D%E5%A5%BD%E7%97%9B%E8%8B%A6/</url>
+      
+        <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>2022年终总结</title>
       <link href="/2023/01/29/2022%E5%B9%B4%E5%BA%A6%E6%80%BB%E7%BB%93/"/>
       <url>/2023/01/29/2022%E5%B9%B4%E5%BA%A6%E6%80%BB%E7%BB%93/</url>
