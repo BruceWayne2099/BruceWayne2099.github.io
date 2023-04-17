@@ -32,12 +32,13 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://brucewayne2099.github.io/images/ai%E7%94%BB%E5%9B%BE6.JPG">
 <meta property="og:image" content="https://brucewayne2099.github.io/images/ai%E7%94%BB%E5%9B%BE.JPG">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/ai%E7%94%BB%E5%9B%BE7.JPG">
 <meta property="og:image" content="https://brucewayne2099.github.io/images/ai%E7%94%BB%E5%9B%BE4.JPG">
 <meta property="og:image" content="https://brucewayne2099.github.io/images/ai%E7%94%BB%E5%9B%BE2.JPG">
 <meta property="og:image" content="https://brucewayne2099.github.io/images/ai%E7%94%BB%E5%9B%BE5.JPG">
 <meta property="og:image" content="https://brucewayne2099.github.io/images/ai%E7%94%BB%E5%9B%BE3.JPG">
 <meta property="article:published_time" content="2023-04-16T12:26:24.000Z">
-<meta property="article:modified_time" content="2023-04-17T05:07:36.860Z">
+<meta property="article:modified_time" content="2023-04-17T06:00:55.722Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="Python">
 <meta property="article:tag" content="AI">
@@ -234,7 +235,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-04-17 13:07:36" itemprop="dateModified" datetime="2023-04-17T13:07:36+08:00">2023-04-17</time>
+                <time title="修改时间：2023-04-17 14:00:55" itemprop="dateModified" datetime="2023-04-17T14:00:55+08:00">2023-04-17</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -287,9 +288,9 @@
 <p>然后我们可以去<code>civitai.com</code>去下载<code>lora</code>和<code>stable-diffusion</code>，这里要先做一个普及：<br>    <figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">stable</span>-diffusion：这个是模型（<span class="keyword">checkpoint</span>），也就是作画的画风，比如写实风，或者动漫风，古典风。这些都是网友自己做的，目前比较火的几个是chillmix、dosmix、perfectWorld等等。</span><br><span class="line">lora：微调，如果你有一些效果，用语言描述又比较麻烦，那么可以搭配这个lora，比如一个模仿逆转裁判著名手势的lora，搭配了这个lora之后，你用上面<span class="keyword">stable</span>-diffusion风格画出来的画都会搭配上lora这个动作。</span><br></pre></td></tr></table></figure></p>
 <p>那么我们先去<code>https://civitai.com/models/8281/perfect-world</code> 下载一个这个叫<code>perfect-world</code>的<code>stable-diffusion</code>，如图：<br><img src="/images/ai%E7%94%BB%E5%9B%BE.JPG" alt=""></p>
 <p>下载到的地址一定要是<code>你的文件夹/stable-diffusion-webui/models/stable-diffusion</code>。这个文件很大，要下一会。</p>
-<h2 id="界面介绍"><a href="#界面介绍" class="headerlink" title="界面介绍"></a>界面介绍</h2><p>下载完毕之后，我们来到<code>127.0.0.1:7860</code>,此时刷新一下左上角的<code>stable diffusion checkout</code>，就会看到<code>perfect-world</code>已经能成功被发现了。然后我们就直接用<code>txt2img</code>这个标签页，这个标签页主要就是用文字来描述图片，目前只能支持英文。</p>
-<p>这里上面是写prompt（正向提示符），也就是你希望出现的元素，比如有阳光，有沙滩，人穿什么衣服，长头发短头发，头发是湿的是干的等等。下面是写negative prompt(反向提示符)避免的东西，AI不善于画手是出名的，现在用<code>stable-diffusion-webui</code>依旧不善于画手，所以很多人都会在这里写上<code>too many fingers</code>、<code>long neck</code>、<code>missing arms</code>、<code>extra arms</code>这样的词，其实没啥用，即使你写了，AI依旧有可能把手画成六指、猪蹄子甚至八臂哪吒…所以有些人就干脆在prompt里写<code>arms behind back</code>。</p>
-<p>对了，写完后请检查一下prompt有没有违反物理定律的搭配，不然AI画出来的图也肯定会逻辑不通。举个简单的例子，你在prompt里即要求人smiling，有要求<code>tongue out</code>，那么出来的图舌头中间就会有一个缝不好看。</p>
+<h2 id="界面介绍"><a href="#界面介绍" class="headerlink" title="界面介绍"></a>界面介绍</h2><p>下载完毕之后，我们来到<code>127.0.0.1:7860</code>,此时刷新一下左上角的<code>stable diffusion checkout</code>，就会看到<code>perfect-world</code>已经能成功被发现了。然后我们就直接用<code>txt2img</code>这个标签页，这个标签页主要就是用文字来描述图片，目前只能支持英文。<br><img src="/images/ai%E7%94%BB%E5%9B%BE7.JPG" alt=""></p>
+<p>这里上面是写prompt（正向提示符），也就是你希望出现的元素，比如有阳光，有沙滩，人穿什么衣服，长头发短头发，头发是湿的是干的等等。下面是写negative prompt(反向提示符)避免的东西，AI不善于画手是出名的，现在用<code>stable-diffusion-webui</code>依旧不善于画手（偶尔会有成功的时候，大约10次里有一次），所以很多人都会在这里写上<code>too many fingers</code>、<code>long neck</code>、<code>missing arms</code>、<code>extra arms</code>这样的词来避免出现乱手的情况。其实没啥用，即使你写了，AI依旧有可能把手画成六指、猪蹄子甚至八臂哪吒…所以有些人就干脆在prompt里写<code>arms behind back</code>等词语来避免画手。</p>
+<p>对了，写完后请检查一下prompt有没有违反物理定律的搭配，不然AI画出来的图也肯定会逻辑不通。举个简单的例子，你在prompt里即要求人<code>smiling</code>，又要求<code>tongue out</code>，那么产出的图里吐出来舌头就不太自然。</p>
 <p>然后再说说界面上其他的东西：<br>    <figure class="highlight oxygene"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">sampling <span class="function"><span class="keyword">method</span>:</span>这个是采样方法，是一套算法得到期望值的。这里有很多种算法，但是没有完美的，需要你多试几次。真人建议DPM ++ <span class="number">2</span>S a</span><br><span class="line"></span><br><span class="line">sampling steps:这个是采样步长，AI画画跟人画画不一样，人画画是一个白纸，然后一点点的丰富上色。而AI是上来一个很模糊的东西（噪音很大的画布），然后一点点精细（去噪），所以这个值如果是<span class="number">1</span>或者很小，那么你得到的可能就是一坨乱呼呼的东西，即噪音最大，所以这个值默认是<span class="number">20</span>，够用了，值越大耗费时间越多，这个值最高是<span class="number">150</span>，越高的画就越精细。我试了几下，<span class="number">150</span>的话，每张<span class="number">1024</span>*<span class="number">1024</span>的图就要好几分钟才能出图，六指的几率小了一点，但是还是有六指...</span><br><span class="line"></span><br><span class="line">batch count：一次生成多少图片。</span><br><span class="line"></span><br><span class="line">batch size：一次生成几组图片，这俩值都跟显存有关。</span><br><span class="line"></span><br><span class="line">CFG Scale：图像跟提示符的一致程度。越高越听话，但是前提是你的prompt足够标准，足够全面，默认的<span class="number">7</span>~<span class="number">10</span>基本就是比较平衡的。</span><br><span class="line"></span><br><span class="line">SEED:这个是随机数种子，如果你看到网上有些图画的很好看，想跟他几乎一模一样，那么你就选择它的种子，相似的概率会高，但是肯定不会是一模一样的。</span><br></pre></td></tr></table></figure></p>
 <p>那么我们现在就用下载好的<code>perfect-world</code>,画一个蝙蝠侠骑行车的图。那么我们的prompt就是:<code>a batman driving a bicycle,in HONGKONG,at night</code>，负面negative prompt我们写：<code>worst quality,logo,watermark</code>，就是避免水印，避免低质量输出等等。点击<code>generate</code>就能产出图片了，如图：<br><img src="/images/ai%E7%94%BB%E5%9B%BE4.JPG" alt=""></p>
 <p>再看一下搭配lora的场景，我们下载一个<code>https://civitai.com/models/7692/objection-ace-attorney-lora</code> 的lora。使用这个lora，你生成的图片都会是这个《逆转裁判》里“异议”指人的造型。把这个lora下载到<code>你的文件夹/stable-diffusion-webui/models/Lora</code>这个文件夹里。<br><img src="/images/ai%E7%94%BB%E5%9B%BE2.JPG" alt=""></p>
