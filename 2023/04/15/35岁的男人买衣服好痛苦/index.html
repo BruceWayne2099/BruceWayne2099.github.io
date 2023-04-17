@@ -34,7 +34,7 @@
 <meta property="og:image" content="https://brucewayne2099.github.io/images/ai%E7%94%BB%E5%9B%BE8.JPG">
 <meta property="og:image" content="https://brucewayne2099.github.io/images/%E8%BF%BD%E6%A2%A6%E6%A0%BC%E6%9E%97.JPG">
 <meta property="article:published_time" content="2023-04-15T12:26:24.000Z">
-<meta property="article:modified_time" content="2023-04-17T11:40:27.445Z">
+<meta property="article:modified_time" content="2023-04-17T15:19:40.408Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="Python">
 <meta property="article:tag" content="AI">
@@ -231,7 +231,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-04-17 19:40:27" itemprop="dateModified" datetime="2023-04-17T19:40:27+08:00">2023-04-17</time>
+                <time title="修改时间：2023-04-17 23:19:40" itemprop="dateModified" datetime="2023-04-17T23:19:40+08:00">2023-04-17</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -257,7 +257,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>2.4k</span>
+              <span>2.5k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -287,9 +287,8 @@
 <p>通过<code>stable-diffusion</code>+<code>lora</code>+prompt这样的组合拳来产出图片，这样可以极大地提高出图效率、丰富出图的内容。</p>
 <p>再来一点实操prompt心得：千万想好了自己的图片样子，然后就照着这个样子去做，不要被眼花缭乱的prompt效果图打乱了计划，我知道C站上美女很多…虽然他们的prompt能生成你想要的效果，但是他们也是好几次里挑出来那么一次的。一点一点丰富自己的prompt，失败了也不要灰心，多跑几次肯定能得到自己想要的图。如果觉得有些图弃之可惜，可以干脆自己PS掉不爽的那部分。</p>
 <h2 id="目前AI的不足"><a href="#目前AI的不足" class="headerlink" title="目前AI的不足"></a>目前AI的不足</h2><ol>
-<li>还是那句话，产出的图的手脚大概率都是不正常的，这里直接上图：<br><img src="/images/ai%E7%94%BB%E5%9B%BE8.JPG" alt="" title="多好的姑娘啊，可惜是一个四指..."></li>
-</ol>
-<ol start="2">
+<li><p>还是那句话，产出的图的手脚大概率都是不正常的，这里直接上图：<br><img src="/images/ai%E7%94%BB%E5%9B%BE8.JPG" alt="" title="多好的姑娘啊，可惜是一个四指..."></p>
+</li>
 <li><p>上面那个问题虽然可以用emoji里的”自拍”、”比耶”、”开心”等等表情来代替英语单词，进而来提升出图的准确性。emoji是能被AI识别的，但是不会每次都识别到。我见过最简单的一个prompt里面的内容就是：<code>🏃🏻‍♀️ 🎒 爬山的emoji</code>，这三个符号就完成了一幅画。但是我尝试一次把”自拍”的emoji放到prompt里，十几次就出来2次左右。还有一次尝试”比耶”，直接比出来4个手指头，不知道的还以为是追梦格林…<br><img src="/images/%E8%BF%BD%E6%A2%A6%E6%A0%BC%E6%9E%97.JPG" alt="" title="老子我有四个总冠军"></p>
 </li>
 <li><p>目前AI只能从一个原材料里学习，玩不了混搭。而且<code>lora</code>虽然方便了一些动作的prompt，但是他还是有使用限制的，比如<code>dolllikeness</code>这个<code>lora</code>，他只能用于近景，如果要看full body的话，跟<code>lora</code>相冲突。</p>
@@ -298,10 +297,12 @@
 </li>
 <li><p>人的表情也比较受限，除了微笑、张嘴、吐舌头（这个也一定几率有BUG）、脸红、哭泣。其他的好像就没啥了。除此之外，AI的影子也有问题，经常影子跟人长得太过离谱。加上就是之前吐槽过多次的AI产出图的手脚不正常，导致批量产的图又要花时间去人工分辨，把那种”八臂哪吒”挑出来放弃掉，或者交给专业的修图师来拯救一下。</p>
 </li>
-<li><p>除了手脚不行，kiss也不行。还有一些动作，比如弹吉他也不行，手根本也没有搭上吉他（感觉好像还是手的问题啊！）</p>
+<li><p>prompt上一些指令也让人哭笑不得，我那时候炼丹，想做一个”吃冰棍的妹子”，结果AI画出来妹子拿的是冰棍的冰的那部分，棍是冲着嘴的…</p>
+</li>
+<li><p>除了手脚不行，kiss也不行。还有一些动作，比如弹吉他也不行，手根本也没有搭上吉他（感觉好像还是手的问题啊！）。最近听说<code>controlnet</code>可以解决多指的问题，但是只能解决明显的手问题，很多场景它还是无能为力，比如抱臂这种重叠的场景。</p>
 </li>
 </ol>
-<p>综上所述，可见目前的AI不是万能的，还需要人手工介入，就冲着它交工不能百分百让人满意，他就注定是一个工具，不要被别人妖言惑众，说AI代替谁谁谁的，用好了工具大家都HAPPY。</p>
+<p>综上所述，可见目前的AI不是万能的，很多地方还需要人手工介入，就冲着它交工不能百分百让人满意，它就注定是一个工具。不要被别人妖言惑众，说AI代替谁谁谁的，用好了工具大家都HAPPY。</p>
 <h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://zhuanlan.zhihu.com/p/619247417" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/619247417</a><br><a href="https://gooptions.cc/stable-diffusion-prompt%E6%95%99%E5%AD%B8/" target="_blank" rel="noopener">https://gooptions.cc/stable-diffusion-prompt%E6%95%99%E5%AD%B8/</a></p>
 
     </div>
