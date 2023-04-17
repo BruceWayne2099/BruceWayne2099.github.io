@@ -34,7 +34,7 @@
 <meta property="og:image" content="https://brucewayne2099.github.io/images/ai%E7%94%BB%E5%9B%BE9.JPG">
 <meta property="og:image" content="https://brucewayne2099.github.io/images/%E8%BF%BD%E6%A2%A6%E6%A0%BC%E6%9E%97.JPG">
 <meta property="article:published_time" content="2023-04-15T12:26:24.000Z">
-<meta property="article:modified_time" content="2023-04-17T11:35:49.653Z">
+<meta property="article:modified_time" content="2023-04-17T11:39:23.361Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="Python">
 <meta property="article:tag" content="AI">
@@ -231,7 +231,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-04-17 19:35:49" itemprop="dateModified" datetime="2023-04-17T19:35:49+08:00">2023-04-17</time>
+                <time title="修改时间：2023-04-17 19:39:23" itemprop="dateModified" datetime="2023-04-17T19:39:23+08:00">2023-04-17</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -257,7 +257,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>2.3k</span>
+              <span>2.4k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -283,9 +283,9 @@
 <p>prompt里也可以用<code>()</code>和<code>[]</code>，每一个<code>()</code>代表权重多加1.1，每一个<code>[]</code>代表权重减少1.1。词语之间可以用下划线来链接，比如<code>long_wave_hair</code>就会产出大波浪。</p>
 <p>具体的prompt例子我就不说了，C站上有的是，discount和reddit都有prompt交流群。随便看看就有收获，在那里即学习了prompt又学习了英语单词又学习了英语语法又伤了身体（囧）…</p>
 <p>但是要注意，不是每次你的prompt写的所有元素都会被AI全部展示到图片上的，权重大的会优先产出，权重小的可能压根就被舍弃掉了。所以建议一个prompt多跑几次，然后慢慢挑图，跑的多了，之前没跑出来的元素就会都出现了。</p>
-<p>而有一些动作可能跑好几百次也不会跑出来，这种大概率就是这个stable-diffusion原生不支持，比如我上面说的<code>BRA(beautiful realistic Asians)V3</code>不支持<code>standing split</code>（一字马），估计是做了限制，所以这种就要搭配lora，让lora来帮助你完成一字马。当然有些也是失败的，那么就要不停的变换stable-diffusion，这里最好看看前任做的图，如果他们show出来的图是有一字马的，那么代表这个stable-diffusion肯定能做一字马。</p>
-<p>通过<code>stable-diffusion</code>+<code>lora</code>+prompt这样的组合拳来产出图片，这样可以极大地提高出图效率。</p>
-<p>这里也有一点prompt心得：就是千万想好了自己的图片样子，然后就照着这个样子去做，不要呗眼花缭乱的prompt效果图打乱了计划，虽然他们的prompt能生成你想要的效果，但是他们也是好几次里挑出来那么一次的。所以就一点一点丰富自己的prompt，失败了也不要灰心，多跑几次肯定能得到自己想要的图。如果觉得有些图弃之可惜，那么可以拿去到<code>img2img</code>这个tab里，进一步雕琢。或者干脆自己PS掉不爽的那部分。</p>
+<p>而有一些动作可能跑好几百次也不会跑出来，这种大概率就是这个stable-diffusion原生不支持，比如我上面说的<code>BRA(beautiful realistic Asians)V3</code>不支持<code>standing split</code>（一字马），估计是做了限制，所以这种就要搭配lora，让lora来帮助你完成一字马。当然有些也是失败的，那么就要不停的变换stable-diffusion，这里最好在C站看看前任用这个stable-diffusion做出来的图，如果他们show出来的图是有一字马的，那么代表这个stable-diffusion肯定能做一字马，是你的姿势不对，要不就继续重试，直到出现为止。</p>
+<p>通过<code>stable-diffusion</code>+<code>lora</code>+prompt这样的组合拳来产出图片，这样可以极大地提高出图效率、丰富出图的内容。</p>
+<p>再来一点实操prompt心得：千万想好了自己的图片样子，然后就照着这个样子去做，不要被眼花缭乱的prompt效果图打乱了计划，我知道C站上美女很多…虽然他们的prompt能生成你想要的效果，但是他们也是好几次里挑出来那么一次的。一点一点丰富自己的prompt，失败了也不要灰心，多跑几次肯定能得到自己想要的图。如果觉得有些图弃之可惜，可以干脆自己PS掉不爽的那部分。</p>
 <h2 id="目前AI的不足"><a href="#目前AI的不足" class="headerlink" title="目前AI的不足"></a>目前AI的不足</h2><ol>
 <li>还是那句话，产出的图的手脚大概率都是不正常的，这里直接上图：<br><img src="/images/ai%E7%94%BB%E5%9B%BE9.JPG" alt="" title="多好的姑娘啊，可惜是一个四指..."></li>
 </ol>
@@ -294,11 +294,11 @@
 </li>
 <li><p>目前AI只能从一个原材料里学习，玩不了混搭。而且<code>lora</code>虽然方便了一些动作的prompt，但是他还是有使用限制的，比如<code>dolllikeness</code>这个<code>lora</code>，他只能用于近景，如果要看full body的话，跟<code>lora</code>相冲突。</p>
 </li>
-<li><p>AI目前的视角还比较死，笔直的站着正面照是最好的，然后背转身还行，来一点复杂动作就要更加复杂的prompt，很多时候ai还不识别（估计跟英语一个词多个意义有关）。</p>
+<li><p>AI目前的视角还比较死，笔直的站着正面照是最好的，然后背转身还行，来一点复杂动作就要更加复杂的prompt，很多时候ai还不识别（估计跟英语一个词多个意义有关）。那估计img2img能解决一点这个问题吧。</p>
 </li>
 <li><p>人的表情也比较受限，除了微笑、张嘴、吐舌头（这个也一定几率有BUG）、脸红、哭泣。其他的好像就没啥了。除此之外，AI的影子也有问题，经常影子跟人长得太过离谱。加上就是之前吐槽过多次的AI产出图的手脚不正常，导致批量产的图又要花时间去人工分辨，把那种”八臂哪吒”挑出来放弃掉，或者交给专业的修图师来拯救一下。</p>
 </li>
-<li><p>除了手脚不行，kiss也不行。然后一些动作，比如弹吉他，手根本也没有搭上吉他（感觉好像还是手的问题啊！）</p>
+<li><p>除了手脚不行，kiss也不行。还有一些动作，比如弹吉他也不行，手根本也没有搭上吉他（感觉好像还是手的问题啊！）</p>
 </li>
 </ol>
 <p>综上所述，可见目前的AI不是万能的，还需要人手工介入，就冲着它交工不能百分百让人满意，他就注定是一个工具，不要被别人妖言惑众，说AI代替谁谁谁的，用好了工具大家都HAPPY。</p>
