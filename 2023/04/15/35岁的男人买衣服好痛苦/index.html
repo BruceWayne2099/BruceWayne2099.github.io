@@ -30,15 +30,17 @@
 <meta property="og:site_name" content="石锤淡啤酒">
 <meta property="og:description" content="沉迷炼丹不可自拔...">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/ai%E7%94%BB%E5%9B%BE9.JPG">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/ai%E7%94%BB%E5%9B%BE9.JPG">
 <meta property="og:image" content="https://brucewayne2099.github.io/images/%E8%BF%BD%E6%A2%A6%E6%A0%BC%E6%9E%97.JPG">
 <meta property="article:published_time" content="2023-04-15T12:26:24.000Z">
-<meta property="article:modified_time" content="2023-04-17T10:32:00.727Z">
+<meta property="article:modified_time" content="2023-04-17T11:17:05.335Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="Python">
 <meta property="article:tag" content="AI">
 <meta property="article:tag" content="人工智能">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://brucewayne2099.github.io/images/%E8%BF%BD%E6%A2%A6%E6%A0%BC%E6%9E%97.JPG">
+<meta name="twitter:image" content="https://brucewayne2099.github.io/images/ai%E7%94%BB%E5%9B%BE9.JPG">
 
 <link rel="canonical" href="https://brucewayne2099.github.io/2023/04/15/35%E5%B2%81%E7%9A%84%E7%94%B7%E4%BA%BA%E4%B9%B0%E8%A1%A3%E6%9C%8D%E5%A5%BD%E7%97%9B%E8%8B%A6/">
 
@@ -229,7 +231,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-04-17 18:32:00" itemprop="dateModified" datetime="2023-04-17T18:32:00+08:00">2023-04-17</time>
+                <time title="修改时间：2023-04-17 19:17:05" itemprop="dateModified" datetime="2023-04-17T19:17:05+08:00">2023-04-17</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -255,7 +257,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>2k</span>
+              <span>2.3k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -275,22 +277,32 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>AI最近的大火，从下围棋跨界到聊天现在是作画，让prompt也跟着火了起来。prompt是啥呢？就是跟AI交流的指令，目前prompt是支持英文和emoji图标的。AI通过阅读prompt的指令，来分析然后再反馈一个结果给人类。所以说如果职业跟是AI有交集的，都建议了解一下prompt，这个任意真的提升效率太多了（我现在业余时间的代码AI包办了80%了,我就剩下20%自己具体情况要看看）。</p>
-<p>回头我们说<code>stable-diffusion</code>的prompt。要画图，肯定要有一个<code>checkpoint</code>，那么这个就是AI学习的原材料。目前AI只能从一个原材料里学习，玩不了混搭，比如我个人比较喜欢的<code>BRA(beautiful realistic Asians)V3</code>这个<code>checkpoint</code>，他的效果就是产出的图非常真实，画亚洲人特别是韩国人，感觉就是照片照出来的照片，所以很多人都拿这个模型产出的图去那种XX论坛上卖…</p>
+        <h2 id="小新的"><a href="#小新的" class="headerlink" title="小新的"></a>小新的</h2><p>AI从下围棋跨界到聊天现在是作画，最近的大火让prompt也跟着火了起来。prompt是啥呢？就是跟AI交流的指令，目前prompt是支持英文和emoji图标的。AI通过阅读prompt的指令，来分析然后再反馈一个结果给人类。所以说如果职业跟是AI有交集的，都建议了解一下prompt，这个任意真的提升效率太多了（我现在业余时间的代码AI包办了80%了,剩下的20%具体情况要自己看）。</p>
+<p>说回<code>stable-diffusion</code>的prompt。要用sdwebui画图，肯定要有一个<code>checkpoint</code>，那么这个就是AI画图的原材料。比如我个人比较喜欢的<code>BRA(beautiful realistic Asians)V3</code>这个<code>checkpoint</code>，他的效果就是产出的图非常真实，画亚洲人特别是韩国人，感觉就是照片照出来的照片，所以很多人都拿这个模型产出的图去那种XX论坛上卖…<br><img src="/images/ai%E7%94%BB%E5%9B%BE9.JPG" alt=""></p>
 <p>话说回来，你prompt里的元素是有前后的，要表达的中心放前面，比如你拍照，拍人物照，肯定镜头的重心就是人物，然后远处的山啊水啊鸟啊狗啊都是配菜，那么prompt里，就把人物放在最前面，当然推荐上来顾全大局，先写上<code>best quality</code>、<code>4K</code>、<code>masterpiece</code>这样的话，要求产出的图是很高清的。然后加上人物，这里人物就要有一番描述了，比如美国人日本人韩国人，皮肤如何，男性女性，戴警察帽子，有没有手表；然后是场景，比如在银行里，在办公室里，黑天白天；动作，比如坐在椅子上，双手叉腰等等，这样基本就能描述出来一个差不多的场景了。差不多就可以产出一个图了。</p>
 <p>然后prompt可以用<code>()</code>和<code>[]</code>，每一个<code>()</code>代表权重多加1.1，每一个<code>[]</code>代表权重减少1.1。词语之间可以用下划线来表示<code>long_wave_hair</code>就会产出大波浪。</p>
 <p>具体的例子我就不说，C站有的是，discount和reddit都有prompt交流群。随便看看就能学习到，又学习了prompt又学习了英语单词又学习了英语语法又伤了身体（囧）…</p>
 <p>但是要注意，不是每次你的prompt写的所有元素都会被AI全部展示到图片上的，权重大的会优先产出，权重小的可能压根就被舍弃掉了。所以建议一个prompt多跑几次，然后慢慢挑图，跑的多了，之前没跑出来的元素就会都出现了。</p>
 <p>而有一些动作可能跑好几百次也不会跑出来，这种大概率就是这个stable-diffusion原生不支持，比如我上面说的<code>BRA(beautiful realistic Asians)V3</code>不支持<code>standing split</code>（一字马），估计是做了限制，所以这种就要搭配lora，让lora来帮助你完成一字马。当然有些也是失败的，那么就要不停的变换stable-diffusion，这里最好看看前任做的图，如果他们show出来的图是有一字马的，那么代表这个stable-diffusion肯定能做一字马。</p>
 <p>通过<code>stable-diffusion</code>+<code>lora</code>+prompt这样的组合拳来产出图片，这样可以极大地提高出图效率。</p>
-<p>这里也有一点prompt心得：就是千万想好了自己的图片样子，然后就照着这个样子去做，不要呗眼花缭乱的prompt效果图打乱了计划，虽然他们的prompt能生成你想要的效果，但是他们也是好几次里挑出来那么一次的。所以就一点一点丰富自己的prompt，失败了也不要灰心，多跑几次肯定能得到自己想要的图。</p>
-<p>下面说一点目前AI的不足：</p>
-<ol>
-<li><p>还是那句话，产出的图的手脚大概率都是不正常的，这里虽然可以用emoji里的”自拍”、”比耶”、”开心”等等表情来代替英语单词，来提升出图的准确性，emoji是能被AI识别的，但是不会每次都识别到。我见过最简单的一个prompt里面的内容就是：<code>🏃🏻‍♀️ 🎒 爬山的emoji</code>，这三个符号就完成了一幅画。但是我尝试一次”自拍”，十几次就出来2次左右。还有一次尝试”比耶”，直接比出来4个手指头，不知道的还以为是追梦格林…<br><img src="/images/%E8%BF%BD%E6%A2%A6%E6%A0%BC%E6%9E%97.JPG" alt=""></p>
+<p>这里也有一点prompt心得：就是千万想好了自己的图片样子，然后就照着这个样子去做，不要呗眼花缭乱的prompt效果图打乱了计划，虽然他们的prompt能生成你想要的效果，但是他们也是好几次里挑出来那么一次的。所以就一点一点丰富自己的prompt，失败了也不要灰心，多跑几次肯定能得到自己想要的图。如果觉得有些图弃之可惜，那么可以拿去到<code>img2img</code>这个tab里，进一步雕琢。或者干脆自己PS掉不爽的那部分。</p>
+<h2 id="目前AI的不足"><a href="#目前AI的不足" class="headerlink" title="目前AI的不足"></a>目前AI的不足</h2><ol>
+<li>还是那句话，产出的图的手脚大概率都是不正常的，这里直接上图：<br><img src="/images/ai%E7%94%BB%E5%9B%BE9.JPG" alt="" title="多好的姑娘啊，可惜是一个四指..."></li>
+</ol>
+<ol start="2">
+<li><p>上面那个问题虽然可以用emoji里的”自拍”、”比耶”、”开心”等等表情来代替英语单词，进而来提升出图的准确性。emoji是能被AI识别的，但是不会每次都识别到。我见过最简单的一个prompt里面的内容就是：<code>🏃🏻‍♀️ 🎒 爬山的emoji</code>，这三个符号就完成了一幅画。但是我尝试一次把”自拍”的emoji放到prompt里，十几次就出来2次左右。还有一次尝试”比耶”，直接比出来4个手指头，不知道的还以为是追梦格林…<br><img src="/images/%E8%BF%BD%E6%A2%A6%E6%A0%BC%E6%9E%97.JPG" alt=""></p>
 </li>
-<li><p>AI目前的视角还比较死，笔直的站着正面照是最好的，然后背转身还行，来一点复杂动作就要更加复杂的prompt，很多时候ai还不识别（估计跟英语一个词多个意义有关），这个太惨了。而且人的表情也比较受限，除了微笑、张嘴、吐舌头（这个也一定几率有BUG）、脸红、哭泣。其他的好像就没啥了。除此之外，AI的影子也有问题，经常影子跟人长得太过离谱。加上就是之前吐槽过多次的AI产出图的手脚不正常，导致批量产的图又要花时间去人工分辨，把那种”八臂哪吒”挑出来放弃掉，或者交给专业的修图师来拯救一下。综上所述，可见目前的AI不是万能的，还需要人手工介入，就冲着它交工不能百分百让人满意，他就注定是一个工具，不要被别人妖言惑众，说AI代替谁谁谁的，用好了工具大家都HAPPY。</p>
+<li><p>目前AI只能从一个原材料里学习，玩不了混搭。而且<code>lora</code>虽然方便了一些动作的prompt，但是他还是有使用限制的，比如<code>dolllikeness</code>这个<code>lora</code>，他只能用于近景，如果要看full body的话，跟<code>lora</code>相冲突。</p>
+</li>
+<li><p>AI目前的视角还比较死，笔直的站着正面照是最好的，然后背转身还行，来一点复杂动作就要更加复杂的prompt，很多时候ai还不识别（估计跟英语一个词多个意义有关）。</p>
+</li>
+<li><p>人的表情也比较受限，除了微笑、张嘴、吐舌头（这个也一定几率有BUG）、脸红、哭泣。其他的好像就没啥了。除此之外，AI的影子也有问题，经常影子跟人长得太过离谱。加上就是之前吐槽过多次的AI产出图的手脚不正常，导致批量产的图又要花时间去人工分辨，把那种”八臂哪吒”挑出来放弃掉，或者交给专业的修图师来拯救一下。</p>
+</li>
+<li><p>除了手脚不行，kiss也不行。然后一些动作，比如弹吉他，手根本也没有搭上吉他（感觉好像还是手的问题啊！）</p>
 </li>
 </ol>
+<p>综上所述，可见目前的AI不是万能的，还需要人手工介入，就冲着它交工不能百分百让人满意，他就注定是一个工具，不要被别人妖言惑众，说AI代替谁谁谁的，用好了工具大家都HAPPY。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a href="https://zhuanlan.zhihu.com/p/619247417" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/619247417</a><br><a href="https://gooptions.cc/stable-diffusion-prompt%E6%95%99%E5%AD%B8/" target="_blank" rel="noopener">https://gooptions.cc/stable-diffusion-prompt%E6%95%99%E5%AD%B8/</a></p>
 
     </div>
 
@@ -428,6 +440,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#小新的"><span class="nav-number">1.</span> <span class="nav-text">小新的</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#目前AI的不足"><span class="nav-number">2.</span> <span class="nav-text">目前AI的不足</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考资料"><span class="nav-number">3.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -498,7 +511,7 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">899k</span>
+    <span title="站点总字数">900k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
