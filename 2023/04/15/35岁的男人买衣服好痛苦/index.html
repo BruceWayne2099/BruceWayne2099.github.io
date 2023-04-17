@@ -34,7 +34,7 @@
 <meta property="og:image" content="https://brucewayne2099.github.io/images/ai%E7%94%BB%E5%9B%BE9.JPG">
 <meta property="og:image" content="https://brucewayne2099.github.io/images/%E8%BF%BD%E6%A2%A6%E6%A0%BC%E6%9E%97.JPG">
 <meta property="article:published_time" content="2023-04-15T12:26:24.000Z">
-<meta property="article:modified_time" content="2023-04-17T11:29:07.464Z">
+<meta property="article:modified_time" content="2023-04-17T11:33:12.190Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="Python">
 <meta property="article:tag" content="AI">
@@ -231,7 +231,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-04-17 19:29:07" itemprop="dateModified" datetime="2023-04-17T19:29:07+08:00">2023-04-17</time>
+                <time title="修改时间：2023-04-17 19:33:12" itemprop="dateModified" datetime="2023-04-17T19:33:12+08:00">2023-04-17</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -278,8 +278,8 @@
 
       
         <h2 id="小经验和小心得"><a href="#小经验和小心得" class="headerlink" title="小经验和小心得"></a>小经验和小心得</h2><p>AI从下围棋跨界到聊天现在是作画，最近的大火让prompt也跟着火了起来。prompt是啥呢？就是跟AI交流的指令，目前prompt是支持英文和emoji图标的。AI通过阅读prompt的指令，来分析然后再反馈一个结果给人类。所以说如果职业跟是AI有交集的，都建议了解一下prompt，这个任意真的提升效率太多了（我现在业余时间的代码AI包办了80%了,剩下的20%具体情况要自己看）。</p>
-<p>说回<code>stable-diffusion</code>的prompt。要用sdwebui画图，肯定要有一个<code>checkpoint</code>，那么这个就是AI画图的原材料。比如我个人比较喜欢的<code>BRA(beautiful realistic Asians)V3</code>这个<code>checkpoint</code>，他的效果就是产出的图非常真实，画亚洲人特别是韩国人，感觉就是照片照出来的照片，所以很多人都拿这个模型产出的图去那种XX论坛上卖…<br><img src="/images/ai%E7%94%BB%E5%9B%BE9.JPG" alt=""></p>
-<p>话说回来，你prompt里的元素是有前后的，要表达的中心放前面，比如你拍照，拍人物照，肯定镜头的重心就是人物，然后远处的山啊水啊鸟啊狗啊都是配菜，那么prompt里，就把人物放在最前面，当然推荐上来顾全大局，先写上<code>best quality</code>、<code>4K</code>、<code>masterpiece</code>这样的话，要求产出的图是很高清的。然后加上人物，这里人物就要有一番描述了，比如美国人日本人韩国人，皮肤如何，男性女性，戴警察帽子，有没有手表；然后是场景，比如在银行里，在办公室里，黑天白天；动作，比如坐在椅子上，双手叉腰等等，这样基本就能描述出来一个差不多的场景了。差不多就可以产出一个图了。</p>
+<p>说回<code>stable-diffusion</code>的prompt。要用sdwebui画图，肯定要有一个<code>checkpoint</code>，那么这个就是AI画图的原材料。比如我个人比较喜欢的<code>BRA(beautiful realistic Asians)V3</code>这个<code>checkpoint</code>，他的效果就是产出的图非常真实，画亚洲人特别是韩国人，感觉就是照片照出来的照片，所以很多人都拿这个模型产出的图去那种XX论坛上卖…<br><img src="/images/ai%E7%94%BB%E5%9B%BE9.JPG" alt="" title="这个图我的prompt改了好几次..."></p>
+<p>话说回来，你prompt里的元素是有前后的，推荐上来顾全大局，先写上<code>best quality</code>、<code>4K</code>、<code>masterpiece</code>这样的话，要求产出的图是很高清的。要表达的中心物体放前面写，就好像你拍照，拍人物照，肯定镜头的重心就是人物，然后远处的山啊水啊鸟啊狗啊都是配菜，那么prompt里，就把人物放在最前面。然后加上人物，这里人物就要有一番描述了，比如美国人日本人韩国人，皮肤如何，男性女性，戴警察帽子，有没有手表；然后是场景，比如在银行里，在办公室里，黑天白天；动作，比如坐在椅子上，双手叉腰等等，这样基本就能描述出来一个差不多的场景了。差不多就可以产出一个图了。</p>
 <p>然后prompt可以用<code>()</code>和<code>[]</code>，每一个<code>()</code>代表权重多加1.1，每一个<code>[]</code>代表权重减少1.1。词语之间可以用下划线来表示<code>long_wave_hair</code>就会产出大波浪。</p>
 <p>具体的例子我就不说，C站有的是，discount和reddit都有prompt交流群。随便看看就能学习到，又学习了prompt又学习了英语单词又学习了英语语法又伤了身体（囧）…</p>
 <p>但是要注意，不是每次你的prompt写的所有元素都会被AI全部展示到图片上的，权重大的会优先产出，权重小的可能压根就被舍弃掉了。所以建议一个prompt多跑几次，然后慢慢挑图，跑的多了，之前没跑出来的元素就会都出现了。</p>
