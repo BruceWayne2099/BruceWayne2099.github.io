@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://brucewayne2099.github.io/"/>
-  <updated>2024-02-02T11:48:24.329Z</updated>
+  <updated>2024-02-04T03:04:15.762Z</updated>
   <id>https://brucewayne2099.github.io/</id>
   
   <author>
@@ -21,9 +21,9 @@
     <link href="https://brucewayne2099.github.io/2024/02/01/rdb%E7%9A%84%E6%8C%81%E4%B9%85%E5%8C%96%E5%AF%BC%E8%87%B4%E7%BA%BF%E4%B8%8A%E6%95%85%E9%9A%9C/"/>
     <id>https://brucewayne2099.github.io/2024/02/01/rdb%E7%9A%84%E6%8C%81%E4%B9%85%E5%8C%96%E5%AF%BC%E8%87%B4%E7%BA%BF%E4%B8%8A%E6%95%85%E9%9A%9C/</id>
     <published>2024-02-01T15:25:09.000Z</published>
-    <updated>2024-02-02T11:48:24.329Z</updated>
+    <updated>2024-02-04T03:04:15.762Z</updated>
     
-    <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><p>这几天在做优化，把应用与rdb超时时间从200ms下降到了50ms。结果rdb在那个时候恰巧出发了aof持久化，整个持久化的过程持续了1.7s，导致线上故障。<br><img src="/images/rdb%E6%95%85%E9%9A%9C2.png" alt="akb48" title="cpu达到了99%"><br><img src="/images/rdb%E6%95%85%E9%9A%9C3.png" alt="akb48" title="出现了大量的jedis错误"></p><p>rdb持久化的过程是什么？这里可以看redis的官方文档：    这里可以看出aof是持久化效果最好的方法，但是它依赖文件的大小，aof文件越大，耗时越久。</p><p>一般来说1.7s的aof耗时不算是很久，但是aof期间主进程是不工作的，导致这个redis集群执行aof的实例在这个阶段不能正常接受服务请求，但是我们的代码里有两个配置放大了这个情况，进而出现了故障。</p><p>第一：我们的服务有重试机制，即如果rdb超时，就会重试3次。<br>第二：我们发现这1.7s时间内写请求飙升，经分析是由于写请求是sku维度的(exhset)，读请求是item维度(exhmget)，按照平均sku数量，重试的写请求相比读请求有10+的放大系数。再叠加之前的重试3次。导致雪崩。</p><p>通过这个故障，我们通过复盘也发现了我们一些当前链路不合理的地方，比如“这个redis品仓关系专用的，不应该直接影响下单成功率，考虑后续解耦策略”。</p><p>其次是阿里云的redis的qps是最基础的qps，比如我这个集群，说是能扛住384万qps，但是这个384万是压测512字节的key和value得到的。而在实际的业务开发场景里，key和value的大小是远远大于512字节的，所以实际qps是不够的。这里需要SRE同学帮忙来压测一下真实的qps水平。<br><img src="/images/rdb%E6%95%85%E9%9A%9C1.png" alt="akb48" title="购买rdb的时候，他的qps只是一个极度乐观的参考值"></p>]]></content>
+    <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><p>这几天在做优化，把应用与rdb超时时间从200ms下降到了50ms。结果rdb在那个时候恰巧出发了aof持久化，整个持久化的过程持续了1.7s，导致线上故障。<br><img src="/images/rdb%E6%95%85%E9%9A%9C2.png" alt="akb48" title="cpu达到了99%"><br><img src="/images/rdb%E6%95%85%E9%9A%9C3.png" alt="akb48" title="出现了大量的jedis错误"></p><p>rdb持久化的过程是什么？这里可以看redis的官方文档：<a href="https://redis.com.cn/redis-persistence.html" target="_blank" rel="noopener">https://redis.com.cn/redis-persistence.html</a> 和 <a href="https://redisbook.readthedocs.io/en/latest/internal/aof.html" target="_blank" rel="noopener">https://redisbook.readthedocs.io/en/latest/internal/aof.html</a> 。这里可以看出aof是持久化效果最好的方法，但是它依赖文件的大小，aof文件越大，耗时越久。如果关闭了aof，那么rdb就成了一个memcache，断电了而且备库也断电了，那数据就没了。</p><p>一般来说1.7s的aof耗时不算是很久，而且每个实例的aof操作其实也挺频繁的，平均20分钟不到就一次，但是aof期间主进程是不工作的，导致这个redis集群执行aof的实例在这个阶段不能正常接受服务请求，但是我们的代码里有两个配置放大了这个情况，进而出现了故障。</p><p>第一：我们的服务有重试机制，即如果rdb超时，就会重试3次。后来我们决定这里的重试取消掉，交易链路么，重试非常容易埋雷。<br>第二：我们发现这1.7s时间内写请求飙升，经分析是由于写请求是sku维度的(exhset)，读请求是item维度(exhmget)，按照平均sku数量，重试的写请求相比读请求有10+的放大系数。再叠加之前的重试3次。导致雪崩。</p><p>通过这个故障，我们通过复盘也发现了我们一些当前链路不合理的地方，比如“这个redis品仓关系专用的，不应该直接影响下单成功率，考虑后续解耦策略”。</p><p>其次是阿里云在选择redis的时候看到的qps是最基础的qps，比如我这个集群，说是能扛住384万qps，但是这个384万是压测512字节的key和value得到的。而在实际的业务开发场景里，key和value的大小是远远大于512字节的，所以实际qps是不够的。这里需要SRE同学帮忙来拿线上比较真实的key-value去压测一下真实的qps水平。<br><img src="/images/rdb%E6%95%85%E9%9A%9C1.png" alt="akb48" title="购买rdb的时候，他的qps只是一个极度乐观的参考值"></p>]]></content>
     
     <summary type="html">
     
