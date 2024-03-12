@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://brucewayne2099.github.io/"/>
-  <updated>2024-03-12T09:51:35.504Z</updated>
+  <updated>2024-03-12T09:36:23.600Z</updated>
   <id>https://brucewayne2099.github.io/</id>
   
   <author>
@@ -15,31 +15,6 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
-  
-  <entry>
-    <title>升级了tomcat8，日志文件没有读权限了</title>
-    <link href="https://brucewayne2099.github.io/2024/03/12/%E5%8D%87%E7%BA%A7%E4%BA%86tomcat%EF%BC%8C%E6%97%A5%E5%BF%97%E6%96%87%E4%BB%B6%E6%B2%A1%E6%9C%89%E8%AF%BB%E6%9D%83%E9%99%90%E4%BA%86/"/>
-    <id>https://brucewayne2099.github.io/2024/03/12/%E5%8D%87%E7%BA%A7%E4%BA%86tomcat%EF%BC%8C%E6%97%A5%E5%BF%97%E6%96%87%E4%BB%B6%E6%B2%A1%E6%9C%89%E8%AF%BB%E6%9D%83%E9%99%90%E4%BA%86/</id>
-    <published>2024-03-12T09:34:41.000Z</published>
-    <updated>2024-03-12T09:51:35.504Z</updated>
-    
-    <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><p>同组新来的java开发突然发现一个问题来咨询，就是他的日志监控无法被监控平台识别：</p><p><img src="/images/%E6%96%87%E4%BB%B6%E6%9D%83%E9%99%90027.png" alt=""></p><p>明明配置路径都正确，监控平台也能获取到他的文件名。结果上去一看发现文件都是”-rw-r—–”的权限：</p><p><img src="/images/%E6%96%87%E4%BB%B6%E6%9D%83%E9%99%90027-3.png" alt=""></p><p>手动使用 <code>chmod -R 664 文件路径</code>临时解决了问题，果然，监控平台拿到了文件并展示了监控项：</p><p><img src="/images/%E6%96%87%E4%BB%B6%E6%9D%83%E9%99%90027-2.png" alt="" title="数据齐全度从2个多了1个"></p><p>于是就怀疑到底改了啥会发生这样的事儿，果然我发现<code>grep Umask /proc/进程PID/status</code>得到java进程是0027，其他进程是0002，既然是0027，那肯定默认相关的文件也就是640。于是就定位在tomcat上，发现tomcat的catalina.sh里写了权限是0027:</p><p><img src="/images/%E6%96%87%E4%BB%B6%E6%9D%83%E9%99%90027-2.png" alt=""></p><p>那就简单了，在引入tomcat8的时候，将catalina.sh改成0002就解决问题。</p><p>最后补上tomcat8的官方文档：<a href="https://tomcat.apache.org/tomcat-8.5-doc/security-howto.html" target="_blank" rel="noopener">https://tomcat.apache.org/tomcat-8.5-doc/security-howto.html</a></p>]]></content>
-    
-    <summary type="html">
-    
-      tomcat8这个umask的改动就是吃饱了撑的
-    
-    </summary>
-    
-    
-      <category term="工作与技术" scheme="https://brucewayne2099.github.io/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/"/>
-    
-    
-      <category term="tomcat" scheme="https://brucewayne2099.github.io/tags/tomcat/"/>
-    
-      <category term="文件权限" scheme="https://brucewayne2099.github.io/tags/%E6%96%87%E4%BB%B6%E6%9D%83%E9%99%90/"/>
-    
-  </entry>
   
   <entry>
     <title>《进击的巨人》观后感</title>
@@ -63,6 +38,31 @@
       <category term="动漫" scheme="https://brucewayne2099.github.io/tags/%E5%8A%A8%E6%BC%AB/"/>
     
       <category term="进击的巨人" scheme="https://brucewayne2099.github.io/tags/%E8%BF%9B%E5%87%BB%E7%9A%84%E5%B7%A8%E4%BA%BA/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>升级了tomcat8，日志文件没有读权限了</title>
+    <link href="https://brucewayne2099.github.io/2024/03/07/%E5%8D%87%E7%BA%A7%E4%BA%86tomcat%EF%BC%8C%E6%97%A5%E5%BF%97%E6%96%87%E4%BB%B6%E6%B2%A1%E6%9C%89%E8%AF%BB%E6%9D%83%E9%99%90%E4%BA%86/"/>
+    <id>https://brucewayne2099.github.io/2024/03/07/%E5%8D%87%E7%BA%A7%E4%BA%86tomcat%EF%BC%8C%E6%97%A5%E5%BF%97%E6%96%87%E4%BB%B6%E6%B2%A1%E6%9C%89%E8%AF%BB%E6%9D%83%E9%99%90%E4%BA%86/</id>
+    <published>2024-03-07T09:34:41.000Z</published>
+    <updated>2024-03-12T09:51:49.757Z</updated>
+    
+    <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><p>同组新来的java开发突然发现一个问题来咨询，就是他的日志监控无法被监控平台识别：</p><p><img src="/images/%E6%96%87%E4%BB%B6%E6%9D%83%E9%99%90027.png" alt=""></p><p>明明配置路径都正确，监控平台也能获取到他的文件名。结果上去一看发现文件都是”-rw-r—–”的权限：</p><p><img src="/images/%E6%96%87%E4%BB%B6%E6%9D%83%E9%99%90027-3.png" alt=""></p><p>手动使用 <code>chmod -R 664 文件路径</code>临时解决了问题，果然，监控平台拿到了文件并展示了监控项：</p><p><img src="/images/%E6%96%87%E4%BB%B6%E6%9D%83%E9%99%90027-2.png" alt="" title="数据齐全度从2个多了1个"></p><p>于是就怀疑到底改了啥会发生这样的事儿，果然我发现<code>grep Umask /proc/进程PID/status</code>得到java进程是0027，其他进程是0002，既然是0027，那肯定默认相关的文件也就是640。于是就定位在tomcat上，发现tomcat的catalina.sh里写了权限是0027:</p><p><img src="/images/%E6%96%87%E4%BB%B6%E6%9D%83%E9%99%90027-2.png" alt=""></p><p>那就简单了，在引入tomcat8的时候，将catalina.sh改成0002就解决问题。</p><p>最后补上tomcat8的官方文档：<a href="https://tomcat.apache.org/tomcat-8.5-doc/security-howto.html" target="_blank" rel="noopener">https://tomcat.apache.org/tomcat-8.5-doc/security-howto.html</a></p>]]></content>
+    
+    <summary type="html">
+    
+      tomcat8这个umask的改动就是吃饱了撑的
+    
+    </summary>
+    
+    
+      <category term="工作与技术" scheme="https://brucewayne2099.github.io/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/"/>
+    
+    
+      <category term="tomcat" scheme="https://brucewayne2099.github.io/tags/tomcat/"/>
+    
+      <category term="文件权限" scheme="https://brucewayne2099.github.io/tags/%E6%96%87%E4%BB%B6%E6%9D%83%E9%99%90/"/>
     
   </entry>
   
