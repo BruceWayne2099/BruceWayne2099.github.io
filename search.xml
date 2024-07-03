@@ -4,6 +4,33 @@
   
     
     <entry>
+      <title>浅谈SRE工作内容和方法论</title>
+      <link href="/2024/07/03/%E6%B5%85%E8%B0%88SRE%E5%B7%A5%E4%BD%9C%E5%86%85%E5%AE%B9%E5%92%8C%E6%96%B9%E6%B3%95%E8%AE%BA/"/>
+      <url>/2024/07/03/%E6%B5%85%E8%B0%88SRE%E5%B7%A5%E4%BD%9C%E5%86%85%E5%AE%B9%E5%92%8C%E6%96%B9%E6%B3%95%E8%AE%BA/</url>
+      
+        <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script>]]></content>
+      
+      
+      <categories>
+          
+          <category> 工作与技术 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 安全生产 </tag>
+            
+            <tag> sre </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>端午澳门3日行</title>
       <link href="/2024/06/06/%E7%AB%AF%E5%8D%88%E6%BE%B3%E9%97%A83%E6%97%A5%E8%A1%8C/"/>
       <url>/2024/06/06/%E7%AB%AF%E5%8D%88%E6%BE%B3%E9%97%A83%E6%97%A5%E8%A1%8C/</url>
@@ -214,6 +241,33 @@
             <tag> redis </tag>
             
             <tag> 缓存 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>浅谈python装饰器的参数传入</title>
+      <link href="/2024/01/03/%E6%B5%85%E8%B0%88python%E8%A3%85%E9%A5%B0%E5%99%A8/"/>
+      <url>/2024/01/03/%E6%B5%85%E8%B0%88python%E8%A3%85%E9%A5%B0%E5%99%A8/</url>
+      
+        <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><p>正好没事看到这样的一个图片：<br><img src="/images/%E8%A3%85%E9%A5%B0%E5%99%A8.jpeg" alt="paradin" title="说的通俗易懂"></p><p>整个过程说的通俗易懂，可以拿去用于校招面试考察基本功。</p><p>但是它图里的例子太简单了，而且是非常理想化的不带参数的装饰器。我想很多人根据这个图想自己写一个带参数的装饰器，那么就会失败。</p><p>举个例子，比如下面这个python，是完全仿照上面的例子写的：</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建一个装饰器</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">zhuangshiqi</span><span class="params">(func)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">xiulian</span><span class="params">(book)</span>:</span></span><br><span class="line">        <span class="keyword">print</span> (<span class="string">"开始！"</span>)</span><br><span class="line">        func()</span><br><span class="line">        <span class="keyword">print</span> (<span class="string">"他终于修炼成功了"</span>+book)</span><br><span class="line">    <span class="keyword">return</span> xiulian</span><br><span class="line"></span><br><span class="line"><span class="comment"># 引用这个装饰器，原函数是传入一个参数，输出一顿话</span></span><br><span class="line"><span class="meta">@zhuangshiqi</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">find_book</span><span class="params">(name)</span>:</span></span><br><span class="line">    print(<span class="string">"经过努力"</span>,name,<span class="string">"得到了武功秘籍!"</span>)</span><br><span class="line"></span><br><span class="line">find_book(<span class="string">"杨过"</span>,<span class="string">"九阴真经"</span>)</span><br></pre></td></tr></table></figure><p>原以为这个输出的结果是：<br>    <figure class="highlight erlang-repl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">开始！</span><br><span class="line">经过努力 杨过 得到了武功秘籍!</span><br><span class="line">他终于修炼成功了九阴真经</span><br></pre></td></tr></table></figure></p><p>哪知道，结果是这样的：<br>    <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">zhuangshiqi.&lt;locals&gt;.xiulian() takes <span class="number">1</span> positional argument but <span class="number">2</span> were given</span><br></pre></td></tr></table></figure></p><p>嗯，学习知识还是要通过实际的栽跟头和实际的场景去学习的。</p><p>首先这个错误的意思就是xiulian()这个函数里是只能传入一个函数的，但是调用的是传入了两个函数。所以我们需要确保 xiulian 函数接收到的参数能够正确传递给 find_book 函数。调整过的代码如下：</p> <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">zhuangshiqi</span><span class="params">(func)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">xiulian</span><span class="params">(*args, **kwargs)</span>:</span></span><br><span class="line">        print(<span class="string">"开始！"</span>)</span><br><span class="line">        func(*args, **kwargs)</span><br><span class="line">        <span class="keyword">print</span> (<span class="string">"他终于修炼成功了"</span> + args[<span class="number">1</span>])</span><br><span class="line">    <span class="keyword">return</span> xiulian</span><br><span class="line"></span><br><span class="line"><span class="meta">@zhuangshiqi</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">find_book</span><span class="params">(name)</span>:</span></span><br><span class="line">    print(<span class="string">"经过努力"</span>, name, <span class="string">"得到了武功秘籍!"</span>)</span><br><span class="line"></span><br><span class="line">find_book(<span class="string">"杨过"</span>, <span class="string">"九阴真经"</span>)</span><br></pre></td></tr></table></figure><p>我们把func()这里加上<em>args, *</em>kwargs，确保这里是能吃进多个函数的。而且要知道，当使用 @zhuangshiqi 装饰 find_book 时，等价于：find_book = zhuangshiqi(find_book)，这意味着 <code>find_book</code> 现在指向 <code>xiulian</code> 函数，<code>xiulian</code> 函数其实是包裹了原始的 <code>find_book</code> 函数的。</p><p>find_book(“杨过”, “九阴真经”)，这个调用实际上是调用了 <code>xiulian(&quot;杨过&quot;, &quot;九阴真经&quot;)</code>，这里kwargs 是空的，传递的参数被 <code>*args</code> 捕获，所以<code>print (&quot;他终于修炼成功了&quot; + args[1])</code>这里就能顺利拿到“九阴真经”这个函数。</p><p>上面例子里用的是 <em>args, *args是位置参数是元组, *</em>kwargs 是关键字参数是字典。如果想改造用 **kwargs的话，代码应该改成如下：</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 装饰器</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">zhuangshiqi</span><span class="params">(func)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">xiulian</span><span class="params">(*args, **kwargs)</span>:</span></span><br><span class="line">        print(<span class="string">"开始！"</span>)</span><br><span class="line">        func(*args, **kwargs)</span><br><span class="line">        print(<span class="string">"修炼了"</span> + kwargs[<span class="string">'book'</span>])</span><br><span class="line">    <span class="keyword">return</span> xiulian</span><br><span class="line"></span><br><span class="line"><span class="meta">@zhuangshiqi</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">find_book</span><span class="params">(name, book)</span>:</span></span><br><span class="line">    print(<span class="string">"经过努力"</span>, name, <span class="string">"得到了武功秘籍!"</span>)</span><br><span class="line"></span><br><span class="line">find_book(name=<span class="string">"杨过"</span>, book=<span class="string">"九阴真经"</span>)</span><br></pre></td></tr></table></figure><p>这段代码的 args 是空的，kwargs 是 {‘name’: ‘杨过’, ‘book’: ‘九阴真经’}。</p><p>还要注意一点，装饰器函数装饰器应该返回一个新函数，而不是立即执行原函数。所以例子里zhuangshiqi下面必须要有xiulian这个函数，不能直接接func()。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 工作与技术 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> python </tag>
+            
+            <tag> 装饰器 </tag>
             
         </tags>
       
