@@ -32,7 +32,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://brucewayne2099.github.io/images/%E8%A3%85%E9%A5%B0%E5%99%A8.jpeg">
 <meta property="article:published_time" content="2024-01-03T03:41:41.000Z">
-<meta property="article:modified_time" content="2024-07-04T02:45:02.580Z">
+<meta property="article:modified_time" content="2024-07-04T02:56:35.774Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="python">
 <meta property="article:tag" content="装饰器">
@@ -228,7 +228,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2024-07-04 10:45:02" itemprop="dateModified" datetime="2024-07-04T10:45:02+08:00">2024-07-04</time>
+                <time title="修改时间：2024-07-04 10:56:35" itemprop="dateModified" datetime="2024-07-04T10:56:35+08:00">2024-07-04</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -293,7 +293,7 @@
 
 <p>这段代码的 args 是空的，kwargs 是 {‘name’: ‘杨过’, ‘book’: ‘九阴真经’}。 看上去kwargs的用法更加清晰。</p>
 <p>还要注意一点，装饰器函数装饰器应该返回一个新函数，而不是立即执行原函数。所以例子里zhuangshiqi下面必须要有xiulian这个函数，不能直接接func()。</p>
-<h2 id="被装饰器本身带有参数的情况"><a href="#被装饰器本身带有参数的情况" class="headerlink" title="被装饰器本身带有参数的情况"></a>被装饰器本身带有参数的情况</h2><p>装饰器本身也是可以带函数的，下面这个例子就比较明显：</p>
+<h2 id="装饰器本身带有参数的情况"><a href="#装饰器本身带有参数的情况" class="headerlink" title="装饰器本身带有参数的情况"></a>装饰器本身带有参数的情况</h2><p>装饰器本身也是可以带函数的，下面这个例子就比较明显：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">from</span> functools <span class="keyword">import</span> wraps</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">delay</span><span class="params">(seconds)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    装饰器，用于延迟函数的执行。</span></span><br><span class="line"><span class="string">    :param seconds: 延迟的秒数</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">decorator</span><span class="params">(func)</span>:</span></span><br><span class="line"><span class="meta">        @wraps(func)</span></span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">wrapped_function</span><span class="params">(*args, **kwargs)</span>:</span></span><br><span class="line">            print(<span class="string">f"等待 <span class="subst">&#123;seconds&#125;</span> 秒后执行 <span class="subst">&#123;func.__name__&#125;</span> 函数..."</span>)</span><br><span class="line">            time.sleep(seconds)</span><br><span class="line">            result = func(*args, **kwargs)</span><br><span class="line">            <span class="keyword">return</span> result</span><br><span class="line">        <span class="keyword">return</span> wrapped_function</span><br><span class="line">    <span class="keyword">return</span> decorator</span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用装饰器</span></span><br><span class="line"><span class="meta">@delay(3)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">greet</span><span class="params">(name)</span>:</span></span><br><span class="line">    print(<span class="string">f"Hello, <span class="subst">&#123;name&#125;</span>!"</span>)</span><br><span class="line"></span><br><span class="line"><span class="meta">@delay(2)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">add</span><span class="params">(a, b)</span>:</span></span><br><span class="line">    result = a + b</span><br><span class="line">    print(<span class="string">f"结果是: <span class="subst">&#123;result&#125;</span>"</span>)</span><br><span class="line">    <span class="keyword">return</span> result</span><br><span class="line"></span><br><span class="line"><span class="comment"># 调用被装饰的函数</span></span><br><span class="line">greet(<span class="string">"Alice"</span>)</span><br><span class="line">add(<span class="number">5</span>, <span class="number">3</span>)</span><br></pre></td></tr></table></figure>
 
 <p>上面这个例子里，delay(seconds)这是一个装饰器函数，他返回的是一个真正的装饰器 decorator。而装饰器decorator，它接收一个函数 func 作为参数。</p>
@@ -435,7 +435,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#被装饰的函数带有参数的情况"><span class="nav-number">1.</span> <span class="nav-text">被装饰的函数带有参数的情况</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#被装饰器本身带有参数的情况"><span class="nav-number">2.</span> <span class="nav-text">被装饰器本身带有参数的情况</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#被装饰的函数带有参数的情况"><span class="nav-number">1.</span> <span class="nav-text">被装饰的函数带有参数的情况</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#装饰器本身带有参数的情况"><span class="nav-number">2.</span> <span class="nav-text">装饰器本身带有参数的情况</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
