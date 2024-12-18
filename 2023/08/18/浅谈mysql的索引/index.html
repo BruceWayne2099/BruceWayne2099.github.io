@@ -35,7 +35,7 @@
 <meta property="og:image" content="https://brucewayne2099.github.io/images/%E7%B4%A2%E5%BC%953.png">
 <meta property="og:image" content="https://brucewayne2099.github.io/images/%E7%B4%A2%E5%BC%952.png">
 <meta property="article:published_time" content="2023-08-18T15:03:28.000Z">
-<meta property="article:modified_time" content="2024-12-18T03:45:37.883Z">
+<meta property="article:modified_time" content="2024-12-18T04:13:02.485Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="mysql">
 <meta property="article:tag" content="数据库">
@@ -232,7 +232,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2024-12-18 11:45:37" itemprop="dateModified" datetime="2024-12-18T11:45:37+08:00">2024-12-18</time>
+                <time title="修改时间：2024-12-18 12:13:02" itemprop="dateModified" datetime="2024-12-18T12:13:02+08:00">2024-12-18</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -290,8 +290,8 @@
 <h2 id="如何使用explain"><a href="#如何使用explain" class="headerlink" title="如何使用explain"></a>如何使用explain</h2><p>当我们分析为啥一个sql这么慢，我们肯定要用到<code>explain</code>命令，我们需要重点关注：</p>
 <ol>
 <li>id列：当 id 相同时，执行顺序由上向下；当 id 不同时，id 值越大，优先级越高，越先执行。</li>
-<li>type列：如果出现<code>ALL</code> <code>INDEX</code> 需要重点关注，表示的是该表在执行计划中是全表扫描或者全索引扫描，性能分别是倒数第一和倒数第二</li>
-<li>rows列：表示的是通过索引过滤后有多少记录。一般来说，执行计划中这个列如果出现比较大的，就需要注意。如果出现扫描行数大于1000，但是只返回2条，那说明索引、SQL等存在优化的空间</li>
+<li>type列：如果出现<code>ALL</code> <code>INDEX</code> 需要重点关注，表示的是该表在执行计划中是全表扫描或者全索引扫描，性能分别是倒数第一和倒数第二。</li>
+<li>rows列：表示的是通过索引过滤后有多少记录。一般来说，执行计划中这个列如果出现比较大的，就需要注意。如果出现扫描行数大于1000，但是只返回2条，那说明索引、SQL等存在优化的空间。</li>
 <li>extra列：如果出现了<code>Using filesort</code>或者<code>Using temporary</code>，说明MySQL没有办法利用索引本身的有序性进行排序。此时，需要关注前面的rows是否有超过2000行以上。如果超过，排序成本会变高。</li>
 <li>filtered列：表示的是返回行数和通过索引扫描的行数比值，最大值100，表示不需要回表过滤。filter 越小，说明索引优化的空间越大。</li>
 </ol>
