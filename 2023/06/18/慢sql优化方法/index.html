@@ -31,7 +31,7 @@
 <meta property="og:description" content="面试的时候你不得好好看看这玩意么？">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2023-06-18T15:03:28.000Z">
-<meta property="article:modified_time" content="2024-12-12T15:10:43.330Z">
+<meta property="article:modified_time" content="2024-12-23T09:55:58.793Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="mysql">
 <meta property="article:tag" content="数据库">
@@ -227,7 +227,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2024-12-12 23:10:43" itemprop="dateModified" datetime="2024-12-12T23:10:43+08:00">2024-12-12</time>
+                <time title="修改时间：2024-12-23 17:55:58" itemprop="dateModified" datetime="2024-12-23T17:55:58+08:00">2024-12-23</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -253,7 +253,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>1.7k</span>
+              <span>2.2k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -300,6 +300,12 @@
 <li>唯一键是最好的索引。</li>
 <li>尽量不要用null，因为null的优化很复杂，也会让索引统计变得复杂。而且null占用的空间更多，尽量用0，’’这样的东西。</li>
 <li>不要让索引参与计算。比如 select id from XXX where id+1=5;这句话不会让mysql先算出来id=4，反而会把索引的值都取出来一个一个比对，直到=5，这样会导致全表扫和全索引扫。</li>
+<li>索引是不是越多越好？不是的。很多开发在创建索引时想法很简单，就是希望动态生成SQL时，无论传什么where条件，都可以走到一个对应的索引，创建了一大片索引。但很明显这是一个反面教材，把数据库当成了搜索引擎，这样建索引对数据库来说，基本是个事故现场。原因是：<ol>
+<li>因为“当执行DML语句时，除了维护正常的表数据之外，还需要同步更新索引列的数据，索引越多，写放大效应越厉害”。</li>
+<li>索引为了维护其有序性，更新是删除旧值再在对应顺序位置插入新值，如果新插入位置所在的数据块已经写满，那就需要把当前数据块部份内容移动一个新的数据块，再修改前后叶子块甚至是分枝块的链式指针，然后再写入数据，这就是我们前面说的块分裂，块分裂非常影响数据库性能，那么索引越多，也会加大了块分裂的可能性。</li>
+<li>MySQL优化器相对其他商业数据库还外于一个很初级的阶段，它每次执行SQL时都会重新生成执行计划，而在生成执行计划时，如果有多个索引可被使用时，这些索引会进入possible_key，然后优化器会对每一个possible_key进行采样并计算数据分布情况，进而最终确认使用哪个真实的索引（key）去执行SQL。</li>
+</ol>
+</li>
 </ol>
 
     </div>
@@ -508,7 +514,7 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">981k</span>
+    <span title="站点总字数">982k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
