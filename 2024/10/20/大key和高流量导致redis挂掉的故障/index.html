@@ -38,7 +38,7 @@
 <meta property="og:image" content="https://brucewayne2099.github.io/images/redis%E9%97%AE%E9%A2%98-6.png">
 <meta property="og:image" content="https://brucewayne2099.github.io/images/redis%E9%97%AE%E9%A2%98-7.png">
 <meta property="article:published_time" content="2024-10-20T09:03:52.000Z">
-<meta property="article:modified_time" content="2025-02-24T07:13:59.556Z">
+<meta property="article:modified_time" content="2025-02-24T07:26:59.985Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="redis">
 <meta property="article:tag" content="SRE">
@@ -235,7 +235,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2025-02-24 15:13:59" itemprop="dateModified" datetime="2025-02-24T15:13:59+08:00">2025-02-24</time>
+                <time title="修改时间：2025-02-24 15:26:59" itemprop="dateModified" datetime="2025-02-24T15:26:59+08:00">2025-02-24</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -286,15 +286,13 @@
 <p>（2）从而引发redis的内存使用率，在5min之内从0%-&gt;100%<br><img src="/images/redis%E9%97%AE%E9%A2%98-4.png" alt="" title="redis的内存使用率达到了100%"></p>
 <p>（3）最终全面GET SET timeout崩溃（11点22分02秒）<br><img src="/images/redis%E9%97%AE%E9%A2%98-3.png" alt="" title="从日志看，redis基本不可用了"><br><img src="/images/redis%E9%97%AE%E9%A2%98-5.png" alt="" title="从日志看，redis基本不可用了"></p>
 <p>（4）最终导致页面返回timeout，故障发生。</p>
-<h2 id="排查思路"><a href="#排查思路" class="headerlink" title="排查思路"></a>排查思路</h2><p>内存使用率100% 就等同于redis不可用吗？<br>解答：正常使用情况下，不是<br>redis有【缓存淘汰机制】<br>Redis 在内存使用率达到 100% 时不会直接崩溃。相反，它依赖内存淘汰策略来释放内存，确保系统的稳定性。</p>
-<p>这个配置在哪里？<br><img src="/images/redis%E9%97%AE%E9%A2%98-6.png" alt="" title="因此大概率默认的是：volatile-lru"><br>大部分同学都是不会主动去调整这里的参数的。</p>
-<p>你根据实际需求配置适当的内存淘汰策略，以便在内存达到上限时，系统能够稳定地处理新请求，而不会出现写操作失败的情况（只要不是noeviction）。<br>也就是说，照理SET GET都应该没啥问题才对（先不考虑其他复杂命令）</p>
-<p>尽管 Redis 本身不会轻易崩溃，但如果内存耗尽且没有淘汰策略或者淘汰策略未能生效，Redis 可能拒绝新的写操作，并返回错误：<code>OOM command not allowed when used memory &gt; &#39;maxmemory&#39;</code></p>
-<p>如果系统的配置或者操作系统的内存管理不当，可能会导致 Redis 进程被操作系统杀死。</p>
-<p>但是事故现象就是：内存使用率100% 时，redis不可用，怎么解释？<br>猜测1：会是淘汰不及时导致的性能瓶颈吗？<br>也就是说 写入的速度&gt;&gt;淘汰的速度</p>
-<p>解答：如果是正常的业务写入，不可能！</p>
-<p>redis纯内存，淘汰速度是非常快的</p>
-<p>这个业务特性，也并非高频写入<br>这个redis实例其实里面存储的KEY很少，最终占了整个实例的内存使用率&lt;5%</p>
+<h2 id="排查思路"><a href="#排查思路" class="headerlink" title="排查思路"></a>排查思路</h2><p>内存使用率100% 就等同于redis不可用吗？<br>解答：正常使用情况下，不是。因为redis有【缓存淘汰机制】。Redis 在内存使用率达到 100% 时不会直接崩溃。相反，它依赖内存淘汰策略来释放内存，确保系统的稳定性。</p>
+<p>这个配置在哪里呢？<br><img src="/images/redis%E9%97%AE%E9%A2%98-6.png" alt="" title="这里默认的是：volatile-lru"><br>大部分开发都是不会主动去调整这里的参数的。</p>
+<p>你根据实际需求配置适当的内存淘汰策略，以便在内存达到上限时，系统能够稳定地处理新请求，而不会出现写操作失败的情况（只要不是noeviction）。也就是说，照理SET GET都应该没啥问题才对（先不考虑其他复杂命令）</p>
+<p>尽管 Redis 本身不会轻易崩溃，但如果内存耗尽且没有淘汰策略或者淘汰策略未能生效，Redis 可能拒绝新的写操作，并返回错误：<code>OOM command not allowed when used memory &gt; &#39;maxmemory&#39;</code>。如果系统的配置或者操作系统的内存管理不当，可能会导致 Redis 进程被操作系统杀死。</p>
+<p>但是事故现象就是：内存使用率100% 时，redis不可用，怎么解释？</p>
+<p>【猜测1】会是淘汰不及时导致的性能瓶颈吗？也就是说 写入的速度&gt;&gt;淘汰的速度</p>
+<p>解答：如果是正常的业务写入，不可能！因为redis纯内存，淘汰速度是非常快的。这个业务特性，也并非高频写入。这个redis实例其实里面存储的KEY很少，最终占了整个实例的内存使用率&lt;5%。</p>
 <p>不太符合正常使用下KEY不断增多，最终挤爆内存使用率的问题</p>
 <p>因此，初步结论：Redis 的崩溃一般不会是由于单纯写入速度超过淘汰速度引起的，尤其是使用了合理的内存淘汰策略时；如果写入速度非常高，而淘汰策略无法及时清除旧数据，Redis 可能会非常频繁地进行键的查找和淘汰操作，从而导致性能下降。</p>
 <p>到底是什么导致了内存使用率激增那？？<br><img src="/images/redis%E9%97%AE%E9%A2%98-7.png" alt="" title="时间分布情况"><br>因此查阅了资料，发现最为贴近的答案</p>
