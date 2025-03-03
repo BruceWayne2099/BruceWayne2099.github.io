@@ -38,7 +38,7 @@
 <meta property="og:image" content="https://brucewayne2099.github.io/images/%E6%85%A2sql5.png">
 <meta property="og:image" content="https://brucewayne2099.github.io/images/%E6%85%A2sql1.png">
 <meta property="article:published_time" content="2024-12-21T02:19:03.000Z">
-<meta property="article:modified_time" content="2025-03-03T02:29:17.973Z">
+<meta property="article:modified_time" content="2025-03-03T02:33:08.803Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="redis">
 <meta property="article:tag" content="SRE">
@@ -235,7 +235,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2025-03-03 10:29:17" itemprop="dateModified" datetime="2025-03-03T10:29:17+08:00">2025-03-03</time>
+                <time title="修改时间：2025-03-03 10:33:08" itemprop="dateModified" datetime="2025-03-03T10:33:08+08:00">2025-03-03</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -310,19 +310,20 @@
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">统计信息里面的表行数/<span class="built_in">where</span>语句索引的扫描行数 * <span class="built_in">limit</span>的值A = 扫描行数</span><br></pre></td></tr></table></figure>
 <p>根据这个公式：原理就是<code>统计信息里面的表行数/where语句索引的扫描行数</code> 就是mysql认为平均扫描一条数据的成本，再乘A就是A条数据的扫描成本。</p>
 <p>首先获得统计信息里面的表行数：<code>2564001</code><br><img src="/images/%E6%85%A2sql5.png" alt="" title="这个表有250多万记录"></p>
-<p>刚刚上面得到name索引的扫描行数：16810，而limit值为15，则计算得到：<code>2564001/16810*15 = 2287.9</code>。<br><img src="/images/%E6%85%A2sql1.png" alt="" title="这里关注row这一列"><br>这个值是远小于name索引的行，所以会走<code>create_at</code>索引。</p>
+<p>刚刚上面得到name索引的扫描行数：16810，而limit值为15，则计算得到：<code>2564001/16810*15 = 2287.9</code>。<br><img src="/images/%E6%85%A2sql1.png" alt="" title="这里关注row这一列"></p>
+<p>这个值是远小于name索引的行，所以会走<code>create_at</code>索引。</p>
 <p>但是为啥会慢呢？？？</p>
 <p>原因就是因为前提说的，<code>restaurant_unit_type</code>是分布极其不均匀的。2是叶子节点为绑定的门店，都是先有叶子节点再有门店，所以叶子节点的<code>create_at</code>普遍较大，又是逆序遍历，所以基本上遍历到后面，甚至全表后才找到足够的数据。这也是为啥<code>restaurant_unit_type</code>去掉后能够较快返回的原因。</p>
 <p>说了这么一大堆，咋解决呢？</p>
 <p>其实问题分析下来，根本原因就是因为优化器错误的选择了<code>order by</code>后的索引嘛，那就不让他选嘛，所以就有如下的解决方案:</p>
 <p>● 直接强force index 指定要走的索引  -》这个太粗暴了<br>● limit值扩大到上面的计算结果远大于where语句后的扫描 -》 开发阶段难以评估，且limit值大多数业务固定<br>● 不让order by 后面有索引。 –比较合理（实测有效）<br>    ○    order by create DESC/Asc —》order by create DESC/ASC， id asc/desc<br>    ○    order by id  -》 order by id + 0</p>
-<h2 id="另外一个参考文章"><a href="#另外一个参考文章" class="headerlink" title="另外一个参考文章"></a>另外一个参考文章</h2><p><code>order by limit</code>易走错索引，发生在<code>5.6/5.7/XDB</code>，这个是MYSQL的优化器不严谨的地方，原因如下:</p>
+<h2 id="另外一个参考文章"><a href="#另外一个参考文章" class="headerlink" title="另外一个参考文章"></a>另外一个参考文章</h2><p><code>order by limit</code>易走错索引，发生在<code>5.6/5.7/XDB</code>版本，这个是MYSQL设计时优化器不严谨的地方，原因如下:</p>
 <ol>
-<li><p>首先sql执行计划会把sql分成2部分，<code>select ...from...where...</code>作为第一部分，<code>order by...limit...</code>作为第二部分。先对s<code>elect ...from...where...</code>做分析，得出最佳路径<code>best_access_path</code>的索引<code>best_index</code>、扫描量<code>row_estimate_first</code>、pk的选择度<code>Cardinality_pk</code>。</p>
+<li><p>首先sql执行计划会把sql分成2部分，<code>select ...from...where...</code>作为第一部分，<code>order by...limit...</code>作为第二部分。先对<code>select ...from...where...</code>做分析，得出最佳路径<code>best_access_path</code>的索引<code>best_index</code>、扫描量<code>row_estimate_first</code>、pk的选择度<code>Cardinality_pk</code>。</p>
 </li>
 <li><p>当sql有<code>order by limit</code>，同时<code>limit的值&lt; best_access_path的row_estimate</code>，同时<code>order by</code>字段有单列索引或在联合索引最左列，触发执行计划<code>recheck(&quot;recheck_reason&quot;: &quot;low_limit&quot;)</code>。</p>
 </li>
-<li><p>recheck后有可能选择order by字段的索引，如果选择了order by索引，同时数据分布不均匀或者实际符合条件的记录条数（即返回行数）小于limit值的话，那么就需要通过索引扫描所有的行回表，访问效率将比全表扫描还慢几倍</p>
+<li><p><code>recheck</code>后有可能选择<code>order by</code>字段的索引，如果选择了<code>order by</code>索引，同时数据分布不均匀或者实际符合条件的记录条数（即返回行数）小于limit值的话，那么就需要通过索引扫描所有的行回表，访问效率将比全表扫描还慢几倍。</p>
 </li>
 </ol>
 <p>order by触发recheck具体算法如下：</p>
@@ -337,7 +338,7 @@
 <li>通过<code>show index from table_name</code>获取pk的选择度，这里记为Cardinality_d</li>
 <li>如果<code>Cardinality_d/row_estimate_c*limit_b&lt;row_estimate_c</code>,即<code>Cardinality_d*limit_b&lt;row_estimate_c*row_estimate_c</code>就会触发走错索引。这里可以看出如果<code>best_access_path</code>索引访问的某个列值记录越多，即数据越不均匀，越容易触发走错索引。</li>
 </ol>
-<p>更快捷方式：因为value_a约等于row_estimate_c（有误差，一般2 * value_a &gt;= row_estimate_c），方程式可以转换为  表记录数 * limit值 &lt; value_a * value_a，即只要知道表记录数，记录最多的列值，limit值，即可计算是否会走错索引（考虑误差和数据增长，建议当表记录数 * limit值 &lt; 4 * value_a * value_a即可认为会可能走错索引）</p>
+<p>更快捷方式：因为value_a约等于row_estimate_c（有误差，一般2 * value_a &gt;= row_estimate_c），方程式可以转换为：表记录数 * limit值 &lt; value_a * value_a，即只要知道表记录数，记录最多的列值，limit值，即可计算是否会走错索引（考虑误差和数据增长，建议当表记录数 * limit值 &lt; 4 * value_a * value_a即可认为会可能走错索引）。</p>
 
     </div>
 
