@@ -31,7 +31,7 @@
 <meta property="og:description" content="监控大盘要解决的问题是“出问题了吗”，“哪里出了问题”，“出了什么问题”">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2024-02-26T10:00:57.000Z">
-<meta property="article:modified_time" content="2025-03-05T09:04:06.080Z">
+<meta property="article:modified_time" content="2025-03-05T09:04:24.408Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="监控">
 <meta property="article:tag" content="SRE">
@@ -226,7 +226,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2025-03-05 17:04:06" itemprop="dateModified" datetime="2025-03-05T17:04:06+08:00">2025-03-05</time>
+                <time title="修改时间：2025-03-05 17:04:24" itemprop="dateModified" datetime="2025-03-05T17:04:24+08:00">2025-03-05</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -284,7 +284,7 @@
 <h4 id="2-3-特色指标"><a href="#2-3-特色指标" class="headerlink" title="2.3 特色指标"></a>2.3 特色指标</h4><p>除了上述常见的指标，能够反应业务流量的压力与负载，以及能够帮助排查问题的指标也可以纳入进大盘。这里举几个例子：<br>● buy2下单大盘的拆单比：用户提交订单时的平均主订单数，值越高意味着合并下单越多，系统处理单个请求的负载越高。<br>● taodetail详情大盘：平均SKU数量，值越高意味着库存、供应链系统的计算压力越大。</p>
 <h2 id="维度的设计"><a href="#维度的设计" class="headerlink" title="维度的设计"></a>维度的设计</h2><h4 id="最常见的维度-单元-机房"><a href="#最常见的维度-单元-机房" class="headerlink" title="最常见的维度 - 单元/机房"></a>最常见的维度 - 单元/机房</h4><p><code>单元*机房</code>是最常见的维度，章节2.1里提到的3种核心指标都应设置按这个维度区分的监控项。<br>● 当个别<code>单元*机房</code>出现异常时，这类监控可以迅速帮助定位到是哪个<code>单元*机房</code>出现了问题。<br>● 每个<code>单元*机房</code>都存在许多差异性，最典型地是会对性能产生影响。通过区分<code>单元*机房</code>查看RT等指标，可以了解和印证同一套系统在不同<code>单元*机房</code>所表现出的差异性。<br>● 不要单独使用单元、机房作为维度，因为同一个单元会有多个机房，同一个机房也可能有多个机房，需要按最小颗粒度做区分。</p>
 <h4 id="其他维度"><a href="#其他维度" class="headerlink" title="其他维度"></a>其他维度</h4><p>其他维度通常带有很强的业务特性或时效性，让这个监控项最有效、最便捷地帮助到SRE、研发是第一优先的原则。<br>● 业务特性：例如业务身份、业务类型来细分某个流量指标。<br>● 时效性：例如接口版本，通常用在系统切流阶段。</p>
-<h2 id="监控项布局"><a href="#监控项布局" class="headerlink" title="监控项布局"></a>监控项布局</h2><p>● 最核心的指标放首屏<br>● 从前至后<br>  ○ 用户动线、产品链路时序从前到后。比如buy2大盘里确认订单 -&gt; 提交订单，逆向交易大盘里路由 -&gt; 详情 -&gt; 渲染 -&gt; 提交 -&gt; 同意，等等。方便查看是从哪个环节开始出现问题的。<br>● 从上至下<br>  ○ 技术链路，因果关系从上至下。流量 -&gt; 成功率/RT -&gt; 限流 -&gt; 错误码。这体现了排查问题的典型思路，比如成功量跌了，是总流量就跌了还是成功率跌了，成功率跌了是因为自身负载高了（RT飙升），还是限流或是某类错误？<br>● 从粗至精<br>  ○ 按维度做细分，先看指标的总量，再看某个维度每个分类的量。最典型的就是按单元<em>机房来查看，排查问题时一个典型的思路就是看总量跌的时候，是所有单元</em>机房一起跌，还是个别机房在跌。其他维度也可以起到一样的作用。</p>
+<h2 id="监控项布局"><a href="#监控项布局" class="headerlink" title="监控项布局"></a>监控项布局</h2><p>● 最核心的指标放首屏<br>● 从前至后<br>  ○ 用户动线、产品链路时序从前到后。比如buy2大盘里确认订单 -&gt; 提交订单，逆向交易大盘里路由 -&gt; 详情 -&gt; 渲染 -&gt; 提交 -&gt; 同意，等等。方便查看是从哪个环节开始出现问题的。<br>● 从上至下<br>  ○ 技术链路，因果关系从上至下。流量 -&gt; 成功率/RT -&gt; 限流 -&gt; 错误码。这体现了排查问题的典型思路，比如成功量跌了，是总流量就跌了还是成功率跌了，成功率跌了是因为自身负载高了（RT飙升），还是限流或是某类错误？<br>● 从粗至精<br>  ○ 按维度做细分，先看指标的总量，再看某个维度每个分类的量。最典型的就是按单元<em>机房来查看，排查问题时一个典型的思路就是看总量跌的时候，是所有`单元</em>机房`一起跌，还是个别机房在跌。其他维度也可以起到一样的作用。</p>
 
     </div>
 
