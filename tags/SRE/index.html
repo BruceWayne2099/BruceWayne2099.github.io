@@ -297,7 +297,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">388</span>
+          <span class="site-state-item-count">389</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -352,12 +352,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">996k</span>
+    <span title="站点总字数">997k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">15:05</span>
+    <span title="站点阅读时长">15:06</span>
 </div>
 
 <div>
@@ -556,6 +556,28 @@ setInterval("createtime()",250);
 </html>
 <!--崩溃欺骗-->
 <script type="text/javascript" src="/js/crash_cheat.js"></script>
+get.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    let { app_id, app_key, server_url } = {"enable":true,"app_id":"YwCmnGyEX7a7KI3mRI4XK4Mq-gzGzoHsz","app_key":"kgqGgAPqi8cB6vTBYU05Xbx0","server_url":null,"security":false};
+    function fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
         if (CONFIG.hostname !== location.hostname) return;
         addCount(Counter);
       } else if (document.querySelectorAll('.post-title-link').length >= 1) {
