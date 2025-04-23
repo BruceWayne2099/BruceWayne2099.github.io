@@ -35,7 +35,7 @@
       <link href="/2025/03/10/%E5%BD%93%E6%88%91%E4%BB%AC%E6%88%90%E5%8A%9F%E7%9A%84%E6%8A%8A%E4%B8%80%E4%B8%AA%E4%B8%9A%E5%8A%A1%E5%81%9A%E4%B8%8B%E7%BA%BF%E4%BA%86/"/>
       <url>/2025/03/10/%E5%BD%93%E6%88%91%E4%BB%AC%E6%88%90%E5%8A%9F%E7%9A%84%E6%8A%8A%E4%B8%80%E4%B8%AA%E4%B8%9A%E5%8A%A1%E5%81%9A%E4%B8%8B%E7%BA%BF%E4%BA%86/</url>
       
-        <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><h2 id="背景和要求"><a href="#背景和要求" class="headerlink" title="背景和要求"></a>背景和要求</h2><p>公司有一个业务计划下线，业务方已在12月就通知商家不再进行续签，并评估将于25年1月陆续下架平台内商品：1月23日商家商品全部下架，2月5日自营商品全部下架，3月31日完成了商家清退，3月31日同时下架app。然后要求在5月份左右实现相关的系统、资源也会全部下线。</p><p>跟法务、财务还有业务开了一个会，听下来，目标很简单：</p><ol><li>要求技术侧配合业务完成商品下架、商家清退、资金盘点提现等，保证业务平稳下线。</li><li>平稳下线这个业务相关的全部系统、资源，同时留存合规&amp;客服需要的离线数据。</li></ol><h2 id="具体安排"><a href="#具体安排" class="headerlink" title="具体安排"></a>具体安排</h2><ol><li>先根据业务的时间轴，制定出技术的时间轴。</li><li>然后对该业务的下线资源进行盘点，盘点的范围包括“应用、ecs、rds数据库、polardb、elk、redis、habase_lindorm、oss、sls、mq、cdn”等等。</li><li>应用的盘点无疑是比较麻烦的一个，要根据整个业务的功能进行梳理：<br><img src="/images/%E7%94%B5%E5%95%86%E4%B8%9A%E5%8A%A1.png" alt="" title="做一个电商的平台是多么的复杂"></li><li>应用和资源都梳理完毕之后，就向资源和应用的owner宣布整个下线的事宜和时间上的安排。</li><li>先动手的是一些实时的对账脚本，因为目前平台已经几乎停止交易了，只剩下几个交了钱但是还在履约的场景。所以这部分脚本停止了之后影响最小。</li><li>一些业务数据大屏可以第二步安排下线。</li><li>各方挂出公告，一周后开始动手。</li><li>观察入口应用的流量情况，如果没有业务流量了，就开始下掉一些入口的应用，确保入口的流量（比如CDN、前端页面）先停掉。如果有流量就分析一下流量来源，逐步分批次下线容器数。这里重点看一下cdn域名关联写死了vip的情况。</li><li>检查业务工单是否已经停止增长，</li><li>不挂在应用下的资源，需要针对每种资源做下线方案，待应用下线后，再下线相关资源。</li></ol>]]></content>
+        <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><h2 id="背景和要求"><a href="#背景和要求" class="headerlink" title="背景和要求"></a>背景和要求</h2><p>公司有一个业务计划下线，业务方已在12月就通知商家不再进行续签，并评估将于25年1月陆续下架平台内商品：1月23日商家商品全部下架，2月5日自营商品全部下架，3月31日完成了商家清退，3月31日同时下架app。然后要求在5月份左右实现相关的系统、资源也会全部下线。</p><p>跟法务、财务还有业务开了一个会，听下来，目标很简单：</p><ol><li>要求技术侧配合业务完成商品下架、商家清退、资金盘点提现等，保证业务平稳下线。</li><li>平稳下线这个业务相关的全部系统、资源，同时留存合规&amp;客服需要的离线数据。</li></ol><h2 id="具体安排"><a href="#具体安排" class="headerlink" title="具体安排"></a>具体安排</h2><ol><li><p>先根据业务的时间轴，制定出技术的时间轴。</p></li><li><p>然后对该业务的下线资源进行盘点，盘点的范围包括“应用、ecs、rds数据库、polardb、elk、redis、habase_lindorm、oss、sls、mq、cdn”等等。</p></li><li><p>应用的盘点无疑是比较麻烦的一个，要根据整个业务的功能进行梳理：<br><img src="/images/%E7%94%B5%E5%95%86%E4%B8%9A%E5%8A%A1.png" alt="" title="做一个电商的平台是多么的复杂"></p></li><li><p>应用和资源都梳理完毕之后，就向资源和应用的owner宣布整个下线的事宜和时间上的安排。</p></li><li><p>先动手的是一些实时的对账脚本，因为目前平台已经几乎停止交易了，只剩下几个交了钱但是还在履约的场景。所以这部分脚本停止了之后影响最小。</p></li><li><p>一些业务数据大屏可以第二步安排下线。</p></li><li><p>各方挂出公告，一周后开始动手。</p></li><li><p>检查业务工单是否已经停止增长。</p></li><li><p>观察入口应用的流量情况，如果没有业务流量了，就开始下掉一些入口的应用，确保入口的流量（比如CDN、前端页面）先停掉。如果有流量就分析一下流量来源，逐步分批次下线容器数。这里重点看一下cdn域名关联写死了vip的情况。</p></li><li><p>不挂在应用下的资源，需要针对每种资源做下线方案，待应用下线后，再下线相关资源。</p></li></ol>]]></content>
       
       
       <categories>
@@ -865,6 +865,35 @@
             <tag> AI </tag>
             
             <tag> 人工智能 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>一次秒杀导致的故障</title>
+      <link href="/2023/04/14/%E4%B8%80%E6%AC%A1%E7%A7%92%E6%9D%80%E5%AF%BC%E8%87%B4%E7%9A%84%E6%95%85%E9%9A%9C/"/>
+      <url>/2023/04/14/%E4%B8%80%E6%AC%A1%E7%A7%92%E6%9D%80%E5%AF%BC%E8%87%B4%E7%9A%84%E6%95%85%E9%9A%9C/</url>
+      
+        <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><p>早上9点有一个秒杀活动，没多久就开始有舆情反馈“用户页面显示中奖但是无法购买”。后来10点秒杀活动结束，整个故障就被动关闭了。</p><p><img src="/images/%E5%B0%8F%E9%BB%91%E7%9B%921.png" alt="" title="这是后来找了一个活动"></p><p><img src="/images/%E5%B0%8F%E9%BB%91%E7%9B%922.png" alt="" title="当时的舆情反馈"></p><p>整体开奖流程如下：<br><img src="/images/%E5%B0%8F%E9%BB%91%E7%9B%923.webp" alt="" title="整体开奖流程"></p><p>开奖时，大量用户进入开奖页（开奖页会展示实时剩余奖品百分比），当时查询奖品剩余百分比接口的QPM约30W。由于用户中签后会清空奖品剩余的缓存，导致请求打到DB上，出现慢SQL，造成数据库被打满（图），数据库被打满后，中奖凭证保存成功，但是部分中签用户更新奖品状态时失败，前台表达是否中奖是依赖凭证内的是否字段，所以出现了中奖，但是无法下单的情况。</p><p>故障原因很简单，但是带来的后续思考很多：</p><ol><li>查询抽签商品库存数接口限流设置较高，导致没有限制住“查询奖品库存缓存失效导致直接打满db”。这里要重新对接口进行压测，确定限流量规则。</li><li>该场景还有其他乱七八糟的业务玩法，要求对其他线上玩法进行全面review避免同样问题。</li><li>缺少直接监控：缺少直接反映预占奖品和确认兑换奖品数据不一致监控导致问题排查和定位长</li><li>日常运维工具缺失：排查问题只能靠开发人为db操作进行，缺少产品化的能力，容易让排查周期长和排查失误的问题</li></ol>]]></content>
+      
+      
+      <categories>
+          
+          <category> 工作与技术 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> SRE </tag>
+            
+            <tag> 数据库 </tag>
+            
+            <tag> 秒杀 </tag>
             
         </tags>
       
