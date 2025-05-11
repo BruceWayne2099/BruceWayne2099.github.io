@@ -31,8 +31,9 @@
 <meta property="og:description" content="系统层面的止血越快，业务侧的止血就越省事">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://brucewayne2099.github.io/images/adb-1.png">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/adb-2.png">
 <meta property="article:published_time" content="2025-05-11T15:26:36.000Z">
-<meta property="article:modified_time" content="2025-05-11T16:25:24.259Z">
+<meta property="article:modified_time" content="2025-05-11T16:27:03.930Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="k8s">
 <meta property="article:tag" content="数据库">
@@ -229,7 +230,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2025-05-12 00:25:24" itemprop="dateModified" datetime="2025-05-12T00:25:24+08:00">2025-05-12</time>
+                <time title="修改时间：2025-05-12 00:27:03" itemprop="dateModified" datetime="2025-05-12T00:27:03+08:00">2025-05-12</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -278,10 +279,10 @@
         <h2 id="一、故障背景"><a href="#一、故障背景" class="headerlink" title="一、故障背景"></a>一、故障背景</h2><p>在描述背景前，先补充点基础知识，理解下<code>ADB PG</code>的定位和架构：<br>ADB PG的定位：<br><img src="/images/adb-1.png" alt="" title="这事阿里云官网数据库产品家族介绍"></p>
 <p>这里说一下，<code>ADB PG</code>全称是<code>AnalyticDB PostgreSQL</code>，基于开源项目<code>Greenplum</code>构建，由阿里云深度扩展。”Analytic” 是一个形容词，主要用于描述与分析（Analysis）相关的特性或方法。</p>
 <p>参考资料来源：<br><a href="https://www.aliyun.com/product/outline/index?spm=5176.28508143.0.0.e939154aeSDRwA&amp;scm=20140722.X_model-category-instance-9e6c8b1b87e83616c97a._.V_1" target="_blank" rel="noopener">https://www.aliyun.com/product/outline/index?spm=5176.28508143.0.0.e939154aeSDRwA&amp;scm=20140722.X_model-category-instance-9e6c8b1b87e83616c97a._.V_1</a></p>
-<p>故障背景：<br>1、dbstack作为阿里云数据库产品族的快速输出方案已经在多个局点部署。<br>2、某局点修复dbstack底座<code>kubelet</code>组件安全漏洞会重启<code>kubelet</code>，因为未知原因（日志被滚动清理了，复盘后提供了排查方向，但无法100%确定），导致部分节点上的pod被重建。<br>3、重建后的pod挂载了宿主机上容器自身的<code>cgroup</code>文件系统，未重建的pod挂载的是宿主机自身的<code>cgroup</code>文件系统，挂载行为发生变化。<br>4、重建后的pod的<code>cgroup</code>关于<code>cpuset.cpus</code>的设置值超过了20个字符，触发ADB PG的已知缺陷。<br>5、ADB PG集群状态异常，使用psql命令行数据库连接工具去连接数据库卡住。<br>6、基础知识：<br>    a.默认情况下Pod 默认不会直接挂载宿主机上的 cgroup 文件系统，因为这样做可能会带来安全风险。如果非要挂载可以用<code>privileged: true</code>（很危险不推荐），或者<code>卷挂载</code>的方式（只需要挂载特定的目录，推荐）。<br>    b.Kubelet 是 Kubernetes 集群中的一个重要组件，负责在一个节点上运行 Pod 容器。它是集群中最底层的代理，与 Kubernetes API Server 通信，并确保容器按预期运行。Kubelet 负责监控和维护节点上的 Pod 状态，确保它们处于期望的状态。</p>
-<h2 id="二、故障排查过程"><a href="#二、故障排查过程" class="headerlink" title="二、故障排查过程"></a>二、故障排查过程</h2><p>1、夜里10点，变更开始后1小时。值班长接到应急，开始调度产研一起排查。<br>一开始并不能明确是什么原因导致的集群异常，所以登陆到Master节点，尝试使用psql连接集群，看看有哪些计算组进程down，但是psql卡住了。</p>
+<p>故障背景：<br>1、dbstack作为阿里云数据库产品族的快速输出方案已经在多个局点部署。<br>2、某局点修复dbstack底座<code>kubelet</code>组件安全漏洞会重启<code>kubelet</code>，因为未知原因（日志被滚动清理了，复盘后提供了排查方向，但无法100%确定），导致部分节点上的pod被重建。<br>3、重建后的pod挂载了宿主机上容器自身的<code>cgroup</code>文件系统，未重建的pod挂载的是宿主机自身的<code>cgroup</code>文件系统，挂载行为发生变化。<br>4、重建后的pod的<code>cgroup</code>关于<code>cpuset.cpus</code>的设置值超过了20个字符，触发ADB PG的已知缺陷。<br>5、ADB PG集群状态异常，使用psql命令行数据库连接工具去连接数据库卡住。<br>6、基础知识：<br>    a.默认情况下Pod 默认不会直接挂载宿主机上的 cgroup 文件系统，因为这样做可能会带来安全风险。如果非要挂载可以用<code>privileged: true</code>（很危险不推荐），或者<code>卷挂载</code>的方式（只需要挂载特定的目录，推荐）。<br>    b.Kubelet 是<code>Kubernetes</code>集群中的一个重要组件，负责在一个节点上运行 Pod 容器。它是集群中最底层的代理，与<code>Kubernetes API Server</code> 通信，并确保容器按预期运行。Kubelet 负责监控和维护节点上的 Pod 状态，确保它们处于期望的状态。</p>
+<h2 id="二、故障排查过程"><a href="#二、故障排查过程" class="headerlink" title="二、故障排查过程"></a>二、故障排查过程</h2><p>1、夜里10点，变更开始后1小时。值班长接到应急，开始调度产研一起排查。<br>一开始并不能明确是什么原因导致的集群异常，所以登陆到Master节点，尝试使用psql连接集群，看看有哪些计算组进程down，但是<code>psql</code>卡住了。<br><img src="/images/adb-2.png" alt="" title="报错cannot write data"></p>
 <p>2、<code>ps -ef | grep -i postgres</code>这个命令就是查看PostgreSQL 相关的所有进程，发现大量<code>backend</code>进程处于<code>startup</code>状态，此现象其实属于常见现象，平时在其他故障场景下也有遇到。</p>
-<p>如果一个backend进程长时间停留在”startup”状态，可能表明存在以下问题：<br>•认证延迟：身份验证服务或配置问题导致认证过程变慢。<br>•资源争抢：系统资源紧张（如CPU、内存、I/O），导致进程等待资源分配。<br>•配置错误：数据库或客户端连接参数配置不当，导致初始化过程卡住。<br>•网络问题：网络延迟或不稳定，影响连接建立或认证信息的交换。<br>•系统问题：Greenplum内部问题，如bug，或者系统级的锁冲突。<br>此时产研根据经验判断，应该是计算组进程有什么异常。</p>
+<p>如果一个backend进程长时间停留在”startup”状态，可能表明存在以下问题：<br>    <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">•认证延迟：身份验证服务或配置问题导致认证过程变慢。</span><br><span class="line">•资源争抢：系统资源紧张（如CPU、内存、I/O），导致进程等待资源分配。</span><br><span class="line">•配置错误：数据库或客户端连接参数配置不当，导致初始化过程卡住。</span><br><span class="line">•网络问题：网络延迟或不稳定，影响连接建立或认证信息的交换。</span><br><span class="line">•系统问题：Greenplum内部问题，如bug，或者系统级的锁冲突。</span><br></pre></td></tr></table></figure><br>此时产研根据经验判断，应该是计算组进程有什么异常。</p>
 <p>3、kill掉任意一个backend进程，让Master进入recovery模式，会释放相关的数据库连接，然后就可以使用psql连接到数据库中，查询到有大量的计算组进程down。</p>
 <p>4、尝试用<code>gpstop -af</code>命令手动停止集群，，但是发现已经存在新启动任务，说明管控探测Master异常，触发了重启，这里为了避免管控干扰问题修复，去杜康临时关闭HA检查。</p>
 <p>5、等管控的启动任务结束后，进入集群，找到任意一个down的计算组进程，查看日志发现，很清楚的不停打印cgroup相关错误，此时原因基本定位到了，但是如何解决又让众人没有思路，只能各种尝试，这部分工作耗费了大量时间。</p>
