@@ -31,7 +31,7 @@
 <meta property="og:description" content="来吧，重新练练算法思维">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2025-05-12T06:22:09.000Z">
-<meta property="article:modified_time" content="2025-05-12T09:11:12.663Z">
+<meta property="article:modified_time" content="2025-05-13T03:13:51.052Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="python">
 <meta property="article:tag" content="面试">
@@ -219,10 +219,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2025-05-12 14:22:09 / 修改时间：17:11:12" itemprop="dateCreated datePublished" datetime="2025-05-12T14:22:09+08:00">2025-05-12</time>
+              <time title="创建时间：2025-05-12 14:22:09" itemprop="dateCreated datePublished" datetime="2025-05-12T14:22:09+08:00">2025-05-12</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-05-13 11:13:51" itemprop="dateModified" datetime="2025-05-13T11:13:51+08:00">2025-05-13</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -247,14 +253,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>3.9k</span>
+              <span>5.3k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>4 分钟</span>
+              <span>5 分钟</span>
             </span>
             <div class="post-description">来吧，重新练练算法思维</div>
 
@@ -271,17 +277,31 @@
 <li>篮子里有100个苹果，将这些苹果进行编号，从0开始到99。现在将这些苹果分成4份，第一份20个，第二份30个，第三份38个，最后一份12个，要求是苹果的编号不能连续。</li>
 </ol>
 <p>【思路】通过构造性方法分配苹果，确保每份内部无连续编号：<br>第三份（38 个苹果）<br>    选取前 38 个偶数（0, 2, 4, …, 74）。这些苹果之间相差 2，无连续编号。<br>第四份（12 个苹果）<br>    选取后 12 个偶数（76, 78, …, 98）。同样无连续编号。<br>第一份（20 个苹果）<br>    选取前 20 个奇数（1, 3, 5, …, 39）。奇数之间相差 2，无连续编号。<br>第二份（30 个苹果）<br>    选取剩余的奇数（41, 43, …, 99）。    同样无连续编号。</p>
-<p>【代码】</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 生成各分组的苹果编号</span></span><br><span class="line">group1 = list(range(<span class="number">1</span>, <span class="number">40</span>, <span class="number">2</span>))       <span class="comment"># 第一份：20 个奇数（1, 3, ..., 39）</span></span><br><span class="line">group2 = list(range(<span class="number">41</span>, <span class="number">100</span>, <span class="number">2</span>))      <span class="comment"># 第二份：30 个奇数（41, 43, ..., 99）</span></span><br><span class="line">group3 = list(range(<span class="number">0</span>, <span class="number">75</span>, <span class="number">2</span>))        <span class="comment"># 第三份：38 个偶数（0, 2, ..., 74）</span></span><br><span class="line">group4 = list(range(<span class="number">76</span>, <span class="number">99</span>, <span class="number">2</span>))       <span class="comment"># 第四份：12 个偶数（76, 78, ..., 98）</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 验证各分组数量是否正确</span></span><br><span class="line"><span class="keyword">assert</span> len(group1) == <span class="number">20</span>, <span class="string">"第一份数量错误"</span></span><br><span class="line"><span class="keyword">assert</span> len(group2) == <span class="number">30</span>, <span class="string">"第二份数量错误"</span></span><br><span class="line"><span class="keyword">assert</span> len(group3) == <span class="number">38</span>, <span class="string">"第三份数量错误"</span></span><br><span class="line"><span class="keyword">assert</span> len(group4) == <span class="number">12</span>, <span class="string">"第四份数量错误"</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 验证各分组内部无连续编号</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">has_consecutive</span><span class="params">(numbers)</span>:</span></span><br><span class="line">    sorted_numbers = sorted(numbers)</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, len(sorted_numbers)):</span><br><span class="line">        <span class="keyword">if</span> sorted_numbers[i] - sorted_numbers[i<span class="number">-1</span>] == <span class="number">1</span>:</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> group <span class="keyword">in</span> [group1, group2, group3, group4]:</span><br><span class="line">    <span class="keyword">assert</span> <span class="keyword">not</span> has_consecutive(group), <span class="string">"存在连续编号"</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 验证所有苹果编号被唯一分配</span></span><br><span class="line">all_apples = set(range(<span class="number">100</span>))</span><br><span class="line">assigned = set(group1 + group2 + group3 + group4)</span><br><span class="line"><span class="keyword">assert</span> all_apples == assigned, <span class="string">"苹果编号未全部分配或重复"</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 输出结果</span></span><br><span class="line">print(<span class="string">"分组结果："</span>)</span><br><span class="line">print(<span class="string">f"第一份: <span class="subst">&#123;group1&#125;</span>"</span>)</span><br><span class="line">print(<span class="string">f"第二份: <span class="subst">&#123;group2&#125;</span>"</span>)</span><br><span class="line">print(<span class="string">f"第三份: <span class="subst">&#123;group3&#125;</span>"</span>)</span><br><span class="line">print(<span class="string">f"第四份: <span class="subst">&#123;group4&#125;</span>"</span>)</span><br></pre></td></tr></table></figure>
 
+
 <ol start="2">
-<li><code>select * from A where exists (select * from B where A.id=B.id);</code>和 <code>select * from A where A.id in (select id from B);</code>如果A表有100条数据，B表有10000条，请问哪个sql语句执行效率高？</li>
+<li>编写一个函数，在字符串数组中查找最长的公共前缀字符串。 如果没有公共前缀，则返回空字符串” “。<br>输入：strs = [“present”,”promotion”,”protect”]<br>输出：”pr”<br>输入：strs = [“al”,”trace”,”mtr”]<br>输出：” “</li>
 </ol>
-<p>【答案】EXISTS 可以利用索引快速查找并提前终止，减少不必要的扫描。IN 需要生成并存储较大的结果集，可能导致内存开销和性能下降。所以，EXISTS 语句的执行效率更高。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">longest_common_prefix</span><span class="params">(strs)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> strs:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">""</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 找到最短的字符串长度</span></span><br><span class="line">    min_length = min(len(s) <span class="keyword">for</span> s <span class="keyword">in</span> strs)</span><br><span class="line">    </span><br><span class="line">    prefix = <span class="string">""</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(min_length):</span><br><span class="line">        char = strs[<span class="number">0</span>][i]</span><br><span class="line">        <span class="keyword">if</span> all(s[i] == char <span class="keyword">for</span> s <span class="keyword">in</span> strs):  <span class="comment"># 判断是否所有字符串的当前位置字符相同，这里如果都相同，就是返回都是Ture,外面再套了一层all</span></span><br><span class="line">            prefix += char</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> prefix</span><br><span class="line"></span><br><span class="line"><span class="comment"># 测试示例</span></span><br><span class="line">strs1 = [<span class="string">"present"</span>, <span class="string">"promotion"</span>, <span class="string">"protect"</span>]</span><br><span class="line">print(longest_common_prefix(strs1))  <span class="comment"># 输出: "pr"</span></span><br><span class="line"></span><br><span class="line">strs2 = [<span class="string">"al"</span>, <span class="string">"trace"</span>, <span class="string">"mtr"</span>]</span><br><span class="line">print(longest_common_prefix(strs2))  <span class="comment"># 输出: ""</span></span><br><span class="line"></span><br><span class="line">strs3 = []</span><br><span class="line">print(longest_common_prefix(strs3))  <span class="comment"># 输出: ""</span></span><br></pre></td></tr></table></figure>
+
 <ol start="3">
-<li>简述CGROUP如何限制进程cpu使用</li>
+<li><p>给定一个整数x，如果x是回文整数，则返回true。 当一个整数向后读取与向前读取相同时，它就是一个回文。例如，121是回文，而123不是。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">is_palindrome</span><span class="params">(x)</span>:</span></span><br><span class="line">    <span class="comment"># 将整数转换为字符串</span></span><br><span class="line">    str_x = str(x)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 比较原字符串和反转后的字符串是否相同</span></span><br><span class="line">    <span class="keyword">return</span> str_x == str_x[::<span class="number">-1</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment"># 测试示例</span></span><br><span class="line">print(is_palindrome(<span class="number">121</span>))  <span class="comment"># 输出: True</span></span><br><span class="line">print(is_palindrome(<span class="number">-121</span>))  <span class="comment"># 输出: False</span></span><br><span class="line">print(is_palindrome(<span class="number">123</span>))  <span class="comment"># 输出: False</span></span><br><span class="line">print(is_palindrome(<span class="number">1221</span>))  <span class="comment"># 输出: True</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>在一个整型数组中, 找到两个index，其对应的两个数相加为给出的目标数字。 你可以假设每个输入都有且仅有一个解。给定一个整数数组nums和一个整数目标值target，返回两个数字的索引，使它们相加到目标值。<br>您可以假设每个输入都只有一个答案，但是不能两次使用同一元素。可以按任何顺序返回答案。<br>示范<br>输入：nums = [3,2,4], target = 6<br>输出：[1,2]<br>输入：nums = [1,2,9], target = 10<br>输出：[0,2]</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">​<span class="function"><span class="keyword">def</span> <span class="title">two_sum</span><span class="params">(nums, target)</span>:</span></span><br><span class="line">    num_dict = &#123;&#125;  <span class="comment"># 创建一个字典</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> index, num <span class="keyword">in</span> enumerate(nums):  <span class="comment"># 逐一获得目标数组的值num和索引i</span></span><br><span class="line">        complement = target - num    <span class="comment"># 然后就是目标值-目标数组的值num，看剩余的的值是否在</span></span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> complement <span class="keyword">in</span> num_dict:</span><br><span class="line">            <span class="keyword">return</span> [num_dict[complement], index]</span><br><span class="line">        </span><br><span class="line">        num_dict[num] = index</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 题目假设一定有解，所以这里不会到达</span></span><br><span class="line">    <span class="keyword">return</span> []</span><br><span class="line"></span><br><span class="line"><span class="comment"># 示例</span></span><br><span class="line">nums = [<span class="number">2</span>, <span class="number">7</span>, <span class="number">11</span>, <span class="number">15</span>]</span><br><span class="line">target = <span class="number">26</span></span><br><span class="line">print(two_sum(nums, target))  <span class="comment"># 输出: [0, 1]</span></span><br></pre></td></tr></table></figure>
+
+
+
+</li>
 </ol>
-<p>【答案】首先需要在系统中创建一个CGroup，并为其配置相应的资源限制。这通常涉及到创建目录结构和设置文件。例如，在 <code>/sys/fs/cgroup/cpu/</code> 下创建一个名为 <code>my_cgroup</code> 的CGroup：<code>mkdir /sys/fs/cgroup/cpu/my_cgroup</code></p>
+<ol start="5">
+<li><p><code>select * from A where exists (select * from B where A.id=B.id);</code>和 <code>select * from A where A.id in (select id from B);</code>如果A表有100条数据，B表有10000条，请问哪个sql语句执行效率高？<br>【答案】EXISTS 可以利用索引快速查找并提前终止，减少不必要的扫描。IN 需要生成并存储较大的结果集，可能导致内存开销和性能下降。所以，EXISTS 语句的执行效率更高。</p>
+</li>
+<li><p>简述CGROUP如何限制进程cpu使用<br>【答案】首先需要在系统中创建一个CGroup，并为其配置相应的资源限制。这通常涉及到创建目录结构和设置文件。例如，在 <code>/sys/fs/cgroup/cpu/</code> 下创建一个名为 <code>my_cgroup</code> 的CGroup：<code>mkdir /sys/fs/cgroup/cpu/my_cgroup</code></p>
+</li>
+</ol>
 <p>然后，设置CPU份额。CGroup提供了两种方式来限制CPU使用：CPU份额（CPU shares）和CPU配额（CPU quotas）。CPU份额决定了各个任务之间的相对优先级。例如，如果两个任务A和B的CPU份额分别是1024和512，那么任务A将获得大约两倍于任务B的CPU时间。</p>
 <p>设置CPU份额：<code>echo 1024 &gt; /sys/fs/cgroup/cpu/my_cgroup/cpu.shares</code></p>
 <p>CPU配额允许你精确地限制任务在一定时间内能够使用的CPU时间。例如，你可以设置一个任务在一个周期内最多只能使用50%的CPU时间。</p>
@@ -290,9 +310,10 @@
 <p>这里，<code>cpu.cfs_quota_us</code> 表示在一个周期内允许的最大CPU时间（单位是微秒），而 <code>cpu.cfs_period_us</code> 表示周期的长度（单位也是微秒）。上面的例子表示在一个周期（100000微秒，即0.1秒）内，最多使用50000微秒（即0.05秒）的CPU时间。</p>
 <p>最后，将特定的进程添加到CGroup中，以便它们受到资源限制的影响。例如，将PID为1234的进程添加到 <code>my_cgroup</code> 中：<code>echo 1234 &gt; /sys/fs/cgroup/cpu/my_cgroup/tasks</code></p>
 <p>现在可以通过读取相关文件来监控CGroup的状态和统计信息。<code>cat /sys/fs/cgroup/cpu/my_cgroup/cpuacct.usage</code></p>
-<ol start="4">
+<ol start="7">
 <li><p>http 301 500和502 含义<br>【答案】</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">HTTP <span class="number">301</span> Moved Permanently（永久重定向），此时客户端会缓存新 URL。而<span class="number">302</span>（临时重定向），客户端不会缓存新 URL。</span><br><span class="line">HTTP <span class="number">500</span> Internal Server Error（服务器内部错误），直接去后端服务器上看问题吧，通常由代码缺陷、配置错误或依赖服务故障引起。</span><br><span class="line">HTTP <span class="number">502</span> Bad Gateway（错误网关）,即作为网关或代理的服务器（如 Nginx、反向代理）从上游服务器（后端服务）收到无效响应。有可能是反向代理的nginx挂了，或者是后端服务超时了。</span><br></pre></td></tr></table></figure></li>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">HTTP <span class="number">301</span> Moved Permanently（永久重定向），此时客户端会缓存新 URL。而<span class="number">302</span>（临时重定向），客户端不会缓存新 URL。</span><br><span class="line">HTTP <span class="number">500</span> Internal Server Error（服务器内部错误），直接去后端服务器上看问题吧，通常由代码缺陷、配置错误或依赖服务故障引起。</span><br><span class="line">HTTP <span class="number">502</span> Bad Gateway（错误网关）,即作为网关或代理的服务器（如 Nginx、反向代理）从上游服务器（后端服务）收到无效响应。有可能是反向代理的nginx挂了，或者是后端服务超时了。</span><br></pre></td></tr></table></figure>
+</li>
 <li><p>如何限制单个容器的最大磁盘占用？<br>【答案】</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">docker create \</span><br><span class="line">  --name my_container \</span><br><span class="line">  --storage-opt size=<span class="number">10</span>G \</span><br><span class="line">  your_image</span><br></pre></td></tr></table></figure>
 </li>
@@ -301,7 +322,7 @@
 <p>如果需要 完全禁止 B 访问 A 的所有服务，而不仅仅是 SSH，则在A侧配置：<code>sudo iptables -A INPUT -s B的IP地址 -j DROP</code></p>
 </li>
 </ol>
-<ol start="7">
+<ol start="10">
 <li><p>谈谈DNS 两种方式<br>【答案】</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">递归 DNS（Recursive DNS）</span><br><span class="line">递归 DNS 服务器负责为客户端解析域名，递归查询整个 DNS 层级（根服务器 → 顶级域服务器 → 权威服务器），直到获取最终的 IP 地址。</span><br><span class="line">特点：客户端视角：客户端只需向递归 DNS 发起请求，无需关心 DNS 查询过程。缓存优化：递归 DNS 通常会缓存结果，减少重复查询。</span><br><span class="line">权威 DNS（Authoritative DNS）</span><br><span class="line">权威 DNS 服务器负责管理特定域名的解析数据（如 example.com 的 A 记录、CNAME 记录等），直接返回域名对应的 IP 地址。</span><br><span class="line">特点：层级关系：每个域名需配置一个或多个权威服务器（主服务器 + 从服务器）。数据源：解析数据存储在区域文件（Zone File）中。</span><br></pre></td></tr></table></figure>
 </li>
@@ -520,7 +541,7 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">15:26</span>
+    <span title="站点阅读时长">15:27</span>
 </div>
 
 <div>
