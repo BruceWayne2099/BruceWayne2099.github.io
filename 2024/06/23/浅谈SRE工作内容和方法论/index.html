@@ -23,18 +23,18 @@
     var CONFIG = {"hostname":"brucewayne2099.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="做一个工作小总结">
+  <meta name="description" content="做一个工作的总结吧">
 <meta property="og:type" content="article">
 <meta property="og:title" content="浅谈SRE工作内容和方法论">
 <meta property="og:url" content="https://brucewayne2099.github.io/2024/06/23/%E6%B5%85%E8%B0%88SRE%E5%B7%A5%E4%BD%9C%E5%86%85%E5%AE%B9%E5%92%8C%E6%96%B9%E6%B3%95%E8%AE%BA/index.html">
 <meta property="og:site_name" content="石锤淡啤酒">
-<meta property="og:description" content="做一个工作小总结">
+<meta property="og:description" content="做一个工作的总结吧">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://brucewayne2099.github.io/images/SRE%E5%B7%A5%E4%BD%9C%E5%86%85%E5%AE%B9.png">
 <meta property="og:image" content="https://brucewayne2099.github.io/images/%E5%85%A8%E9%93%BE%E8%B7%AF%E5%8E%8B%E6%B5%8B%E5%AE%89%E6%8E%92.png">
 <meta property="og:image" content="https://brucewayne2099.github.io/images/%E5%AE%89%E5%85%A8%E7%94%9F%E4%BA%A733.png">
 <meta property="article:published_time" content="2024-06-23T03:53:54.000Z">
-<meta property="article:modified_time" content="2025-05-13T03:56:20.647Z">
+<meta property="article:modified_time" content="2025-05-13T07:10:07.481Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="安全生产">
 <meta property="article:tag" content="sre">
@@ -230,7 +230,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2025-05-13 11:56:20" itemprop="dateModified" datetime="2025-05-13T11:56:20+08:00">2025-05-13</time>
+                <time title="修改时间：2025-05-13 15:10:07" itemprop="dateModified" datetime="2025-05-13T15:10:07+08:00">2025-05-13</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -265,7 +265,7 @@
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
               <span>5 分钟</span>
             </span>
-            <div class="post-description">做一个工作小总结</div>
+            <div class="post-description">做一个工作的总结吧</div>
 
         </div>
       </header>
@@ -309,13 +309,13 @@
 <h2 id="单链路压测-amp-全链路压测"><a href="#单链路压测-amp-全链路压测" class="headerlink" title="单链路压测&amp;全链路压测"></a>单链路压测&amp;全链路压测</h2><p>除了电商平台有全链路压测（包含：导购+交易+支付+商家+数据），我已知高德他们也会有全链路压测，因为他们也会有爆发流量。</p>
 <p>作为业务域参加全链路压测准入的条件很简单，就是单链路压测通过。毕竟业务在变化在迭代，可能有了新的场景新的标，那么就要自己单链路跑通了之后才能上全链路，不然可能就会影响其他原本跑通的链路也跑不通。同时要计算需要多少资源，容量预估完要准备多少机器，这些是要事先算出来的，不是靠压测摸出来的。</p>
 <p>单链路压测首先要确认你的压测场景。</p>
-<p>举个例子，曾经我们要压测茅台抢购，那么就先确认我们要压测的场景有哪些：<br>    1. 商品详情<br>    2. 购物车 （购物车是有动态计算的，比如你多选了一个，下面的价格就会变，或者你下拉购物车的时候，会刷新你新加到购物车的商品，这两个操作在实际人操作的时候其实很难同步，但是为了压测，也就放一起了）<br>    3. 订单确认<br>    4. 订单提交</p>
+<p>举个例子，曾经我们要压测茅台抢购，那么就要先确认我们要压测的场景有哪些：<br>    1. 商品详情<br>    2. 购物车 （购物车是有动态计算的，比如你多选了一个，下面的价格就会变，或者你下拉购物车的时候，会刷新你新加到购物车的商品，这两个操作在实际人操作的时候其实很难同步，但是为了压测，也就放一起了）<br>    3. 订单确认<br>    4. 订单提交</p>
 <p>确认了商品之后，我们还要看每个场景里我们都要重点关注啥。</p>
 <p>比如现在在我司平台抢茅台是要提前预约的，而<code>商品详情</code>、<code>购物车</code>、<code>确认订单</code>这3个链路需要校验消费者是否预约，并且是将用户的预约记录缓存到同一个缓存当中，那么这个预约记录的缓存就非常重要，是压测的重要关注点之一。</p>
 <p>然后呢，发现买茅台不是还赠袋子和小杯子么？实际中经常有丢掉赠品只发茅台的情况出现，每次都需要客服布防，然后仓库手动补发，链路体验极差。经排查发现，是因为库存限流导致赠品丢失（茅台场景赠品渲染有库存，下单无库存时并不会强阻断下单）。所以为了防止大量丢增，需要重点关注库存服务的整体稳定性。</p>
 <p>最后因为热点是茅台，那么还要验证商品的热点散列是否生效。</p>
 <p>以上确认好了压测场景和每个场景需要关注的点之后，就要拿出历史的数据，通过历史的数据和现在链路的变化（比如某个环节，原来调用3次接口，现在只调用两次了），得到我们本次的压测流量。</p>
-<p>然后就可以找一个夜深人静的时候进行施压，根据业务实际情况看是脉冲还是需要一个预热再脉冲。在压测中记录问题。</p>
+<p>然后就要先挂出公告，通知相关方压测的时间和影响。再按照公告的约定找一个夜深人静的时候进行施压，根据业务实际情况看是脉冲还是需要一个预热再脉冲。在压测中记录问题。</p>
 <p>压测结束的时候，我们也要对比一下压测结果，我认为判断压测是否成功通过主要就是以下几个标准：</p>
 <ol>
 <li>涉及的场景齐全，接口qps也符合事前预期。</li>
