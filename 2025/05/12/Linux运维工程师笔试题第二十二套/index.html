@@ -31,7 +31,7 @@
 <meta property="og:description" content="来吧，重新练练算法思维">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2025-05-12T06:22:09.000Z">
-<meta property="article:modified_time" content="2025-05-13T03:31:51.498Z">
+<meta property="article:modified_time" content="2025-05-13T14:42:28.229Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="python">
 <meta property="article:tag" content="面试">
@@ -227,7 +227,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2025-05-13 11:31:51" itemprop="dateModified" datetime="2025-05-13T11:31:51+08:00">2025-05-13</time>
+                <time title="修改时间：2025-05-13 22:42:28" itemprop="dateModified" datetime="2025-05-13T22:42:28+08:00">2025-05-13</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -253,7 +253,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>5.6k</span>
+              <span>6k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -331,7 +331,12 @@
 <li><p>谈谈bind高可用机制<br>【答案】</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">主从服务器（Primary/Secondary）：通过主服务器（Primary）和从服务器（Secondary）的协作，确保在主服务器故障时，从服务器仍能提供解析服务。</span><br><span class="line">负载均衡 + VIP（Virtual IP）：通过虚拟 IP（VIP）和负载均衡器（如 HAProxy）将流量分发到多个 BIND 实例，实现无缝故障转移。</span><br><span class="line">DNSSEC + 区域签名：通过 DNSSEC（DNS Security Extensions）对区域数据进行签名，确保数据完整性和防篡改。</span><br><span class="line">自动故障切换（Keepalived + VRRP）：使用 Keepalived 实现主备服务器的自动切换，当主服务器宕机时，VIP 自动转移到备用服务器。</span><br></pre></td></tr></table></figure>
 </li>
-<li><p>mysql主从同步的全同步复制和半同步复制是啥？<br>【答案】<br>mysql默认的复制方式是异步的，主库把日志发送给从库后不关心从库是否已经处理，这样会产生一个问题就是假设主库挂了，从库处理失败了，这时候从库升为主库后，日志就丢失了。由此产生两个概念。<br>全同步复制：主库写入binlog后强制同步日志到从库，所有的从库都执行完成后才返回给客户端，但是很显然这个方式的话性能会受到严重影响。<br>半同步复制：和全同步不同的是，半同步复制的逻辑是这样，从库写入日志成功后返回ACK确认给主库，主库收到至少一个从库的确认就认为写操作完成。</p>
+<li><p>mysql主从同步的全同步复制和半同步复制是啥？<br>【答案】</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mysql默认的复制方式是异步的，主库把日志发送给从库后不关心从库是否已经处理，这样会产生一个问题就是假设主库挂了，从库处理失败了，这时候从库升为主库后，日志就丢失了。由此产生两个概念。</span><br><span class="line">全同步复制：主库写入binlog后强制同步日志到从库，所有的从库都执行完成后才返回给客户端，但是很显然这个方式的话性能会受到严重影响。</span><br><span class="line">半同步复制：和全同步不同的是，半同步复制的逻辑是这样，从库写入日志成功后返回ACK确认给主库，主库收到至少一个从库的确认就认为写操作完成。</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>free -m 这个命令的输出是啥意思？<br>【答案】</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">total：总内存大小（单位：MB）。used + free + buff/cache ≈ total，这是正常现象。</span><br><span class="line">used：已使用的内存大小（包括缓存和缓冲区）。used 为 <span class="number">0</span> 时，表示物理内存足够，无需使用交换分区。used 明显大于 <span class="number">0</span>，说明物理内存不足，系统开始使用磁盘作为虚拟内存（性能可能下降）。</span><br><span class="line">free：完全空闲的内存大小（未被使用）。</span><br><span class="line">shared：共享内存大小（通常由多个进程共享的内存区域）。</span><br><span class="line">buff/cache：内核缓存和缓冲区占用的内存大小（这部分可以被快速释放以供应用程序使用）。</span><br><span class="line">available：可用内存大小（预估当前系统可分配的内存，比 free + buff/cache 更合理）。如果 available 接近 <span class="number">0</span>，可能需要优化内存使用或增加内存。</span><br><span class="line">Mem：物理内存（RAM）的统计信息。</span><br><span class="line">Swap：交换分区（Swap）的统计信息。</span><br><span class="line"></span><br><span class="line">结合 watch 命令实时监控内存：watch -n <span class="number">1</span> free -m</span><br></pre></td></tr></table></figure>
+
 </li>
 </ol>
 
