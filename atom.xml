@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://brucewayne2099.github.io/"/>
-  <updated>2025-05-13T14:42:28.229Z</updated>
+  <updated>2025-05-15T03:06:24.575Z</updated>
   <id>https://brucewayne2099.github.io/</id>
   
   <author>
@@ -15,6 +15,33 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>全链路压测中遇到的一个奇葩问题</title>
+    <link href="https://brucewayne2099.github.io/2025/05/15/%E5%85%A8%E9%93%BE%E8%B7%AF%E5%8E%8B%E6%B5%8B%E4%B8%AD%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%B8%AA%E5%A5%87%E8%91%A9%E9%97%AE%E9%A2%98/"/>
+    <id>https://brucewayne2099.github.io/2025/05/15/%E5%85%A8%E9%93%BE%E8%B7%AF%E5%8E%8B%E6%B5%8B%E4%B8%AD%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%B8%AA%E5%A5%87%E8%91%A9%E9%97%AE%E9%A2%98/</id>
+    <published>2025-05-15T02:18:02.000Z</published>
+    <updated>2025-05-15T03:06:24.575Z</updated>
+    
+    <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><p>这几天忙于618大促，5月14日集团决定要进行全链路压测用于应对16日的付尾款。</p><p>于是白天就准备好了晚上压测用到的数据预热任务，我们的预热任务是12点启动，数据的缓存过期时间是43200秒，即12个小时，也就是晚上12点数据过期，足够覆盖压测的时间段了。<br><img src="/images/%E7%BC%93%E5%AD%98%E8%BF%87%E6%9C%9F3.png" alt="paradin"></p><p>我们的预热逻辑是这样的：从odps离线表里拿到key，然后预热接口会请求这些key，如果没有的话，就会去数据库里查，然后再put到缓存里，逻辑很简单。</p><p>然后整个预热过程非常顺利，命中率和成功率都满足要求：<br><img src="/images/%E7%BC%93%E5%AD%98%E8%BF%87%E6%9C%9F2.png" alt="paradin"></p><p>晚场压测分为几个阶段：20点压了“定金+尾款”阶段，然后休息一下，21点半压“纯现货”阶段。结果20点那波非常正常符合预期，结果21点半这一波，流量刚起来，上游就报了大量错误：<br><img src="/images/%E7%BC%93%E5%AD%98%E8%BF%87%E6%9C%9F.png" alt="paradin"></p><p>然后我们一看错误细节，发现是缓存有大量的写操作，即数据库被打爆了。换言之就是缓存数据过期了，但是不应该呀，上面说过了，我们的数据应该是晚上12点过期的，为什么21点半就过期了？</p>]]></content>
+    
+    <summary type="html">
+    
+      真特么的是刺激的一夜
+    
+    </summary>
+    
+    
+      <category term="工作与技术" scheme="https://brucewayne2099.github.io/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/"/>
+    
+    
+      <category term="全链路压测" scheme="https://brucewayne2099.github.io/tags/%E5%85%A8%E9%93%BE%E8%B7%AF%E5%8E%8B%E6%B5%8B/"/>
+    
+      <category term="缓存" scheme="https://brucewayne2099.github.io/tags/%E7%BC%93%E5%AD%98/"/>
+    
+      <category term="空保护" scheme="https://brucewayne2099.github.io/tags/%E7%A9%BA%E4%BF%9D%E6%8A%A4/"/>
+    
+  </entry>
   
   <entry>
     <title>Linux运维工程师笔试题第二十二套</title>
@@ -506,31 +533,6 @@
       <category term="年终总结" scheme="https://brucewayne2099.github.io/tags/%E5%B9%B4%E7%BB%88%E6%80%BB%E7%BB%93/"/>
     
       <category term="电影" scheme="https://brucewayne2099.github.io/tags/%E7%94%B5%E5%BD%B1/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>rdb的持久化导致线上故障</title>
-    <link href="https://brucewayne2099.github.io/2024/02/01/rdb%E7%9A%84%E6%8C%81%E4%B9%85%E5%8C%96%E5%AF%BC%E8%87%B4%E7%BA%BF%E4%B8%8A%E6%95%85%E9%9A%9C/"/>
-    <id>https://brucewayne2099.github.io/2024/02/01/rdb%E7%9A%84%E6%8C%81%E4%B9%85%E5%8C%96%E5%AF%BC%E8%87%B4%E7%BA%BF%E4%B8%8A%E6%95%85%E9%9A%9C/</id>
-    <published>2024-02-01T15:25:09.000Z</published>
-    <updated>2024-02-05T02:41:27.637Z</updated>
-    
-    <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><p>这几天在做优化，把应用与rdb超时时间从200ms下降到了50ms。结果rdb在那个时候恰巧出发了aof持久化，整个持久化的过程持续了1.7s，导致线上故障。<br><img src="/images/rdb%E6%95%85%E9%9A%9C2.png" alt="akb48" title="cpu达到了99%"><br><img src="/images/rdb%E6%95%85%E9%9A%9C3.png" alt="akb48" title="出现了大量的jedis错误"></p><p>rdb持久化的过程是什么？这里可以看redis的官方文档：<a href="https://redis.com.cn/redis-persistence.html" target="_blank" rel="noopener">https://redis.com.cn/redis-persistence.html</a> 和 <a href="https://redisbook.readthedocs.io/en/latest/internal/aof.html" target="_blank" rel="noopener">https://redisbook.readthedocs.io/en/latest/internal/aof.html</a> 。这里可以看出aof是持久化效果最好的方法，但是它依赖文件的大小，aof文件越大，耗时越久。如果关闭了aof，那么rdb就成了一个memcache，断电了而且备库也断电了，那数据就没了。</p><p>一般来说1.7s的aof耗时不算是很久，而且每个实例的aof操作其实也挺频繁的，平均20分钟不到就一次，但是aof期间主进程是不工作的，导致这个redis集群执行aof的实例在这个阶段不能正常接受服务请求，但是我们的代码里有两个配置放大了这个情况，进而出现了故障。</p><p>第一：我们的服务有重试机制，即如果rdb超时，就会重试3次。后来我们决定这里的重试取消掉，交易链路么，重试非常容易埋雷。<br>第二：我们发现这1.7s时间内写请求飙升，经分析是由于写请求是sku维度的(exhset)，读请求是item维度(exhmget)，按照平均sku数量，重试的写请求相比读请求有10+的放大系数。再叠加之前的重试3次。导致雪崩。</p><p>通过这个故障，我们通过复盘也发现了我们一些当前链路不合理的地方，比如“这个redis品仓关系专用的，不应该直接影响下单成功率，考虑后续解耦策略”。</p><p>其次是阿里云在选择redis的时候看到的qps是最基础的qps，比如我这个集群，说是能扛住384万qps，但是这个384万是压测512字节的key和value得到的。而在实际的业务开发场景里，key和value的大小是远远大于512字节的，所以实际qps是不够的。这里需要SRE同学帮忙来拿线上比较真实的key-value去压测一下真实的qps水平。<br><img src="/images/rdb%E6%95%85%E9%9A%9C1.png" alt="akb48" title="购买rdb的时候，他的qps只是一个极度乐观的参考值"></p>]]></content>
-    
-    <summary type="html">
-    
-      Select 多个固定值在一列的两种写法，一种是传统的union all，还有一个就是explode，比如SELECT explode(array(&#39;张三&#39;,&#39;李四&#39;,&#39;王五&#39;,&#39;赵六&#39;,&#39;陈七&#39;)) AS name ;
-    
-    </summary>
-    
-    
-      <category term="工作与技术" scheme="https://brucewayne2099.github.io/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/"/>
-    
-    
-      <category term="redis" scheme="https://brucewayne2099.github.io/tags/redis/"/>
-    
-      <category term="缓存" scheme="https://brucewayne2099.github.io/tags/%E7%BC%93%E5%AD%98/"/>
     
   </entry>
   

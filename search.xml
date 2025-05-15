@@ -4,6 +4,35 @@
   
     
     <entry>
+      <title>全链路压测中遇到的一个奇葩问题</title>
+      <link href="/2025/05/15/%E5%85%A8%E9%93%BE%E8%B7%AF%E5%8E%8B%E6%B5%8B%E4%B8%AD%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%B8%AA%E5%A5%87%E8%91%A9%E9%97%AE%E9%A2%98/"/>
+      <url>/2025/05/15/%E5%85%A8%E9%93%BE%E8%B7%AF%E5%8E%8B%E6%B5%8B%E4%B8%AD%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%B8%AA%E5%A5%87%E8%91%A9%E9%97%AE%E9%A2%98/</url>
+      
+        <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><p>这几天忙于618大促，5月14日集团决定要进行全链路压测用于应对16日的付尾款。</p><p>于是白天就准备好了晚上压测用到的数据预热任务，我们的预热任务是12点启动，数据的缓存过期时间是43200秒，即12个小时，也就是晚上12点数据过期，足够覆盖压测的时间段了。<br><img src="/images/%E7%BC%93%E5%AD%98%E8%BF%87%E6%9C%9F3.png" alt="paradin"></p><p>我们的预热逻辑是这样的：从odps离线表里拿到key，然后预热接口会请求这些key，如果没有的话，就会去数据库里查，然后再put到缓存里，逻辑很简单。</p><p>然后整个预热过程非常顺利，命中率和成功率都满足要求：<br><img src="/images/%E7%BC%93%E5%AD%98%E8%BF%87%E6%9C%9F2.png" alt="paradin"></p><p>晚场压测分为几个阶段：20点压了“定金+尾款”阶段，然后休息一下，21点半压“纯现货”阶段。结果20点那波非常正常符合预期，结果21点半这一波，流量刚起来，上游就报了大量错误：<br><img src="/images/%E7%BC%93%E5%AD%98%E8%BF%87%E6%9C%9F.png" alt="paradin"></p><p>然后我们一看错误细节，发现是缓存有大量的写操作，即数据库被打爆了。换言之就是缓存数据过期了，但是不应该呀，上面说过了，我们的数据应该是晚上12点过期的，为什么21点半就过期了？</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 工作与技术 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 全链路压测 </tag>
+            
+            <tag> 缓存 </tag>
+            
+            <tag> 空保护 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>Linux运维工程师笔试题第二十二套</title>
       <link href="/2025/05/12/Linux%E8%BF%90%E7%BB%B4%E5%B7%A5%E7%A8%8B%E5%B8%88%E7%AC%94%E8%AF%95%E9%A2%98%E7%AC%AC%E4%BA%8C%E5%8D%81%E4%BA%8C%E5%A5%97/"/>
       <url>/2025/05/12/Linux%E8%BF%90%E7%BB%B4%E5%B7%A5%E7%A8%8B%E5%B8%88%E7%AC%94%E8%AF%95%E9%A2%98%E7%AC%AC%E4%BA%8C%E5%8D%81%E4%BA%8C%E5%A5%97/</url>
