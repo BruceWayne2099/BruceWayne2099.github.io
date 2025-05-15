@@ -41,7 +41,7 @@
 <meta property="og:image" content="https://brucewayne2099.github.io/images/%E7%BC%93%E5%AD%98%E8%BF%87%E6%9C%9F6.png">
 <meta property="og:image" content="https://brucewayne2099.github.io/images/%E7%BC%93%E5%AD%98%E8%BF%87%E6%9C%9F5.png">
 <meta property="article:published_time" content="2025-05-15T02:18:02.000Z">
-<meta property="article:modified_time" content="2025-05-15T06:52:09.964Z">
+<meta property="article:modified_time" content="2025-05-15T12:59:40.738Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="全链路压测">
 <meta property="article:tag" content="缓存">
@@ -232,7 +232,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2025-05-15 10:18:02 / 修改时间：14:52:09" itemprop="dateCreated datePublished" datetime="2025-05-15T10:18:02+08:00">2025-05-15</time>
+              <time title="创建时间：2025-05-15 10:18:02 / 修改时间：20:59:40" itemprop="dateCreated datePublished" datetime="2025-05-15T10:18:02+08:00">2025-05-15</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -291,7 +291,7 @@
 <p>后来问了一下负责压测的同学，他早上9点上班之后，会用压测流量走一下渲染的接口拉一把最新的偏移好的营销压测数据，防止营销数据过期导致压测的时候下单阻断，这个是常规的操作。而我们这个应用是在渲染的下游，所以早上他跑接口的时候也会请求到我们这个应用。</p>
 <p>结论就是：击穿到DB的请求实际没有影子数据，会通过空保护对象进行缓存，这类对象无法通过主动预热任务写进缓存，依赖JIT压测流量自然预热。早上09:10到09:50有压测试跑流量，这时会将这些流量的空保护对象写进缓存，压测数据过期时间统一设置为12h +（1min内随机时间），因此晚上21点到21点30期间这些空保护对象会集中失效，从而导致21:31分脉冲时缓存击穿到DB，进而引起DB抖动。</p>
 <p>事后action：将缓存失效时间打散，不要一批全部失效，打散时间从原来的1分钟延长到1个小时内随机失效。同时减少tair调用量，降低空查询比例，提升主动预热任务的有效性。</p>
-<h2 id="空保护"><a href="#空保护" class="headerlink" title="空保护"></a>空保护</h2><p>但是其实这些是“空保护”，啥是空保护呢？是一种通过缓存“空值”来防止缓存穿透的策略。它的核心目标是避免因查询不存在的数据而导致数据库或后端服务被频繁访问，从而保护系统稳定性。</p>
+<h2 id="空保护"><a href="#空保护" class="headerlink" title="空保护"></a>空保护</h2><p>啥是空保护呢？是一种通过缓存“空值”来防止缓存穿透的策略。它的核心目标是避免因查询不存在的数据而导致数据库或后端服务被频繁访问，从而保护系统稳定性。</p>
 <p>例如用户恶意构造不存在的ID），导致每次请求都会穿透到数据库，可能引发数据库压力激增甚至崩溃。举个例子：用户频繁查询 ID=99999999 的数据（该ID在数据库中不存在）→ 缓存中没有该ID → 请求穿透到数据库 → 数据库返回空 → 重复触发，直到嗝屁。</p>
 <p>所以就通过缓存“空值”（如 null 或特定标记），将不存在的数据结果缓存一段时间，避免重复请求穿透到数据库。</p>
 <p>实现流程：</p>
