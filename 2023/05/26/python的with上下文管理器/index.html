@@ -31,7 +31,7 @@
 <meta property="og:description" content="上下文管理器用于自动管理资源，确保资源在使用后被正确释放，即使发生异常也能安全退出。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2023-05-26T14:55:47.000Z">
-<meta property="article:modified_time" content="2025-05-27T10:10:13.378Z">
+<meta property="article:modified_time" content="2025-05-27T10:11:10.261Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="python">
 <meta property="article:tag" content="基础知识">
@@ -226,7 +226,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2025-05-27 18:10:13" itemprop="dateModified" datetime="2025-05-27T18:10:13+08:00">2025-05-27</time>
+                <time title="修改时间：2025-05-27 18:11:10" itemprop="dateModified" datetime="2025-05-27T18:11:10+08:00">2025-05-27</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -252,7 +252,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>1.4k</span>
+              <span>0</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -272,32 +272,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>with 管理机制的核心作用有以下几点：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">a. 自动释放资源：无需手动调用 close() 或 release()。</span><br><span class="line">b. 异常安全：即使代码抛出异常，资源仍能正确释放。</span><br><span class="line">c. 简化代码：减少冗余的 <span class="keyword">try</span>...<span class="keyword">finally</span> 块。</span><br></pre></td></tr></table></figure>
-
-<ol>
-<li><p>简单用法</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">f = open(<span class="string">'abc.txt'</span>, <span class="string">'r'</span>)</span><br><span class="line">f.read()</span><br><span class="line">f.close()</span><br><span class="line">```	</span><br><span class="line"><span class="number">2.</span> 当abc.txt不存在时，open报错，f也不存在，所以要加异常捕捉</span><br><span class="line"></span><br><span class="line">```python</span><br><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    f = open(<span class="string">'abc.txt'</span>, <span class="string">'r'</span>)</span><br><span class="line">    s = f.read()</span><br><span class="line"><span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">    print(<span class="string">f'something is wrong : <span class="subst">&#123;e&#125;</span>'</span>)</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    print(<span class="string">'no error'</span>)</span><br><span class="line"><span class="keyword">finally</span>:</span><br><span class="line">    <span class="keyword">if</span> f:</span><br><span class="line">        f.close()</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>使用with可以简化逻辑，只要退出with范围，自动处理<code>f.close()</code></p>
-</li>
-</ol>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    <span class="keyword">with</span> open(<span class="string">'abc.txt'</span>, <span class="string">'r'</span>) <span class="keyword">as</span> f:</span><br><span class="line">        s = f.read() <span class="comment"># 只要离开with范围，自动执行f.close()</span></span><br><span class="line"><span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">    print(<span class="string">f'something is wrong: <span class="subst">&#123;e&#125;</span>'</span>)</span><br></pre></td></tr></table></figure>
-
-<p>其实在open函数里面自动处理掉了<code>f.close()</code>，得益于with管理机制。</p>
-<ol start="4">
-<li>自定义类，也想用with管理</li>
-</ol>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyClass</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">        print(<span class="string">'init'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__enter__</span><span class="params">(self)</span>:</span></span><br><span class="line">        print(<span class="string">"enter"</span>)</span><br><span class="line">        <span class="keyword">return</span> self <span class="comment"># 这里返回的就是with中的as后面的my</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__exit__</span><span class="params">(self, exception_type, exception_value, traceback)</span>:</span></span><br><span class="line">        print(<span class="string">"exit"</span>) <span class="comment"># 如果是异常导致的离开，那么可以打印异常信息，否则忽略后面3个参数</span></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">True</span>  <span class="comment"># 返回 False 表示 希望传播异常。True表示消化了异常</span></span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">process</span><span class="params">(self)</span>:</span></span><br><span class="line">        print(<span class="string">'process'</span>)</span><br><span class="line">        <span class="comment"># raise KeyError 如果这里发生异常，那么__exit__的后面3个参数就有值了</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> MyClass() <span class="keyword">as</span> my:</span><br><span class="line">    my.process()</span><br><span class="line">    print(<span class="string">'nihao'</span>)</span><br></pre></td></tr></table></figure>
-
-<p>本质上就是个语法糖，只要一个类实现了<code>__enter__</code>和<code>__exit__</code>，就可以使用with来管理，同时在进入with范围时调用<code>__enter__</code>, 在退出with范围时调用<code>__exit__</code>。<br>这样你在with范围中的所有操作都会在 enter和exit之间，同时可以在enter和exit中做一些特殊处理。</p>
-<ol start="5">
-<li>自定义函数，也想用with管理</li>
-</ol>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> contextlib <span class="keyword">import</span> contextmanager</span><br><span class="line"></span><br><span class="line"><span class="meta">@contextmanager</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">process</span><span class="params">()</span>:</span></span><br><span class="line">    print(<span class="string">'enter'</span>)</span><br><span class="line">    <span class="keyword">yield</span> <span class="string">'helloworld'</span>  <span class="comment"># 这里就是 with as后面的 p</span></span><br><span class="line">    print(<span class="string">'exit'</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> process() <span class="keyword">as</span> p:</span><br><span class="line">    print(p)</span><br><span class="line">    print(<span class="string">'nihao'</span>)</span><br></pre></td></tr></table></figure>
-
-<p>这样你在with范围中的所有操作都会在 enter和exit之间，同时可以在enter和exit中做一些特殊处理。</p>
-
+        
     </div>
 
     
@@ -508,7 +483,7 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">15:45</span>
+    <span title="站点阅读时长">15:44</span>
 </div>
 
 <div>
