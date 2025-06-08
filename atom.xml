@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://brucewayne2099.github.io/"/>
-  <updated>2025-05-28T13:07:33.773Z</updated>
+  <updated>2025-06-08T13:10:03.584Z</updated>
   <id>https://brucewayne2099.github.io/</id>
   
   <author>
@@ -15,6 +15,33 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>唠唠同城容灾</title>
+    <link href="https://brucewayne2099.github.io/2025/06/08/%E5%94%A0%E5%94%A0%E5%AE%B9%E7%81%BE/"/>
+    <id>https://brucewayne2099.github.io/2025/06/08/%E5%94%A0%E5%94%A0%E5%AE%B9%E7%81%BE/</id>
+    <published>2025-06-08T12:02:03.000Z</published>
+    <updated>2025-06-08T13:10:03.584Z</updated>
+    
+    <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><p>作为一个SRE，其实要面对的故障原因主要就是这么几个：</p><ol><li>基础设施</li><li>生产系统</li><li>操作人</li><li>操作流程</li></ol><p>既然基础设施肯定会出问题（挖断光缆、火灾等等），那么容灾这个课题是每一个SRE必须要研究的事情。不过相比较火灾这种影响面是一栋楼的，洪水+大风这种影响一片楼的天灾更吓人。</p><p>此时SRE就要跟基础的同学一起制定演练规则、演练机制、容灾架构和具体的演练方案，通过定期的演练可以验收如下事情：<br>● 容灾能力检验：检验集团业务线核心业务的容灾能力（恢复能力、恢复时长）；<br>● 容灾预案有效性检验：检查核心业务机房级故障容灾预案有效性；<br>● 容灾风险透视：预先透视容灾风险，降低风险转化为线上故障的的机率；<br>● 容灾应急能力提升：通过演练，提升灾难场景下业务团队的协作能力；</p><p>这里本文先唠唠“同城容灾”。</p><p>首先业务应该优先接入同城容灾，同时接入层aserver、数据库（三节点）、Tair（缓存主备）、中间件早已标配同城容灾能力，因此对于业务而言接入同城容灾成本是非常低的，基本上只要应用容器在双机房部署，并且将HSF服务规则和VIPServer对称调用策略都开启同机房优先即可(非必选，可通过CDR执行CS拉黑预案；能接受更长RTO可等待中间件健康检测感知断网自动收敛)。</p><p><img src="/images/%E5%AE%B9%E7%81%BE1.png" alt="paradin" title="日常态的架构"></p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">入口流量按照<span class="number">1</span>:<span class="number">1</span>均衡分布到两个机房的接入层，接入层通过VIPServer获取upstream列表，并按照同机房转发以保证入口流量尽量在机房内封闭。</span><br><span class="line">应用间HSF服务调用通过HSF服务接口的同机房优先策略保证RPC流量尽量在机房内封闭。</span><br><span class="line">Notify和MetaQ：消息双机房随机收发。</span><br><span class="line">MDB定制版：应用读写本机房的集群，两个机房的集群会双向同步删除操作。这里解释一下为啥要这样，因为降低延迟，提升性能。电商里很多的秒杀、实时风控的场景，这些都是对延迟敏感的业务，所以RT不能太高。同时每个机房也可以根据负载来独立扩容，比如增加只读实例。为啥要双向同步删除操作，是为了保障数据的一致性，用户在一个机房删除数据后，若另一机房未同步删除就会有数据不一致（重复订单）的问题。</span><br><span class="line">MDB标准版：应用跨机房读写。</span><br><span class="line">LDB：主备模式，其中一个机房的应用需要跨机房读写。</span><br><span class="line">数据库：主备模式，<span class="number">3</span>节点分布在张北 NA61 NA62 NA63 <span class="number">3</span>机房，<span class="number">3</span>节点强一致数据同步，由于同城机房网络时延&lt;<span class="number">1</span>ms，因此对业务几乎无感知。</span><br></pre></td></tr></table></figure><p>当进入容灾态的时候，就是这样了：<br><img src="/images/%E5%AE%B9%E7%81%BE2.png" alt="paradin" title="接入层（例如aserver）、应用层都在演练范围、Tair部分加白，xdb数据库不在演练范围。"></p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">入口流量由GOC统一切到非故障机房的接入层，接入层通过VIPServer获取upstream列表，并按照同机房转发以保证入口流量尽量在机房内封闭。</span><br><span class="line">应用间HSF服务调用通过HSF服务接口的同机房优先策略保证RPC流量尽量在机房内封闭。如未设置同机房优先则会出现跨机房的HSF调用超时，需要等待CS感知心跳并自动收敛或者通过CDR主动拉黑断网容器IP。</span><br><span class="line">Notify和MetaQ：故障时变成同机房收发消息；如有消费者仅在故障机房部署，此时消息会堆积，但不会丢。</span><br><span class="line">MDB定制版：应用读写本机房的集群，两个机房的集群会双向同步删除操作。故障时无需切换，网络恢复后故障机房的缓存数据会被清空。</span><br><span class="line">MDB标准版：应用跨机房读写部分会失败，命中率下降超过<span class="number">50</span>%。</span><br><span class="line">LDB：主备模式，由GOC统一切到非故障机房进行读写。</span><br><span class="line">数据库：主备模式，<span class="number">3</span>节点分布在张北 NA61 NA62 NA63 <span class="number">3</span>机房，强一致数据同步，Leader节点所在机房故障会自动切到Follower节点进行读写。</span><br></pre></td></tr></table></figure><p>所以说整个同城容灾的精华就是“HSF同机房优先”，以及数据库leader心跳异常后自动切到follower。如果容灾开始了，就要通过日志和监控链接来确认“机房切换（DNS，tair和中间件）是否成功了”以及“业务的异常日志是否有预期内的收敛”</p>]]></content>
+    
+    <summary type="html">
+    
+      设预期，勤演练，接快恢，定责轻
+    
+    </summary>
+    
+    
+      <category term="大牛之路" scheme="https://brucewayne2099.github.io/categories/%E5%A4%A7%E7%89%9B%E4%B9%8B%E8%B7%AF/"/>
+    
+    
+      <category term="SRE" scheme="https://brucewayne2099.github.io/tags/SRE/"/>
+    
+      <category term="稳定性" scheme="https://brucewayne2099.github.io/tags/%E7%A8%B3%E5%AE%9A%E6%80%A7/"/>
+    
+      <category term="容灾" scheme="https://brucewayne2099.github.io/tags/%E5%AE%B9%E7%81%BE/"/>
+    
+  </entry>
   
   <entry>
     <title>当谈论面试的时候是在谈论什么</title>
@@ -508,31 +535,6 @@
       <category term="旅游" scheme="https://brucewayne2099.github.io/tags/%E6%97%85%E6%B8%B8/"/>
     
       <category term="日本" scheme="https://brucewayne2099.github.io/tags/%E6%97%A5%E6%9C%AC/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>m1芯片的Macos系统安装java 8</title>
-    <link href="https://brucewayne2099.github.io/2024/04/03/macos-m1%E8%8A%AF%E7%89%87%E5%AE%89%E8%A3%85java-8/"/>
-    <id>https://brucewayne2099.github.io/2024/04/03/macos-m1%E8%8A%AF%E7%89%87%E5%AE%89%E8%A3%85java-8/</id>
-    <published>2024-04-03T02:54:16.000Z</published>
-    <updated>2024-07-04T03:13:35.229Z</updated>
-    
-    <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><p>我日常工作里经常要把odps上的数据拉到桌面上在钉钉上发来发去，因为公司的数据安全政策，odps默认结果一次只能最多复制100行，如果是1000行的数据就要点击10遍，很烦人，不然就要走download审批，也很烦人。于是我忘了从哪里搞来了一个叫odps_clt_release_64 这么个工具，它可以用命令行直接通过内网把需要的数据拉到macos上。</p><p>但是我现在换了一个新的苹果，换了m1芯片很高档，当我在odps_clt_release_64路径里执行熟悉的<code>odpscmd</code>命令时，报错：</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">The operation couldn’t be completed. Unable to locate a Java Runtime.</span><br><span class="line">Please visit http://www.java.com <span class="keyword">for</span> information on installing Java.</span><br></pre></td></tr></table></figure><p>发现系统里面没有java了，于是我就直接跑去<a href="https://www.oracle.com/java/technologies/downloads/" target="_blank" rel="noopener">https://www.oracle.com/java/technologies/downloads/</a> 里，下载最新的香喷喷的jdk 22，由于我是M1芯片，所以下载的是<code>ARM64 DMG Installer</code>，一顿操作安装之后，再执行<code>odpscmd</code>命令时，换了一个报错：</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Error occurred during initialization of boot layer</span><br><span class="line">java.lang.module.FindException: Module java.xml.bind <span class="keyword">not</span> found</span><br></pre></td></tr></table></figure><p>google了一下发现，原来 <code>java.xml.bind</code> 在JDK 11及以上的版本里被干掉了。原来python2升级python3后，因为功能调整而无法启动的痛苦在java也有。于是我就只能去下载一个java8，于是来到 <a href="https://www.oracle.com/java/technologies/downloads/#java8-mac" target="_blank" rel="noopener">https://www.oracle.com/java/technologies/downloads/#java8-mac</a> 里，下载对应的<code>ARM64 DMG Installer</code>，这里比较恶心，要下载老java必须要注册，于是耐着性子注册了一下，顺利下载并安装。然后这次启动<code>odpscmd</code>就好了：</p><p><img src="/images/odpscmd.png" alt="paradin" title="终于好了"></p><p>然后就是要删除之前下载的jdk-22，删除的方法很简单，在<code>/Library/Java/JavaVirtualMachines/</code> 里找到对应的jdk-22.jdk，然后直接<code>rm -rf</code>删除就好了。</p><p>如果执行<code>java -version</code>的时候，出现了 <code>java.lang.Error:Properties init:Could not determine current working directory</code>，那是因为你当前的目录已经不存在了，换一个目录，重新执行<code>java -version</code>这个命令就行。</p>]]></content>
-    
-    <summary type="html">
-    
-      4年了，换了一个新的m1电脑，终于不烫了也不漏电的同时也要搭建新环境
-    
-    </summary>
-    
-    
-      <category term="工作与技术" scheme="https://brucewayne2099.github.io/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/"/>
-    
-    
-      <category term="java" scheme="https://brucewayne2099.github.io/tags/java/"/>
-    
-      <category term="odps" scheme="https://brucewayne2099.github.io/tags/odps/"/>
     
   </entry>
   
