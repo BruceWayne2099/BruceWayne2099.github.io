@@ -33,7 +33,7 @@
 <meta property="og:image" content="https://brucewayne2099.github.io/images/%E5%AE%B9%E7%81%BE1.png">
 <meta property="og:image" content="https://brucewayne2099.github.io/images/%E5%AE%B9%E7%81%BE2.png">
 <meta property="article:published_time" content="2025-06-08T12:02:03.000Z">
-<meta property="article:modified_time" content="2025-06-08T13:10:03.584Z">
+<meta property="article:modified_time" content="2025-06-09T03:16:01.325Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="SRE">
 <meta property="article:tag" content="稳定性">
@@ -222,10 +222,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2025-06-08 20:02:03 / 修改时间：21:10:03" itemprop="dateCreated datePublished" datetime="2025-06-08T20:02:03+08:00">2025-06-08</time>
+              <time title="创建时间：2025-06-08 20:02:03" itemprop="dateCreated datePublished" datetime="2025-06-08T20:02:03+08:00">2025-06-08</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-06-09 11:16:01" itemprop="dateModified" datetime="2025-06-09T11:16:01+08:00">2025-06-09</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -250,14 +256,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>1.5k</span>
+              <span>1.8k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
+              <span>2 分钟</span>
             </span>
             <div class="post-description">设预期，勤演练，接快恢，定责轻</div>
 
@@ -287,7 +293,9 @@
 <p>当进入容灾态的时候，就是这样了：<br><img src="/images/%E5%AE%B9%E7%81%BE2.png" alt="paradin" title="接入层（例如aserver）、应用层都在演练范围、Tair部分加白，xdb数据库不在演练范围。"></p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">入口流量由GOC统一切到非故障机房的接入层，接入层通过VIPServer获取upstream列表，并按照同机房转发以保证入口流量尽量在机房内封闭。</span><br><span class="line">应用间HSF服务调用通过HSF服务接口的同机房优先策略保证RPC流量尽量在机房内封闭。如未设置同机房优先则会出现跨机房的HSF调用超时，需要等待CS感知心跳并自动收敛或者通过CDR主动拉黑断网容器IP。</span><br><span class="line">Notify和MetaQ：故障时变成同机房收发消息；如有消费者仅在故障机房部署，此时消息会堆积，但不会丢。</span><br><span class="line">MDB定制版：应用读写本机房的集群，两个机房的集群会双向同步删除操作。故障时无需切换，网络恢复后故障机房的缓存数据会被清空。</span><br><span class="line">MDB标准版：应用跨机房读写部分会失败，命中率下降超过<span class="number">50</span>%。</span><br><span class="line">LDB：主备模式，由GOC统一切到非故障机房进行读写。</span><br><span class="line">数据库：主备模式，<span class="number">3</span>节点分布在张北 NA61 NA62 NA63 <span class="number">3</span>机房，强一致数据同步，Leader节点所在机房故障会自动切到Follower节点进行读写。</span><br></pre></td></tr></table></figure>
 
-<p>所以说整个同城容灾的精华就是“HSF同机房优先”，以及数据库leader心跳异常后自动切到follower。如果容灾开始了，就要通过日志和监控链接来确认“机房切换（DNS，tair和中间件）是否成功了”以及“业务的异常日志是否有预期内的收敛”</p>
+<p>所以说整个同城容灾的精华就是“HSF同机房优先”，这里面还有一个Config server，这个Config server也是主备的，主down机之后，备cs会立即接管集群。数据库leader心跳异常后自动切到follower也是非常重要。</p>
+<p>如果是要做容灾的演习，事前需要先跟业务约定，每次的断网只会断一个机房的网，同时发布演练计划。这样避免届时断网的时候有大量报警而产生不必要的惊慌。然后组织方需要发布演练公告，让参与的业务方SRE加入沟通群，方便及时交流。大部分SRE oncall 即可，核心领域的SRE需要现场值班。</p>
+<p>然后组织方开始准备工作，比如白名单和打标。在注入故障的时候，就要应用的负责人和SRE通过日志和监控链接来确认“机房切换（DNS，tair和中间件）是否成功”、“自动容灾预案是否生效”、“业务的异常日志是否有预期内的收敛”以及“业务成功率是否在预期内恢复”。</p>
 
     </div>
 
