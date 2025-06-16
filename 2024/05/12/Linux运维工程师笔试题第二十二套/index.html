@@ -31,7 +31,7 @@
 <meta property="og:description" content="在Java中，未使用BufferedInputStream读取文件导致调用方sys过高，本质是频繁的系统调用引起的性能瓶颈">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2024-05-12T06:22:09.000Z">
-<meta property="article:modified_time" content="2025-06-11T10:08:21.245Z">
+<meta property="article:modified_time" content="2025-06-16T06:16:52.459Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="python">
 <meta property="article:tag" content="面试">
@@ -227,7 +227,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2025-06-11 18:08:21" itemprop="dateModified" datetime="2025-06-11T18:08:21+08:00">2025-06-11</time>
+                <time title="修改时间：2025-06-16 14:16:52" itemprop="dateModified" datetime="2025-06-16T14:16:52+08:00">2025-06-16</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -337,7 +337,7 @@
 <li><p>free -m 这个命令的输出是啥意思？<br>【答案】</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">total：总内存大小（单位：MB）。used + free + buff/cache ≈ total，这是正常现象。</span><br><span class="line">used：已使用的内存大小（包括缓存和缓冲区）。used 为 <span class="number">0</span> 时，表示物理内存足够，无需使用交换分区。used 明显大于 <span class="number">0</span>，说明物理内存不足，系统开始使用磁盘作为虚拟内存（性能可能下降）。</span><br><span class="line">free：完全空闲的内存大小（未被使用）。</span><br><span class="line">shared：共享内存大小（通常由多个进程共享的内存区域）。</span><br><span class="line">buff/cache：内核缓存和缓冲区占用的内存大小（这部分可以被快速释放以供应用程序使用）。</span><br><span class="line">available：可用内存大小（预估当前系统可分配的内存，比 free + buff/cache 更合理）。如果 available 接近 <span class="number">0</span>，可能需要优化内存使用或增加内存。</span><br><span class="line">Mem：物理内存（RAM）的统计信息。</span><br><span class="line">Swap：交换分区（Swap）的统计信息。</span><br><span class="line"></span><br><span class="line">结合 watch 命令实时监控内存：watch -n <span class="number">1</span> free -m</span><br></pre></td></tr></table></figure>
 </li>
-<li><p>tair的读写RT都有升高，跟有热点 key 是什么关系？</p>
+<li><p>tair的读写RT都有升高，跟有热点 key是什么关系？</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">（<span class="number">1</span>）单节点负载过载</span><br><span class="line">现象：热点 Key 通常集中在 单个缓存节点（Tair 的数据分片机制下，Key 分布不均可能导致热点集中）。</span><br><span class="line">结果：a.该节点的 CPU、内存、网络带宽被耗尽。  </span><br><span class="line">     b.请求排队等待，导致 RT 明显上升，甚至触发超时或熔断。</span><br><span class="line">（<span class="number">2</span>）线程阻塞与锁竞争</span><br><span class="line">现象：对热点 Key 的并发读写操作可能引发 锁竞争（如原子操作 INCR、分布式锁）。</span><br><span class="line">结果：</span><br><span class="line">    a.大量线程等待锁释放，导致 请求堆积。</span><br><span class="line">例如：秒杀场景中对库存的频繁减扣。</span><br><span class="line">（<span class="number">3</span>）网络拥塞</span><br><span class="line">现象：大量请求集中访问热点 Key，导致节点与客户端之间的网络链路饱和。</span><br><span class="line">结果：a.网络延迟增加，RT 上升。</span><br><span class="line">    b.可能波及同节点的其他非热点 Key 请求（“木桶效应”）。</span><br><span class="line">（<span class="number">4</span>）缓存穿透或击穿</span><br><span class="line">现象：</span><br><span class="line">    a.缓存穿透：非法 Key 的高频查询（如攻击性扫描）。</span><br><span class="line">    b.缓存击穿：热点 Key 过期后，大量请求直接穿透到后端数据库。</span><br><span class="line">结果：后端数据库压力激增，导致整体 RT 雪崩式升高。</span><br></pre></td></tr></table></figure>
 </li>
 <li><p>无序正整数数字中找出所有元素拼接后的最小值，比如 [1,3,2],得到 123。<br>【思路】这个题不能简单的用sort从小到大排序然后组合起来就交卷，因为有一种情况，假设给的列表是[1,30,2,15]，直接sort后的得到的答案是121530,但是实际最小的值应该是115230，核心原因就是2虽然小于15，但是放在数字里作为百位数或者千位数这个逻辑就不对了。<br>但是sort还是要sort的，毕竟它是唯一一个python具备排序的功能。核心点是sort是可以带入key的，比如sort(key=len)，这个的效果就是按照各个元素的字符串长度来排序了，不要简单的以为sort只能排数字大小。</p>
@@ -497,7 +497,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">408</span>
+          <span class="site-state-item-count">409</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -509,7 +509,7 @@
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
-        <span class="site-state-item-count">361</span>
+        <span class="site-state-item-count">362</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -557,7 +557,7 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">16:05</span>
+    <span title="站点阅读时长">16:09</span>
 </div>
 
 <div>
