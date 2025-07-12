@@ -33,7 +33,7 @@
 <meta property="og:image" content="https://brucewayne2099.github.io/images/python%E9%9D%A2%E8%AF%95.png">
 <meta property="og:image" content="https://brucewayne2099.github.io/images/python%E9%9D%A2%E8%AF%952.png">
 <meta property="article:published_time" content="2024-05-26T16:08:45.000Z">
-<meta property="article:modified_time" content="2025-06-11T12:48:04.006Z">
+<meta property="article:modified_time" content="2025-07-10T03:11:18.784Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="python">
 <meta property="article:tag" content="面试">
@@ -230,7 +230,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2025-06-11 20:48:04" itemprop="dateModified" datetime="2025-06-11T20:48:04+08:00">2025-06-11</time>
+                <time title="修改时间：2025-07-10 11:11:18" itemprop="dateModified" datetime="2025-07-10T11:11:18+08:00">2025-07-10</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -256,7 +256,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>2.8k</span>
+              <span>3.4k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -318,6 +318,12 @@ d.持久卷（PersistentVolume）无法绑定</code></pre></li>
 <li><p>系统的 CPU 使用率很高，却找不到高 CPU 的应用？<br>有可能是短时应用导致的问题：<br>a.应用里直接调用了其他二进制程序，这些程序通常运行时间比较短，通过 top 等工具也不容易发现。<br>b.应用本身在不停地崩溃重启，而启动过程的资源初始化，很可能会占用相当多的 CPU。</p>
 </li>
 <li><p>应用的Metaspace 使用率高，都有什么样的原因？<br>a. 加载的类数量多，类加载也会导致 CPU升高（少数静态类加载除外）<br>b. 新类与老类共存（未卸载旧类）<br>c. Metaspace 泄漏（Memory Leak）<br>d. JVM 参数配置不当</p>
+</li>
+<li><p>场景题，现在发现由于索引缺失且数据库许久没有清除数据，导致了慢sql问题，你应该如何止血？<br>这里建议先联系DBA启动“CPU放开”预案，暂时获取到额外的cpu能力，此时索引构建可能会影响线上业务的情况，那么剩下的步骤就是：停止主备同步、备库构建索引、开启数据同步、数据追平后做主备切换。</p>
+</li>
+<li><p>接上面，为什么要在备库创建索引，主库不可以么？<br>InnoDB 存储引擎下执行CREATE INDEX会 锁表（表级锁），禁止读写操作。可通过 SHOW PROCESSLIST 查看是否出现 Waiting for table metadata lock。即使不锁表，索引构建仍会占用大量内存和 I/O，可能影响性能。</p>
+</li>
+<li><p>如果流量下跌，排查的步骤是什么？<br>a. 首先先看成功率是否符合预期，以及对应的上游的流量是否也下跌，如果成功率不符合预期，或者上游的流量没有下跌，那么可能是我们自身应用出了问题，需要第一时间判断问题并止血。<br>b. 如果上游链路也流量下跌，无论是直接依赖还是场景依赖（比如carts2 查看购物车是 buy2 渲染订单的前置步骤）请立即联系上游应用对应的负责人，跟进上游的进展。<br>c. 如果是单独一个机房或者某个地域出现流量下跌，马上看其他同机房或者同地域的应用是否也同时出现下跌，如果也在下跌立即联系集团侧容灾负责人。这种情况大概率是机房网络或入口网关出现故障。</p>
 </li>
 </ol>
 
@@ -532,7 +538,7 @@ d.持久卷（PersistentVolume）无法绑定</code></pre></li>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">16:17</span>
+    <span title="站点阅读时长">16:18</span>
 </div>
 
 <div>
