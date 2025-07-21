@@ -31,7 +31,7 @@
 <meta property="og:description" content="在Java中，未使用BufferedInputStream读取文件导致调用方sys过高，本质是频繁的系统调用引起的性能瓶颈">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2024-05-12T06:22:09.000Z">
-<meta property="article:modified_time" content="2025-06-16T06:16:52.459Z">
+<meta property="article:modified_time" content="2025-07-17T12:45:32.962Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="python">
 <meta property="article:tag" content="面试">
@@ -227,7 +227,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2025-06-16 14:16:52" itemprop="dateModified" datetime="2025-06-16T14:16:52+08:00">2025-06-16</time>
+                <time title="修改时间：2025-07-17 20:45:32" itemprop="dateModified" datetime="2025-07-17T20:45:32+08:00">2025-07-17</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -253,7 +253,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>8.3k</span>
+              <span>8.5k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -340,8 +340,12 @@
 <li><p>tair的读写RT都有升高，跟有热点 key是什么关系？</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">（<span class="number">1</span>）单节点负载过载</span><br><span class="line">现象：热点 Key 通常集中在 单个缓存节点（Tair 的数据分片机制下，Key 分布不均可能导致热点集中）。</span><br><span class="line">结果：a.该节点的 CPU、内存、网络带宽被耗尽。  </span><br><span class="line">     b.请求排队等待，导致 RT 明显上升，甚至触发超时或熔断。</span><br><span class="line">（<span class="number">2</span>）线程阻塞与锁竞争</span><br><span class="line">现象：对热点 Key 的并发读写操作可能引发 锁竞争（如原子操作 INCR、分布式锁）。</span><br><span class="line">结果：</span><br><span class="line">    a.大量线程等待锁释放，导致 请求堆积。</span><br><span class="line">例如：秒杀场景中对库存的频繁减扣。</span><br><span class="line">（<span class="number">3</span>）网络拥塞</span><br><span class="line">现象：大量请求集中访问热点 Key，导致节点与客户端之间的网络链路饱和。</span><br><span class="line">结果：a.网络延迟增加，RT 上升。</span><br><span class="line">    b.可能波及同节点的其他非热点 Key 请求（“木桶效应”）。</span><br><span class="line">（<span class="number">4</span>）缓存穿透或击穿</span><br><span class="line">现象：</span><br><span class="line">    a.缓存穿透：非法 Key 的高频查询（如攻击性扫描）。</span><br><span class="line">    b.缓存击穿：热点 Key 过期后，大量请求直接穿透到后端数据库。</span><br><span class="line">结果：后端数据库压力激增，导致整体 RT 雪崩式升高。</span><br></pre></td></tr></table></figure>
 </li>
-<li><p>无序正整数数字中找出所有元素拼接后的最小值，比如 [1,3,2],得到 123。<br>【思路】这个题不能简单的用sort从小到大排序然后组合起来就交卷，因为有一种情况，假设给的列表是[1,30,2,15]，直接sort后的得到的答案是121530,但是实际最小的值应该是115230，核心原因就是2虽然小于15，但是放在数字里作为百位数或者千位数这个逻辑就不对了。<br>但是sort还是要sort的，毕竟它是唯一一个python具备排序的功能。核心点是sort是可以带入key的，比如sort(key=len)，这个的效果就是按照各个元素的字符串长度来排序了，不要简单的以为sort只能排数字大小。</p>
+<li><p>什么场景下的GC耗时很长可以通过增加容器数来有效解决？<br>GC（垃圾回收）耗时长通常由以下原因导致：<br>堆内存过大：Full GC 扫描的堆内存越大，耗时越长。<br>高并发负载：单容器处理大量请求，导致对象分配速度快，GC 频率升高。</p>
 </li>
+</ol>
+<p>增加容器数 的本质是 水平扩展，通过分散负载和减少单容器内存压力，间接降低 GC 耗时。</p>
+<ol start="16">
+<li>无序正整数数字中找出所有元素拼接后的最小值，比如 [1,3,2],得到 123。<br>【思路】这个题不能简单的用sort从小到大排序然后组合起来就交卷，因为有一种情况，假设给的列表是[1,30,2,15]，直接sort后的得到的答案是121530,但是实际最小的值应该是115230，核心原因就是2虽然小于15，但是放在数字里作为百位数或者千位数这个逻辑就不对了。<br>但是sort还是要sort的，毕竟它是唯一一个python具备排序的功能。核心点是sort是可以带入key的，比如sort(key=len)，这个的效果就是按照各个元素的字符串长度来排序了，不要简单的以为sort只能排数字大小。</li>
 </ol>
 <p>但是这个key怎么来？这里还有一个问题，就是如何判断我们上面说的“2和15谁前谁后”了，这里用字符串的比较功能，因为”2”+”15” = “215”, 而 “15”+”2” = “152”,通过字符串的比较，返回1 -1 和0这三种情况，然后用这三种情况作为key就行了。</p>
 <p>这题比较难的地方就是用到了<code>cmp_to_key</code>这个东西，估计在笔试的时候用python的同学很难想到它。我当时面字节数据中台的时候就让写这道题，我就没写出来…这道题是明显的java更好写（Comparator是自带的模块），但是python反而不好写的典型。</p>
