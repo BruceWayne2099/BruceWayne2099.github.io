@@ -23,12 +23,12 @@
     var CONFIG = {"hostname":"brucewayne2099.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="这不是我的原创，但是对学习java的gc过程很有好处">
+  <meta name="description" content="这不是我的原创，是对学习java的gc过程很有好处，所以赶紧钻研学习">
 <meta property="og:type" content="article">
 <meta property="og:title" content="通过调整jmv参数，有效提升系统可用率">
 <meta property="og:url" content="https://brucewayne2099.github.io/2025/07/25/%E9%80%9A%E8%BF%87%E8%B0%83%E6%95%B4jmv%E5%8F%82%E6%95%B0%EF%BC%8C%E6%9C%89%E6%95%88%E6%8F%90%E5%8D%87%E7%B3%BB%E7%BB%9F%E5%8F%AF%E7%94%A8%E7%8E%87/index.html">
 <meta property="og:site_name" content="石锤淡啤酒">
-<meta property="og:description" content="这不是我的原创，但是对学习java的gc过程很有好处">
+<meta property="og:description" content="这不是我的原创，是对学习java的gc过程很有好处，所以赶紧钻研学习">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://brucewayne2099.github.io/images/jvm1.png">
 <meta property="og:image" content="https://brucewayne2099.github.io/images/jvm2.png">
@@ -43,8 +43,16 @@
 <meta property="og:image" content="https://brucewayne2099.github.io/images/jvm11.png">
 <meta property="og:image" content="https://brucewayne2099.github.io/images/jvm12.png">
 <meta property="og:image" content="https://brucewayne2099.github.io/images/jvm12.png">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/jvm14.png">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/jvm15.png">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/jvm16.png">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/jvm17.png">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/jvm18.png">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/jvm19.png">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/jvm20.png">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/jvm21.png">
 <meta property="article:published_time" content="2025-07-25T03:50:10.000Z">
-<meta property="article:modified_time" content="2025-07-25T09:02:26.809Z">
+<meta property="article:modified_time" content="2025-07-25T09:15:29.085Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="java">
 <meta property="article:tag" content="gc">
@@ -235,7 +243,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2025-07-25 11:50:10 / 修改时间：17:02:26" itemprop="dateCreated datePublished" datetime="2025-07-25T11:50:10+08:00">2025-07-25</time>
+              <time title="创建时间：2025-07-25 11:50:10 / 修改时间：17:15:29" itemprop="dateCreated datePublished" datetime="2025-07-25T11:50:10+08:00">2025-07-25</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -261,7 +269,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>5.9k</span>
+              <span>5.8k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -270,7 +278,7 @@
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
               <span>5 分钟</span>
             </span>
-            <div class="post-description">这不是我的原创，但是对学习java的gc过程很有好处</div>
+            <div class="post-description">这不是我的原创，是对学习java的gc过程很有好处，所以赶紧钻研学习</div>
 
         </div>
       </header>
@@ -311,11 +319,11 @@
 <p>实验结果如下图，可知索引的确在第一次 YGC 时从 Eden 被直接复制到了 Old（因为清理后年轻代占用变为 0，否则年轻代清理后仍然会占用 400MB 左右）<br><img src="/images/jvm11.png" alt="paradin" title="直接晋升"></p>
 <p>总结：本次优化前，每次索引切换后会出现2次连续的长耗时YGC，在不改任何一行业务代码、不加一台机器的前提下，仅通过设置 <code>MaxTenuringThreshold=0</code>，GC 长暂停时间直接减半。体现在系统监控上就是索引切换时报错量明显变少，服务抖动时成功率从 95% 提高至 98%：<br><img src="/images/jvm12.png" alt="paradin" title="不走s区，直接去old"></p>
 <h4 id="InitialTenuringThreshold"><a href="#InitialTenuringThreshold" class="headerlink" title="InitialTenuringThreshold"></a>InitialTenuringThreshold</h4><p>经实测，设置 <code>InitialTenuringThreshold=1</code> 也能达到类似上面的效果，也能将索引复制次数从 2 次减少为 1 次，提高系统稳定性：<br><img src="/images/jvm12.png" alt="paradin" title="InitialTenuringThreshold和MaxTenuringThreshold的作用类似，都是用于调整对象晋升到老年代的年龄阈值"></p>
-<h4 id="AlwaysTenure"><a href="#AlwaysTenure" class="headerlink" title="AlwaysTenure"></a>AlwaysTenure</h4><p>前两小节的核心思想是让索引直接晋升并复制到老年代。恰好 AlwaysTenure 参数也能达到该目的，参数作用如字面含义：让对象总是晋升。经实测，设置 AlwaysTenure 后，也能将索引复制次数从 2 次减少为 1 次，提高系统稳定性：</p>
-<p>说明：<br>●由于索引较大，Eden 区剩余空间可能无法容纳整个索引，因此上图总共经历了 3 次 YGC 清理释放，才让索引全部创建完成。其中每次 YGC 会把已构造好的索引局部晋升到老年代，前后总共 3 次 YGC 才把索引完整搬到了老年代。这与“AlwaysTenure 将索引复制次数从 2 次减少为 1 次”结论并不冲突</p>
-<p>●AlwaysTenure 相当于只使用 Eden 和 Old，而 Survivor 闲置。与之作用相反的参数是 NeverTenure，会让对象在年轻代中反复辗转而永远不晋升，意味着只使用了 Eden 和 Survivor 区，而 Old 区闲置。两个参数都比较极端，只有在特殊业务场景才考虑使用</p>
-<p>●降低晋升年龄阈值会让对象更容易进入老年代，通常会加重老年代 FGC 负担。而本业务场景比较特殊，对象的存活时间两极分化明显：一种是由 RPC 请求产生的朝生夕灭的对象，存活时间毫秒级；另一种则是巨型索引对象，存活时间最短都有数十分钟。因此就算把晋升年龄阈值改为 1，这些临时对象大概率已失活（被清理）而非存活（被晋升），故修改以上 JVM 参数不会加重本系统FGC负担</p>
-<h4 id="让索引直接分配到老年代"><a href="#让索引直接分配到老年代" class="headerlink" title="让索引直接分配到老年代"></a>让索引直接分配到老年代</h4><p>上节内容已将索引流转路径已从 Eden =&gt; Survivor =&gt; Old（2 次复制）优化为 Eden =&gt; Old（1 次复制）。能否更极端一点，让新索引在最初创建时，就一步到位直接分配到老年代（0 次复制）？这样索引复制导致服务抖动的问题将得到根治。思路如下：</p>
+<h4 id="AlwaysTenure"><a href="#AlwaysTenure" class="headerlink" title="AlwaysTenure"></a>AlwaysTenure</h4><p>AlwaysTenure参数作用如字面含义：让对象总是晋升。经实测，设置 AlwaysTenure 后，也能将索引复制次数从 2 次减少为 1 次，提高系统稳定性：<br><img src="/images/jvm14.png" alt="paradin" title="AlwaysTenure 参数也能达到该目的"></p>
+<p>这里多说明一下：<br>● 由于索引较大，Eden 区剩余空间可能无法容纳整个索引，因此上图总共经历了 3 次 YGC 清理释放，才让索引全部创建完成。其中每次 YGC 会把已构造好的索引局部晋升到老年代，前后总共 3 次 YGC 才把索引完整搬到了老年代。这与“AlwaysTenure 将索引复制次数从 2 次减少为 1 次”结论并不冲突。</p>
+<p>● AlwaysTenure 相当于只使用 Eden 和 Old，而 Survivor 闲置。与之作用相反的参数是 NeverTenure，会让对象在年轻代中反复辗转而永远不晋升，意味着只使用了 Eden 和 Survivor 区，而 Old 区闲置。两个参数都比较极端，只有在特殊业务场景才考虑使用。</p>
+<p>● 降低晋升年龄阈值会让对象更容易进入老年代，但是会加重老年代 FGC 负担。而本业务场景比较特殊，对象的存活时间两极分化明显：一种是由 RPC 请求产生的朝生夕灭的对象，存活时间毫秒级；另一种则是巨型索引对象，存活时间最短都有数十分钟。因此就算把晋升年龄阈值改为1，这些临时对象大概率已失活（被清理）而非存活（被晋升），故修改以上 JVM 参数不会加重本系统FGC负担。</p>
+<h4 id="让索引直接分配到老年代"><a href="#让索引直接分配到老年代" class="headerlink" title="让索引直接分配到老年代"></a>让索引直接分配到老年代</h4><p>上节内容已将索引流转路径已从<code>Eden =&gt; Survivor =&gt; Old（2 次复制）</code>优化为 <code>Eden =&gt; Old（1 次复制）</code>。能否更极端一点，让新索引在最初创建时，就一步到位直接分配到老年代（0 次复制）？思路如下：<br><img src="/images/jvm15.png" alt="paradin" title="这样索引复制导致服务抖动的问题将得到根治"></p>
 <p>围绕此思路，继续做了如下尝试：</p>
 <figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">PretenureSizeThreshold</span> 参数作用：当对象的大小超过 PretenureSizeThreshold 时，该对象会直接分配到老年代</span><br></pre></td></tr></table></figure>
 
@@ -323,17 +331,19 @@
 <figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">G1HeapRegionSize 参数作用：G1GC 将堆内存划分为多个大小相等的区域，这些区域被称为 Region，旨在提高垃圾收集的效率和灵活性。当待分配对象大小 &gt; G1HeapRegionSize / <span class="number">2</span> 时，会被直接分配到老年代</span><br></pre></td></tr></table></figure>
 
 <p>然而，修改 G1HeapRegionSize 参数后继续观察，索引切换时系统仍然抖动，看 GC 日志索引流转路径仍然是 <code>Eden =&gt; Survivor =&gt; Old</code>，并没有达到预期效果。</p>
-<p>原因分析：业务上索引虽然整体很大（约 500MB），但实际是由上百万个小对象组成的。索引的创建过程实际就是内部海量小对象逐个创建的过程，这些小对象被分配至 Eden（而非 Old）是合理的、符合预期的，因此从结果来看整个索引实际仍然被分配在 Eden 区。除非是 int[] arr = new int[1000000000] 这类情况，JVM 能在最初明确知道 arr 需要多少空间，才可直接分配到老年代。</p>
-<h4 id="加速索引复制过程"><a href="#加速索引复制过程" class="headerlink" title="加速索引复制过程"></a>加速索引复制过程</h4><p>在不改变索引固有大小、索引复制次数的情况下，也可以考虑调节如下参数来提高复制速度、降低暂停时长：</p>
+<p>原因分析：业务上索引虽然整体很大（约500MB），但实际是由上百万个小对象组成的。索引的创建过程实际就是内部海量小对象逐个创建的过程，这些小对象被分配至 Eden（而非 Old）是合理的、符合预期的，因此从结果来看整个索引实际仍然被分配在 Eden 区。除非是 int[] arr = new int[1000000000] 这类情况，JVM 能在最初明确知道 arr 需要多少空间，才可直接分配到老年代。</p>
+<h4 id="加速索引复制过程"><a href="#加速索引复制过程" class="headerlink" title="加速索引复制过程"></a>加速索引复制过程</h4><p>在不改变索引固有大小、索引复制次数的情况下，也可以考虑调节如下参数来提高复制速度、降低暂停时长：<br><img src="/images/jvm16.png" alt="paradin" title="这几个参数也都挨个试过"></p>
 <p>实测调整以上参数无明显改善：MaxGCPauseMillis 只是一个目标值，然而复制索引固有耗时始终有那么久，作用不大。其次，经实测 GC 默认并发线程数已接近 CPU 核数，也无更多优化空间。</p>
-<h4 id="升级JDK11-ZGC"><a href="#升级JDK11-ZGC" class="headerlink" title="升级JDK11 - ZGC"></a>升级JDK11 - ZGC</h4><p>传统的 CMS 和 G1 都存在各自的理论局限（例如 CMS 的内存碎片化，G1 只能在 STW 时移动对象，两者 STW 时长会随着活跃对象的增加而增加），这正是我们大索引复制所遇到的问题。<br>JDK11 中新增 ZGC，核心变化是引入了着色指针（Colored Pointers）和读屏障（Load Barriers）机制，解决对象复制过程中准确访问对象的问题，从 STW 优化为并发转移。核心原理如下：</p>
+<h4 id="升级JDK11-ZGC"><a href="#升级JDK11-ZGC" class="headerlink" title="升级JDK11 - ZGC"></a>升级JDK11 - ZGC</h4><p>传统的 CMS 和 G1 都存在各自的理论局限（例如 CMS 的内存碎片化，G1 只能在 STW 时移动对象，两者 STW 时长会随着活跃对象的增加而增加），这正是我们大索引复制所遇到的问题。</p>
+<p>JDK11 中新增 ZGC，核心变化是引入了着色指针（Colored Pointers）和读屏障（Load Barriers）机制，解决对象复制过程中准确访问对象的问题，从 STW 优化为并发转移。核心原理如下：</p>
 <figure class="highlight gcode"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ZGC中业务线程访问对象将触发“读屏障”，如果发现对象被复制移动了（通过“着色指针”实现），则“读屏障”会把读出来的指针更新到对象的新地址上，让业务线程始终访问到对象更新后、移动后的正确地址。对比之下<span class="name">G1</span>只能先暂停并复制对象、更新指针地址，随后再解除暂停让业务线程访问对象</span><br></pre></td></tr></table></figure>
-<p>以上机制让 ZGC 可以有更高的并发度、更低的 STW 时长。对比 G1 如下：</p>
-<p>经实测使用 ZGC 后稳定性有提升，但索引切换期间仍然会有轻微抖动。诊断分析 GC 日志发现此期间有 Allocation Stall（导致应用程序在尝试分配内存时暂时停止，直到有足够的内存可用）：</p>
-<p>本系统每次分配新索引都需要约 500MB 内存，这是 JVM 无法预知的。对比监控可发现每次索引切换时，每个服务端 RT 尖刺均对应了一次堆内存占用尖刺，如下图：</p>
+
+<p>以上机制让 ZGC 可以有更高的并发度、更低的 STW 时长。对比 G1 如下：<br><img src="/images/jvm17.png" alt="paradin" title="ZGC vs G1"></p>
+<p>经实测使用 ZGC 后稳定性有提升，但索引切换期间仍然会有轻微抖动。诊断分析 GC 日志发现此期间有 Allocation Stall（导致应用程序在尝试分配内存时暂时停止，直到有足够的内存可用）：<br><img src="/images/jvm18.png" alt="paradin" title="ZGC还是有点效果的"></p>
+<p>本系统每次分配新索引都需要约 500MB 内存，这是 JVM 无法预知的。对比监控可发现每次索引切换时，每个服务端 RT 尖刺均对应了一次堆内存占用尖刺，如下图：<br><img src="/images/jvm19.png" alt="paradin" title="时间轴都对得上"></p>
 <p>由于 ZGC 在内存整理阶段是无锁复制，因此 GC 日志中没再发现耗时异常的记录，经实测服务成功率进一步提高到了 99.5%。但美中不足的是由于 Allocation Stall 问题，系统时常还是会有些小抖动。</p>
-<h2 id="问题复盘"><a href="#问题复盘" class="headerlink" title="问题复盘"></a>问题复盘</h2><p>回顾本问题，复盘为什么 YGC 的负面影响这么大，让本系统在索引切换时成功率跌至 95%？核心问题是本系统挑战本身就非常大，需要同时满足以下三个条件，缺一不可：<br>● 对延迟非常敏感：同步调用且毫秒级返回，不能长时间暂停，否则每次长暂停都会直接体现为业务监控上的报错<br>● 极高的内存压力：每次索引切换会带来 GB 级的内存消耗、清理和复制开销，这是导致 YGC 耗时久的根源<br>● 极高的并发量：总流量十万级 QPS，单机数千 QPS。GC 暂停时所有请求都将暂停处理，导致大量超时</p>
-<p>针对组内某个高并发（10W+ QPS）、低延迟（毫秒级返回）、高内存压力（最快每 15 分钟一次 GB 级索引切换）系统不稳定问题，本文基于 JVM 调参做了一系列探索尝试，最终彻底实现了索引无感切换，让服务可用率稳定在 99.995%。有效的优化手段如下：</p>
+<h2 id="问题复盘"><a href="#问题复盘" class="headerlink" title="问题复盘"></a>问题复盘</h2><p>回顾本问题，复盘为什么YGC的负面影响这么大，让本系统在索引切换时成功率跌至95%？核心问题是本系统挑战本身就非常大，需要同时满足以下三个条件，缺一不可：<br>● 对延迟非常敏感：同步调用且毫秒级返回，不能长时间暂停，否则每次长暂停都会直接体现为业务监控上的报错<br>● 极高的内存压力：每次索引切换会带来 GB 级的内存消耗、清理和复制开销，这是导致 YGC 耗时久的根源<br>● 极高的并发量：总流量十万级 QPS，单机数千 QPS。GC 暂停时所有请求都将暂停处理，导致大量超时<br><img src="/images/jvm20.png" alt="paradin" title="维护这么难得的系统也是一个挺有挑战的事儿"></p>
+<p>针对组内某个高并发（10W+ QPS）、低延迟（毫秒级返回）、高内存压力（最快每 15 分钟一次 GB 级索引切换）系统不稳定问题，本文基于 JVM 调参做了一系列探索尝试，最终彻底实现了索引无感切换，让服务可用率稳定在 99.995%。有效的优化手段如下：<br><img src="/images/jvm21.png" alt="paradin" title="总结～"></p>
 <p>至此，未来无论系统 QPS 涨到多高、索引体积膨胀到多大、索引切换多么频繁，系统都能无感切换索引，稳定性不再受到任何影响。完结撒花~</p>
 
     </div>
