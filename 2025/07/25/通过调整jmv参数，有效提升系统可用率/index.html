@@ -52,7 +52,7 @@
 <meta property="og:image" content="https://brucewayne2099.github.io/images/jvm20.png">
 <meta property="og:image" content="https://brucewayne2099.github.io/images/jvm21.png">
 <meta property="article:published_time" content="2025-07-25T03:50:10.000Z">
-<meta property="article:modified_time" content="2025-07-25T09:38:49.301Z">
+<meta property="article:modified_time" content="2025-07-25T09:40:20.150Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="java">
 <meta property="article:tag" content="gc">
@@ -243,7 +243,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2025-07-25 11:50:10 / 修改时间：17:38:49" itemprop="dateCreated datePublished" datetime="2025-07-25T11:50:10+08:00">2025-07-25</time>
+              <time title="创建时间：2025-07-25 11:50:10 / 修改时间：17:40:20" itemprop="dateCreated datePublished" datetime="2025-07-25T11:50:10+08:00">2025-07-25</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -330,11 +330,11 @@
 <p>然而 PretenureSizeThreshold 参数对 G1GC 并不生效，实测也发现调整该参数后没有稳定性增益。</p>
 <figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">G1HeapRegionSize 参数作用：G1GC 将堆内存划分为多个大小相等的区域，这些区域被称为 Region，旨在提高垃圾收集的效率和灵活性。当待分配对象大小 &gt; G1HeapRegionSize / <span class="number">2</span> 时，会被直接分配到老年代</span><br></pre></td></tr></table></figure>
 
-<p>然而，修改 G1HeapRegionSize 参数后继续观察，索引切换时系统仍然抖动，看 GC 日志索引流转路径仍然是 <code>Eden =&gt; Survivor =&gt; Old</code>，并没有达到预期效果。</p>
+<p>修改 G1HeapRegionSize 参数后继续观察，索引切换时系统仍然抖动，看 GC 日志索引流转路径仍然是 <code>Eden =&gt; Survivor =&gt; Old</code>，并没有达到预期效果。</p>
 <p>原因分析：业务上索引虽然整体很大（约500MB），但实际是由上百万个小对象组成的。索引的创建过程实际就是内部海量小对象逐个创建的过程，这些小对象被分配至 Eden（而非 Old）是合理的、符合预期的，因此从结果来看整个索引实际仍然被分配在 Eden 区。除非是 int[] arr = new int[1000000000] 这类情况，JVM 能在最初明确知道 arr 需要多少空间，才可直接分配到老年代。</p>
 <h4 id="加速索引复制过程"><a href="#加速索引复制过程" class="headerlink" title="加速索引复制过程"></a>加速索引复制过程</h4><p>在不改变索引固有大小、索引复制次数的情况下，也可以考虑调节如下参数来提高复制速度、降低暂停时长：<br><img src="/images/jvm16.png" alt="paradin" title="这几个参数也都挨个试过"></p>
 <p>实测调整以上参数无明显改善：MaxGCPauseMillis 只是一个目标值，然而复制索引固有耗时始终有那么久，作用不大。其次，经实测 GC 默认并发线程数已接近 CPU 核数，也无更多优化空间。</p>
-<h4 id="升级JDK11-ZGC"><a href="#升级JDK11-ZGC" class="headerlink" title="升级JDK11 - ZGC"></a>升级JDK11 - ZGC</h4><p>传统的 CMS 和 G1 都存在各自的理论局限（例如 CMS 的内存碎片化，G1 只能在 STW 时移动对象，两者 STW 时长会随着活跃对象的增加而增加），这正是我们大索引复制所遇到的问题。</p>
+<h4 id="升级JDK11-ZGC"><a href="#升级JDK11-ZGC" class="headerlink" title="升级JDK11 - ZGC"></a>升级JDK11 - ZGC</h4><p>传统的CMS和G1都存在各自的理论局限（例如CMS的内存碎片化，G1只能在STW时移动对象，两者STW时长会随着活跃对象的增加而增加），这正是我们大索引复制所遇到的问题。</p>
 <p>JDK11 中新增 ZGC，核心变化是引入了着色指针（Colored Pointers）和读屏障（Load Barriers）机制，解决对象复制过程中准确访问对象的问题，从 STW 优化为并发转移。核心原理如下：</p>
 <figure class="highlight gcode"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ZGC中业务线程访问对象将触发“读屏障”，如果发现对象被复制移动了（通过“着色指针”实现），则“读屏障”会把读出来的指针更新到对象的新地址上，让业务线程始终访问到对象更新后、移动后的正确地址。对比之下<span class="name">G1</span>只能先暂停并复制对象、更新指针地址，随后再解除暂停让业务线程访问对象</span><br></pre></td></tr></table></figure>
 
