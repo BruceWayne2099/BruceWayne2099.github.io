@@ -34,8 +34,12 @@
 <meta property="og:image" content="https://brucewayne2099.github.io/images/jvm2.png">
 <meta property="og:image" content="https://brucewayne2099.github.io/images/jvm3.png">
 <meta property="og:image" content="https://brucewayne2099.github.io/images/jvm4.png">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/jvm5.png">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/jvm6.png">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/jvm7.png">
+<meta property="og:image" content="https://brucewayne2099.github.io/images/jvm8.png">
 <meta property="article:published_time" content="2025-07-25T03:50:10.000Z">
-<meta property="article:modified_time" content="2025-07-25T08:49:59.604Z">
+<meta property="article:modified_time" content="2025-07-25T08:54:45.407Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="java">
 <meta property="article:tag" content="gc">
@@ -226,7 +230,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2025-07-25 11:50:10 / 修改时间：16:49:59" itemprop="dateCreated datePublished" datetime="2025-07-25T11:50:10+08:00">2025-07-25</time>
+              <time title="创建时间：2025-07-25 11:50:10 / 修改时间：16:54:45" itemprop="dateCreated datePublished" datetime="2025-07-25T11:50:10+08:00">2025-07-25</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -277,17 +281,18 @@
 <h2 id="排查过程"><a href="#排查过程" class="headerlink" title="排查过程"></a>排查过程</h2><h3 id="初步分析"><a href="#初步分析" class="headerlink" title="初步分析"></a>初步分析</h3><p>查看上游系统报错日志，发现全都是同步调用请求超时，报错<code>TimeoutException</code>。因此需要重点分析系统A是否有异常。<br>首先，在报错时间段业务流量并没有明显上涨，系统 A 的CPU水位、机器load也没有明显异常，因此可初步排除由于流量激增、超出系统最大负载所致。<br>其次，系统 A 执行请求的过程全都是一些内存计算逻辑，不需要远程调用数据库、中间件、外部系统，因此也可排除是外部依赖服务抖动/有瓶颈导致。<br>其次，虽然系统 A 的并发流量很高（单机高达数千 QPS），但每条请求之间不涉及同步/互斥的单机/分布式锁逻辑，因此也可排除由于锁导致请求等待超时所致。<br>经过以上初步分析，已排除流量激增、外部服务有瓶颈、并发锁等可能影响因素，但并未定位到根因，需要进一步深入分析。</p>
 <h3 id="定位根因"><a href="#定位根因" class="headerlink" title="定位根因"></a>定位根因</h3><p>查看系统日志，发现服务抖动期间，该系统曾发生过一次热数据发布（系统索引切换）：<br><img src="/images/jvm3.png" alt="paradin" title="系统 A 在内存中加载了一份索引（可简单理解为一个比较复杂的大对象/数据结构），且系统 A 会不定期（最快每 15 分钟）更换旧索引、加载最新版本索引"></p>
 <p>已知本系统的索引较大（约 0.5G），由于索引切换过程会产生大量新对象和内存垃圾，因此高度怀疑服务抖动与 GC 强相关。查看 <code>gc.log</code>，在系统抖动期间果然发现了长耗时的 YGC：<br><img src="/images/jvm4.png" alt="paradin" title="Object Copy：GC 时不再使用的对象会被清理释放，并整理剩余存活对象，整理过程存活对象会被复制到内存中新的位置"></p>
-<p>观察日志可发现 Object Copy 环节耗时明显异常，高达 200ms，且本过程会 STW（Stop The World）。因此服务抖动的根本原因已锁定：系统 A 加载的索引非常大，导致 YGC 时索引在堆内存的复制过程耗时久，复制期间业务线程被长时间暂停，导致上游请求大量超时报错。</p>
-<h2 id="优化过程"><a href="#优化过程" class="headerlink" title="优化过程"></a>优化过程</h2><h3 id="常规思路"><a href="#常规思路" class="headerlink" title="常规思路"></a>常规思路</h3><p>针对 GC 暂停久这类常见问题，有如下一些常规优化思路：</p>
-<p>然而，以上方法在本次场景中大多不适用。首先经排查代码并不存在 Bug，且索引体积已无更多压缩空间，且索引算法层面并不支持增量式更新只能全量更替。其次，加机器虽然能通过稀释单机请求量，让 STW 长暂停影响到的请求量更少，但并未从根本解决问题，且会导致机器资源大量浪费。另外使用堆外内存虽然可不受 GC 管理，但高频访问下序列化/反序列化开销无法容忍。</p>
+<p>观察日志可发现<code>Object Copy</code>环节耗时明显异常，高达200ms，且本过程会<code>STW（Stop The World）</code>。因此服务抖动的根本原因已锁定：<code>系统A加载的索引非常大，导致 YGC 时索引在堆内存的复制过程耗时久，复制期间业务线程被长时间暂停，导致上游请求大量超时报错</code>。</p>
+<h2 id="优化过程"><a href="#优化过程" class="headerlink" title="优化过程"></a>优化过程</h2><h3 id="常规思路"><a href="#常规思路" class="headerlink" title="常规思路"></a>常规思路</h3><p>针对 GC 暂停久这类常见问题，有如下一些常规优化思路：<br><img src="/images/jvm5.png" alt="paradin" title="这些思路都是面试时候可以拿来装逼的材料"></p>
+<p>然而，以上方法在本次场景中大多不适用。首先经排查代码并不存在Bug，且索引体积已无更多压缩空间，且索引算法层面并不支持增量式更新只能全量更替。其次，加机器虽然能通过稀释单机请求量，让 STW 长暂停影响到的请求量更少，但并未从根本解决问题，且会导致机器资源大量浪费。另外使用堆外内存虽然可不受 GC 管理，但高频访问下序列化/反序列化开销无法容忍。</p>
 <p>因此，综合来看只能考虑在 JVM 参数方面做优化：通过修改参数调整 JVM 的行为模式，让索引复制带来的负面影响尽可能小，保障服务高可用。</p>
 <h3 id="详细分析GC日志"><a href="#详细分析GC日志" class="headerlink" title="详细分析GC日志"></a>详细分析GC日志</h3><p>根据 “定位根因” 那一段的分析，问题已归因为<code>YGC Object Copy</code>阶段复制索引时耗时太久，导致上游请求超时报错。本节进一步详细分析 GC 日志，更细粒度还原整个 GC 过程，探索有无潜在优化点。<br>已知当前 JVM 核心参数如下：</p>
 <figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">-Xms12g</span><br><span class="line">-Xmx12g</span><br><span class="line">-XX:<span class="attribute">MetaspaceSize</span>=512m</span><br><span class="line">-XX:<span class="attribute">MaxMetaspaceSize</span>=512m</span><br><span class="line">-XX:+UseG1GC</span><br><span class="line">-XX:<span class="attribute">G1HeapRegionSize</span>=16M</span><br><span class="line">-XX:<span class="attribute">MaxGCPauseMillis</span>=100</span><br></pre></td></tr></table></figure>
 
-<p>通过集团 ATP 工具对原始 GC 日志进行可视化分析，下图中标出了各 GC 事件的时间点和变化曲线：<br>﻿﻿<br>从图中可以分析出如下信息：<br>① 蓝色圆点：一个点代表一次 YGC，横轴上堆满了密密麻麻的蓝点，说明 YGC 发生非常频繁且耗时短，毫秒级即可完成清理，这是理想中的情况。符合预期<br>② 粉色折线：代表堆内存占用量的变化情况，可以看到整体呈锯齿形，不断快速上升和下降。由于系统流量较大且请求执行过程会不断产生一些朝生夕灭的临时对象，因此可看到粉色折线快速上升。当 Eden 区不足时触发 YGC 清理，内存释放完成即可看到粉色折线下降到低点。符合预期<br>③ 异常蓝点：远离横轴说明耗时久，它们就是刚刚在日志中手动找到的长耗时 YGC 记录。需重点关注<br>④ 紫色折线：代表老年代堆内存占用量的变化情况。相比之下老年代占用率上涨缓慢，因为大多数临时对象都在年轻代被清理掉了，不会进入老年代。然而观察发现每次长耗时 YGC 蓝点附近，都会伴随着紫色折线阶梯式上升。需重点关注</p>
-<p>其次，还可发现长耗时 YGC 往往是成对出现的，有如下规律：成对出现、时间接近、耗时都长、第一次晋升量少、第二次晋升量多，如下图所示：</p>
+<p>通过集团 ATP 工具对原始 GC 日志进行可视化分析，下图中标出了各 GC 事件的时间点和变化曲线：<br><img src="/images/jvm6.png" alt="paradin" title="grace-parser 对于分析堆和线程栈是一个好东西"></p>
+<p>从图中可以分析出如下信息：<br>① 蓝色圆点：一个点代表一次 YGC，横轴上堆满了密密麻麻的蓝点，说明 YGC 发生非常频繁且耗时短，毫秒级即可完成清理，这是理想中的情况。符合预期<br>② 粉色折线：代表堆内存占用量的变化情况，可以看到整体呈锯齿形，不断快速上升和下降。由于系统流量较大且请求执行过程会不断产生一些朝生夕灭的临时对象，因此可看到粉色折线快速上升。当 Eden 区不足时触发 YGC 清理，内存释放完成即可看到粉色折线下降到低点。符合预期<br>③ 异常蓝点：远离横轴说明耗时久，它们就是刚刚在日志中手动找到的长耗时 YGC 记录。需重点关注<br>④ 紫色折线：代表老年代堆内存占用量的变化情况。相比之下老年代占用率上涨缓慢，因为大多数临时对象都在年轻代被清理掉了，不会进入老年代。然而观察发现每次长耗时 YGC 蓝点附近，都会伴随着紫色折线阶梯式上升。需重点关注</p>
+<p>其次，还可发现长耗时YGC往往是成对出现的，有如下规律：<code>成对出现、时间接近、耗时都长、第一次晋升量少、第二次晋升量多</code>，如下图所示：<br><img src="/images/jvm7.png" alt="paradin" title="可见每次切换索引就超时抖动"></p>
 <p>综上，整合目前所有已知线索：系统在每次切换索引时，都会超时抖动，且在抖动时间点会发现连续的两次长耗时 YGC（第二次 YGC 晋升量大）。</p>
-<p>经分析以上现象符合预期，详细过程推演还原如下：</p>
+<p>经分析以上现象符合预期，详细过程推演还原如下：<br><img src="/images/jvm8.png" alt="paradin" title="gc原理"></p>
 <p>● 阶段一：系统创建新索引，相关对象默认被分配至 Eden 区<br>● 阶段二：Eden 区空间不足，触发第一次 YGC，此时新索引被复制（Object Copy）到 Survivor 区，耗时久<br>● 阶段三：新索引构造完成，并被 GcRoot 引用上，旧索引与 GcRoot 引用被断开<br>● 阶段四：系统持续处理外部请求，Eden 区空间再次不足，触发第二次 YGC，此时旧索引被清理。新索引又被复制（Object Copy）到 Old 区（晋升），耗时久<br>● 阶段五：后续即使外部流量再次把 Eden 区打满，YGC 也能毫秒级快速完成。因为只需快速清理临时对象即可，新索引已稳定在老年代不会再被腾挪复制</p>
 <h3 id="一些尝试"><a href="#一些尝试" class="headerlink" title="一些尝试"></a>一些尝试</h3><p>至此，问题原因已非常清晰：每次新生成的索引会随着 YGC 连续复制多次，复制过程暂停久导致系统抖动。因此可考虑基于如下一些思路来针对性优化本问题，后文会逐个详细解释：</p>
 <h4 id="让索引尽早晋升到老年代"><a href="#让索引尽早晋升到老年代" class="headerlink" title="让索引尽早晋升到老年代"></a>让索引尽早晋升到老年代</h4><p>通常情况下，一个对象最初会被分配在 Eden 区，第一次 YGC 后进入 Survivor 区。此后每次 YGC 对象会在 S0 和 S1 之间反复腾挪，且每次腾挪后对象 age+1，当 age 大于默认阈值时会晋升到 Old 区。因此对象在堆内存中的流转路径是：<code>Eden =&gt; S0 =&gt; S1 =&gt; S0 =&gt; S1 =&gt; ... =&gt; Old</code><br>由于本例中索引对象复制开销太大，因此可考虑让索引尽早晋升到老年代，避免在年轻代反复腾挪影响系统稳定性。有如下 JVM 参数可以达到此目的：</p>
