@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="java 8-alpine这个镜像好像不带有&#x2F;etc&#x2F;localtime这个文件，这样可能日志时间会相差8小时，可以修改jar包来指定区域来解决问题。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="XtraBackup的安装和使用">
+<meta property="og:url" content="http://example.com/2019/06/17/XtraBackup%E7%9A%84%E5%AE%89%E8%A3%85%E5%92%8C%E4%BD%BF%E7%94%A8/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="java 8-alpine这个镜像好像不带有&#x2F;etc&#x2F;localtime这个文件，这样可能日志时间会相差8小时，可以修改jar包来指定区域来解决问题。">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/xtrabackup2.png">
+<meta property="og:image" content="http://example.com/images/xtrabackup.png">
+<meta property="article:published_time" content="2019-06-17T02:37:56.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:47:14.309Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="mysql">
+<meta property="article:tag" content="数据备份">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/xtrabackup2.png">
+
+<link rel="canonical" href="http://example.com/2019/06/17/XtraBackup%E7%9A%84%E5%AE%89%E8%A3%85%E5%92%8C%E4%BD%BF%E7%94%A8/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>XtraBackup的安装和使用 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/06/17/XtraBackup%E7%9A%84%E5%AE%89%E8%A3%85%E5%92%8C%E4%BD%BF%E7%94%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          XtraBackup的安装和使用
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-06-17 10:37:56" itemprop="dateCreated datePublished" datetime="2019-06-17T10:37:56+08:00">2019-06-17</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:47:14" itemprop="dateModified" datetime="2025-11-08T08:47:14+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>1.6k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>6 mins.</span>
+            </span>
+            <div class="post-description">java 8-alpine这个镜像好像不带有/etc/localtime这个文件，这样可能日志时间会相差8小时，可以修改jar包来指定区域来解决问题。</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>XtraBackup是数据库物理备份工具，是阿里云RDS备份数据库的组件。它的优点是热备而且速度快，效率比mysqldump不知道高到哪里去了。它的备份原理如下:</p>
+<ol>
+<li>innobackupex首先会启动一个xtrabackup_log后台检测的进程，实时检测mysql的redo log的变化，一旦发现redo有新的日志写入，立刻将日志写入到日志文件xtrabackup_log中。</li>
+<li>物理拷贝innodb的数据文件和系统表空间文件idbdata1到对应的以默认时间戳为备份目录的地方</li>
+<li>复制结束后，执行<code>flush table with read lock</code>操作进行全库锁表准备备份非InnoDB文件</li>
+<li>复制.frm .myd .myi等非InnoDB引擎文件</li>
+<li>查看binary log 的位置</li>
+<li>解锁unlock tables</li>
+<li>停止xtrabackup_log进程</li>
+</ol>
+<p><img src="/images/xtrabackup2.png" alt="akb48"></p>
+<h2 id="安装与全量备份"><a href="#安装与全量备份" class="headerlink" title="安装与全量备份"></a>安装与全量备份</h2><p>先去<a target="_blank" rel="noopener" href="https://www.percona.com/downloads/Percona-XtraBackup-2.4/LATEST/">https://www.percona.com/downloads/Percona-XtraBackup-2.4/LATEST/</a> 下载2.4版本的XtraBackup，虽然最新的版本是<code>8.0.6</code>，但是据说它只支持mysql8.0和percona8.0…<br><img src="/images/xtrabackup.png" alt="akb48"></p>
+<p>安装步骤如下：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[root@share ~]<span class="comment">#	yum install -y cmake libaio-devel</span></span><br><span class="line">[root@share ~]<span class="comment">#	yum install glibc glibc-devel glibc-static perl-Digest-MD5 perl-DBD-MySQL -y</span></span><br><span class="line">   [root@share ~]<span class="comment"># wget ftp://rpmfind.net/linux/atrpms/el6-x86_64/atrpms/stable/libev-4.04-2.el6.x86_64.rpm</span></span><br><span class="line">   [root@share ~]<span class="comment"># rpm -ivh libev-4.04-2.el6.x86_64.rpm			#xtrabackup安装依赖libev.so.4()(64bit) </span></span><br><span class="line">[root@share ~]<span class="comment"># rpm -ivh percona-xtrabackup-24-2.4.14-1.el6.x86_64.rpm </span></span><br><span class="line">warning: percona-xtrabackup-<span class="number">24</span>-<span class="number">2.4</span><span class="number">.14</span>-<span class="number">1.</span>el6.x86_64.rpm: Header V4 RSA/SHA256 Signature, key ID 8507efa5: NOKEY</span><br><span class="line">Preparing...                          <span class="comment">################################# [100%]</span></span><br><span class="line">Updating / installing...</span><br><span class="line">   <span class="number">1</span>:percona-xtrabackup-<span class="number">24</span>-<span class="number">2.4</span><span class="number">.14</span>-<span class="number">1.</span>el<span class="comment">################################# [100%]</span></span><br><span class="line">[root@share ~]<span class="comment"># </span></span><br></pre></td></tr></table></figure></p>
+<p>安装完毕之后，就可以<code>innobackupex --host=127.0.0.1 --user=root --password=数据库密码 --defaults-file=/etc/mysql/my.cnf /备份的文件夹名</code>来备份数据库。同时备份结束之后会生成一个LSN号，在增量备份时候，就只备份大于此号的数据页。</p>
+<p>如果有了备份文件想要全量恢复的话，就是如下操作：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">scp -r /backup/备份文件夹/ 另一个mysqlIP:/backup/	<span class="comment">#先将本机的备份文件夹拷贝到其他服务器里去</span></span><br><span class="line">innobackupex --apply-log --use-memory=1G /backup/备份文件夹/	<span class="comment">#在新的mysql里进行数据的准备工作，这一步用来合成可用的数据，--use-memory根据实际情况指定</span></span><br><span class="line">systemctl stop mariadb</span><br><span class="line">rm -rf /var/lib/mysql/*		<span class="comment">#停止当前进程，并且删除数据目录和对应日志</span></span><br><span class="line">innobackupex --datadir=/var/lib/mysql --copy-back /backup/备份文件夹/		<span class="comment">#将准备好的数据还原到对应目录里</span></span><br><span class="line">chown -R mysql: /var/lib/mysql/		<span class="comment">#将文件夹属主和组都更改成mysql</span></span><br><span class="line">systemctl start mariadb		<span class="comment">#重启进程</span></span><br></pre></td></tr></table></figure>
+	</p>
+<h2 id="增量备份与恢复"><a href="#增量备份与恢复" class="headerlink" title="增量备份与恢复"></a>增量备份与恢复</h2><p>增量备份的前提是全量备份，假设我们已经进行了全量备份。增量备份过程如下：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">innobackupex -p数据库密码 --incremental /全量备份文件夹 --incremental-basedir=/backup/增量备份文件夹<span class="number">1</span>/	<span class="comment">#与全量备份文件夹相比，进行增量备份</span></span><br><span class="line">scp -r /backup/* 另一个mysqlIP:/backup/		<span class="comment">#传递给另个mysql里</span></span><br><span class="line">innobackupex --apply-log --redo-only --use-memory=1G /backup/全量备份文件夹/	<span class="comment">#先对最早的全量备份进行恢复</span></span><br><span class="line">innobackupex --apply-log --redo-only --use-memory=1G /backup/全量备份文件夹/ --incremental-<span class="built_in">dir</span>=/backup/增量备份文件夹<span class="number">1</span>		</span><br><span class="line"><span class="comment">#在之前全量备份的基础上合并一波增量备份</span></span><br><span class="line">systemctl stop mariadb</span><br><span class="line">rm -rf /var/lib/mysql/*		<span class="comment">#停止当前进程，并且删除数据目录和对应日志</span></span><br><span class="line">innobackupex --datadir=/var/lib/mysql --copy-back /backup/备份文件夹/		<span class="comment">#将准备好的数据还原到对应目录里</span></span><br><span class="line">chown -R mysql: /var/lib/mysql/		<span class="comment">#将文件夹属主和组都更改成mysql</span></span><br><span class="line">systemctl start mariadb		<span class="comment">#重启进程</span></span><br></pre></td></tr></table></figure></p>
+<p>查看是否是增量备份还是全量备份，可以通过<code>xtrabackup_checkpoints</code>文件里的<code>backup_type</code>字段：<code>full-prepared</code>是全量备份、<code>incremental</code>是增量备份。</p>
+<p>这里有一个坑，就是<code>备份和恢复的时候使用的xtrabackup的版本要保持一致</code>，如果不一致，就会有<code>Failed to connect to MySQL server to detect version.</code>的错误。如果出现了错误，就要根据mysql版本在原有命令后添加<code>--ibbackup xtrabackup_版本号</code>，比如我的mysql是5.6版本的，那么语句就是<code>innobackupex --use-memory=1G --apply-log /data/back --ibbackup xtrabackup_56</code> 。</p>
+<h2 id="Mysql如何恢复到任意时间点"><a href="#Mysql如何恢复到任意时间点" class="headerlink" title="Mysql如何恢复到任意时间点"></a>Mysql如何恢复到任意时间点</h2><p>众所周知，mysql的更新操作（UPDATE）是“先备份再覆盖”的一个过程，那备份在哪里呢?<code>buffer</code>。</p>
+<p>但是这个瞬间就会出现buffer的数据页与磁盘的数据页内容不一致，这时的buffer的数据页叫<code>dirty page</code>。如果此时出现了mysql非正常宕机，就会出现“数据并没有同步到磁盘文件中，而且已经从内存里出来了”的现象，即数据丢失。</p>
+<p>为了解决这个现象，就在buffer的<code>dirty page</code>变更结束之后，把相应修改记录记录到<code>redo log</code>里。如果在发现有数据丢失的现象，可以通过<code>redo log</code>回溯。更多内容可以看<a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=MjM5NjMyMjUzNg==&mid=2448131616&idx=1&sn=5af80b03adef5846b7dc51015d99f7e7&scene=0#wechat_redirect&rd2werd=1#wechat_redirect">https://mp.weixin.qq.com/s?__biz=MjM5NjMyMjUzNg==&amp;mid=2448131616&amp;idx=1&amp;sn=5af80b03adef5846b7dc51015d99f7e7&amp;scene=0#wechat_redirect&amp;rd2werd=1#wechat_redirect</a> 这篇文章。</p>
+<p>整理一下mysql里更新语句的内幕：</p>
+<p>系统当取到一个UPDATE语句的时候，会先通过主键找到该行，判断此行是否在buffer里，如果在就直接返回给执行器，如果不在就先从磁盘拷贝一份到内存里，在内存里对数据进行修改，此时生成了<code>dirty page</code>，同时也将这个操作记录更新到<code>redo log</code>里，<code>redo log</code>处于<code>prepare</code>状态（mysql生成<code>xid</code>)，通知执行器可以提交覆盖磁盘（这是一个事务）。然后执行器先生成这个操作的bin log（mysql是<code>日志先行</code>的设计），然后再执行覆盖的操作（将<code>xid</code>写进<code>bin log</code>)，至此更新完成。</p>
+<p>假设此时mysql出现了非正常宕机，那么先找一下有没有之前的xtrabackup等工具保留的备份，如果有当日的备份，再结合<code>bin log</code>可以恢复一个临时表。然后扫描最后一个<code>bin log</code>，提取出xid。重做检查点以后的<code>redo log</code>，搜集处于<code>prepare</code>阶段的事务链表，将事务的<code>xid</code>与<code>bin log</code>中的<code>xid</code>对比。若存在，说明事务记录到<code>bin log</code>成功，只是最终未<code>commit</code>成功，可以直接提交，否则就回滚。</p>
+<h2 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h2><p><a target="_blank" rel="noopener" href="http://mysql.taobao.org/monthly/2016/03/07/">http://mysql.taobao.org/monthly/2016/03/07/</a><br><a target="_blank" rel="noopener" href="http://mysql.taobao.org/monthly/2018/02/05/">http://mysql.taobao.org/monthly/2018/02/05/</a><br><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=MjM5NjMyMjUzNg==&mid=2448131616&idx=1&sn=5af80b03adef5846b7dc51015d99f7e7&scene=0#wechat_redirect&rd2werd=1#wechat_redirect">https://mp.weixin.qq.com/s?__biz=MjM5NjMyMjUzNg==&amp;mid=2448131616&amp;idx=1&amp;sn=5af80b03adef5846b7dc51015d99f7e7&amp;scene=0#wechat_redirect&amp;rd2werd=1#wechat_redirect</a><br><a target="_blank" rel="noopener" href="https://help.aliyun.com/knowledge_detail/41738.html?spm=a2c4g.11186631.2.4.2b9d6998v5nwaK">https://help.aliyun.com/knowledge_detail/41738.html?spm=a2c4g.11186631.2.4.2b9d6998v5nwaK</a></p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/mysql/" rel="tag"># mysql</a>
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%A4%87%E4%BB%BD/" rel="tag"># 数据备份</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/06/12/%E8%AE%B0%E5%BD%95%E4%B8%80%E6%AC%A1%E4%BC%98%E5%8C%96%E5%89%8D%E7%AB%AFdocker%E7%9A%84%E8%BF%87%E7%A8%8B/" rel="prev" title="记录一次优化前端docker的过程">
+      <i class="fa fa-chevron-left"></i> 记录一次优化前端docker的过程
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/06/20/%E7%BD%91%E6%98%93%E9%9B%B7%E7%81%AB%E8%BF%90%E7%BB%B4%E9%9D%A2%E8%AF%95%E8%AE%B0%E5%BD%95/" rel="next" title="网易雷火运维面试全纪录">
+      网易雷火运维面试全纪录 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85%E4%B8%8E%E5%85%A8%E9%87%8F%E5%A4%87%E4%BB%BD"><span class="nav-number">1.</span> <span class="nav-text">安装与全量备份</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A2%9E%E9%87%8F%E5%A4%87%E4%BB%BD%E4%B8%8E%E6%81%A2%E5%A4%8D"><span class="nav-number">2.</span> <span class="nav-text">增量备份与恢复</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Mysql%E5%A6%82%E4%BD%95%E6%81%A2%E5%A4%8D%E5%88%B0%E4%BB%BB%E6%84%8F%E6%97%B6%E9%97%B4%E7%82%B9"><span class="nav-number">3.</span> <span class="nav-text">Mysql如何恢复到任意时间点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E6%A1%A3"><span class="nav-number">4.</span> <span class="nav-text">参考文档</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="阿里云SLB自带白名单功能，可以通过SLB端口跳转到Kibana的5601端口的时候指定某些IP访问">
+<meta property="og:type" content="article">
+<meta property="og:title" content="让Nginx鉴权功能保护Kibana网页">
+<meta property="og:url" content="http://example.com/2019/02/28/%E8%AE%A9Nginx%E9%89%B4%E6%9D%83%E5%8A%9F%E8%83%BD%E4%BF%9D%E6%8A%A4Kibana%E7%BD%91%E9%A1%B5/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="阿里云SLB自带白名单功能，可以通过SLB端口跳转到Kibana的5601端口的时候指定某些IP访问">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/kibana20.png">
+<meta property="og:image" content="http://example.com/images/kibana21.gif">
+<meta property="article:published_time" content="2019-02-28T07:55:27.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:48:16.443Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="docker">
+<meta property="article:tag" content="kibana">
+<meta property="article:tag" content="nginx">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/kibana20.png">
+
+<link rel="canonical" href="http://example.com/2019/02/28/%E8%AE%A9Nginx%E9%89%B4%E6%9D%83%E5%8A%9F%E8%83%BD%E4%BF%9D%E6%8A%A4Kibana%E7%BD%91%E9%A1%B5/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>让Nginx鉴权功能保护Kibana网页 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/02/28/%E8%AE%A9Nginx%E9%89%B4%E6%9D%83%E5%8A%9F%E8%83%BD%E4%BF%9D%E6%8A%A4Kibana%E7%BD%91%E9%A1%B5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          让Nginx鉴权功能保护Kibana网页
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-02-28 15:55:27" itemprop="dateCreated datePublished" datetime="2019-02-28T15:55:27+08:00">2019-02-28</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:48:16" itemprop="dateModified" datetime="2025-11-08T08:48:16+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>797</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>3 mins.</span>
+            </span>
+            <div class="post-description">阿里云SLB自带白名单功能，可以通过SLB端口跳转到Kibana的5601端口的时候指定某些IP访问</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>Kibana本身是一个Web界面，但是出于安全和机密的考虑，我们肯定不会让互联网上所有的人都能随便看到Kibana里的内容，但是X-pack目前又不支持6.2以上的版本，于是我们可以使用Nginx的密码功能来保护Kibana的网页：要访问Kibana时需要先输入密码，正确就登陆到Kibana，如果错误就是403。</p>
+<p>Kibana是容器安装的，安装过程可以去查看：<a target="_blank" rel="noopener" href="https://rorschachchan.github.io/2019/01/21/%E5%B0%86kafka%E5%8A%A0%E5%85%A5%E5%88%B0Elk%E9%9B%86%E7%BE%A4/">https://rorschachchan.github.io/2019/01/21/%E5%B0%86kafka%E5%8A%A0%E5%85%A5%E5%88%B0Elk%E9%9B%86%E7%BE%A4/</a> </p>
+<h2 id="事前准备"><a href="#事前准备" class="headerlink" title="事前准备"></a>事前准备</h2><p>Nginx也是容器安装，<code>docker pull nginx</code>拉取最新的nginx镜像，在下载的时候呢我们也别对着屏幕干巴巴的等。由于在nginx配置转发的时候，需要知道Kibana的容器IP，这是因为Kibana和正在下载的Nginx是两个不同的容器，Nginx是需要跨容器访问的。</p>
+<p>默认的官方Kibana镜像登录是非root的，这种虽然安全，但是不能config也不能yum，于是我们首先要使用root账号登录进去，语句是：<br>	<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">docker exec -it --user root kibana容器ID /bin/bash</span><br><span class="line">yum update -y</span><br><span class="line">yum install -y net-tools	#下载ifconfig</span><br></pre></td></tr></table></figure></p>
+<p>使用ifconfig和netstat查看容器的IP和工作端口：<br><img src="/images/kibana20.png" alt="办公室"></p>
+<p>可以确认Kibana的IP是<code>172.17.0.4</code>，端口是5601。这时候我们就可以写一个<code>kibana.conf</code>，让nginx容器用这个配置文件达到跳转的目的！</p>
+<p><code>kibana.conf</code>全文如下：<br>	<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">upstream kibana_server &#123;</span><br><span class="line">        server  172.17.0.3:5601 weight=1 max_fails=3  fail_timeout=60;	#这里写的就是kibana的容器IP和端口，如果是多台kibana想要按权重访问，就写weight</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">server &#123;</span><br><span class="line">        listen *:33664;	#nginx容器自己的端口</span><br><span class="line">        server_name _;</span><br><span class="line">        auth_basic &quot;Restricted Access&quot;;      # 验证</span><br><span class="line">        auth_basic_user_file /etc/nginx/conf.d/htpasswd.users;             # 验证文件</span><br><span class="line"></span><br><span class="line">        location / &#123;</span><br><span class="line">                proxy_pass http://kibana_server;	#这个地方就是upstream</span><br><span class="line">                proxy_http_version 1.1;</span><br><span class="line">                proxy_set_header Upgrade $http_upgrade;</span><br><span class="line">                proxy_set_header Connection &#x27;upgrade&#x27;;</span><br><span class="line">                proxy_set_header Host $host;</span><br><span class="line">                proxy_cache_bypass $http_upgrade;</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>把这个文件保存在<code>/mnt/nginx</code>目录里。</p>
+<h2 id="配置nginx密码"><a href="#配置nginx密码" class="headerlink" title="配置nginx密码"></a>配置nginx密码</h2><p>nginx要创建验证文件授权,需要先安装<code>httpd-tools</code>工具：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">yum install -y  httpd-tools </span><br><span class="line">htpasswd -bc /mnt/nginx/htpasswd.users kibana password123 <span class="comment"># 创建验证文件</span></span><br><span class="line">Adding password <span class="keyword">for</span> user admin</span><br></pre></td></tr></table></figure></p>
+<p>这时我们就创建了一个<code>/mnt/nginx/htpasswd.users</code>，里面的用户是kibana，密码是password123。这个密码在文件里是加密的，用cat命令无法正常查看到的。</p>
+<h2 id="启动nginx容器"><a href="#启动nginx容器" class="headerlink" title="启动nginx容器"></a>启动nginx容器</h2><p>此时nginx镜像应该下载完毕了，那么就直接启动镜像，启动语句是：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run --hostname Kngx -p <span class="number">80</span>:<span class="number">33664</span> --name Knginx -v /mnt/nginx/:/etc/nginx/conf.d/ -d nginx</span><br></pre></td></tr></table></figure></p>
+<p>简单说一下这个命令：这个容器名叫Knginx，hostname是Kngx，做了宿主机80端口到此容器33664端口的转发，将宿主机的<code>/mnt/nginx/</code>挂载到容器里的<code>/etc/nginx/conf.d/</code>，同时直接启动nginx。</p>
+<p>启动成功之后，我们看到刚刚建立的<code>htpasswd.users</code>和<code>kibana.conf</code>都已经成功被Knginx容器配置上，然后打开浏览器，看看效果：<br><img src="/images/kibana21.gif" alt="办公室" title="kibana加载比较慢"></p>
+<p>这样就达到了密码访问页面的效果，如果想加IP白名单呢，也可以直接在<code>kibana.conf</code>里补充相关配置，修改完毕之后，重启Knginx容器即可。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a target="_blank" rel="noopener" href="https://www.hugeserver.com/kb/how-secure-kibana-nginx-centos/">https://www.hugeserver.com/kb/how-secure-kibana-nginx-centos/</a></p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/docker/" rel="tag"># docker</a>
+              <a href="/tags/nginx/" rel="tag"># nginx</a>
+              <a href="/tags/kibana/" rel="tag"># kibana</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/02/19/Linux%E8%BF%90%E7%BB%B4%E5%B7%A5%E7%A8%8B%E5%B8%88%E7%AC%94%E8%AF%95%E9%A2%98%E7%AC%AC%E5%8D%81%E4%B8%83%E5%A5%97/" rel="prev" title="Linux运维工程师笔试题第十七套">
+      <i class="fa fa-chevron-left"></i> Linux运维工程师笔试题第十七套
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/03/01/h5%E7%95%8C%E9%9D%A2%E5%AE%9E%E7%8E%B0%E6%A1%8C%E9%9D%A2%E6%8E%A8%E9%80%81%E9%80%9A%E7%9F%A5/" rel="next" title="H5界面实现桌面推送通知">
+      H5界面实现桌面推送通知 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8B%E5%89%8D%E5%87%86%E5%A4%87"><span class="nav-number">1.</span> <span class="nav-text">事前准备</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%85%8D%E7%BD%AEnginx%E5%AF%86%E7%A0%81"><span class="nav-number">2.</span> <span class="nav-text">配置nginx密码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8nginx%E5%AE%B9%E5%99%A8"><span class="nav-number">3.</span> <span class="nav-text">启动nginx容器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">4.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

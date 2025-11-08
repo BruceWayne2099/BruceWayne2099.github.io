@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="纵然你的身子骨是铁打的，我想你也需要了解一款“实现同步服务，配置维护和命名服务”的东西吧。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Zookeeper集群的搭建与配置">
+<meta property="og:url" content="http://example.com/2018/02/05/Zookeeper%E9%9B%86%E7%BE%A4%E7%9A%84%E6%90%AD%E5%BB%BA%E4%B8%8E%E9%85%8D%E7%BD%AE/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="纵然你的身子骨是铁打的，我想你也需要了解一款“实现同步服务，配置维护和命名服务”的东西吧。">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/zook1.png">
+<meta property="og:image" content="http://example.com/images/zook2.png">
+<meta property="og:image" content="http://example.com/images/zook3.png">
+<meta property="og:image" content="http://example.com/images/zook4.png">
+<meta property="og:image" content="http://example.com/images/zook5.png">
+<meta property="og:image" content="http://example.com/images/zook6.png">
+<meta property="og:image" content="http://example.com/images/zook7.png">
+<meta property="og:image" content="http://example.com/images/zook8.png">
+<meta property="article:published_time" content="2018-02-05T02:15:21.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:47:17.505Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="zookeeper">
+<meta property="article:tag" content="运维技术">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/zook1.png">
+
+<link rel="canonical" href="http://example.com/2018/02/05/Zookeeper%E9%9B%86%E7%BE%A4%E7%9A%84%E6%90%AD%E5%BB%BA%E4%B8%8E%E9%85%8D%E7%BD%AE/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>Zookeeper集群的搭建与配置 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2018/02/05/Zookeeper%E9%9B%86%E7%BE%A4%E7%9A%84%E6%90%AD%E5%BB%BA%E4%B8%8E%E9%85%8D%E7%BD%AE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Zookeeper集群的搭建与配置
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-02-05 10:15:21" itemprop="dateCreated datePublished" datetime="2018-02-05T10:15:21+08:00">2018-02-05</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:47:17" itemprop="dateModified" datetime="2025-11-08T08:47:17+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>1.7k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>6 mins.</span>
+            </span>
+            <div class="post-description">纵然你的身子骨是铁打的，我想你也需要了解一款“实现同步服务，配置维护和命名服务”的东西吧。</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>Zookeeper的下载地址：<code>https://github.com/apache/zookeeper/archive/master.zip</code><br>zkclient的下载地址：<code>https://github.com/sgroschupf/zkclient</code></p>
+<p>至于zookeeper的作用和原理我这里就不多赘述了，大家有兴趣可以去查查，这里主要就是动手操作。</p>
+<h2 id="搭建集群"><a href="#搭建集群" class="headerlink" title="搭建集群"></a>搭建集群</h2><p>首先先看一下本次zk实验服务器的名称和IP情况，这里我们选择了三台服务器作zkserver，因为三台是标配，一台的话就只有leader没有follower，不是很稳定的结构，当然啦如果你的公司土豪的话是可以玩三十台：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">dvl-mrszk-<span class="number">001</span>	<span class="number">10.117</span><span class="number">.0</span><span class="number">.125</span></span><br><span class="line">dvl-mrszk-<span class="number">002</span>	<span class="number">10.117</span><span class="number">.1</span><span class="number">.158</span></span><br><span class="line">dvl-mrszk-<span class="number">003</span>	<span class="number">10.168</span><span class="number">.152</span><span class="number">.227</span></span><br></pre></td></tr></table></figure></p>
+<p>对这三台服务器都要进行如下的步骤:</p>
+<p>1)先把zookeeper.zip传到linux里，然后解压到<code>/usr</code>文件夹下；</p>
+<p>2)进入<code>/usr/zookeeper/conf</code>文件夹，<code>vim zoo.cfg</code>，在最下面补充上面的三个zkserver，见图：<br><img src="/images/zook1.png" alt="paradin"></p>
+<p>3)再来到<code>/usr/zookeeper/data</code>文件夹，如果里面有文件就清空所有文件，如果是1号zkserver就<code>echo 1 &gt; myid</code>，如果当前机器是2号zkserver就<code>echo 2 &gt; myid</code>，依次类推，这里一定要注意，不可以都写一样。</p>
+<p>4)<code>vim /etc/hosts</code>，还要把这三台机器的ip地址和名字都写进去，如下：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span> localhost</span><br><span class="line">::<span class="number">1</span>         localhost localhost.<span class="property">localdomain</span> localhost6 localhost6.<span class="property">localdomain6</span></span><br><span class="line"><span class="number">10.117</span><span class="number">.0</span><span class="number">.125</span> dvl-mrszk-<span class="number">001</span></span><br><span class="line"><span class="number">10.117</span><span class="number">.1</span><span class="number">.158</span> dvl-mrszk-<span class="number">002</span></span><br><span class="line"><span class="number">10.168</span><span class="number">.152</span><span class="number">.227</span> dvl-mrszk-<span class="number">003</span></span><br></pre></td></tr></table></figure></p>
+<p>5)再来<code>/usr/zookeeper/bin</code>文件夹，<code>./zkServer.sh start</code>启动zk，然后再<code>./zkServer.sh status</code>查看进程情况，如图看见第一台和第三台zkserver的身份是<code>follower</code>，第二台是<code>leader</code>：<br><img src="/images/zook2.png" alt="paradin"></p>
+<p><img src="/images/zook3.png" alt="paradin"></p>
+<p><img src="/images/zook4.png" alt="paradin"></p>
+<p>至此整个zk集群就搭建并且启动完成了。<font color=red>注意：zookeeper集群时，zookeeper要求半数以上的机器可用，zookeeper才能提供服务。</font></p>
+<h2 id="故障排除"><a href="#故障排除" class="headerlink" title="故障排除"></a>故障排除</h2><p>如果这里有启动失败的情况，比如<code>Error contacting service. It is probably not running.</code>这样的字样，那么有这么几种可能：<br>1）data文件夹下的<code>myid</code>有数字重复或者是数字漏写的情况；<br>2）<code>zoo.cfg</code>里的指定日志文件夹没有手动创建；<br>3）<code>/etc/hosts</code>下的名字与zoo.cfg里的server字段不相符，注意一下，&#x2F;etc&#x2F;hosts里的127.0.0.1的名字不要与本ip后面的名字一模一样，不然zk也无法识别！<br>4）<code>/etc/hosts</code>名字使用了中文，java系对中文是很不友好的。</p>
+<p>如果出现的<code>Cannot open channel to X at election address /A.B.C.D:3888</code>的日志报错，检查一下<code>zoo.cfg</code>里的123与<code>myid</code>的123是否一致。</p>
+<h2 id="配置文件详解"><a href="#配置文件详解" class="headerlink" title="配置文件详解"></a>配置文件详解</h2><p>1.<code>tickTime</code>：这个时间是作为 Zookeeper 服务器之间或客户端与服务器之间维持心跳的时间间隔，也就是每个 tickTime 时间就会发送一个心跳。<br>2.<code>dataDir</code>：顾名思义就是 Zookeeper 保存数据的目录，默认情况下，Zookeeper 将写数据的日志文件也保存在这个目录里。<br>3.<code>clientPort</code>：这个端口就是客户端连接 Zookeeper 服务器的端口，Zookeeper 会监听这个端口，接受客户端的访问请求。<br>4.<code>initLimit</code>：这个配置项是用来配置 Zookeeper 接受 客户端（这里所说的客户端不是用户连接 Zookeeper 服务器的客户端，而是 Zookeeper 服务器集群中连接到 Leader 的 Follower 服务器）初始化连接时最长能忍受多少个心跳时间间隔数。当已经超过 5个心跳的时间（也就是 tickTime）长度后 Zookeeper 服务器还没有收到客户端的返回信息，那么表明这个客户端连接失败。总的时间长度就是 5<em>2000&#x3D;10秒。<br>5.<code>syncLimit</code>：这个配置项标识 Leader 与 Follower 之间发送消息，请求和应答时间长度，最长不能超过多少个 tickTime 的时间长度，总的时间长度就是2</em>2000&#x3D;4秒。<br>6.<code>server.A=B：C：D</code>：其中 A 是一个数字，表示这个是第几号服务器；B 是这个服务器的 ip 地址；C 表示的是这个服务器与集群中的 Leader 服务器交换信息的端口；D 表示的是万一集群中的 Leader 服务器挂了，需要一个端口来重新进行选举，选出一个新的 Leader，而这个端口就是用来执行选举时服务器相互通信的端口。如果是伪集群的配置方式，由于 B 都是一样，所以不同的 Zookeeper 实例通信端口号不能一样，所以要给它们分配不同的端口号。</p>
+<h2 id="验证成果"><a href="#验证成果" class="headerlink" title="验证成果"></a>验证成果</h2><p>Zookeeper的配置工具叫<code>Zooinspector</code>，下载地址是：<code>https://issues.apache.org/jira/secure/attachment/12436620/ZooInspector.zip</code>，下载完直接解压缩就可以在windows里使用。</p>
+<p>我们实验的这三台服务器只有内网，但是如果要连接zooinspector，还是需要通过外网权限连接的，这里可以配一个iptables转发规则，配iptables的步骤在这里：<a target="_blank" rel="noopener" href="http://chenx1242.blog.51cto.com/10430133/1875950">http://chenx1242.blog.51cto.com/10430133/1875950</a> ，照葫芦画瓢即可，但是要注意，zk的端口是<code>2181</code>。</p>
+<p>当然，如果不想费事的话，就直接给zkserver配一个外网IP，直接连接。</p>
+<p>成功连接到<code>zooinspector</code>，就会看到这样的内容，这里的lcconfig是手动添加的，右击鼠标，选择<code>add node</code>，然后直接写上<code>lcconfig</code>就行，这个名字是根据实际需要填写的：</p>
+<p><img src="/images/zook5.png" alt="paradin"></p>
+<p>上面我们已经配置了zkserver集群而且还启动zkserver进程，现在还需要zkclient，zkclient就是请求发起的一方，然后我们可以在各个的模块服务器上部署zkclient服务，通过启动zkclient服务，来让这些模块统一从zooinspector里取值，这样就达到了批量配置，同时保证一致性的效果。</p>
+<p>zk的模板文件是<code>_tpl.properties</code>为结尾的文件，我这里模块的名字叫mrs，那么在实验里这个模板文件就是<code>mrs_tpl.properties</code>，这个<code>mrs_tpl.properties</code>里有这样的一个字段，如图：</p>
+<p><img src="/images/zook6.png" alt="paradin"></p>
+<p>而我们在zooinspector里对应就这么填写：</p>
+<p><img src="/images/zook7.png" alt="paradin"></p>
+<p>保存zooinspector，然后从windows返回到linux，启动zkclient服务和对应的模块进程，如果配置都正常的话，那么程序就会正常启动，<code>ps -ef|grep java</code>就会看到一个叫<code>lczk.AppServerDaemon</code>的进程。这个时候在去看一下mrs的配置文件：</p>
+<p><img src="/images/zook8.png" alt="paradin"></p>
+<p>可以看到areaAk取得值就是zk里面<code>data_center</code>里面<code>access_key</code>里面的ak的值，其他的几个值也是同理。可见整个zk已经配置成功，模块都进行了统一配置，而且这些配置既然能被一个接受，同时也会被其他相同的模块服务器所接受。这样就达到了批量配置的效果。</p>
+<h2 id="拓展阅读"><a href="#拓展阅读" class="headerlink" title="拓展阅读"></a>拓展阅读</h2><p><a target="_blank" rel="noopener" href="http://ibruce.info/2014/10/23/zookeeper/">http://ibruce.info/2014/10/23/zookeeper/</a></p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%BF%90%E7%BB%B4%E6%8A%80%E6%9C%AF/" rel="tag"># 运维技术</a>
+              <a href="/tags/zookeeper/" rel="tag"># zookeeper</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/02/02/Uwsgi%E7%9A%84%E5%AE%89%E8%A3%85%E5%92%8C%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/" rel="prev" title="Uwsgi的安装和简单使用">
+      <i class="fa fa-chevron-left"></i> Uwsgi的安装和简单使用
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/02/05/Jenkins%E5%AE%89%E8%A3%85%E4%B8%8E%E5%88%9B%E5%BB%BA%E7%AE%80%E5%8D%95%E4%BB%BB%E5%8A%A1/" rel="next" title="Jenkins的安装与创建简单任务">
+      Jenkins的安装与创建简单任务 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%90%AD%E5%BB%BA%E9%9B%86%E7%BE%A4"><span class="nav-number">1.</span> <span class="nav-text">搭建集群</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%85%E9%9A%9C%E6%8E%92%E9%99%A4"><span class="nav-number">2.</span> <span class="nav-text">故障排除</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E8%AF%A6%E8%A7%A3"><span class="nav-number">3.</span> <span class="nav-text">配置文件详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%AA%8C%E8%AF%81%E6%88%90%E6%9E%9C"><span class="nav-number">4.</span> <span class="nav-text">验证成果</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8B%93%E5%B1%95%E9%98%85%E8%AF%BB"><span class="nav-number">5.</span> <span class="nav-text">拓展阅读</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

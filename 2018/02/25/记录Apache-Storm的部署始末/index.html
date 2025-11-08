@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="杭州终于要有一点春天的温暖了">
+<meta property="og:type" content="article">
+<meta property="og:title" content="记录Apache Storm的部署始末">
+<meta property="og:url" content="http://example.com/2018/02/25/%E8%AE%B0%E5%BD%95Apache-Storm%E7%9A%84%E9%83%A8%E7%BD%B2%E5%A7%8B%E6%9C%AB/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="杭州终于要有一点春天的温暖了">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/storm1.jpg">
+<meta property="og:image" content="http://example.com/images/storm2.jpg">
+<meta property="og:image" content="http://example.com/images/storm3.png">
+<meta property="og:image" content="http://example.com/images/storm4.png">
+<meta property="og:image" content="http://example.com/images/storm5.png">
+<meta property="og:image" content="http://example.com/images/storm6.png">
+<meta property="og:image" content="http://example.com/images/storm7.png">
+<meta property="article:published_time" content="2018-02-25T13:27:42.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:48:17.999Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="storm">
+<meta property="article:tag" content="大数据分析">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/storm1.jpg">
+
+<link rel="canonical" href="http://example.com/2018/02/25/%E8%AE%B0%E5%BD%95Apache-Storm%E7%9A%84%E9%83%A8%E7%BD%B2%E5%A7%8B%E6%9C%AB/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>记录Apache Storm的部署始末 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2018/02/25/%E8%AE%B0%E5%BD%95Apache-Storm%E7%9A%84%E9%83%A8%E7%BD%B2%E5%A7%8B%E6%9C%AB/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          记录Apache Storm的部署始末
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-02-25 21:27:42" itemprop="dateCreated datePublished" datetime="2018-02-25T21:27:42+08:00">2018-02-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:48:17" itemprop="dateModified" datetime="2025-11-08T08:48:17+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>2k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>7 mins.</span>
+            </span>
+            <div class="post-description">杭州终于要有一点春天的温暖了</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p><code>Storm</code>是一个流式处理框架（你可以把它当成一种消息队列），开发人员开发出特定的项目，然后通过storm这个渠道下发各种任务，从而达到任务执行的效果。</p>
+<p>Storm有两个比较重要的组件：<code>nimbus</code>和<code>supervision</code>，其中<code>nimbus</code>主要是承接任务和分配任务用，而每一个<code>supervision</code>可以有若干<code>worker</code>（视服务器硬件而定），而<code>supervison</code>的主要任务就是监控对应的<code>worker</code>，一旦<code>worker</code>死了，<code>supervision</code>就会把他们唤醒。</p>
+<p>本次试验是用的是金山云服务器，storm的版本是<code>1.0.2</code>，配置是<code>1个nimbus，三个supervision</code>，每一个worker上只执行一个任务，总共三个任务。</p>
+<h2 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h2><p>安装<code>storm</code>之前需要在<code>storm</code>里新安装一套<code>zookeeper</code>，因为<code>storm</code>是需要一个zk集群的，<code>nimbus</code>和每一个<code>supervisior</code>是通过zk的心跳来传递存活的信息，于是我们就在每一个<code>supervision</code>里面安装一个<code>zookeeper</code>，并且启动<code>zookeeper</code>的<code>server</code>端，安装<code>zookeeper</code>的方法可以移步<a target="_blank" rel="noopener" href="http://chenx1242.blog.51cto.com/10430133/1889715">http://chenx1242.blog.51cto.com/10430133/1889715</a> 。</p>
+<p>上面这段话用图来说就是这样子：<br><img src="/images/storm1.jpg" alt="paradin"></p>
+<p>启动<code>zookeeper</code>之后，就需要在<code>nimbus</code>和<code>supervisior</code>里安装<code>storm</code>，上面说过本次安装的<code>storm</code>是<code>1.0.2</code>版本，路径直接是<code>/storm/apache-storm-1.0.2</code>。</p>
+<p>将<code>storm</code>安装完之后，需要在<code>nimbus</code>和<code>supervisior</code>里更改<code>/etc/hosts</code>文件，改成如下的格式：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span> localhost</span><br><span class="line"> </span><br><span class="line">nimbus的内网<span class="variable constant_">IP</span> online-nimbus-<span class="number">001</span></span><br><span class="line">supervision1的内网<span class="variable constant_">IP</span> supervision-<span class="number">001</span></span><br><span class="line">supervision2的内网<span class="variable constant_">IP</span> supervision-<span class="number">002</span></span><br><span class="line">supervision3的内网<span class="variable constant_">IP</span> supervision-<span class="number">003</span></span><br><span class="line"> </span><br><span class="line">zookeeper的内网<span class="variable constant_">IP</span> zookeeper的名称            #注意，这里的zk是给模块拉取配置的zk</span><br><span class="line">storm的zk1的内网<span class="variable constant_">IP</span> storm的zk1            #这里的zk就是给storm集群用的zk</span><br><span class="line">storm的zk2的内网<span class="variable constant_">IP</span>  storm的zk2                      #如果storm的zk是standalone模式，这里就不要写了。</span><br><span class="line">storm的zk3的内网<span class="variable constant_">IP</span>  storm的zk3                      #如果storm的zk是standalone模式，这里就不要写了。</span><br></pre></td></tr></table></figure></p>
+<p>保存完<code>/etc/hosts</code>之后，还有一个比较重要的步骤，就是在<code>/etc/ld.so.conf.d/</code>这个路径里面建立一个<code>ffmped.conf</code>这个文件，文件的内容如下：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">/storm/apache-storm-<span class="number">1.0</span><span class="number">.2</span>/lib</span><br><span class="line">/storm/apache-storm-<span class="number">1.0</span><span class="number">.2</span>/lib/3rd</span><br></pre></td></tr></table></figure></p>
+<p>注意，<code>/storm/apache-storm-1.0.2</code>是我的storm路径，在实际情况下需要根据自己的路径进行更改。</p>
+<p>把这个<code>ffmped.conf</code>建立成功之后，我们可以测试一下，如果输入<code>ldconfig</code>的话，会出现如下的内容，就证明达到了我们的效果：<br><img src="/images/storm2.jpg" alt="paradin"></p>
+<p><code>storm</code>本身的<code>bin</code>目录夹里也有很多命令可以直接使用，为了调用<code>storm list</code>方便，我们需要把<code>bin/storm</code>这个可执行文件作一个软连接，方法就是先<code>cd /usr/local/bin/</code>，然后<code>ln -s /storm/apache-storm-1.0.2/bin/storm storm</code>。这样的话，我们就可以直接使用<code>storm list</code>来查看任务列表了。</p>
+<h2 id="Storm的具体配置"><a href="#Storm的具体配置" class="headerlink" title="Storm的具体配置"></a>Storm的具体配置</h2><p>安装了<code>storm</code>，调整了命令行，同时也搞定了<code>ffmpeg.conf</code>，下面就是调整<code>storm</code>的配置文件了，<code>nimbus</code>和<code>supervisior</code>都要修改。</p>
+<p>storm的配置文件叫<code>storm.yaml</code>，路径位于<code>storm</code>文件夹下的<code>/conf/</code>文件夹，我们需要在这个文件里面输入如下的内容：<br><img src="/images/storm3.png" alt="paradin"></p>
+<p>下面对配置文件作一个简单的解释：<br>1）storm.zookeeper.port:zk的默认端口2181；<br>2）storm.cluster.mode:storm的集群运行模式，这里我们也是采用默认的distributed（分布式）；<br>3）storm.local.dir:storm使用的本地文件的目录，这个目录必须存在而且storm进程可读写；<br>4）supervisor.slots.ports：这个地方在nimbus里可以不用管，但是在supervisior里是需要改的，如果你只打开6700，那么就只放开了6700端口，即只有一个worker，如果你打开了6700、6701、6702三个端口，那么就意味这个supervisior将有三个worker在工作，由于这次试验里我们每一个supervisor只开启一个任务，所以在supervisior的storm.yaml里这个节点就只保留6700，其他的就全部注释掉；<br>5）nimbus.task.launch.secs:task启动时的一个特殊超时设置.在启动后第一次心跳前会使用该值来临时替代nimbus.task.timeout.secs；<br>6）worker.childopts:设定每个worker (JVM任务)的最小和最大内存；</p>
+<p>更改完了<code>storm.yaml</code>之后，就要在<code>nimbus</code>里面安装<code>zkclient</code>。直接复制粘贴过来就好了。</p>
+<p>如果你不喜欢<code>storm</code>自带的日志格式，想更改一下日志的内容，那么就要在<code>/storm/apache-storm-1.0.2/log4j2</code>文件夹里面修改<code>worker.xml</code>，不过在这里善意的提醒，最好在修改之前先备份原有的<code>worker.xml</code>。</p>
+<h2 id="连接具体任务"><a href="#连接具体任务" class="headerlink" title="连接具体任务"></a>连接具体任务</h2><p>这次的实验包用的是我所在的公司开发内部使用的包，先把这个包的内容复制到<code>/storm/</code>文件夹下，同时<code>mkdir install</code>和<code>makir properties</code>这两个文件夹，在<code>install</code>文件夹里有开发写的任务的<code>jar</code>包和启动程序，如下：<br><img src="/images/storm4.png" alt="paradin"></p>
+<p>而在<code>properties</code>文件夹里，应该有这个任务的配置文件，如下：<br><img src="/images/storm5.png" alt="paradin"></p>
+<p>由于我们已经事前在<code>/etc/hosts</code>里指定了zkclient需要访问的zk的ip地址了，那么如果zk项配置正确，zkclient这个时候是可以成功启动的。同时在<code>install</code>文件夹里<code>./update_stormserver_config.sh</code>也应该是反应正确的。</p>
+<p>然后我们就可以启动storm了。</p>
+<h2 id="启动nimbus和supervision"><a href="#启动nimbus和supervision" class="headerlink" title="启动nimbus和supervision"></a>启动nimbus和supervision</h2><p>启动<code>storm</code>要先启动<code>nimbus</code>，在<code>/storm/apache-storm-1.0.2/bin</code>里面启动<code>run_nimbus.sh</code>，然后等一下会有一大片东西出现，再<code>jps</code>一下就能看到<code>nimbus</code>已经启动了，如图：<br><img src="/images/storm6.png" alt="paradin"></p>
+<p>从上图我们可以看到，18141的进程就是<code>zkclient</code>，只不过在<code>jps</code>里它名字叫<code>AppServerDaemon</code>，而<code>zkServer</code>在<code>jps</code>里叫<code>QuorumPeerMain</code>。</p>
+<p>如果 <code>storm</code>出现<code>Did you specify a valid list of nimbus hosts for config nimbus.seeds?</code>的错误提示，那么就是<code>nimbus</code>没有启动的缘故。</p>
+<p>启动了<code>nimbus</code>之后，就可以在<code>supervisor</code>的机器里去效仿着启动<code>supervisor</code>，但是这里要注意，如果你开启了一个<code>supervisior</code>，那么按照我们上面的配置文件，就启动了一个6700端口的<code>worker</code>，这个时候在<code>nimbus</code>执行下派一个任务的命令，<code>nimbus</code>就会下派这个任务给这个<code>worker</code>。</p>
+<p>下派命令的例子如下：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">storm jar storm-starter-<span class="number">0.9</span><span class="number">.2</span>-incubating-jar-<span class="keyword">with</span>-dependencies.<span class="property">jar</span> com.<span class="property">lechange</span>.<span class="property">recordshare</span>.<span class="property">RecordShareTopology</span> <span class="number">1</span></span><br></pre></td></tr></table></figure></p>
+<p>这样就启动了一个叫<code>videoshare</code>的任务，这个任务只用1个<code>worker</code>。</p>
+<p>如果在命令行里反馈这样的错误：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="title class_">Error</span>: <span class="title class_">Could</span> not find or load main <span class="keyword">class</span> <span class="title class_">storm</span>.<span class="property">starter</span>.<span class="property">recordshare</span>.<span class="property">RecordShareTopology</span></span><br></pre></td></tr></table></figure></p>
+<p>或者<code>exception in thread main java.lang.NoClassDefFoundError</code>这样的错误，那就要检查jar包和路径。</p>
+<p>而如果你再打开一个<code>supervisor</code>，在<code>nimbus</code>端又下发了一个任务，那么这个任务就会给刚刚新启动的<code>supervisor</code>。这样，启动一个下发一个，就会对每一个<code>worker</code>具体干的任务情况有一个比较清晰的了解。<br><img src="/images/storm7.png" alt="paradin"></p>
+<p>在nimbus上执行<code>storm list</code>，就可以获得上图的样子，可以看出，我在nimbus端下发了三个任务，就是<code>topology_name</code>这一栏，他们的状态也是<code>active</code>，而<code>workers</code>数量都是1，也就是说在那三台<code>supervisor</code>里都在工作。而跑到<code>supervisor</code>一看日志，也是对应有各自的任务日志。</p>
+<p>至此整个storm和具体的模块工作的搭建就完成了。</p>
+<h2 id="补充"><a href="#补充" class="headerlink" title="补充"></a>补充</h2><p>如果你事前一口气把三个<code>supervisor</code>都打开了，即开启了3个<code>worker</code>，然后一口气在<code>nimbus</code>端，一口气输入了三个下发任务的命令，那么这三个命令会随机的到这三个<code>worker</code>里，没有任何顺序而言，你只能通过日志的关键词来判断具体的<code>worker</code>做哪些任务。</p>
+<p>而如果你的worker数量少于<code>nimbus</code>下发任务的数量，会有什么反应呢？</p>
+<p>答案就是任务根本没有<code>worker</code>去干，在<code>storm list</code>里，多余的任务对应的<code>num_workers</code>的数字是0，而如果这个时候你新增一个<code>supervisor</code>到这个<code>storm</code>集群，那么这个任务就会吭哧吭哧开始工作了。</p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90/" rel="tag"># 大数据分析</a>
+              <a href="/tags/storm/" rel="tag"># storm</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/02/25/DockerFile%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AAnginx%E5%AE%B9%E5%99%A8%E7%9A%84%E5%85%A8%E8%BF%87%E7%A8%8B/" rel="prev" title="DockerFile创建一个nginx容器的全过程">
+      <i class="fa fa-chevron-left"></i> DockerFile创建一个nginx容器的全过程
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/02/26/%E8%A7%A3%E5%86%B3https%E8%AF%81%E4%B9%A6%E5%9C%A8%E8%B5%9B%E9%97%A8%E9%93%81%E5%85%8B%E8%AE%A4%E8%AF%81%E5%A4%B1%E8%B4%A5%E7%9A%84%E9%97%AE%E9%A2%98/" rel="next" title="解决https证书在赛门铁克认证失败的问题">
+      解决https证书在赛门铁克认证失败的问题 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C"><span class="nav-number">2.</span> <span class="nav-text">准备工作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Storm%E7%9A%84%E5%85%B7%E4%BD%93%E9%85%8D%E7%BD%AE"><span class="nav-number">3.</span> <span class="nav-text">Storm的具体配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9E%E6%8E%A5%E5%85%B7%E4%BD%93%E4%BB%BB%E5%8A%A1"><span class="nav-number">4.</span> <span class="nav-text">连接具体任务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8nimbus%E5%92%8Csupervision"><span class="nav-number">5.</span> <span class="nav-text">启动nimbus和supervision</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A1%A5%E5%85%85"><span class="nav-number">6.</span> <span class="nav-text">补充</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

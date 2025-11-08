@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="这次是跟K8S相关的题">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux运维工程师笔试题第二十套">
+<meta property="og:url" content="http://example.com/2019/09/16/Linux%E8%BF%90%E7%BB%B4%E5%B7%A5%E7%A8%8B%E5%B8%88%E7%AC%94%E8%AF%95%E9%A2%98%E7%AC%AC%E4%BA%8C%E5%8D%81%E5%A5%97/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="这次是跟K8S相关的题">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/%E5%B9%BC%E8%A9%B9%E5%8A%A9%E6%94%BB%E9%87%8C%E5%9F%BA%E6%88%B4%E7%BB%B4%E6%96%AF.gif">
+<meta property="article:published_time" content="2019-09-16T08:10:28.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:47:02.166Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="大牛之路">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/%E5%B9%BC%E8%A9%B9%E5%8A%A9%E6%94%BB%E9%87%8C%E5%9F%BA%E6%88%B4%E7%BB%B4%E6%96%AF.gif">
+
+<link rel="canonical" href="http://example.com/2019/09/16/Linux%E8%BF%90%E7%BB%B4%E5%B7%A5%E7%A8%8B%E5%B8%88%E7%AC%94%E8%AF%95%E9%A2%98%E7%AC%AC%E4%BA%8C%E5%8D%81%E5%A5%97/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>Linux运维工程师笔试题第二十套 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/09/16/Linux%E8%BF%90%E7%BB%B4%E5%B7%A5%E7%A8%8B%E5%B8%88%E7%AC%94%E8%AF%95%E9%A2%98%E7%AC%AC%E4%BA%8C%E5%8D%81%E5%A5%97/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Linux运维工程师笔试题第二十套
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-09-16 16:10:28" itemprop="dateCreated datePublished" datetime="2019-09-16T16:10:28+08:00">2019-09-16</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:47:02" itemprop="dateModified" datetime="2025-11-08T08:47:02+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>1.7k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>6 mins.</span>
+            </span>
+            <div class="post-description">这次是跟K8S相关的题</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="试题正文"><a href="#试题正文" class="headerlink" title="试题正文"></a>试题正文</h2><ol>
+<li><p>请解释Deployment、ReplicaSets、StatefulSets、Pod、Job、CronJob的不同用途<br><code>Deployment</code>的应用场景： 无状态的、轻量级应用<br><code>StatefulSets</code>的应用场景： 有状态的应用，每个节点有固定的的身份ID、Pod的启动有先后顺序、存储使用持久化存储卷（PV&#x2F;PVC）；<br><code>Deployment</code>和<code>Statefulset</code>之间很显著的区别是deployment的pod名每次重启之后会变，而stateful不会变，另外statefuset的启动是有顺序的。<br><code>Job</code>的应用场景： 负责处理任务，即仅执行一次的任务，它保证批处理任务的一个或多个Pod成功结束；<br><code>CronJob</code>的应用场景: 在给定的时间点运行一个任务，也可以周期性地在给定时间点运行；</p>
+</li>
+<li><p>Kubernetes 如何处理持久性？<br>根据独立的存储系统如NFS、iSCSI、cephfs、glusterfs等，创建动态&#x2F;静态PV，然后对应绑定PVC，然后在POD里使用PVC即可。</p>
+</li>
+<li><p>什么是sidecar容器？你能给出一个用例，说明你为什么要使用它么？<br>将应用程序的功能划分为单独的进程可以被视为 Sidecar 容器。Sidecar的设计模式允许你为应用程序添加许多功能，而无需额外第三方组件的配置和代码。<br>实际的应用场景是比如一些服务，还要搭配<code>监控、日志、集中化配置和网络服务</code>这样的附属服务的时候，就可以考虑用sidecar模式。</p>
+</li>
+<li><p>kubernetes包含几个组件。 各个组件的功能是什么。组件之间是如何交互的。<br>k8s大致分为3个部分：Master节点、Node节点、应用。</p>
+</li>
+</ol>
+<p>Master节点提供集群的控制面板，其下组件有：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">kube-apiserver 提供k8s的API调用服务。</span><br><span class="line">etcd 数据中心，存储集群的所有数据。</span><br><span class="line">kube-scheduler 调度器，负责给新创建的容器分配节点等。</span><br><span class="line">kube-controller-manager 控制管理器，负责监控和维护集群状态。</span><br><span class="line">cloud-controller-manager 是提供给第三方开发k8s特性的。</span><br></pre></td></tr></table></figure></p>
+<p>其中controller又包含：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Node Controller 报告节点健康状态。</span><br><span class="line">Replication Controller 维护rc的pod个数，pod挂掉又控制重启。</span><br><span class="line">Endpoints Controller 填充Endpoint对象，主要是给Service和Pod。</span><br><span class="line">Service Account &amp; Token Controllers 创建帐号和Token。</span><br></pre></td></tr></table></figure></p>
+<p>Node节点组件：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">kubelet 管理Pod里面的容器。</span><br><span class="line">kube-proxy 管理网络路由规则。</span><br><span class="line">container runtime 容器运行环境，如Docker等。</span><br></pre></td></tr></table></figure></p>
+<p>应用都是部署在<code>kube-system</code>这个命名空间下的。如：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">DNS dns服务。</span><br><span class="line">Dashboard web管理界面。</span><br><span class="line">Container Resource Monitoring 容器资源管理和监控，如cAdvisor、Prometheus。</span><br><span class="line">Cluster-level Logging 日志收集分节点、集群、应用三种类型，可用elk或fluentd等。</span><br></pre></td></tr></table></figure></p>
+<ol start="5">
+<li><p>k8s中的pod内几个容器之间的关系是什么。<br>一个Pod是一组容器的集合，像豌豆荚于豌豆。提供容器间存储和网络的共享，和一系列运行规范。Pod里面的容器共享网络，因此可使用localhost通讯。由于也共享存储，所以可以使用IPC和共享内存进行通讯。</p>
+</li>
+<li><p>如何在 Kubernetes 中实现负载均衡？<br>通过创建service来实现负载均衡，<code>Service Cluster IP</code> 是一个虚拟 IP，它与<code>pod IP</code>的映射关系是通过<code>iptables</code>，而且用的是使用类似轮询的负载均衡策略（iptables规则里有–probability 0.33332999982这样的标记）。</p>
+</li>
+<li><p>Deployment、Rc、Rs有什么区别。 其使用方式使用条件和原理是什么。<br><code>Replication Controller</code>是最早的部署、升级Pod的管理工具，他能保证pod的健康个数。<br><code>Replication Set</code>包含RC的所有功能，它比RC强的地方就是RC只支持等式的seletor，而RS的用法更丰富。<br><code>Deployment</code>比RS还高级，而且支持历史回溯、回滚、查看事件状态、暂停启动升级等功能，而且它支持两种升级方案：Recreate（全毁重建）、RollingUpdate（默认，逐步替换）</p>
+</li>
+<li><p>Cgroup中的cpu有哪几种限制方式。<br>Cgroup限制CPU的方式有三种：<code>cpuset</code>、<code>cpuquota</code>、<code>cpushares</code>，具体如下：</p>
+ <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cpuset隔离方式是以分配核心的方式进行资源隔离，可以提供的资源分配最小粒度是核心，不能提供更细粒度的资源隔离，但是隔离之后运算的相互影响最低。需要注意的是在服务器开启了超线程的情况下，要小心选择分配的核心，否则不同cgroup间的性能差距会比较大。</span><br><span class="line">cpuquota给我们提供了一种比cpuset可以更细粒度的分配资源的方式，并且保证了cgroup使用cpu比率的上限，相当于对cpu资源的硬限制。</span><br><span class="line">cpushares给我们提供了一种可以按权重比率弹性分配cpu时间资源的手段：当cpu空闲的时候，某一个要占用cpu的cgroup可以完全占用剩余cpu时间，充分利用资源。而当其他cgroup需要占用的时候，每个cgroup都能保证其最低占用时间比率，达到资源隔离的效果。</span><br></pre></td></tr></table></figure></li>
+</ol>
+<p>注意！Linux cgroup和Docker都将CPU核心数分成了1024个时间片（shares），而Kubernetes将它分成了1000个shares。所以有时候用docker inspect和kubectl查看有小小的误差。</p>
+<ol start="9">
+<li><p>k8s是如何使用实现request和limit的？<br>CPU 资源限制和内存资源限制一样都是由cgroup控制</p>
+</li>
+<li><p>kubectl run这个命令敲下去会有什么过程？<br>首先kubectl会先进行客户端验证的操作，kubectl run会自己判断创建的资源类型，比如当<code>-–replicas=1</code>的时候<code>--restart=Never</code>，那么生成的就是pod。如果有指定参数<code>--generator</code>，可以来部署其他多种资源类型。</p>
+</li>
+</ol>
+<p>然后通过<code>apiVersion</code>字段生成REST路径并且真正地发送HTTP请求。一旦请求发送到kube-apiserver之后获得成功的响应，kube-apiserver将对HTTP请求进行反序列化，然后利用得到的结果构建运行时对象的信息（有点像kubectl生成器的逆过程），并保存到etcd中。</p>
+<p>此时Scheduler开始调度，第一轮算法是淘汰掉不满足pod需求的节点，第二轮算法是在符合要求的候选节点上进行优选，将结果打分。一旦找到了合适的节点，Scheduler就会创建一个Binding对象，该对象的Name和Uid与Pod相匹配，然后通过POST请求发送给apiserver。apiserver会把该资源与对应的node记录到etcd里。</p>
+<p>Kubelet服务进程会根据度结果先创建pause容器，然后再进行业务Pod的创建。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a target="_blank" rel="noopener" href="https://juejin.im/post/5d28508ff265da1b7638ceeb">https://juejin.im/post/5d28508ff265da1b7638ceeb</a> （kubectl 创建 Pod 背后到底发生了什么？）<br><img src="/images/%E5%B9%BC%E8%A9%B9%E5%8A%A9%E6%94%BB%E9%87%8C%E5%9F%BA%E6%88%B4%E7%BB%B4%E6%96%AF.gif" alt="paradin" title="幼詹放弃扣篮，助攻里基代维斯"></p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%A4%A7%E7%89%9B%E4%B9%8B%E8%B7%AF/" rel="tag"># 大牛之路</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/09/11/%E8%A7%A3%E5%86%B3Mysql%E7%9A%84CPU%E8%BF%87%E9%AB%98%E7%9A%84%E9%97%AE%E9%A2%98/" rel="prev" title="解决Mysql的CPU过高的问题">
+      <i class="fa fa-chevron-left"></i> 解决Mysql的CPU过高的问题
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/09/23/%E4%B8%AD%E7%A7%8B%E8%8B%8F%E5%B7%9E%E6%B8%B8%E8%AE%B0/" rel="next" title="中秋苏州游记">
+      中秋苏州游记 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%95%E9%A2%98%E6%AD%A3%E6%96%87"><span class="nav-number">1.</span> <span class="nav-text">试题正文</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">2.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

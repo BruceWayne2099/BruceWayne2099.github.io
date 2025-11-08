@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="其实DeamonSet可以看成一个配置了节点级反亲和属性的deployment，而replicas的数字要与node个数相同">
+<meta property="og:type" content="article">
+<meta property="og:title" content="K8s里pod的调度笔记">
+<meta property="og:url" content="http://example.com/2019/09/11/K8s%E9%87%8Cpod%E8%B0%83%E5%BA%A6%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="其实DeamonSet可以看成一个配置了节点级反亲和属性的deployment，而replicas的数字要与node个数相同">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/k8s41.png">
+<meta property="og:image" content="http://example.com/images/k8s42.png">
+<meta property="og:image" content="http://example.com/images/k8s43.png">
+<meta property="og:image" content="http://example.com/images/k8s44.png">
+<meta property="og:image" content="http://example.com/images/%E5%85%AB%E6%9D%91%E5%A1%81%E6%89%A3%E7%89%B9%E7%BA%B3.gif">
+<meta property="article:published_time" content="2019-09-11T06:19:19.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:47:00.935Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="k8s">
+<meta property="article:tag" content="节点调度">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/k8s41.png">
+
+<link rel="canonical" href="http://example.com/2019/09/11/K8s%E9%87%8Cpod%E8%B0%83%E5%BA%A6%E7%AC%94%E8%AE%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>K8s里pod的调度笔记 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/09/11/K8s%E9%87%8Cpod%E8%B0%83%E5%BA%A6%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          K8s里pod的调度笔记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-09-11 14:19:19" itemprop="dateCreated datePublished" datetime="2019-09-11T14:19:19+08:00">2019-09-11</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:47:00" itemprop="dateModified" datetime="2025-11-08T08:47:00+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>1.4k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>5 mins.</span>
+            </span>
+            <div class="post-description">其实DeamonSet可以看成一个配置了节点级反亲和属性的deployment，而replicas的数字要与node个数相同</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>k8s里对pod的调度的过程简单说就是：当<code>Scheduler</code>通过<code>API server</code>的watch接口监听到新建Pod副本的信息后，它会检查所有符合该Pod要求的Node列表，开始执行Pod调度逻辑。调度成功后将Pod绑定到目标节点上，目标Node上的<code>kubelet</code>服务进程接管后继工作，负责Pod生命周期的后半生。同时<code>Scheduler</code>并将绑定信息传给<code>API server</code>写入etcd中。</p>
+<p><code>Kubernetes Scheduler</code>提供的调度流程分三步：</p>
+<ol>
+<li>预选策略(predicate)：遍历nodelist，选择出符合要求的候选节点，Kubernetes内置了多种预选规则供用户选择。</li>
+<li>优选策略(priority)：在选择出符合要求的候选节点中，采用优选规则计算出每个节点的积分，最后选择得分最高的。</li>
+<li>选定(select)：如果最高得分有好几个节点，select就会从中随机选择一个节点。</li>
+</ol>
+<p>而具体方案有以下几种：<br>pod对pod：podAffinity和podantiAffinity<br>pod对node：nodeName、nodeSelector、Taint和Toleration、nodeAffinity和nodeantiAffinity、DeamonSet</p>
+<h2 id="强指定nodeName"><a href="#强指定nodeName" class="headerlink" title="强指定nodeName"></a>强指定nodeName</h2><p>先看一下当前node的情况：<br><img src="/images/k8s41.png" alt="paradin"></p>
+<p>最简单无脑的把pod分配到node上的方法就是<code>nodeName</code>，这个方法是不走schedule分配的，而是直接到对应的node上由kubelet创建pod，举个例子，写一个<code>pod.yaml</code>：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  labels:</span><br><span class="line">    run: pod-manual-schedule</span><br><span class="line">  namespace: default</span><br><span class="line">  name: pod-manual-schedule</span><br><span class="line">spec:</span><br><span class="line">  nodeName: <span class="string">&quot;node2&quot;</span>		<span class="comment">#这里填写的是NAME段，指定这个pod去node2节点上</span></span><br><span class="line">  <span class="comment">#nodeSelector:</span></span><br><span class="line">     <span class="comment">#  cloudnil.com/role: dev #指定调度节点为带有label标记为：cloudnil.com/role=dev的node节点</span></span><br><span class="line">  <span class="comment">#schedulerName: default-scheduler		#调度器可以自己确定，一般来说这一行不写，即默认的那个调度器</span></span><br><span class="line">  containers:</span><br><span class="line">    - name: my-pod</span><br><span class="line">      image: nginx:<span class="number">1.11</span><span class="number">.9</span></span><br></pre></td></tr></table></figure></p>
+<p><code>kubectl apply -f pod.yaml</code>之后，查看一下效果，果然分配到了node2上：<br><img src="/images/k8s42.png" alt="paradin"></p>
+<p><code>kubectl delete -f 1.yaml</code>删掉该pod。</p>
+<p>跟<code>nodeName</code>差不多功效的是<code>nodeSelector</code>，只不过后者靠label而不是名字来给pod指定node。</p>
+<p>但是要注意！！！如果在创建<code>deployment/pod</code>的时候指定了<code>nodeName</code>，那么k8s是不会做调度的，也就是说不管该node上的剩余资源是否满足request，都会硬往里塞。那么如果node上的剩余资源不足，就会发现pod处于<code>outofcpu/outofmem</code>。</p>
+<h2 id="亲和性nodeaffinity"><a href="#亲和性nodeaffinity" class="headerlink" title="亲和性nodeaffinity"></a>亲和性nodeaffinity</h2><p>通过<code>nodeAffinity</code>调度pod就多了一丝动态选择的味道，不像<code>nodeName</code>那么死板了。首先<code>kubectl label nodes node3 has-eip=yes</code>先给node3打上<code>has-eip=yes</code>这样的label，然后写一个pod.yaml如下：<br>	<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">apiVrsion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  labels:</span><br><span class="line">    run: node-affinity</span><br><span class="line">  namespace: <span class="keyword">default</span></span><br><span class="line">  name: node-affinity</span><br><span class="line">spec:</span><br><span class="line">  containers:</span><br><span class="line">    - name: my-pod</span><br><span class="line">      image: nginx:<span class="number">1.11</span><span class="number">.9</span></span><br><span class="line">      imagePullPolicy: IfNotPresent</span><br><span class="line">  affinity:</span><br><span class="line">    nodeAffinity:</span><br><span class="line">      requiredDuringSchedulingIgnoredDuringExecution:</span><br><span class="line">        nodeSelectorTerms:</span><br><span class="line">          - matchExpressions:</span><br><span class="line">              - key: has-eip</span><br><span class="line">                operator: In</span><br><span class="line">                values:</span><br><span class="line">                  - <span class="string">&quot;yes&quot;</span></span><br></pre></td></tr></table></figure></p>
+<p><code>kubectl apply -f pod.yaml</code>之后，查看一下效果，果然分配到了node3上：<br><img src="/images/k8s43.png" alt="paradin"></p>
+<p>如果说就是不信邪，要把nodeAffinity和nodeName&#x2F;nodeSelector一起用，而且还不是指向同一个node，那么这个pod就会调度失败，卡在<code>Predicate MatchNodeSelector failed</code>这个阶段。</p>
+<h2 id="谈谈topologyKey"><a href="#谈谈topologyKey" class="headerlink" title="谈谈topologyKey"></a>谈谈topologyKey</h2><p>众所周知，为了照顾pod之间的超亲密关系，k8s还有一个podAffinity，比如一个yaml如下：<br>	<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  labels:</span><br><span class="line">    run: pod-affinity</span><br><span class="line">  namespace: <span class="keyword">default</span></span><br><span class="line">  name: pod-affinity</span><br><span class="line">spec:</span><br><span class="line">  containers:</span><br><span class="line">    - name: my-pod</span><br><span class="line">      image: nginx:<span class="number">1.11</span><span class="number">.9</span></span><br><span class="line">      imagePullPolicy: IfNotPresent</span><br><span class="line">  affinity:</span><br><span class="line">    podAffinity:</span><br><span class="line">      requiredDuringSchedulingIgnoredDuringExecution:</span><br><span class="line">      - labelSelector:</span><br><span class="line">          matchExpressions:</span><br><span class="line">            - key: run</span><br><span class="line">              operator: In</span><br><span class="line">              values:</span><br><span class="line">                - <span class="string">&quot;node-affinity&quot;</span></span><br><span class="line">        topologyKey: kubernetes.io/hostname</span><br></pre></td></tr></table></figure></p>
+<p>这里面有一个元素叫<code>topologyKey</code>，对它的讲解并不多，很多资料也是一句带过。我这里打算研究一番：</p>
+<p>topologyKey是<code>拓扑域</code>，即一个范围。这个范围可大可小，可以是地区、机房也可以是一个node。它实际对应的还是一个node的标签，也就是说，其实topologyKey就是用于筛选Node的。</p>
+<p>结合我上面那个yaml，这个yaml意思就是要在<code>default</code>这个命名空间里创建一个叫<code>pod-affinity</code>的pod，它要求必须与<code>run：node-affinity</code>这样的pod在同一个node里，而且这个node还要有<code>kubernetes.io/hostname</code>这样的label。</p>
+<p>那么如何判断一个node的label里有没有<code>kubernetes.io/hostname</code>？使用<code>kubectl get nodes -o wide --show-labels</code> 看一下：<br><img src="/images/k8s44.png" alt="paradin"></p>
+<p>可见图里三个node都有<code>kubernetes.io/hostname</code>，但是如何结合拓扑域呢？举个例子：Pod1在<code>k8s.io/hostname=node1</code>的Node上，Pod2在<code>k8s.io/hostname=node2</code>的Node上，Pod3在<code>k8s.io/hostname=node1</code>的Node上，则Pod2和Pod1、Pod3不在同一个拓扑域，而Pod1和Pod3在同一个拓扑域。</p>
+<p>注意！原则上，<code>topologyKey</code>可以是任何合法的标签Key。但是出于性能和安全原因，<code>对topologyKey</code>有一些限制：</p>
+<ol>
+<li>于亲和性和 <code>requiredDuringSchedulingIgnoredDuringExecution</code>的Pod反亲和性，<code>topologyKey</code>不能为空。</li>
+<li>对于<code>requiredDuringSchedulingIgnoredDuringExecution</code> 的Pod反亲和性，引入<code>LimitPodHardAntiAffinityTopology</code>准入控制器来限制<code>topologyKey</code>只能是 <code>kubernetes.io/hostname</code>。如果要使用自定义拓扑域，则可以修改准入控制器，或者直接禁用它。</li>
+<li>对于 <code>preferredDuringSchedulingIgnoredDuringExecution</code> 的Pod反亲和性，空的<code>topologyKey</code> 表示所有拓扑域。截止v1.12版本，所有拓扑域还只能是<code>kubernetes.io/hostname</code>、<code>failure-domain.beta.kubernetes.io/zone</code>和<code>failure-domain.beta.kubernetes.io/region</code>的组合。</li>
+<li>除上述情况外，<code>topologyKey</code>可以是任何合法的标签key。</li>
+</ol>
+<h2 id="timeAdded的问题"><a href="#timeAdded的问题" class="headerlink" title="timeAdded的问题"></a>timeAdded的问题</h2><p>在Node的<code>taint</code>的配置里，可能会有<code>timeAdded</code>这样的字眼：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">taints:</span><br><span class="line">  - effect: NoSchedule</span><br><span class="line">    key: dedicated</span><br><span class="line">    timeAdded: null</span><br><span class="line">    value: master</span><br></pre></td></tr></table></figure></p>
+<p>这个<code>timeAdded</code>是啥？很少有人介绍，就有人误认为效果是类似<code>toleration</code>里的<code>tolerationSeconds</code>，其实是不对的。</p>
+<p><code>timeadded</code>只有在<code>effect:NoExecute</code>里才有具体的值，其余时候都是<code>null</code>，这个字段的设计用途是：“考虑到不同的node可能时间不一致，如果k8s组件出现时间误差的时候，通过<code>timeAdded</code> + <code>pod.tolerationSeconds</code>小于等于<code>time.Now</code>来保证taint能成功的把pod转移到其他的node去”。</p>
+<p>不过这个字段据说要慢慢被淘汰掉了，所以可以不用太关注它。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a target="_blank" rel="noopener" href="http://bazingafeng.com/2019/03/31/k8s-affinity-topologykey/">http://bazingafeng.com/2019/03/31/k8s-affinity-topologykey/</a><br><a target="_blank" rel="noopener" href="https://github.com/kubernetes/kubernetes/issues/42394">https://github.com/kubernetes/kubernetes/issues/42394</a><br><a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000018446858">https://segmentfault.com/a/1190000018446858</a></p>
+<p><img src="/images/%E5%85%AB%E6%9D%91%E5%A1%81%E6%89%A3%E7%89%B9%E7%BA%B3.gif" alt="paradin" title="八村塁扣特纳是他在今年世界杯为数不多的亮点"></p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/k8s/" rel="tag"># k8s</a>
+              <a href="/tags/%E8%8A%82%E7%82%B9%E8%B0%83%E5%BA%A6/" rel="tag"># 节点调度</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/08/26/Gitlab-runner%E5%AE%9E%E7%8E%B0%E8%B7%A8%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%83%A8%E7%BD%B2/" rel="prev" title="Gitlab-runner实现跨服务器部署">
+      <i class="fa fa-chevron-left"></i> Gitlab-runner实现跨服务器部署
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/09/11/%E8%A7%A3%E5%86%B3Mysql%E7%9A%84CPU%E8%BF%87%E9%AB%98%E7%9A%84%E9%97%AE%E9%A2%98/" rel="next" title="解决Mysql的CPU过高的问题">
+      解决Mysql的CPU过高的问题 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%BA%E6%8C%87%E5%AE%9AnodeName"><span class="nav-number">2.</span> <span class="nav-text">强指定nodeName</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%B2%E5%92%8C%E6%80%A7nodeaffinity"><span class="nav-number">3.</span> <span class="nav-text">亲和性nodeaffinity</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B0%88%E8%B0%88topologyKey"><span class="nav-number">4.</span> <span class="nav-text">谈谈topologyKey</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#timeAdded%E7%9A%84%E9%97%AE%E9%A2%98"><span class="nav-number">5.</span> <span class="nav-text">timeAdded的问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">6.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

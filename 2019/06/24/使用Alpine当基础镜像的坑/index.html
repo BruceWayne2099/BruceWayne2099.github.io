@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="卷扩容时使用resize2fs出现Bad magic number in super-block while trying to open的错误，可使用xfs_growfs破之">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用Alpine当基础镜像的坑">
+<meta property="og:url" content="http://example.com/2019/06/24/%E4%BD%BF%E7%94%A8Alpine%E5%BD%93%E5%9F%BA%E7%A1%80%E9%95%9C%E5%83%8F%E7%9A%84%E5%9D%91/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="卷扩容时使用resize2fs出现Bad magic number in super-block while trying to open的错误，可使用xfs_growfs破之">
+<meta property="og:locale">
+<meta property="article:published_time" content="2019-06-24T09:09:32.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:47:32.430Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="Golang">
+<meta property="article:tag" content="docker">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2019/06/24/%E4%BD%BF%E7%94%A8Alpine%E5%BD%93%E5%9F%BA%E7%A1%80%E9%95%9C%E5%83%8F%E7%9A%84%E5%9D%91/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>使用Alpine当基础镜像的坑 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/06/24/%E4%BD%BF%E7%94%A8Alpine%E5%BD%93%E5%9F%BA%E7%A1%80%E9%95%9C%E5%83%8F%E7%9A%84%E5%9D%91/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          使用Alpine当基础镜像的坑
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-06-24 17:09:32" itemprop="dateCreated datePublished" datetime="2019-06-24T17:09:32+08:00">2019-06-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:47:32" itemprop="dateModified" datetime="2025-11-08T08:47:32+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>798</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>3 mins.</span>
+            </span>
+            <div class="post-description">卷扩容时使用resize2fs出现Bad magic number in super-block while trying to open的错误，可使用xfs_growfs破之</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="踩坑正文"><a href="#踩坑正文" class="headerlink" title="踩坑正文"></a>踩坑正文</h2><p>今天部署开发要上一个新模块，此模块已经通过golang编译好的，而且在本地机器可以正常启动，现在需要将其容器化—-制作一个镜像，然后在根据这个镜像启动程序。</p>
+<p>本着基础镜像最小的原则，就选择了<code>alpine:latest</code>。先创建一个干净的alpine镜像挂载模块所在的文件夹，然后<code>docker exec</code>进去执行启动脚本。发现启动脚本里涉及到了<code>cpulimit</code>、<code>rpm</code>、<code>ps -p</code>、 <code>sudo</code>等alpine非自带命令所以无法启动。alpine安装模块的命令即非<code>yum</code>又非<code>apt-get</code>，而是<code>apk add</code>，于是在Dockerfile里添加一句：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">RUN apk add cpulimit &amp;&amp; apk add rpm &amp;&amp; apk add sudo &amp;&amp; apk --update add procps</span><br></pre></td></tr></table></figure></p>
+<p>新镜像制作完毕，进去启动还是失败。具体表现是<code>./启动脚本</code>的时候报<code>&quot;no such file or directory&quot;</code>，开始我以为是因为alpine没有<code>/bin/bash</code>的缘故，把所有的shebang都改成了<code>/bin/sh</code>。但是发现启动的时候报格式错误，我想到这是一个go编译好的脚本，那么<code>./</code>就应该可以直接启动的。后来在<a target="_blank" rel="noopener" href="https://github.com/gin-gonic/gin/issues/1178">https://github.com/gin-gonic/gin/issues/1178</a> 里查到原来alpine里是没有稳定的libc，所以还要添加<code>libc6-compat</code>和<code>libstdc++</code>。</p>
+<p>在镜像里<code>apk add libc6-compat &amp;&amp; apk add libstdc++</code>之后，发现启动脚本还有这样一句话：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo <span class="string">&#x27;./core_%e.%p&#x27;</span> | sudo tee /proc/sys/kernel/core_pattern</span><br></pre></td></tr></table></figure></p>
+<p>这个命令是无法执行的，因为docker里<code>/proc/sys/kernel/core_pattern</code>是只读文件，自然无法进行修改。但是宿主机上的这个文件是root用户可以修改的。这可怎么办？</p>
+<p>我开始想既然宿主机的<code>/proc/sys/kernel/core_pattern</code>可以修改，那么就把宿主机的<code>/proc/sys/kernel/core_pattern</code>挂载给镜像不就得了？但是在执行的时候会报错：<code>cannot be mounted because it is located inside “/proc”</code>，因为Docker不允许在<code>proc</code>目录下随意挂文件，如果你有信心可以通过修改docker的源码来实现挂载的效果。</p>
+<p>但是我觉得还是沉稳为上，于是就想出一个办法：在docker run的时候添加<code>--privileged</code>，这样容器获得了额外的特权可以对系统变量的值进行修改。但是要注意如果容器发生了重启，那么值会恢复成原样，即无法持久化。不过在启动脚本里已经有了echo语句，这样每一次执行启动脚本都会更改<code>/proc/sys/kernel/core_pattern</code>，于是就不用太担心这个问题了。</p>
+<p>最后完整的Dockerfile如下：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">FROM alpine:latest</span><br><span class="line">MAINTAINER ChrisChan &lt;<span class="number">33664</span>@dahuatech.com&gt;</span><br><span class="line"></span><br><span class="line">RUN apk update &amp;&amp; apk add libc6-compat &amp;&amp; apk add libstdc++ &amp;&amp; apk add cpulimit &amp;&amp; apk add rpm &amp;&amp; apk add sudo &amp;&amp; apk --update add procps</span><br><span class="line">RUN mkdir -p /mnt/agentmizar	<span class="comment">#agentmizar这个就是工作的模块名</span></span><br><span class="line">WORKDIR /mnt/agentmizar		<span class="comment">#设定工作目录</span></span><br><span class="line">CMD [<span class="string">&quot;sh&quot;</span>, <span class="string">&quot;control&quot;</span>, <span class="string">&quot;start&quot;</span>]		<span class="comment">#启动之</span></span><br></pre></td></tr></table></figure></p>
+<p>创建完镜像之后，启动语句如下：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run --name 容器名 -dit  -v /opt/:/opt/:ro -v /etc/localtime:/etc/localtime:ro --privileged 镜像名		<span class="comment">#别忘了对准时间</span></span><br></pre></td></tr></table></figure></p>
+<p>补充一句，最后镜像大小不到50MB。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_41980563/article/details/88876874">https://blog.csdn.net/qq_41980563/article/details/88876874</a><br><a target="_blank" rel="noopener" href="https://serverfault.com/questions/883625/alpine-shell-cant-find-file-in-docker">https://serverfault.com/questions/883625/alpine-shell-cant-find-file-in-docker</a><br><a target="_blank" rel="noopener" href="https://sq.163yun.com/blog/article/155817999160799232">https://sq.163yun.com/blog/article/155817999160799232</a></p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/docker/" rel="tag"># docker</a>
+              <a href="/tags/Golang/" rel="tag"># Golang</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/06/21/%E7%A0%94%E7%A9%B6%E4%B8%80%E4%B8%8BZabbix-3-4%E7%9A%84%E6%9C%8D%E5%8A%A1%E4%B8%BB%E5%8A%A8%E5%8F%91%E7%8E%B0%E5%8A%9F%E8%83%BD/" rel="prev" title="研究一下Zabbix 3.4的服务主动发现功能">
+      <i class="fa fa-chevron-left"></i> 研究一下Zabbix 3.4的服务主动发现功能
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/06/25/Python%E7%AB%AF%E5%8F%A3%E6%8E%A2%E6%B5%8B%E8%84%9A%E6%9C%AC/" rel="next" title="Python端口探测脚本">
+      Python端口探测脚本 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B8%A9%E5%9D%91%E6%AD%A3%E6%96%87"><span class="nav-number">1.</span> <span class="nav-text">踩坑正文</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">2.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

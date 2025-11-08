@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="以前扫描出来是封端口，现在是把整个IP都封掉了，技术进步了。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="记录部署ProxySql的过程">
+<meta property="og:url" content="http://example.com/2019/05/31/%E8%AE%B0%E5%BD%95%E9%83%A8%E7%BD%B2ProxySql%E7%9A%84%E8%BF%87%E7%A8%8B/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="以前扫描出来是封端口，现在是把整个IP都封掉了，技术进步了。">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/proxy16.png">
+<meta property="og:image" content="http://example.com/images/proxy18.png">
+<meta property="og:image" content="http://example.com/images/proxy17.png">
+<meta property="og:image" content="http://example.com/images/proxy19.png">
+<meta property="og:image" content="http://example.com/images/proxy20.png">
+<meta property="og:image" content="http://example.com/images/proxy21.png">
+<meta property="og:image" content="http://example.com/images/proxy22.png">
+<meta property="og:image" content="http://example.com/images/proxy23.png">
+<meta property="og:image" content="http://example.com/images/proxy24.png">
+<meta property="og:image" content="http://example.com/images/proxy25.png">
+<meta property="og:image" content="http://example.com/images/proxy26.png">
+<meta property="article:published_time" content="2019-05-31T03:12:05.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:48:20.447Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="mysql">
+<meta property="article:tag" content="proxysql">
+<meta property="article:tag" content="读写分离">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/proxy16.png">
+
+<link rel="canonical" href="http://example.com/2019/05/31/%E8%AE%B0%E5%BD%95%E9%83%A8%E7%BD%B2ProxySql%E7%9A%84%E8%BF%87%E7%A8%8B/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>记录部署ProxySql的过程 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/05/31/%E8%AE%B0%E5%BD%95%E9%83%A8%E7%BD%B2ProxySql%E7%9A%84%E8%BF%87%E7%A8%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          记录部署ProxySql的过程
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-05-31 11:12:05" itemprop="dateCreated datePublished" datetime="2019-05-31T11:12:05+08:00">2019-05-31</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:48:20" itemprop="dateModified" datetime="2025-11-08T08:48:20+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>2.3k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>8 mins.</span>
+            </span>
+            <div class="post-description">以前扫描出来是封端口，现在是把整个IP都封掉了，技术进步了。</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="安装与启动"><a href="#安装与启动" class="headerlink" title="安装与启动"></a>安装与启动</h2><p>先去<code>https://github.com/sysown/proxysql/releases</code> 下载稳定版本 ，我是下载的<code>proxysql-2.0.4-1-centos7.x86_64.rpm</code>，然后<code>rpm -ivh proxysql-2.0.4-1-centos7.x86_64.rpm</code>，如果出现了如下错误：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@dvlshop-proxysql-001 ~]<span class="comment"># rpm -ivh proxysql-2.0.4-1-centos7.x86_64.rpm </span></span><br><span class="line">error: Failed dependencies:</span><br><span class="line">	perl(DBD::mysql) <span class="keyword">is</span> needed by proxysql-<span class="number">2.0</span><span class="number">.4</span>-<span class="number">1.</span>x86_64</span><br><span class="line">	perl(DBI) <span class="keyword">is</span> needed by proxysql-<span class="number">2.0</span><span class="number">.4</span>-<span class="number">1.</span>x86_64</span><br></pre></td></tr></table></figure><br>就执行一下<code>yum install -y perl-IO-Socket-SSL perl-DBD-MySQL</code>就可以了。</p>
+<p>安装成功之后，启动的命令是<code>service proxysql start</code>：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@dvlshop-proxysql-001 ~]<span class="comment"># service proxysql start</span></span><br><span class="line">Starting ProxySQL: <span class="number">2019</span>-05-<span class="number">31</span> <span class="number">11</span>:<span class="number">23</span>:<span class="number">10</span> [INFO] Using config file /etc/proxysql.cnf</span><br><span class="line"><span class="number">2019</span>-05-<span class="number">31</span> <span class="number">11</span>:<span class="number">23</span>:<span class="number">10</span> [INFO] No SSL keys/certificates found <span class="keyword">in</span> datadir (/var/lib/proxysql). Generating new keys/certificates.</span><br><span class="line">DONE!</span><br><span class="line">[root@dvlshop-proxysql-001 ~]<span class="comment"># </span></span><br></pre></td></tr></table></figure></p>
+<p>启动完毕就可以使用初始命令<code>mysql -uadmin -padmin -h 127.0.0.1 -P 6032</code>来登录proxysql了，如图：<br><img src="/images/proxy16.png" alt="akb48"></p>
+<p>补充一下：proxysql的默认管理端口是<code>6032</code>，客户端服务端口是<code>6033</code>。默认的用户名密码都是<code>admin</code>，可以在配置文件里看到。<br><img src="/images/proxy18.png" alt="akb48"></p>
+<p>再说一下各个重要文件的位置：proxysql的静态配置文件是<code>/etc/proxysql.cnf</code>(只在第一次启动的时候有用，后续所有的配置修改都是对SQLite数据库操作，并且不会更新到<code>proxysql.cnf</code>文件中。)，日志文件是<code>/var/lib/proxysql/proxysql.log</code>，SQLITE的数据文件是<code>/var/lib/proxysql/proxysql.db</code>。</p>
+<h2 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h2><p>与之前的中间件atlas不同，配置ProxySQL是基于sql命令的方式完成的，而且配置完成之后直接应用无需重启。怎么做到这个的呢？是因为ProxySQL的三层管理配置设计：</p>
+<ol>
+<li>runtime：运行中使用的配置文件，这些表的数据库无法直接修改，只能从其他层级load加载。这一份配置会直接影响到生产环境的，所以要将配置加载进RUNTIME层时需要三思而行；</li>
+<li>memory：提供用户动态修改配置文件，它是我们修改proxysql的唯一正常入口。一般来说在修改一个配置时，首先修改Memory层，确认无误后再接入RUNTIME层，最后持久化到DISK和CONFIG FILE层。也就是说memeory层里面的配置随便改，不影响生产，也不影响磁盘中保存的数据。</li>
+<li>disk：将修改的配置保存到磁盘SQLit表中（即：proxysql.db），DISK&#x2F;CONFIG FILE层表示持久存储的那份配置，持久层对应的磁盘文件是$(DATADIR)&#x2F;proxysql.db，在重启ProxySQL的时候，会从proxysql.db文件中加载信息。即如果不持久化下来，重启后，配置都将丢失。</li>
+<li>config：一般不使用它（即：proxysql.cnf）</li>
+</ol>
+<p>再重复一遍：proxysql分为三个级别，RUNTIME是即时生效的，MEMORY是保存在内存中但并不立即生效的，DISK|CONFIG FILE是持久化或写在配置文件中的。修改的配置都是在memory层。可以load到runtime，使配置在不用重启proxysql的情况下也可以生效，也可以save到disk，将对配置的修改持久化！如图：<br><img src="/images/proxy17.png" alt="akb48"></p>
+<p>这三个级别的配置文件互不干扰，在某个层级修改了配置文件，想要加载或保存到另一个层级，需要额外的LOAD或SAVE操作：”LOAD xx_config FROM xx_level | LOAD xx_config TO xx_level | SAVE xx_config TO xx_level | SAVE xx_config FROM xx_level”等等。</p>
+<p>由此可见，如果想要更改proxysql的初始账号密码以及端口，改了<code>/etc/proxysql.cnf</code>是没用的，应该通过sql命令行进入到proxysql里，先查看<code>global_variables</code>这个表：<br><img src="/images/proxy19.png" alt="akb48"></p>
+<p>要修改表里的内容才算是真正的修改了配置文件！于是想要在admin:admin的基础上添加一个lcshop:lcshop2019这个用户同时把登录端口改成127.0.0.1:6969，那么语句如下：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">update global_variables <span class="built_in">set</span> variable_value = <span class="string">&#x27;admin:admin;lcshop:lcshop2019&#x27;</span> where variable_name = <span class="string">&#x27;admin-admin_credentials&#x27;</span>;</span><br><span class="line">update global_variables <span class="built_in">set</span> variable_value = <span class="string">&#x27;127.0.0.1:6969&#x27;</span> where variable_name = <span class="string">&#x27;admin-mysql_ifaces&#x27;</span>;	<span class="comment">#登录proxysql的管理端口是6969了</span></span><br><span class="line">LOAD MYSQL SERVERS TO RUNTIME;  <span class="comment">#常用，让修改的配置生效</span></span><br><span class="line">SAVE MYSQL SERVERS TO DISK;     <span class="comment">#常用，将修改的配置持久化</span></span><br></pre></td></tr></table></figure></p>
+<p>此时就是使用新账号和新端口访问proxysql管理界面了！如图：<br><img src="/images/proxy20.png" alt="akb48"></p>
+<p>跟mysql一样，如果你想查看历史命令记录，<code>cat ~/mysql_history</code>即可。</p>
+<h2 id="具体配置"><a href="#具体配置" class="headerlink" title="具体配置"></a>具体配置</h2><p>假设我有一组阿里云RDS数据库，主库的内网地址是rm-bp1el471x0ltbg402.mysql.rds.aliyuncs.com，从库的内网地址是rr-bp10ki29n7n8z0ex0.mysql.rds.aliyuncs.com，端口皆3306，并且将这台proxysql的IP地址添加到双方的白名单里。</p>
+<p>首先先把两个mysql信息插入到<code>mysql_servers</code>，如下：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">MySQL [(none)]&gt; insert into mysql_servers(hostgroup_id,hostname,port) values(<span class="number">10</span>,<span class="string">&#x27;rm-bp1el471x0ltbg402.mysql.rds.aliyuncs.com&#x27;</span>,<span class="number">3306</span>);	<span class="comment">#10表示写组，为20表示读组。</span></span><br><span class="line">Query OK, <span class="number">1</span> row affected (<span class="number">0.01</span> sec)</span><br><span class="line">MySQL [(none)]&gt; insert into mysql_servers(hostgroup_id,hostname,port) values(<span class="number">20</span>,<span class="string">&#x27;rr-bp10ki29n7n8z0ex0.mysql.rds.aliyuncs.com&#x27;</span>,<span class="number">3306</span>);</span><br><span class="line">Query OK, <span class="number">1</span> row affected (<span class="number">0.00</span> sec)</span><br><span class="line">MySQL [(none)]&gt; select * <span class="keyword">from</span> mysql_servers;</span><br><span class="line">+--------------+---------------------------------------------+------+-----------+--------+--------+-------------+-----------------+---------------------+---------+----------------+---------+</span><br><span class="line">| hostgroup_id | hostname                                    | port | gtid_port | status | weight | compression | max_connections | max_replication_lag | use_ssl | max_latency_ms | comment |</span><br><span class="line">+--------------+---------------------------------------------+------+-----------+--------+--------+-------------+-----------------+---------------------+---------+----------------+---------+</span><br><span class="line">| <span class="number">10</span>           | rm-bp1el471x0ltbg402.mysql.rds.aliyuncs.com | <span class="number">3306</span> | <span class="number">0</span>         | ONLINE | <span class="number">1</span>      | <span class="number">0</span>           | <span class="number">1000</span>            | <span class="number">0</span>                   | <span class="number">0</span>       | <span class="number">0</span>              |         |</span><br><span class="line">| <span class="number">20</span>           | rr-bp10ki29n7n8z0ex0.mysql.rds.aliyuncs.com | <span class="number">3306</span> | <span class="number">0</span>         | ONLINE | <span class="number">1</span>      | <span class="number">0</span>           | <span class="number">1000</span>            | <span class="number">0</span>                   | <span class="number">0</span>       | <span class="number">0</span>              |         |</span><br><span class="line">+--------------+---------------------------------------------+------+-----------+--------+--------+-------------+-----------------+---------------------+---------+----------------+---------+</span><br><span class="line"><span class="number">2</span> rows <span class="keyword">in</span> <span class="built_in">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p>然后还要在阿里云的RDS控制台上创建两个用户，一个是监控用户<code>sqlmonitor</code>，一个是普通的进程用户<code>proxysql</code>。先将进程用户proxysql添加到<code>mysql_users</code>这个表里<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">MySQL [(none)]&gt;	INSERT INTO mysql_users(username,password,default_hostgroup) VALUES (<span class="string">&#x27;proxysql&#x27;</span>,<span class="string">&#x27;这里是账号对应的密码&#x27;</span>,<span class="number">10</span>);</span><br><span class="line">MySQL [(none)]&gt; select * <span class="keyword">from</span> mysql_users;</span><br><span class="line">+----------+--------------------+--------+---------+-------------------+----------------+---------------+------------------------+--------------+---------+----------+-----------------+---------+</span><br><span class="line">| username | password           | active | use_ssl | default_hostgroup | default_schema | schema_locked | transaction_persistent | fast_forward | backend | frontend | max_connections | comment |</span><br><span class="line">+----------+--------------------+--------+---------+-------------------+----------------+---------------+------------------------+--------------+---------+----------+-----------------+---------+</span><br><span class="line">| proxysql | 这里是账号对应的密码| <span class="number">1</span>      | <span class="number">0</span>       | <span class="number">10</span>                | NULL           | <span class="number">0</span>             | <span class="number">1</span>                      | <span class="number">0</span>            | <span class="number">1</span>       | <span class="number">1</span>        | <span class="number">10000</span>           |         |</span><br><span class="line">+----------+--------------------+--------+---------+-------------------+----------------+---------------+------------------------+--------------+---------+----------+-----------------+---------+</span><br><span class="line"><span class="number">1</span> row <span class="keyword">in</span> <span class="built_in">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">   LOAD MYSQL USERS TO RUNTIME;</span><br><span class="line">SAVE MYSQL USERS TO DISK;</span><br></pre></td></tr></table></figure></p>
+<p>这里说一下<code>default_hostgroup</code>，它的意思是“这个用户的请求没有匹配到规则时，默认发到这个<code>hostgroup</code>，默认0”，由于我们上面设定10是写组，所以这里写成10。</p>
+<p>这里默认保存的密码是明文的，如果想保存加密后的密码，可以先去mysql的界面里进行加密，比如：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">MySQL [(none)]&gt; select PASSWORD(<span class="string">&#x27;114514&#x27;</span>);</span><br><span class="line">+-------------------------------------------+</span><br><span class="line">| PASSWORD(<span class="string">&#x27;114514&#x27;</span>)                        |</span><br><span class="line">+-------------------------------------------+</span><br><span class="line">| *D9050F2D99C3DDD8138912B7BDF8F4BACBE3A8E7 |</span><br><span class="line">+-------------------------------------------+</span><br></pre></td></tr></table></figure></p>
+<p>然后用这个密码输入，比如：<code>insert into mysql_users(username,password,active,default_hostgroup) values (&#39;proxysql2&#39;,&#39;*D9050F2D99C3DDD8138912B7BDF8F4BACBE3A8E7&#39;,1,20);</code>。注意！mysql_users的username是不能重复的。</p>
+<p>确认一下账号已经正确连接：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">MySQL [(none)]&gt; select * <span class="keyword">from</span> mysql_server_connect_log;</span><br><span class="line">+---------------------------------------------+------+------------------+-------------------------+---------------+</span><br><span class="line">| hostname                                    | port | time_start_us    | connect_success_time_us | connect_error |</span><br><span class="line">+---------------------------------------------+------+------------------+-------------------------+---------------+</span><br><span class="line">| rm-bp1el471x0ltbg402.mysql.rds.aliyuncs.com | <span class="number">3306</span> | <span class="number">1559649241943118</span> | <span class="number">8607</span>                    | NULL          |</span><br><span class="line">| rr-bp10ki29n7n8z0ex0.mysql.rds.aliyuncs.com | <span class="number">3306</span> | <span class="number">1559649242748088</span> | <span class="number">1291</span>                    | NULL          |</span><br><span class="line">| rr-bp10ki29n7n8z0ex0.mysql.rds.aliyuncs.com | <span class="number">3306</span> | <span class="number">1559649301943192</span> | <span class="number">1396</span>                    | NULL          |</span><br><span class="line">| rm-bp1el471x0ltbg402.mysql.rds.aliyuncs.com | <span class="number">3306</span> | <span class="number">1559649302760022</span> | <span class="number">7218</span>                    | NULL          |</span><br><span class="line">+---------------------------------------------+------+------------------+-------------------------+---------------+</span><br><span class="line"><span class="number">4</span> rows <span class="keyword">in</span> <span class="built_in">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p>发现<code>connect_error</code>为空，而且<code>connect_success_time_us</code>有值可见已经成功连接了。如果<code>connect_error</code>有具体的错误，那么就可以根据错误来修改。<br>	<br>然后添加<code>sqlmonitor</code>用户，它主要是用来健康监测：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">set</span> mysql-monitor_username=<span class="string">&#x27;sqlmonitor&#x27;</span>;</span><br><span class="line"><span class="built_in">set</span> mysql-monitor_password=<span class="string">&#x27;对应的密码&#x27;</span>;</span><br><span class="line"><span class="comment">#或者是UPDATE global_variables SET variable_value=&#x27;monitor&#x27; WHERE variable_name=&#x27;sqlmonitor&#x27;;</span></span><br><span class="line"><span class="comment">#UPDATE global_variables SET variable_value=&#x27;unixfbi&#x27; WHERE variable_name=&#x27;对应的密码&#x27;; </span></span><br><span class="line">LOAD MYSQL VARIABLES TO RUNTIME;  <span class="comment">#别忘了让修改的配置生效</span></span><br><span class="line">SAVE MYSQL VARIABLES TO DISK;     <span class="comment">#将修改的配置持久化</span></span><br></pre></td></tr></table></figure></p>
+<p>此时在另外一个xshell对话框窗口尝试一下使用proxysql连接数据库，使用<code>mysql -h127.0.0.1 -P6033 -uproxysql -p</code>效果如图：<br><img src="/images/proxy21.png" alt="akb48"></p>
+<p>已经成功的通过proxysql来访问到数据库了！</p>
+<h2 id="验证读写分离"><a href="#验证读写分离" class="headerlink" title="验证读写分离"></a>验证读写分离</h2><p>首先在proxysql账号下创建一个tables：<br><img src="/images/proxy22.png" alt="akb48"></p>
+<p>然后往里面随机插入三条数据：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">INSERT INTO players ( name, team, num ) VALUES ( <span class="string">&quot;Jordan&quot;</span>, <span class="string">&quot;Bulls&quot;</span> , <span class="number">23</span>);</span><br><span class="line">INSERT INTO players ( name, team, num ) VALUES ( <span class="string">&quot;Kobe&quot;</span>, <span class="string">&quot;Lakers&quot;</span> , <span class="number">24</span>);</span><br><span class="line">INSERT INTO players ( name, team, num ) VALUES ( <span class="string">&quot;Duncan&quot;</span>, <span class="string">&quot;Spurs&quot;</span> , <span class="number">21</span>);</span><br></pre></td></tr></table></figure></p>
+<p>查看数据如下：<br><img src="/images/proxy23.png" alt="akb48"></p>
+<p>此时新开一个xshell窗口登录proxysql的管理端，<code>select * from stats_mysql_query_digest;</code>查看语句细节如下：<br><img src="/images/proxy24.png" alt="akb48"></p>
+<p>发现所有的语句的hostgroup都是10，也就是我们上面设定的写库，即读库并没有承担起读的作用。这是为什么呢？因为proxysql还需要设定路由。于是我们添加两个路由：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">insert into mysql_query_rules(rule_id,active,match_digest,destination_hostgroup,apply)values(<span class="number">1</span>,<span class="number">1</span>,<span class="string">&#x27;^SELECT.*FOR UPDATE$&#x27;</span>,<span class="number">10</span>,<span class="number">1</span>);</span><br><span class="line">insert into mysql_query_rules(rule_id,active,match_digest,destination_hostgroup,apply)values(<span class="number">2</span>,<span class="number">1</span>,<span class="string">&#x27;^SELECT&#x27;</span>,<span class="number">20</span>,<span class="number">1</span>);</span><br><span class="line">load mysql query rules to runtime;	<span class="comment">#生效</span></span><br><span class="line">save mysql query rules to disk;		<span class="comment">#持久化</span></span><br></pre></td></tr></table></figure><br>如图：<br><img src="/images/proxy25.png" alt="akb48"></p>
+<p>加上这几句话的含义是：1.将select语句全部路由至hostgroup_id&#x3D;20的组(也就是读组)； 2.但是<code>select * from tb for update</code>这样的语句是修改数据的，所以需要单独定义，将它路由至hostgroup_id&#x3D;10的组(也就是写组)； 3.其他没有被规则匹配到的组将会被路由至用户默认的组(mysql_users表中的<code>default_hostgroup</code>)</p>
+<p>然后我们返回到mysql，再插入几句数据，再重新打开<code>select * from stats_mysql_query_digest;</code>，发现符合标准的select都落到了hostgroup是20的mysql上了，测试读写分离成功，如图：<br><img src="/images/proxy26.png" alt="akb48"></p>
+<p>最后补充几个常用的语句：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">select hostgroup_id, hostname, status <span class="keyword">from</span> runtime_mysql_servers;	<span class="comment">#查看在用的mysql状态</span></span><br><span class="line">select * <span class="keyword">from</span> mysql_server_ping_log;	<span class="comment">#查看mysql的连接情况</span></span><br><span class="line">select * <span class="keyword">from</span> stats_mysql_query_rules;	<span class="comment">#查看路由规则命中情况</span></span><br><span class="line">load mysql users to runtime;</span><br><span class="line">load mysql servers to runtime;</span><br><span class="line">load mysql query rules to runtime;</span><br><span class="line">load mysql variables to runtime;</span><br><span class="line">load admin variables to runtime;</span><br><span class="line"><span class="comment">#load进runtime，是配置生效</span></span><br><span class="line"></span><br><span class="line">save mysql users to disk;</span><br><span class="line">save mysql servers to disk;</span><br><span class="line">save mysql query rules to disk;</span><br><span class="line">save mysql variables to disk;</span><br><span class="line">save admin variables to disk;</span><br><span class="line"><span class="comment">#save到磁盘(/var/lib/proxysql/proxysql.db)中，永久保存配置</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a target="_blank" rel="noopener" href="https://github.com/sysown/ProxySQL">https://github.com/sysown/ProxySQL</a><br><a target="_blank" rel="noopener" href="https://arstercz.com/proxysql-%E4%BB%8B%E7%BB%8D%E5%8F%8A%E6%B5%8B%E8%AF%95%E4%BD%BF%E7%94%A8/">https://arstercz.com/proxysql-%E4%BB%8B%E7%BB%8D%E5%8F%8A%E6%B5%8B%E8%AF%95%E4%BD%BF%E7%94%A8/</a><br><a target="_blank" rel="noopener" href="http://seanlook.com/2017/04/10/mysql-proxysql-install-config/">http://seanlook.com/2017/04/10/mysql-proxysql-install-config/</a> （具体各表的信息可以看这个）<br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/kevingrace/p/10329714.html">https://www.cnblogs.com/kevingrace/p/10329714.html</a>	（墙裂推荐！mysql 5.7的主从同步也有）</p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/mysql/" rel="tag"># mysql</a>
+              <a href="/tags/%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB/" rel="tag"># 读写分离</a>
+              <a href="/tags/proxysql/" rel="tag"># proxysql</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/05/21/Gitlab%E9%85%8D%E7%BD%AEssh%EF%BC%8C%E5%AE%9E%E7%8E%B0%E7%A7%98%E9%92%A5%E4%B8%8A%E4%BC%A0%E4%B8%8B%E8%BD%BD%E4%BB%A3%E7%A0%81/" rel="prev" title="Gitlab配置ssh，实现秘钥上传下载代码">
+      <i class="fa fa-chevron-left"></i> Gitlab配置ssh，实现秘钥上传下载代码
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/06/06/%E8%B0%83%E6%95%B4Django%E4%BD%BF%E5%85%B6%E5%8F%AF%E4%BB%A5%E4%B8%8A%E4%BC%A0%E5%A4%A7%E6%96%87%E4%BB%B6%E5%92%8C%E5%A4%9A%E6%96%87%E4%BB%B6/" rel="next" title="调整Django使其可以上传大文件和多文件">
+      调整Django使其可以上传大文件和多文件 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85%E4%B8%8E%E5%90%AF%E5%8A%A8"><span class="nav-number">1.</span> <span class="nav-text">安装与启动</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-number">2.</span> <span class="nav-text">基本概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B7%E4%BD%93%E9%85%8D%E7%BD%AE"><span class="nav-number">3.</span> <span class="nav-text">具体配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%AA%8C%E8%AF%81%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB"><span class="nav-number">4.</span> <span class="nav-text">验证读写分离</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">5.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

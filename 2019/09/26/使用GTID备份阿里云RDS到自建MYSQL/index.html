@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="如果发现&#x2F;var&#x2F;log&#x2F;journal&#x2F;XXX&#x2F;system.journal文件过大，可以使用journalctl --vacuum-size&#x3D;500M 缩小到只有500M">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用GTID主从同步阿里云RDS到自建Mysql">
+<meta property="og:url" content="http://example.com/2019/09/26/%E4%BD%BF%E7%94%A8GTID%E5%A4%87%E4%BB%BD%E9%98%BF%E9%87%8C%E4%BA%91RDS%E5%88%B0%E8%87%AA%E5%BB%BAMYSQL/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="如果发现&#x2F;var&#x2F;log&#x2F;journal&#x2F;XXX&#x2F;system.journal文件过大，可以使用journalctl --vacuum-size&#x3D;500M 缩小到只有500M">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/gtid1.png">
+<meta property="og:image" content="http://example.com/images/gtid2.png">
+<meta property="og:image" content="http://example.com/images/gtid3.png">
+<meta property="og:image" content="http://example.com/images/gtid7.png">
+<meta property="og:image" content="http://example.com/images/gtid4.png">
+<meta property="og:image" content="http://example.com/images/gtid11.png">
+<meta property="og:image" content="http://example.com/images/gtid9.png">
+<meta property="og:image" content="http://example.com/images/gtid10.png">
+<meta property="og:image" content="http://example.com/images/gtid12.png">
+<meta property="article:published_time" content="2019-09-26T03:42:09.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:47:34.450Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="gtid">
+<meta property="article:tag" content="mysql主从">
+<meta property="article:tag" content="阿里云">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/gtid1.png">
+
+<link rel="canonical" href="http://example.com/2019/09/26/%E4%BD%BF%E7%94%A8GTID%E5%A4%87%E4%BB%BD%E9%98%BF%E9%87%8C%E4%BA%91RDS%E5%88%B0%E8%87%AA%E5%BB%BAMYSQL/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>使用GTID主从同步阿里云RDS到自建Mysql | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/09/26/%E4%BD%BF%E7%94%A8GTID%E5%A4%87%E4%BB%BD%E9%98%BF%E9%87%8C%E4%BA%91RDS%E5%88%B0%E8%87%AA%E5%BB%BAMYSQL/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          使用GTID主从同步阿里云RDS到自建Mysql
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-09-26 11:42:09" itemprop="dateCreated datePublished" datetime="2019-09-26T11:42:09+08:00">2019-09-26</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:47:34" itemprop="dateModified" datetime="2025-11-08T08:47:34+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>2.3k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>8 mins.</span>
+            </span>
+            <div class="post-description">如果发现/var/log/journal/XXX/system.journal文件过大，可以使用journalctl --vacuum-size=500M 缩小到只有500M</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="基础概念"><a href="#基础概念" class="headerlink" title="基础概念"></a>基础概念</h2><p>传统的MYSQL主从就是主库每做一个操作会在binlog上做一个position，每做一个event就在binlog做一个起始编号、一个终止编号。然后主库把binlog传递给从库，然后从库根据这个binlog的pos值就按照顺序做一样的操作，达到两个数据库保持一致的目的。</p>
+<p>GTID不用这个position的方式，而是用了<code>全局事物标识</code>，这个标识的格式是<code>source_id:transaction_id</code>，如3E11FA47-71CA-11E1-9E33-C80AA9429562:23：</p>
+<ol>
+<li><code>source_id</code>即是<code>server_uuid</code>，在第一次启动时生成(函数 generate_server_uuid)，并持久化到<code>DATADIR/auto.cnf</code>文件里；</li>
+<li><code>transaction_id</code>是顺序化的序列号(sequence number)，在每台 MySQL 服务器上都是从 1 开始<code>自增长</code>的序列，是事务的唯一标识；</li>
+</ol>
+<p>它的主从过程是这样的：主库更新数据时，会在事务前产生GTID，连通sql记录到<code>binlog</code>日志中。从库的<code>i/o</code>线程将变更的<code>binlog</code>写入到<code>relay log</code>中,读取值是根据<code>gitd_next变量</code>，告诉从库下一个执行哪个GTID。从库的sql线程从<code>relay log</code>中获取GTID，然后对比从库的的<code>binlog</code>是否有记录。如果有记录，说明该GTID的事务已经执行，从库会忽略。如果没有记录，从库就会从<code>relay log</code>中执行该GTID的事务，并记录到从库<code>binlog</code>。在解析过程中会判断是否有主键，如果没有就用二级索引，如果没有二级索引就用全部扫描。</p>
+<p>也就是说，无论是级联情况，还是一主多从情况，都可以通过GTID自动找点儿，而无需像之前那样通过<code>binlog</code>和<code>binlog_position</code>找点儿了。更多GTID 原理的知识可以去查看：<a target="_blank" rel="noopener" href="https://keithlan.github.io/2016/06/23/gtid/">https://keithlan.github.io/2016/06/23/gtid/</a> 。</p>
+<p><font color=red>注意！</font>由于RDS for MySQL 5.6版本引入了GTID特性，因此要求应用不能够在事务中创建和删除临时表。那么如何对待临时表？</p>
+<ol>
+<li>将SQL语句里的<code>temporary table</code>语句更改为<code>table</code>，使用普通表替代临时表，规避这个问题；</li>
+<li>修改代码，将临时表的创建和删除操作放在事务外，并且保证会话的参数<code>autocommit=1</code>；</li>
+</ol>
+<p>源RDS地址（内网）：rm-bp12k8yne0909uv68.mysql.rds.aliyuncs.com<br>目标ECS地址（内网）：172.31.0.67</p>
+<h2 id="工具准备"><a href="#工具准备" class="headerlink" title="工具准备"></a>工具准备</h2><p>首先是现在ECS里安装<code>mysql 5.6</code>。由于centos 7默认安装的数据库是mariabd，所以使用tar.gz包安装。<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">wget -c <span class="string">&quot;http://dev.mysql.com/get/Downloads/MySQL-5.6/mysql-5.6.33-linux-glibc2.5-x86_64.tar.gz&quot;</span></span><br><span class="line">tar zxvf mysql-<span class="number">5.6</span><span class="number">.33</span>-linux-glibc2<span class="number">.5</span>-x86_64.tar.gz -C /usr/local/</span><br><span class="line">cd /usr/local &amp;&amp; ln -s mysql-<span class="number">5.6</span><span class="number">.33</span>-linux-glibc2<span class="number">.5</span>-x86_64 mysql</span><br><span class="line">mkdir -p /home/mysql/data</span><br><span class="line">chown -R mysql.mysql /home/mysql &amp;&amp; chmod -R o=--- /home/mysql		<span class="comment"># chmod -o是其他以外的人</span></span><br></pre></td></tr></table></figure></p>
+<p>使用<code>service mysqld start</code>启动，再用<code>mysql -u root -p </code>登录进去，修改掉root的空密码：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; update mysql.user <span class="built_in">set</span> password=password(<span class="string">&#x27;123123123&#x27;</span>) where user=<span class="string">&#x27;root&#x27;</span>;</span><br><span class="line">Query OK, <span class="number">4</span> rows affected (<span class="number">0.00</span> sec)</span><br><span class="line">Rows matched: <span class="number">4</span>  Changed: <span class="number">4</span>  Warnings: <span class="number">0</span></span><br></pre></td></tr></table></figure></p>
+<p>要进行GTID，首先要确认阿里云RDS作为主库是否支持GTID，如图：<br><img src="/images/gtid1.png" alt="akb48"></p>
+<p>可见阿里云那一段是没问题的。</p>
+<p>然后安装xtrabackup，由于我们是<code>mysql 5.6</code>，所以xtrabackup的版本是2.3：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">wget https://www.percona.com/downloads/XtraBackup/Percona-XtraBackup-<span class="number">2.3</span><span class="number">.5</span>/binary/redhat/<span class="number">7</span>/x86_64/percona-xtrabackup-<span class="number">2.3</span><span class="number">.5</span>-<span class="number">1.</span>el7.x86_64.rpm</span><br><span class="line">yum localinstall percona-xtrabackup-<span class="number">2.3</span><span class="number">.2</span>-<span class="number">1.</span>el7.x86_64.rpm</span><br></pre></td></tr></table></figure></p>
+<p>最后，检查RDS白名单，确保ECS与RDS可通。</p>
+<h2 id="具体操作"><a href="#具体操作" class="headerlink" title="具体操作"></a>具体操作</h2><p>登录阿里云的RDS控制台，选择对应的RDS之后，点击左侧栏的<code>备份恢复</code>，将最近的一次备份下载下来：<br><img src="/images/gtid2.png" alt="akb48"></p>
+<p>由于是内网，直接就<code>复制内网地址</code>，在ECS上执行如下操作：<br>	<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">wget -c <span class="string">&#x27;&lt;数据备份文件外网下载地址&gt;&#x27;</span> -O /home/mysql/shopoms.tar.gz	#注意引号一定要带！</span><br><span class="line">tar -izxvf shopoms.tar.gz -C /home/mysql/shopoms	#解压缩</span><br></pre></td></tr></table></figure></p>
+<p>解压缩完毕之后，打开&#x2F;opt&#x2F;shopoms看一下文件组成：<br><img src="/images/gtid3.png" alt="akb48"></p>
+<p>用xtrabackup工具恢复解压好的备份文件，于是<code>innobackupex --defaults-file=/home/mysql/data/backup-my.cnf --apply-log /home/mysql/data</code>。稍等一会，解压缩成功，备份一下<code>backup-my.cnf</code>，改名叫<code>slave-oms.cnf</code>：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">[mysqld]</span><br><span class="line"><span class="comment"># from rds backup-my.cnf</span></span><br><span class="line">innodb_checksum_algorithm=innodb</span><br><span class="line">innodb_data_file_path=ibdata1:200M:autoextend</span><br><span class="line">innodb_log_files_in_group=<span class="number">2</span></span><br><span class="line">innodb_log_file_size=<span class="number">524288000</span></span><br><span class="line">innodb_undo_directory=.</span><br><span class="line">innodb_undo_tablespaces=<span class="number">0</span></span><br><span class="line"><span class="comment"># need for slave </span></span><br><span class="line">server-<span class="built_in">id</span> = <span class="number">666</span> 	<span class="comment"># 从实例的id,不能与master的id相同</span></span><br><span class="line">port=<span class="number">3306</span></span><br><span class="line">master-info-repository = file</span><br><span class="line">relay-log-info_repository = file</span><br><span class="line">binlog-<span class="built_in">format</span> = ROW		<span class="comment"># 这里必须是ROW</span></span><br><span class="line">skip-grant-tables   <span class="comment">##忽略mysql权限问题，免密码直接登录</span></span><br><span class="line"><span class="comment"># GTID</span></span><br><span class="line">gtid-mode = ON		<span class="comment"># 打开了gtid模式</span></span><br><span class="line">enforce-gtid-consistency = true</span><br><span class="line">log-<span class="built_in">bin</span> = hostname-<span class="built_in">bin</span></span><br><span class="line">relay-log = /tmp/relay.log	<span class="comment">#注意这个文件要被mysql用户读取到，如果这里不设定对，就会有Slave failed to initialize relay log info structure from the repository的错误</span></span><br><span class="line">expire_logs_days=<span class="number">10</span> <span class="comment"># 控制binlog日志文件保留时间</span></span><br><span class="line">max_binlog_size=100M             </span><br><span class="line">replicate-ignore-db=mysql   <span class="comment"># 不需要同步的库  </span></span><br><span class="line">log-slave-updates=<span class="number">1</span></span><br><span class="line"><span class="comment"># Recommended in standard MySQL setup</span></span><br><span class="line">sql_mode=NO_ENGINE_SUBSTITUTION,STRICT_TRANS_TABLES </span><br><span class="line">[mysqld_safe]</span><br><span class="line">log-error=/var/log/mysqld.log</span><br><span class="line">pid-file=/var/run/mysqld/mysqld.pid</span><br><span class="line">socket = /tmp/mysql.sock</span><br></pre></td></tr></table></figure></p>
+<p>同时<code>chown -R mysql:mysql /home/mysql/data</code>修改文件属主，并确定文件所属为MySQL用户。然后执行<code>/usr/local/mysql/bin/mysqld_safe --defaults-file=/home/mysql/data/slave-oms.cnf --user=mysql --basedir=/usr/local/mysql --datadir=/home/mysql/data &amp;</code>启动mysql。如图：<br><img src="/images/gtid7.png" alt="akb48"></p>
+<p>然后使用root账号登陆该mysql：<br><img src="/images/gtid4.png" alt="akb48"></p>
+<p>添加主库信息：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; change master to</span><br><span class="line">    -&gt; master_host=<span class="string">&#x27;rm-bp12k8yne0909uv68.mysql.rds.aliyuncs.com&#x27;</span>,</span><br><span class="line">    -&gt; master_user=<span class="string">&#x27;oms&#x27;</span>,master_port=<span class="number">3306</span>,master_password=<span class="string">&#x27;对应密码&#x27;</span>,</span><br><span class="line">    -&gt; master_auto_position=<span class="number">1</span>;</span><br><span class="line">ERROR <span class="number">1794</span> (HY000): Slave <span class="keyword">is</span> <span class="keyword">not</span> configured <span class="keyword">or</span> failed to initialize properly. You must at least <span class="built_in">set</span> --server-<span class="built_in">id</span> to enable either a master <span class="keyword">or</span> a slave. Additional error messages can be found <span class="keyword">in</span> the MySQL error log.</span><br></pre></td></tr></table></figure></p>
+<p>原因是由于RDS的备份文件中包含了RDS的主从复制关系，需要把这些主从复制关系清理掉，清理方法：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; truncate table mysql.slave_relay_log_info;</span><br><span class="line">Query OK, <span class="number">0</span> rows affected (<span class="number">0.14</span> sec)</span><br><span class="line"></span><br><span class="line">mysql&gt; truncate table mysql.slave_master_info;</span><br><span class="line">Query OK, <span class="number">0</span> rows affected (<span class="number">0.03</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p>重启mysql，注意！恢复完成的<code>mysql.user</code>是不包含rds中创建的用户的，需要重新创建：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; delete <span class="keyword">from</span> mysql.db where user&lt;&gt;<span class="string">&#x27;root&#x27;</span> <span class="keyword">and</span> char_length(user)&gt;<span class="number">0</span>;</span><br><span class="line">Query OK, <span class="number">10</span> rows affected (<span class="number">0.02</span> sec)</span><br><span class="line"></span><br><span class="line">mysql&gt; delete <span class="keyword">from</span> mysql.tables_priv where user&lt;&gt;<span class="string">&#x27;root&#x27;</span> <span class="keyword">and</span> char_length(user)&gt;<span class="number">0</span>;</span><br><span class="line">Query OK, <span class="number">42</span> rows affected (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">mysql&gt; flush privileges;</span><br><span class="line">Query OK, <span class="number">0</span> rows affected (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">mysql&gt; change master to</span><br><span class="line">    -&gt; master_host=<span class="string">&#x27;rm-bp12k8yne0909uv68.mysql.rds.aliyuncs.com&#x27;</span>,</span><br><span class="line">    -&gt; master_user=<span class="string">&#x27;oms&#x27;</span>,master_port=<span class="number">3306</span>,master_password=<span class="string">&#x27;对应密码&#x27;</span>,</span><br><span class="line">    -&gt; master_auto_position=<span class="number">1</span>;</span><br><span class="line">ERROR <span class="number">1201</span> (HY000): Could <span class="keyword">not</span> initialize master info structure; more error messages can be found <span class="keyword">in</span> the MySQL error log</span><br></pre></td></tr></table></figure></p>
+<p>这里是因为在<code>/home/mysql/data</code>下有一个<code>master.info</code>，需要先删掉他，然后重新执行<code>change master to ...</code>就可以了，这期间不用停止mysql进程。</p>
+<p>然后就是启动同步：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; reset master;</span><br><span class="line">Query OK, <span class="number">0</span> rows affected (<span class="number">0.03</span> sec)</span><br><span class="line"></span><br><span class="line">mysql&gt; reset slave;</span><br><span class="line">Query OK, <span class="number">0</span> rows affected (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">mysql&gt; start slave;</span><br><span class="line">Query OK, <span class="number">0</span> rows affected (<span class="number">0.04</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p>使用<code>show slave status\G</code>查看一下主从状态：<br><img src="/images/gtid11.png" alt="akb48"></p>
+<h2 id="出现1236错误"><a href="#出现1236错误" class="headerlink" title="出现1236错误"></a>出现1236错误</h2><p>但是此时大概率应该出现了<code>Last_IO_Error: Got fatal error 1236 from master when reading data from binary log: &#39;The slave is connecting using CHANGE MASTER TO MASTER_AUTO_POSITION = 1, but the master has purged binary logs containing GTIDs that the slave requires.&#39;</code>这个错误，如图：<br><img src="/images/gtid9.png" alt="akb48"></p>
+<p>这里要先说两个概念：</p>
+<ol>
+<li>gtid_executed(global)：MySQL数据库已经执行过的Gtid事务，处于内存中。<code>show master status/show slave status</code>中的<code>Executed_Gtid_Set</code>也取自这里；</li>
+<li>gtid_purged(global)：由于binlog文件的删除(如<code>purge binary logs</code>或者超过<code>expire_logs_days</code>设置)已经丢失的Gtid事务，它是<code>gtid_executed</code>的子集；</li>
+</ol>
+<p>明白了上面两个概念，我们再来回溯一下这个过程：</p>
+<ol>
+<li>我们用RDS做的备份集来恢复出一个自建ECS的mysql实例；</li>
+<li>启动主从同步；</li>
+<li>从库在开始同步前,主库会依靠GTID来确认从库在开始同步以后, 能够把每一个主库上执行过的事务(包括slave的SQL Thread)都复现一次,最终保持和主库完全一致;</li>
+<li>但是从库指定的<code>GTID_PURGED</code>并不等于主库的<code>GTID_EXECUTED</code>，为什么呢?因为主库多出来的这些gtid已经purge（丢失）掉了或者是新的从库未指定过<code>GTID_PURGED</code>；</li>
+<li>出现1236的故障报错；</li>
+</ol>
+<p>此时我们分别进入到主从mysql里，执行<code>show global variables like &#39;%gtid%&#39;\G</code>，查询一下<code>gtid_purged</code>，如图：<br><img src="/images/gtid10.png" alt="akb48" title="左边主库rds，右边自建ecs"></p>
+<p>我们先在主库上<code>show global variables like &#39;GTID_EXECUTED&#39;;</code>看一下效果：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; show <span class="keyword">global</span> variables like <span class="string">&#x27;GTID_EXECUTED&#x27;</span>;</span><br><span class="line">+---------------+------------------------------------------------------------------------------------------------+</span><br><span class="line">| Variable_name | Value                                                                                          |</span><br><span class="line">+---------------+------------------------------------------------------------------------------------------------+</span><br><span class="line">| gtid_executed | 18e99fbf-5f38-<span class="number">11e8</span>-8a6f-6c92bf21d8b5:<span class="number">1</span>-<span class="number">1519695</span>, 4ccd3917-5f58-<span class="number">11e8</span>-8b41-7cd30adfe86a:<span class="number">1</span>-<span class="number">9717278</span> |</span><br><span class="line">+---------------+------------------------------------------------------------------------------------------------+</span><br><span class="line"><span class="number">1</span> row <span class="keyword">in</span> <span class="built_in">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p>在从库上执行如下的内容：<br>	<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; stop slave;</span><br><span class="line">Query OK, <span class="number">0</span> rows affected (<span class="number">0.01</span> sec)</span><br><span class="line"></span><br><span class="line">mysql&gt; reset master;		# 这一步是为了把GTID_EXECUTED清空</span><br><span class="line">Query OK, <span class="number">0</span> rows affected (<span class="number">0.03</span> sec)</span><br><span class="line"></span><br><span class="line">mysql&gt; show global variables like <span class="string">&#x27;GTID_EXECUTED&#x27;</span>;</span><br><span class="line">+---------------+-------+</span><br><span class="line">| Variable_name | Value |</span><br><span class="line">+---------------+-------+</span><br><span class="line">| gtid_executed |       |</span><br><span class="line">+---------------+-------+</span><br><span class="line"><span class="number">1</span> row in set (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">mysql&gt; set global GTID_PURGED=<span class="string">&#x27;18e99fbf-5f38-11e8-8a6f-6c92bf21d8b5:1-1519695,4ccd3917-5f58-11e8-8b41-7cd30adfe86a:1-9717278&#x27;</span>;	# 把主库的GTID_EXECUTED值填进来</span><br><span class="line">Query OK, <span class="number">0</span> rows affected (<span class="number">0.03</span> sec)</span><br><span class="line"></span><br><span class="line">mysql&gt; show global variables like <span class="string">&#x27;GTID_EXECUTED&#x27;</span>;                                              </span><br><span class="line">+---------------+------------------------------------------------------------------------------------------------+</span><br><span class="line">| Variable_name | Value                                                                                          |</span><br><span class="line">+---------------+------------------------------------------------------------------------------------------------+</span><br><span class="line">| gtid_executed | <span class="number">18e99</span>fbf<span class="number">-5</span>f38<span class="number">-11e8</span><span class="number">-8</span>a6f<span class="number">-6</span>c92bf21d8b5:<span class="number">1</span><span class="number">-1519695</span>, <span class="number">4</span>ccd3917<span class="number">-5</span>f58<span class="number">-11e8</span><span class="number">-8</span>b41<span class="number">-7</span>cd30adfe86a:<span class="number">1</span><span class="number">-9717278</span> |</span><br><span class="line">+---------------+------------------------------------------------------------------------------------------------+</span><br><span class="line"><span class="number">1</span> row in set (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">mysql&gt; start slave;</span><br><span class="line">Query OK, <span class="number">0</span> rows affected (<span class="number">0.01</span> sec)</span><br><span class="line"></span><br></pre></td></tr></table></figure></p>
+<p>再次执行<code>show slave status\G</code>，就好了：<br><img src="/images/gtid12.png" alt="akb48"></p>
+<p>由于mysql的配置文件没有规定<code>readonly</code>，所以我在从库也可以执行insert和update等写操作，但是是不会同步到主库的，而且还会由于主从数据不一致而报错。如果RDS不想要了，直接<code>stop slave</code>，把这个自建mysql当主库就行了。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/weifeng1463/p/9678303.html">https://www.cnblogs.com/weifeng1463/p/9678303.html</a><br><a target="_blank" rel="noopener" href="https://misakatang.cn/2019/03/02/%E9%98%BF%E9%87%8C%E4%BA%91RDS%E9%80%BB%E8%BE%91%E5%A4%87%E4%BB%BD%E6%81%A2%E5%A4%8D%E4%B8%BB%E4%BB%8E/">https://misakatang.cn/2019/03/02/%E9%98%BF%E9%87%8C%E4%BA%91RDS%E9%80%BB%E8%BE%91%E5%A4%87%E4%BB%BD%E6%81%A2%E5%A4%8D%E4%B8%BB%E4%BB%8E/</a><br><a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000015657340">https://segmentfault.com/a/1190000015657340</a><br><a target="_blank" rel="noopener" href="https://help.aliyun.com/knowledge_detail/41817.html">https://help.aliyun.com/knowledge_detail/41817.html</a> </p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E9%98%BF%E9%87%8C%E4%BA%91/" rel="tag"># 阿里云</a>
+              <a href="/tags/mysql%E4%B8%BB%E4%BB%8E/" rel="tag"># mysql主从</a>
+              <a href="/tags/gtid/" rel="tag"># gtid</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/09/23/%E4%B8%AD%E7%A7%8B%E8%8B%8F%E5%B7%9E%E6%B8%B8%E8%AE%B0/" rel="prev" title="中秋苏州游记">
+      <i class="fa fa-chevron-left"></i> 中秋苏州游记
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/09/30/Tomcat8%E9%85%8D%E7%BD%AEapr/" rel="next" title="Tomcat8配置apr">
+      Tomcat8配置apr <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5"><span class="nav-number">1.</span> <span class="nav-text">基础概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B7%A5%E5%85%B7%E5%87%86%E5%A4%87"><span class="nav-number">2.</span> <span class="nav-text">工具准备</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B7%E4%BD%93%E6%93%8D%E4%BD%9C"><span class="nav-number">3.</span> <span class="nav-text">具体操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%BA%E7%8E%B01236%E9%94%99%E8%AF%AF"><span class="nav-number">4.</span> <span class="nav-text">出现1236错误</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">5.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

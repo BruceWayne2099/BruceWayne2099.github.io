@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="这个问题是5.6&#x2F;5.7&#x2F;XDB中的一个官方Bug，在高版本中已经有所优化，不过还是会有相关的问题，了解总是好的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="order by limit走错了索引">
+<meta property="og:url" content="http://example.com/2024/12/21/order-by-limit%E8%B5%B0%E9%94%99%E4%BA%86%E7%B4%A2%E5%BC%95/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="这个问题是5.6&#x2F;5.7&#x2F;XDB中的一个官方Bug，在高版本中已经有所优化，不过还是会有相关的问题，了解总是好的">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/%E6%85%A2sql1.png">
+<meta property="og:image" content="http://example.com/images/%E6%85%A2sql2.png">
+<meta property="og:image" content="http://example.com/images/%E6%85%A2sql3.png">
+<meta property="og:image" content="http://example.com/images/%E6%85%A2sql4.png">
+<meta property="og:image" content="http://example.com/images/%E6%85%A2sql3.png">
+<meta property="og:image" content="http://example.com/images/%E6%85%A2sql5.png">
+<meta property="og:image" content="http://example.com/images/%E6%85%A2sql1.png">
+<meta property="article:published_time" content="2024-12-21T02:19:03.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:47:20.985Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="SRE">
+<meta property="article:tag" content="redis">
+<meta property="article:tag" content="缓存">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/%E6%85%A2sql1.png">
+
+<link rel="canonical" href="http://example.com/2024/12/21/order-by-limit%E8%B5%B0%E9%94%99%E4%BA%86%E7%B4%A2%E5%BC%95/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>order by limit走错了索引 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/12/21/order-by-limit%E8%B5%B0%E9%94%99%E4%BA%86%E7%B4%A2%E5%BC%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          order by limit走错了索引
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-12-21 10:19:03" itemprop="dateCreated datePublished" datetime="2024-12-21T10:19:03+08:00">2024-12-21</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:47:20" itemprop="dateModified" datetime="2025-11-08T08:47:20+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>1.7k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>6 mins.</span>
+            </span>
+            <div class="post-description">这个问题是5.6/5.7/XDB中的一个官方Bug，在高版本中已经有所优化，不过还是会有相关的问题，了解总是好的</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="问题和解决"><a href="#问题和解决" class="headerlink" title="问题和解决"></a>问题和解决</h2><p>今天看到这么一个sql：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">select *</span><br><span class="line">from</span><br><span class="line">  restaurant_restaurant_unit this_</span><br><span class="line">where</span><br><span class="line">  this_.name LIKE &#x27;张三%&#x27;</span><br><span class="line">  and this_.restaurant_unit_type &lt;&gt; 2</span><br><span class="line">  and this_.is_valid = 1</span><br><span class="line">  and this_.status = 1</span><br><span class="line">order by</span><br><span class="line">  this_.created_at DESC </span><br><span class="line">limit</span><br><span class="line">  15;</span><br></pre></td></tr></table></figure>
+
+<p>这个sql的执行时间竟然达到了令人发指的9s，这里补充一下前提知识：</p>
+<ol>
+<li>数据表有name的索引、<code>created_at</code>的索引，主建是id</li>
+<li><code>is_valid</code>和<code>status</code>都可以视为有效状态</li>
+<li><code>restaurant_unit_type</code>是节点类型，一共就3种:1是中间节点，2是叶子节点（绑定的门店），3是根节点。数据分布规模来说，2的数据远大于1和3.</li>
+<li>sql查出来结果只有14条</li>
+</ol>
+<p>打开这个慢sql的工单，映入眼帘的第一个字符就是&lt;&gt;，果然数据库执行计划执行一下，结果如下：<br><img src="/images/%E6%85%A2sql1.png" title="走的是create_at的索引"></p>
+<p>果然，走的是<code>create_at</code>的索引。开心的打开左边数据库信息，索引信息打开：<br><img src="/images/%E6%85%A2sql2.png"></p>
+<p>结果<code>restaurant_unit_type</code>没有索引，<code>name</code>有索引，理论上是不会影响走<code>name</code>索引的呀。</p>
+<p>既然不是&lt;&gt;导致的慢sql问题，那么到底是啥呢？凭借“菜就多练”的原则，我执行了下面几个和慢sql类似的执行计划:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">sql1：去掉order by limit</span><br><span class="line">	select</span><br><span class="line">	  *</span><br><span class="line">	from</span><br><span class="line">	  restaurant_restaurant_unit this_</span><br><span class="line">	where </span><br><span class="line">	  this_.name &lt;&gt; &#x27;张三%&#x27;</span><br><span class="line">	  and this_.restaurant_unit_type &lt;&gt; 2</span><br><span class="line">	  and this_.is_valid = 1</span><br><span class="line">	  and this_.status = 1;</span><br></pre></td></tr></table></figure>
+
+<p>执行计划：<br><img src="/images/%E6%85%A2sql3.png" title="这次走的是name的索引"></p>
+<p>这次执行时间只有8ms，快了很多。比加上<code>order by limit</code>的有了重大提高。 看来是<code>order by limit</code>导致的？</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">sql2：去掉&lt;&gt;</span><br><span class="line">	select</span><br><span class="line">	  *</span><br><span class="line">	from</span><br><span class="line">	  restaurant_restaurant_unit this_</span><br><span class="line">	where </span><br><span class="line">	  this_.name like &#x27;张三%&#x27;</span><br><span class="line">	  -- and this_.restaurant_unit_type &lt;&gt; 2  //把这个条件注释掉</span><br><span class="line">	  and this_.is_valid = 1</span><br><span class="line">	  and this_.status = 1</span><br><span class="line">	order by</span><br><span class="line">	  this_.created_at DESC</span><br><span class="line">	limit</span><br><span class="line">	  15;</span><br></pre></td></tr></table></figure>
+<p>执行计划：<br><img src="/images/%E6%85%A2sql4.png" title="这次走的是name的索引"><br>可以看到此时并不会走<code>name</code>索引，走了<code>create_at</code>的索引，执行时间虽然有所增加，但是也远远达不到9m的程度。最后只能咨询dba的同学,dba说：<code>where语句和order by limit语句中都包含了索引列时，mysql优化器可能会选择错误的索引导致更加慢</code>。</p>
+<p>从上面的sql也能看出，加入<code>order by limit </code>后，索引从<code>name</code>变成了<code>create_at</code>。注意的是，只是可能慢，具体慢不慢得看数据的分布情况。</p>
+<p>分析下上面的慢sql为啥是慢sql:</p>
+<p>首先不带<code>order by limit</code>的sql执行计划如下：<br><img src="/images/%E6%85%A2sql3.png" title="这里关注row这一列"></p>
+<p>之前更多关注走索引，其实还有一个关键量，扫描行数：<code>16810</code>。</p>
+<p>这个值是mysql优化器认为走name索引需要扫描的行数，这个是正经索引下探方法得到的值，相对准确。</p>
+<p>但是加入<code>order by limit A </code>后，此时存在了两个索引<code>create_at</code> 和 <code>name。 </code>对于优化器来说，其目标是选择扫描行数最少的索引是最佳的，所以需要计算<code>create_at</code>的扫描行数。 而这就是问题的关键：<code>order by limit A</code> 是如何计算扫描行的。计算公式:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">统计信息里面的表行数/where语句索引的扫描行数 * limit的值A = 扫描行数</span><br></pre></td></tr></table></figure>
+<p>根据这个公式：原理就是<code>统计信息里面的表行数/where语句索引的扫描行数</code> 就是mysql认为平均扫描一条数据的成本，再乘A就是A条数据的扫描成本。</p>
+<p>首先获得统计信息里面的表行数：<code>2564001</code><br><img src="/images/%E6%85%A2sql5.png" title="这个表有250多万记录"></p>
+<p>刚刚上面得到name索引的扫描行数：16810，而limit值为15，则计算得到：<code>2564001/16810*15 = 2287.9</code>。<br><img src="/images/%E6%85%A2sql1.png" title="这里关注row这一列"></p>
+<p>这个值是远小于name索引的行，所以会走<code>create_at</code>索引。</p>
+<p>但是为啥会慢呢？？？</p>
+<p>原因就是因为前提说的，<code>restaurant_unit_type</code>是分布极其不均匀的。2是叶子节点为绑定的门店，都是先有叶子节点再有门店，所以叶子节点的<code>create_at</code>普遍较大，又是逆序遍历，所以基本上遍历到后面，甚至全表后才找到足够的数据。这也是为啥<code>restaurant_unit_type</code>去掉后能够较快返回的原因。</p>
+<p>说了这么一大堆，咋解决呢？</p>
+<p>其实问题分析下来，根本原因就是因为优化器错误的选择了<code>order by </code>后的索引嘛，那就不让他选嘛，所以就有如下的解决方案:</p>
+<p>● 直接强force index 指定要走的索引  -》这个太粗暴了<br>● limit值扩大到上面的计算结果远大于where语句后的扫描 -》 开发阶段难以评估，且limit值大多数业务固定<br>● 不让order by 后面有索引。 –比较合理（实测有效）<br>	○	order by create DESC&#x2F;Asc —》order by create DESC&#x2F;ASC， id asc&#x2F;desc<br>	○	order by id  -》 order by id + 0</p>
+<h2 id="另外一个参考文章"><a href="#另外一个参考文章" class="headerlink" title="另外一个参考文章"></a>另外一个参考文章</h2><p><code>order by limit</code>易走错索引，发生在<code>5.6/5.7/XDB</code>版本，这个是MYSQL设计时优化器不严谨的地方，原因如下:</p>
+<ol>
+<li><p>首先sql执行计划会把sql分成2部分，<code>select ...from...where...</code>作为第一部分，<code>order by...limit...</code>作为第二部分。先对<code>select ...from...where...</code>做分析，得出最佳路径<code>best_access_path</code>的索引<code>best_index</code>、扫描量<code>row_estimate_first</code>、pk的选择度<code>Cardinality_pk</code>。</p>
+</li>
+<li><p>当sql有<code>order by limit</code>，同时<code>limit的值&lt; best_access_path的row_estimate</code>，同时<code>order by</code>字段有单列索引或在联合索引最左列，触发执行计划<code>recheck(&quot;recheck_reason&quot;: &quot;low_limit&quot;)</code>。</p>
+</li>
+<li><p><code>recheck</code>后有可能选择<code>order by</code>字段的索引，如果选择了<code>order by</code>索引，同时数据分布不均匀或者实际符合条件的记录条数（即返回行数）小于limit值的话，那么就需要通过索引扫描所有的行回表，访问效率将比全表扫描还慢几倍。</p>
+</li>
+</ol>
+<p>order by触发recheck具体算法如下：</p>
+<ol>
+<li><code>Cardinality_pk/row_estimate_first </code>获得<code>best_index</code>字段所选值平均每条记录的间距（扫描量）row_estimate_second（这里是优化器不严谨的地方，因为优化器直接认为数据是均匀分布的）</li>
+<li>如果<code>row_estimate_second * limit值 &lt; row_estimate_first</code>,则选择<code>order by</code>字段索引，反之选择<code>best_access_path</code>索引<code>best_index</code></li>
+</ol>
+<p>怎么确认哪些<code>order by limit sql</code>会走错索引：</p>
+<ol>
+<li>对where条件的列数据量<code>group by</code>分析，确认记录最多的列值，这里记为value_a；记录limit的值，这里记为limit_b</li>
+<li>去掉<code>order by limit</code>字段执行explain获取访问value_a的<code>best_access_path</code>索引的扫描量，这里记为<code>row_estimate_c</code></li>
+<li>通过<code>show index from table_name</code>获取pk的选择度，这里记为Cardinality_d</li>
+<li>如果<code>Cardinality_d/row_estimate_c*limit_b&lt;row_estimate_c</code>,即<code>Cardinality_d*limit_b&lt;row_estimate_c*row_estimate_c </code>就会触发走错索引。这里可以看出如果<code>best_access_path</code>索引访问的某个列值记录越多，即数据越不均匀，越容易触发走错索引。</li>
+</ol>
+<p>更快捷方式：因为value_a约等于row_estimate_c（有误差，一般2 * value_a &gt;&#x3D; row_estimate_c），方程式可以转换为：表记录数 * limit值 &lt; value_a * value_a，即只要知道表记录数，记录最多的列值，limit值，即可计算是否会走错索引（考虑误差和数据增长，建议当表记录数 * limit值 &lt; 4 * value_a * value_a即可认为会可能走错索引）。</p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/redis/" rel="tag"># redis</a>
+              <a href="/tags/SRE/" rel="tag"># SRE</a>
+              <a href="/tags/%E7%BC%93%E5%AD%98/" rel="tag"># 缓存</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/11/05/%E4%BB%8E%E6%9D%9C%E7%90%AA%E5%B3%B0%E7%9A%84%E8%AE%BF%E8%B0%88%E8%AF%B4%E8%AF%B4%E9%A6%99%E6%B8%AF%E7%94%B5%E5%BD%B1/" rel="prev" title="从杜琪峰的访谈说说香港电影">
+      <i class="fa fa-chevron-left"></i> 从杜琪峰的访谈说说香港电影
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2025/02/06/2024%E5%B9%B4%E7%BB%88%E6%80%BB%E7%BB%93/" rel="next" title="2024年终总结">
+      2024年终总结 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E5%92%8C%E8%A7%A3%E5%86%B3"><span class="nav-number">1.</span> <span class="nav-text">问题和解决</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%A6%E5%A4%96%E4%B8%80%E4%B8%AA%E5%8F%82%E8%80%83%E6%96%87%E7%AB%A0"><span class="nav-number">2.</span> <span class="nav-text">另外一个参考文章</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

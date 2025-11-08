@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="这个周末沉迷炼丹不可自拔...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="用sdwebui跑prompt的小经验">
+<meta property="og:url" content="http://example.com/2023/04/15/35%E5%B2%81%E7%9A%84%E7%94%B7%E4%BA%BA%E4%B9%B0%E8%A1%A3%E6%9C%8D%E5%A5%BD%E7%97%9B%E8%8B%A6/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="这个周末沉迷炼丹不可自拔...">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/ai%E7%94%BB%E5%9B%BE9.JPG">
+<meta property="og:image" content="http://example.com/images/ai%E7%94%BB%E5%9B%BE8.JPG">
+<meta property="og:image" content="http://example.com/images/%E8%BF%BD%E6%A2%A6%E6%A0%BC%E6%9E%97.JPG">
+<meta property="og:image" content="http://example.com/images/ai%E7%94%BB%E5%9B%BE10.JPG">
+<meta property="og:image" content="http://example.com/images/ai%E7%94%BB%E5%9B%BE11.JPG">
+<meta property="article:published_time" content="2023-04-15T12:26:24.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:46:40.976Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="AI">
+<meta property="article:tag" content="Python">
+<meta property="article:tag" content="人工智能">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/ai%E7%94%BB%E5%9B%BE9.JPG">
+
+<link rel="canonical" href="http://example.com/2023/04/15/35%E5%B2%81%E7%9A%84%E7%94%B7%E4%BA%BA%E4%B9%B0%E8%A1%A3%E6%9C%8D%E5%A5%BD%E7%97%9B%E8%8B%A6/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>用sdwebui跑prompt的小经验 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/04/15/35%E5%B2%81%E7%9A%84%E7%94%B7%E4%BA%BA%E4%B9%B0%E8%A1%A3%E6%9C%8D%E5%A5%BD%E7%97%9B%E8%8B%A6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          用sdwebui跑prompt的小经验
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-04-15 20:26:24" itemprop="dateCreated datePublished" datetime="2023-04-15T20:26:24+08:00">2023-04-15</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:46:40" itemprop="dateModified" datetime="2025-11-08T08:46:40+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%9D%A0%E4%B9%B1%E8%8A%B1%E5%A4%A9/" itemprop="url" rel="index"><span itemprop="name">坠乱花天</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>2.4k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>9 mins.</span>
+            </span>
+            <div class="post-description">这个周末沉迷炼丹不可自拔...</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="小经验和小心得"><a href="#小经验和小心得" class="headerlink" title="小经验和小心得"></a>小经验和小心得</h2><p>AI从下围棋跨界到聊天现在是作画，最近的大火让prompt也跟着火了起来。prompt是啥呢？就是跟AI交流的指令，目前prompt是支持英文和emoji图标的。AI通过阅读prompt传入的指令，来分析然后再反馈一个结果给人类。所以说如果职业是跟AI有交集的，都建议了解一下prompt，这个任意真的提升效率太多了（我现在业余时间的代码AI包办了80%了,剩下的20%具体情况要自己看）。</p>
+<p>当然我们的网络环境很拉，这是耽误各位进步的一个头疼问题…</p>
+<p>说回sdwebui的prompt。要用sdwebui画图，肯定要有一个<code>checkpoint</code>，那么这个就是AI画图的原材料。比如我个人比较喜欢的<code>BRA(beautiful realistic Asians)V3</code>这个<code>checkpoint</code>，他的效果就是产出的图非常真实，画亚洲人特别是韩国人，感觉就是照片照出来的照片，所以很多人都拿这个模型产出的图去那种XX论坛上卖…<br><img src="/images/ai%E7%94%BB%E5%9B%BE9.JPG" title="这个图我的prompt改了好几次，基本很满意，可惜耳环没画好，跟助听器似的"></p>
+<p>prompt里的元素是有前后的，推荐上来先顾全大局，写上<code>best quality</code>、<code>4K</code>、<code>masterpiece</code>这样的话，要求AI产出的图是很高清的。要表达的中心物体放前面写，就好像你拍照，拍人物照，肯定镜头的重心就是人物，然后远处的山啊水啊鸟啊狗啊都是配菜，那么prompt里，就把人物放在最前面。这里人物就要有一番描述了，比如是美国人还是日本人还是韩国人，皮肤如何，男性女性，戴个警察帽子，带一个手表，浅浅的微笑这样的细节描述；然后是场景，比如在银行里，或者在办公室里，黑天白天；动作，比如坐在椅子上翘二郎腿，双手叉腰等等，这样基本就能描述出来一个场景了。差不多也可以产出一个图了。</p>
+<p>prompt里也可以用<code>()</code>和<code>[]</code>来调整权重，每一个<code>()</code>代表权重多加1.1，每一个<code>[]</code>代表权重减少1.1。词语之间可以用下划线来链接，比如<code>long_wave_hair</code>就会产出大波浪。</p>
+<p>具体的prompt例子我就不说了，C站上有的是，discount和reddit也都有prompt交流群。随便看看就有收获，在那里即学习了prompt又学习了英语单词又学习了英语语法又伤了身体（囧）…</p>
+<p>但是要注意，不是每次你的prompt写的所有元素都会被AI全部展示到图片上的，权重大的会优先产出，权重小的可能压根就被舍弃掉了。所以建议同一个prompt多跑几次，然后慢慢挑图，跑的多了，之前没跑出来的元素就会都出现了。</p>
+<p>而有一些动作可能跑好几百次也不会跑出来，这种大概率就是这个chickpoint原生不支持，比如我上面说的<code>BRA(beautiful realistic Asians)V3</code>不支持<code>standing split</code>（一字马），估计是做了限制，所以这种情况就要搭配lora，让lora来帮助你完成一字马。当然有些也是失败的，那么就要不停的变换chickpoint。这里建议先去C站看看前任用这个chickpoint做出来的图，如果他们show出来的图是有一字马而且用的prompt是没有使用其他的lora，那么代表这个原生的chickpoint肯定能做一字马，是你的prompt不对，就继续重试，直到出现为止。</p>
+<p>通过<code>chickpoint</code>+<code>lora</code>+prompt这样的组合拳来产出图片，这样可以极大地提高出图效率、丰富出图的内容。</p>
+<p>最后再来一点实操prompt心得：想好了自己的图片样子，然后就照着这个样子去做。千万不要被眼花缭乱的prompt效果图打乱了计划，我知道C站上美女很多，看着看着就让人心猿意马…虽然他们的prompt能生成你想要的效果，但是他们也是好几次里挑出来那么一次的。一点一点丰富自己的prompt，失败了也不要灰心，只要前任跑出来过，那么多跑几次肯定能得到自己想要的图。如果觉得有些图弃之可惜，可以干脆自己动手，PS掉不爽的那部分。</p>
+<h2 id="目前AI的不足"><a href="#目前AI的不足" class="headerlink" title="目前AI的不足"></a>目前AI的不足</h2><ol>
+<li><p>还是那句话，产出的图的手脚大概率都是不正常的，这里直接上图：<br><img src="/images/ai%E7%94%BB%E5%9B%BE8.JPG" title="多好的姑娘啊，可惜手指头和脚都不对..."><br>但是好的lora+好的chickpoint可以有效的降低手脚畸形的概率。</p>
+</li>
+<li><p>prompt可以用emoji里的”自拍”、”比耶”、”开心”等等表情来代替英语单词，进而来提升出图的准确性。emoji是能被AI识别的，但是不会每次都识别到。我见过最简单的一个prompt里面的内容就是：<code>🏃🏻‍♀️ 🎒 爬山的emoji</code>，这三个符号就完成了一幅画。但是我尝试把”自拍”的emoji放到prompt里，十几次就出来2次左右的效果。还有一次尝试”比耶”的emoji，直接比出来4个手指头，不知道的还以为是追梦格林…<br><img src="/images/%E8%BF%BD%E6%A2%A6%E6%A0%BC%E6%9E%97.JPG" title="老子我有四个总冠军"></p>
+</li>
+<li><p>目前AI只能从一个checkpoint里学习，玩不了混搭。而且<code>lora</code>虽然方便了一些动作的prompt，但是他还是有使用限制的，比如<code>dolllikeness</code>这个<code>lora</code>，它只能用于近景，如果prompt里又写了<code>full body</code>的话，就跟<code>lora</code>相冲突，<code>full body</code>的效果如果小于lora的权重的话那产出的图就不会出现全身的效果。</p>
+</li>
+<li><p>AI目前的视角还比较死板，笔直的站着拍正面照的效果是最好的，其次背景效果也很好，然后背转身看镜头这种就有几率失败了，来一点复杂动作就要更加复杂的prompt，而这些prompt很多时候ai还不识别（估计跟英语一个词多个意义有关）。这种就需要sdwebui其他的一些功能来解决问题了。</p>
+</li>
+<li><p>AI画出来的表情也比较受限，除了微笑、张嘴、吐舌头（这个也一定几率有BUG）、脸红。其他的好像就没啥了，哭泣都不是很明显。除此之外，AI图片的影子也有问题，经常影子跟人相差的得太过离谱，让人细思极恐。</p>
+</li>
+<li><p>prompt上一些指令被AI识别的结果也让人哭笑不得，我炼丹想做一个”一只手拿着冰棍的妹子”，结果AI画出来妹子手里拿的是冰棍的冰的那部分，棍是冲着嘴的…</p>
+</li>
+<li><p>除了手脚不行，kiss也不行。之外还有一些动作，比如弹吉他也不行，手根本也没有搭上吉他（感觉好像还是手的问题啊！）。听说<code>controlnet</code>可以解决多指的问题，但是只能解决明显的手问题，比如抱臂这种重叠交叉的场景它还是无能为力。</p>
+</li>
+<li><p>AI目前没有一个反馈机制，比如它prompt执行的好执行的不好，需要有人类进行反馈，这样来达到训练它的目的，但是sdwebui没有这样的打分机制，这点跟chatgpt不同。</p>
+</li>
+</ol>
+<p>综上所述，可见目前的AI不是万能的，很多地方还需要人手工介入，就冲着它交工不能百分百让人满意，它就注定是一个工具。不要被别人妖言惑众，说AI可以代替谁谁谁的。掌握了工具，用好了工具大家都HAPPY。</p>
+<h2 id="如果我想用AI画知名人物"><a href="#如果我想用AI画知名人物" class="headerlink" title="如果我想用AI画知名人物"></a>如果我想用AI画知名人物</h2><p>很多人看到了网上的AI画出来什么特朗普被捕啊普京被捕啊就也想用sdwebui去试试，但是原生的sdwebui里的AI是只知道资料但是不清楚长相的，所以直接输入名字就想是画效果是不好的，比如你输入一个<code>kobe bryant</code>，能出一个穿湖人24号的光头黑人，但是脸跟Kobe差的挺多。</p>
+<p>比如二次元圈出名的蒂法，你在prompt里输入<code>Tifa Lockhart</code>，AI画的并不像，那么也想要得到蒂法就需要去训练一个蒂法模样的lora。让这个lora来帮你实现蒂法的长相，lora训练的越好，做出来的画就越逼真，如图：<br><img src="/images/ai%E7%94%BB%E5%9B%BE10.JPG" title="盔甲使用ai创造的，脸蛋使用lora校正的"><br><img src="/images/ai%E7%94%BB%E5%9B%BE11.JPG" title="这个也是一个上品了，手生成的很不错"></p>
+<p>但是lora就有一个问题，因为训练lora多半都是拿正脸照，所以生成的图片也基本都是正脸的，不太能有侧脸或者其他的样子。这一点也证实了上面的第四点“AI目前的视角还比较死板”。</p>
+<p>AI直接画名人要面临很严重的法律问题，所以即使你训练了lora，C站也不会直接让你放上去的，所以这种lora你也就只能自己本地留着，或者商用授权卖掉，毕竟这个世界宅男很多，愿意花钱的宅男也很多…</p>
+<p>不过前几天发现有一个妹子把自己的照片训练成了lora，并且放到了C站上，<a target="_blank" rel="noopener" href="https://civitai.com/models/34102/nana">https://civitai.com/models/34102/nana</a> ，这个妹子倒也不拿兄弟们当外人，任由别人来拿她的脸做福利姬。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/619247417">https://zhuanlan.zhihu.com/p/619247417</a><br>正面prompt学习：<a target="_blank" rel="noopener" href="https://gooptions.cc/chickpoint-prompt%E6%95%99%E5%AD%B8/">https://gooptions.cc/chickpoint-prompt%E6%95%99%E5%AD%B8/</a><br>负面prompt学习：<a target="_blank" rel="noopener" href="https://vocus.cc/article/amp/642520acfd89780001223a22">https://vocus.cc/article/amp/642520acfd89780001223a22</a><br>控制人物视角：<a target="_blank" rel="noopener" href="https://m.huke88.com/article/8069.html">https://m.huke88.com/article/8069.html</a></p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/AI/" rel="tag"># AI</a>
+              <a href="/tags/Python/" rel="tag"># Python</a>
+              <a href="/tags/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/" rel="tag"># 人工智能</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/04/14/%E4%B8%80%E6%AC%A1%E7%A7%92%E6%9D%80%E5%AF%BC%E8%87%B4%E7%9A%84%E6%95%85%E9%9A%9C/" rel="prev" title="一次秒杀导致的故障">
+      <i class="fa fa-chevron-left"></i> 一次秒杀导致的故障
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/05/04/%E6%BC%AB%E9%95%BF%E7%9A%84%E5%AD%A3%E8%8A%82/" rel="next" title="《漫长的季节》观后感">
+      《漫长的季节》观后感 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%8F%E7%BB%8F%E9%AA%8C%E5%92%8C%E5%B0%8F%E5%BF%83%E5%BE%97"><span class="nav-number">1.</span> <span class="nav-text">小经验和小心得</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%AE%E5%89%8DAI%E7%9A%84%E4%B8%8D%E8%B6%B3"><span class="nav-number">2.</span> <span class="nav-text">目前AI的不足</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E6%9E%9C%E6%88%91%E6%83%B3%E7%94%A8AI%E7%94%BB%E7%9F%A5%E5%90%8D%E4%BA%BA%E7%89%A9"><span class="nav-number">3.</span> <span class="nav-text">如果我想用AI画知名人物</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">4.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

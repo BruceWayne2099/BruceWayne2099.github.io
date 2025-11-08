@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="如果要用go语言去在windows里写文件，那么换行符是\r\n而不是\n">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Nginx使用proxy_pass里的坑">
+<meta property="og:url" content="http://example.com/2019/07/08/Nginx%E4%BD%BF%E7%94%A8proxy-pass%E9%87%8C%E7%9A%84%E5%9D%91/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="如果要用go语言去在windows里写文件，那么换行符是\r\n而不是\n">
+<meta property="og:locale">
+<meta property="article:published_time" content="2019-07-08T07:47:57.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:47:07.771Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="nginx">
+<meta property="article:tag" content="proxy_pass">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2019/07/08/Nginx%E4%BD%BF%E7%94%A8proxy-pass%E9%87%8C%E7%9A%84%E5%9D%91/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>Nginx使用proxy_pass里的坑 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/07/08/Nginx%E4%BD%BF%E7%94%A8proxy-pass%E9%87%8C%E7%9A%84%E5%9D%91/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Nginx使用proxy_pass里的坑
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-07-08 15:47:57" itemprop="dateCreated datePublished" datetime="2019-07-08T15:47:57+08:00">2019-07-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:47:07" itemprop="dateModified" datetime="2025-11-08T08:47:07+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>1k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>4 mins.</span>
+            </span>
+            <div class="post-description">如果要用go语言去在windows里写文件，那么换行符是\r\n而不是\n</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="第一坑"><a href="#第一坑" class="headerlink" title="第一坑"></a>第一坑</h2><p>我们有一个后台服务A，架构是这样：<br>	<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">管理员 ====&gt; nginx ====&gt; AWS的云服务器（服务A）</span><br></pre></td></tr></table></figure></p>
+<p>此时在nginx上做了一个<code>proxy_pass</code>的转发，如下：<br>	<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">	server &#123;</span><br><span class="line">    listen <span class="number">8081</span>;</span><br><span class="line">    server_name xxx.com;</span><br><span class="line"></span><br><span class="line">    location / &#123;</span><br><span class="line">        proxy_pass aws云服务器的IP地址:对应端口;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>一直用的挺好，但是后来这个服务业务量上来了，就扩了一台机器，也部署了A服务，然后在前面加上了一个ELB做最小连接数分配，如图：<br>	<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">								AWS的云服务器<span class="number">1</span>（服务A）</span><br><span class="line">管理员 ====&gt; nginx ===&gt; ELB  ===&gt;</span><br><span class="line">								AWS的云服务器<span class="number">2</span>（服务A）</span><br></pre></td></tr></table></figure></p>
+<p>此时修改了一下<code>proxy_pass</code>的配置：<br>	<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">	server &#123;</span><br><span class="line">    listen <span class="number">8081</span>;</span><br><span class="line">    server_name xxx.com;</span><br><span class="line"></span><br><span class="line">    location / &#123;</span><br><span class="line">        proxy_pass http:<span class="comment">//aws的ELB域名地址:对应端口;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>当时是好使的，但是第二天就不好使了，nginx调用结果是502 Bad Gateway，当时是分别curl路径然后又抓包，一路十三招查下来也没什么头绪。后来发现原来<code>proxy_pass</code>后面如果接的是域名地址的话，那么Nginx会在每次启动和重载设置时，使用DNS将域名解析为IP地址缓存下来，并在之后<font color=red>一直使用这个IP！</font>只有通过<code>nginx -s reload</code>这样的重启才会强制刷新IP，所以当时在nginx上抓包发现跳转的IP其实并不存在。由于在AWS中ELB的内网域名对应的IP并不是一直不变的，这才导致了上面的问题。</p>
+<p>新更改的配置如下：<br>	<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    listen <span class="number">80</span>;</span><br><span class="line">    server_name xxx.xxx.net;</span><br><span class="line"></span><br><span class="line">    resolver DNS服务器地址 valid=<span class="number">30</span>s;		#resolver 是 DNS 服务器地址, valid 设定 DNS 刷新频率</span><br><span class="line">    set $service_lb aws的ELB域名地址;		</span><br><span class="line"></span><br><span class="line">    location / &#123;</span><br><span class="line">        proxy_pass http:<span class="comment">//$service_lb;		#若有路径的必要，就加上$request_uri</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>需要特别注意的一点是set语句不能写到 location 里面，否则不会生效。</p>
+<h2 id="第二坑"><a href="#第二坑" class="headerlink" title="第二坑"></a>第二坑</h2><p><code>proxy_pass</code>这个配置对相对路径和绝对路径也有很有讲究，比如：<br>	<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">location /proxy/ &#123;</span><br><span class="line">        proxy_pass http:<span class="comment">//10.0.0.1:8080/;		#这里以/结尾 </span></span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure></p>
+<p>当访问 <a target="_blank" rel="noopener" href="http://127.0.0.1/proxy/a/b/c.txt">http://127.0.0.1/proxy/a/b/c.txt</a> 时，nginx匹配到<code>/proxy/</code>路径，把请求转发给10.0.0.1:8080服务，实际请求代理服务器的路径为<br><code>http://10.0.0.1:8080/a/b/c.txt</code>（不带location目录）。</p>
+<p>如果是这么写的：<br>	<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">location /proxy/ &#123;</span><br><span class="line">         proxy_pass http:<span class="comment">//10.0.0.1:8080;	#这里没有以/结尾</span></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>当访问 <a target="_blank" rel="noopener" href="http://127.0.0.1/proxy/a/b/c.txt">http://127.0.0.1/proxy/a/b/c.txt</a> 时，nginx匹配到<code>/proxy/</code>路径，把请求转发给10.0.0.1:8080服务，实际请求代理服务器的路径为<br><code>http://10.0.0.1:8080/proxy/a/b/c.txt</code>（带location目录），此时nginx会把匹配的proxy也代理给代理服务器。</p>
+<p><code>proxy_pass</code>后面接多一级路径的情况跟上面一致。</p>
+<h2 id="补充一个-host-400错误的故障"><a href="#补充一个-host-400错误的故障" class="headerlink" title="补充一个$host 400错误的故障"></a>补充一个$host 400错误的故障</h2><p>400这个状态码是<code>Bad Request</code>，基本上就是请求header或者是<code>cookie</code>有问题，而请求header的问题要么是头过大要么是头没有。在<code>HTTP/1.0</code>里不支持Host请求头的，而在<code>HTTP/1.1</code>中，Host请求头部必须存在,否则会返回<code>400 Bad Request</code>。如果请求的URI不包含所请求服务的主机名，则必须为Host头字段指定一个空值。</p>
+<p>nginx如果配置了<code>$http_host</code>变量做反向代理时，后端真实的服务器是需要知道请求的host头，而<code>$http_host</code>的值是’’，所以会触发400这个错误。这个情况就需要用<code>$hosts</code>来替代<code>$http_host</code>。</p>
+<p>也就是说：<code>proxy_set_header Host $host</code>这一行的作用是把原http请求的Header中的Host字段也放到转发的请求里。如果不加这一行的话，nginx转发的请求header里就不会有Host字段，而服务器是靠这个Host值来区分你请求的是哪个域名的资源的。</p>
+<p>还有一种400的情况：如果是GET请求没问题，而POST请求返回400错误，那么可能是websocket配置成了全局单独配置websocket的地址即可。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a target="_blank" rel="noopener" href="https://www.jibing57.com/2018/11/27/nginx-with-dynamic-upstreams-to-ELB/">https://www.jibing57.com/2018/11/27/nginx-with-dynamic-upstreams-to-ELB/</a><br><a target="_blank" rel="noopener" href="http://www.syyong.com/net/Using-nginx-s-proxy_pass-function-to-do-domain-name-forwarding-causes-an-accident.html">http://www.syyong.com/net/Using-nginx-s-proxy_pass-function-to-do-domain-name-forwarding-causes-an-accident.html</a><br><a target="_blank" rel="noopener" href="https://blog.nswebfrog.com/2018/09/09/nginx-proxypass-dns/">https://blog.nswebfrog.com/2018/09/09/nginx-proxypass-dns/</a><br><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/b113bd14f584">https://www.jianshu.com/p/b113bd14f584</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/woshimrf/p/nginx-proxy-rewrite-url.html">https://www.cnblogs.com/woshimrf/p/nginx-proxy-rewrite-url.html</a></p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/nginx/" rel="tag"># nginx</a>
+              <a href="/tags/proxy-pass/" rel="tag"># proxy_pass</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/07/05/Intellij-Idea%E9%85%8D%E7%BD%AEGO%E8%B0%83%E7%94%A8%E6%9C%AC%E5%9C%B0%E5%8C%85/" rel="prev" title="Intellij Idea配置GO调用本地包">
+      <i class="fa fa-chevron-left"></i> Intellij Idea配置GO调用本地包
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/07/11/%E4%BD%BF%E7%94%A8pycurl%E6%9D%A5%E6%A8%A1%E6%8B%9Fcurl%E6%95%88%E6%9E%9C/" rel="next" title="使用pycurl来模拟curl效果">
+      使用pycurl来模拟curl效果 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E5%9D%91"><span class="nav-number">1.</span> <span class="nav-text">第一坑</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%BA%8C%E5%9D%91"><span class="nav-number">2.</span> <span class="nav-text">第二坑</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A1%A5%E5%85%85%E4%B8%80%E4%B8%AA-host-400%E9%94%99%E8%AF%AF%E7%9A%84%E6%95%85%E9%9A%9C"><span class="nav-number">3.</span> <span class="nav-text">补充一个$host 400错误的故障</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">4.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

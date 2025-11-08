@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="重新感受一下敲代码和排查问题的快乐吧～">
+<meta property="og:type" content="article">
+<meta property="og:title" content="浅谈python装饰器的参数传入">
+<meta property="og:url" content="http://example.com/2024/01/03/%E6%B5%85%E8%B0%88python%E8%A3%85%E9%A5%B0%E5%99%A8/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="重新感受一下敲代码和排查问题的快乐吧～">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/%E8%A3%85%E9%A5%B0%E5%99%A8.jpeg">
+<meta property="article:published_time" content="2024-01-03T03:41:41.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:48:07.075Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="python">
+<meta property="article:tag" content="装饰器">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/%E8%A3%85%E9%A5%B0%E5%99%A8.jpeg">
+
+<link rel="canonical" href="http://example.com/2024/01/03/%E6%B5%85%E8%B0%88python%E8%A3%85%E9%A5%B0%E5%99%A8/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>浅谈python装饰器的参数传入 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/01/03/%E6%B5%85%E8%B0%88python%E8%A3%85%E9%A5%B0%E5%99%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          浅谈python装饰器的参数传入
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-01-03 11:41:41" itemprop="dateCreated datePublished" datetime="2024-01-03T11:41:41+08:00">2024-01-03</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:48:07" itemprop="dateModified" datetime="2025-11-08T08:48:07+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>1.3k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>5 mins.</span>
+            </span>
+            <div class="post-description">重新感受一下敲代码和排查问题的快乐吧～</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>正好没事看到这样的一个图片：<br><img src="/images/%E8%A3%85%E9%A5%B0%E5%99%A8.jpeg" alt="paradin" title="说的通俗易懂"></p>
+<p>整个过程说的通俗易懂，可以拿去用于校招面试考察基本功。</p>
+<p>但是它图里的例子太简单了，而且是非常理想化的不带参数的装饰器。如果根据这个图照搬照抄想自己写一个带参数的装饰器，那么就会失败。</p>
+<h2 id="被装饰的函数带有参数的情况"><a href="#被装饰的函数带有参数的情况" class="headerlink" title="被装饰的函数带有参数的情况"></a>被装饰的函数带有参数的情况</h2><p>举个例子，比如下面这个python，是完全仿照上面的例子写的：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建一个装饰器</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">zhuangshiqi</span>(<span class="params">func</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">xiulian</span>(<span class="params">book</span>):</span><br><span class="line">        <span class="built_in">print</span> (<span class="string">&quot;开始！&quot;</span>)</span><br><span class="line">        func()</span><br><span class="line">        <span class="built_in">print</span> (<span class="string">&quot;他终于修炼成功了&quot;</span>+book)</span><br><span class="line">    <span class="keyword">return</span> xiulian</span><br><span class="line"></span><br><span class="line"><span class="comment"># 引用这个装饰器，原函数是传入一个参数，输出一顿话</span></span><br><span class="line"><span class="meta">@zhuangshiqi</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">find_book</span>(<span class="params">name</span>):</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;经过努力&quot;</span>,name,<span class="string">&quot;得到了武功秘籍!&quot;</span>)</span><br><span class="line"></span><br><span class="line">find_book(<span class="string">&quot;杨过&quot;</span>,<span class="string">&quot;九阴真经&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>原以为这个输出的结果是：<br>    <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">开始！</span><br><span class="line">经过努力 杨过 得到了武功秘籍!</span><br><span class="line">他终于修炼成功了九阴真经</span><br></pre></td></tr></table></figure></p>
+<p>哪知道，结果是这样的：<br>    <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">zhuangshiqi.&lt;<span class="built_in">locals</span>&gt;.xiulian() takes <span class="number">1</span> positional argument but <span class="number">2</span> were given</span><br></pre></td></tr></table></figure></p>
+<p>嗯，学习知识还是要通过实际的栽跟头和实际的场景去学习的。</p>
+<p>首先这个错误的意思就是<code>xiulian()</code>这个函数里是只能传入一个函数的，但是调用的是传入了两个函数。所以我们需要确保<code>xiulian </code>函数接收到的参数能够正确传递给 <code>find_book</code> 函数。调整过的代码如下：</p>
+ <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">zhuangshiqi</span>(<span class="params">func</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">xiulian</span>(<span class="params">*args, **kwargs</span>):</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;开始！&quot;</span>)</span><br><span class="line">        func(*args, **kwargs)  <span class="comment"># 调用原函数</span></span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">len</span>(args) &gt;= <span class="number">2</span>:</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">&quot;他终于修炼成功了&quot;</span> + args[<span class="number">1</span>])  <span class="comment"># 安全访问 args[1]</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">&quot;他终于修炼成功了&quot;</span>)</span><br><span class="line">    <span class="keyword">return</span> xiulian</span><br><span class="line"></span><br><span class="line"><span class="meta">@zhuangshiqi</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">find_book</span>(<span class="params">name, book_name=<span class="literal">None</span></span>):  <span class="comment"># 修改为接受两个参数</span></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;经过努力&quot;</span>, name, <span class="string">&quot;得到了武功秘籍!&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 调用时传入两个参数</span></span><br><span class="line">find_book(<span class="string">&quot;杨过&quot;</span>, <span class="string">&quot;九阴真经&quot;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>首先就像图里的第四个小图说的，当使用<code> @zhuangshiqi</code> 装饰 <code>find_book</code> 时，等价于：<code>find_book = zhuangshiqi(find_book)</code>，这意味着 <code>find_book</code> 现在指向 <code>xiulian</code> 函数，<code>xiulian</code> 函数其实是包裹了原始的 <code>find_book</code> 函数的。而<code>find_book</code>看上去只有一个函数<code>name</code>，但是其实在<code>xiulian</code>里还有一个就是<code>args[1]</code>，所以我们把<code>func()</code>这里加上<code>*args, **kwargs</code>，确保这里是能吃进多个函数的。</p>
+<p><code>find_book(&quot;杨过&quot;, &quot;九阴真经&quot;)</code>，这个调用实际上是调用了 <code>xiulian(&quot;杨过&quot;, &quot;九阴真经&quot;)</code>。只不过<code>九阴真经</code>在<code>find_book</code>里没有体现，但是确实<code>xiulian</code>的必须，所以如果传入2个参数的话，就会报错，因为它默认认为只需要1个参数。</p>
+<p>这里<code>kwargs</code>是空的，传递的参数被 <code>*args</code> 捕获，所以<code>print (&quot;他终于修炼成功了&quot; + args[1])</code>这里就能顺利拿到“九阴真经”这个函数。</p>
+<p>上面例子里用的是 <code>*args, *args</code>是位置参数是元组, <code>**kwargs </code>    是关键字参数是字典。如果想改造用 <code>**kwargs</code>的话，代码应该改成如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">zhuangshiqi</span>(<span class="params">func</span>):</span><br><span class="line"><span class="keyword">def</span> <span class="title function_">xiulian</span>(<span class="params">*args, **kwargs</span>):</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;开始！&quot;</span>)</span><br><span class="line">    func(*args, **kwargs)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;修炼了&quot;</span> + kwargs[<span class="string">&#x27;book&#x27;</span>])</span><br><span class="line"><span class="keyword">return</span> xiulian</span><br><span class="line"></span><br><span class="line"><span class="meta">@zhuangshiqi</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">find_book</span>(<span class="params">name, place,book</span>):</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;经过努力&quot;</span>, name, <span class="string">&quot;在&quot;</span>, place, <span class="string">&quot;得到了武功秘籍!&quot;</span>)</span><br><span class="line"></span><br><span class="line">find_book(name=<span class="string">&quot;林平之&quot;</span>,place=<span class="string">&#x27;岳不群家窗户外&#x27;</span>,book=<span class="string">&quot;辟邪剑谱&quot;</span>) <span class="comment"># 这里多家了一个函数</span></span><br></pre></td></tr></table></figure>
+
+<p>这段代码的<code>args</code>是空的，<code>kwargs</code>是<code>{&#39;name&#39;: &#39;林平之&#39;,&#39;place&#39;: &#39;岳不群家窗户外&#39;,&#39;book&#39;: &#39;辟邪剑谱&#39;}</code>。 看上去kwargs的用法更加清晰，推荐！</p>
+<p>还要注意一点，装饰器函数装饰器应该返回一个新函数，而不是立即执行原函数。所以例子里<code>zhuangshiqi</code>下面必须要有<code>xiulian</code>这个函数，不能直接接<code>func()</code>。</p>
+<h2 id="装饰器本身带有参数的情况"><a href="#装饰器本身带有参数的情况" class="headerlink" title="装饰器本身带有参数的情况"></a>装饰器本身带有参数的情况</h2><p>装饰器本身也是可以带函数的，下面这个例子就比较明显：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">from</span> functools <span class="keyword">import</span> wraps</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">delay</span>(<span class="params">seconds</span>):</span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    装饰器，用于延迟函数的执行。</span></span><br><span class="line"><span class="string">    :param seconds: 延迟的秒数</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">decorator</span>(<span class="params">func</span>):</span><br><span class="line"><span class="meta">        @wraps(<span class="params">func</span>)</span></span><br><span class="line">        <span class="keyword">def</span> <span class="title function_">wrapped_function</span>(<span class="params">*args, **kwargs</span>):</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">f&quot;等待 <span class="subst">&#123;seconds&#125;</span> 秒后执行 <span class="subst">&#123;func.__name__&#125;</span> 函数...&quot;</span>)</span><br><span class="line">            time.sleep(seconds)</span><br><span class="line">            result = func(*args, **kwargs)</span><br><span class="line">            <span class="keyword">return</span> result</span><br><span class="line">        <span class="keyword">return</span> wrapped_function</span><br><span class="line">    <span class="keyword">return</span> decorator</span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用装饰器</span></span><br><span class="line"><span class="meta">@delay(<span class="params"><span class="number">3</span></span>)</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">greet</span>(<span class="params">name</span>):</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;Hello, <span class="subst">&#123;name&#125;</span>!&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="meta">@delay(<span class="params"><span class="number">2</span></span>)</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">add</span>(<span class="params">a, b</span>):</span><br><span class="line">    result = a + b</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;结果是: <span class="subst">&#123;result&#125;</span>&quot;</span>)</span><br><span class="line">    <span class="keyword">return</span> result</span><br><span class="line"></span><br><span class="line"><span class="comment"># 调用被装饰的函数</span></span><br><span class="line">greet(<span class="string">&quot;Alice&quot;</span>)</span><br><span class="line">add(<span class="number">5</span>, <span class="number">3</span>)</span><br></pre></td></tr></table></figure>
+
+<p>上面这个例子里，<code>delay(seconds)</code>这是一个装饰器函数，他返回的是一个真正的装饰器<code>decorator</code>。而装饰器<code>decorator</code>，它接收一个函数<code>func</code>作为参数。</p>
+<p>而内部函数<code>wrapped_function</code>，该函数在调用被装饰函数之前等待指定的时间。并且通过<code>{func.__name__}</code>获取到被装饰函数的名字，并在调用被装饰函数之后打印出该函数的名字。这句话可以更好的帮你理解 <code>被调函数=装饰器（函数）</code>这个装饰器的基本逻辑。</p>
+<p>而<code>@wraps(func)</code>是啥意思呢？它是为了确保装饰器不会改变被装饰函数的签名和文档字符串（docstring）而加上的。</p>
+<p>装饰器本身带有参数的情况其实在工作中很常见，最常见的操作就是打印日志的时候，可以在装饰器添加参数<code>level=&quot;INFO&quot; or evel=&quot;DEBUG&quot;</code>来调整对应的日志级别。</p>
+<p>总之，装饰器是python的一个进阶，有了它，能够使你的代码更加简洁和易维护，而且也让菜鸟们更加崇拜你。</p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/python/" rel="tag"># python</a>
+              <a href="/tags/%E8%A3%85%E9%A5%B0%E5%99%A8/" rel="tag"># 装饰器</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/12/18/%E4%BC%98%E5%BE%85%E7%9A%84%E4%BB%A3%E4%BB%B7/" rel="prev" title="停止内耗，直接一点">
+      <i class="fa fa-chevron-left"></i> 停止内耗，直接一点
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/02/01/rdb%E7%9A%84%E6%8C%81%E4%B9%85%E5%8C%96%E5%AF%BC%E8%87%B4%E7%BA%BF%E4%B8%8A%E6%95%85%E9%9A%9C/" rel="next" title="rdb的持久化导致线上故障">
+      rdb的持久化导致线上故障 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A2%AB%E8%A3%85%E9%A5%B0%E7%9A%84%E5%87%BD%E6%95%B0%E5%B8%A6%E6%9C%89%E5%8F%82%E6%95%B0%E7%9A%84%E6%83%85%E5%86%B5"><span class="nav-number">1.</span> <span class="nav-text">被装饰的函数带有参数的情况</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A3%85%E9%A5%B0%E5%99%A8%E6%9C%AC%E8%BA%AB%E5%B8%A6%E6%9C%89%E5%8F%82%E6%95%B0%E7%9A%84%E6%83%85%E5%86%B5"><span class="nav-number">2.</span> <span class="nav-text">装饰器本身带有参数的情况</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

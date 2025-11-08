@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="开发同学的这个模块一旦启动，会很快的速度建立50000多个连接，zabbix发消息给端口肯定会有延迟，所以就会导致zabbix取端口值困难。而一旦模块停止，取值就会秒取。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Zabbix里item取值超时怎么办？">
+<meta property="og:url" content="http://example.com/2018/02/08/Zabbix%E9%87%8Citem%E5%8F%96%E5%80%BC%E8%B6%85%E6%97%B6%E6%80%8E%E4%B9%88%E5%8A%9E%EF%BC%9F/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="开发同学的这个模块一旦启动，会很快的速度建立50000多个连接，zabbix发消息给端口肯定会有延迟，所以就会导致zabbix取端口值困难。而一旦模块停止，取值就会秒取。">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/item1.png">
+<meta property="og:image" content="http://example.com/images/item2.png">
+<meta property="og:image" content="http://example.com/images/item3.png">
+<meta property="og:image" content="http://example.com/images/item4.png">
+<meta property="article:published_time" content="2018-02-08T03:02:53.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:47:16.993Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="zabbix">
+<meta property="article:tag" content="运维监控">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/item1.png">
+
+<link rel="canonical" href="http://example.com/2018/02/08/Zabbix%E9%87%8Citem%E5%8F%96%E5%80%BC%E8%B6%85%E6%97%B6%E6%80%8E%E4%B9%88%E5%8A%9E%EF%BC%9F/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>Zabbix里item取值超时怎么办？ | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2018/02/08/Zabbix%E9%87%8Citem%E5%8F%96%E5%80%BC%E8%B6%85%E6%97%B6%E6%80%8E%E4%B9%88%E5%8A%9E%EF%BC%9F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Zabbix里item取值超时怎么办？
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-02-08 11:02:53" itemprop="dateCreated datePublished" datetime="2018-02-08T11:02:53+08:00">2018-02-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:47:16" itemprop="dateModified" datetime="2025-11-08T08:47:16+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>514</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>2 mins.</span>
+            </span>
+            <div class="post-description">开发同学的这个模块一旦启动，会很快的速度建立50000多个连接，zabbix发消息给端口肯定会有延迟，所以就会导致zabbix取端口值困难。而一旦模块停止，取值就会秒取。</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h2><p>开发同学新开发了一个模块，需要运维监控一下<code>8683\8682\9002</code>这三个端口，于是我就在zabbix里把这三个端口进行了监控，但是却无法返回值，如图：<br><img src="/images/item1.png" alt="paradin"></p>
+<p>可见其他的自定义监控项是好使的，偏偏三个监控端口的项都是<code>not-supported</code>。我就进去到item里看看，<code>type of information</code>和<code>data type</code>都是正常的，而且每三十秒一次更新，应该是没有什么问题的。<br><img src="/images/item2.png" alt="paradin"></p>
+<p>于是我就去zabbix的server使用<code>zabbix-get</code>去试试，到底是怎么回事儿，使用结果如图：<br><img src="/images/item3.png" alt="paradin"></p>
+<p>可见使用<code>zabbix_get</code>是可以取到值的，而且取值都正确，三个正常的端口反馈都是1，而不存在的端口（9002）的反馈是0。可是,我发现使用<code>zabbix_ge</code>t取值pid是结果秒出，而取值<code>net.tcp.listen</code>则是等了几乎5秒钟才获得结果。那么问题就出在这里了。</p>
+<p>调整<code>zabbix_agentd.conf</code>里的<code>Timeout</code>值，把其设定为10，然后重启zabbix进程就OK了。</p>
+<h2 id="补充"><a href="#补充" class="headerlink" title="补充"></a>补充</h2><p>1）<a target="_blank" rel="noopener" href="https://www.xiaomastack.com/2015/07/03/zabbix_net-tcp-listen/comment-page-1/#comment-319%EF%BC%8C%E5%BE%88%E5%A4%9A%E6%97%B6%E5%80%99%E7%AB%AF%E5%8F%A3%E7%9B%91%E5%90%AC%E4%BC%9A%E5%87%BA%E9%94%99%EF%BC%8C%E4%BA%8E%E6%98%AF%E5%B0%B1%E7%94%A8%E8%87%AA%E5%AE%9A%E4%B9%89%E9%94%AE%E5%80%BC%E7%9A%84%E6%96%B9%E6%B3%95%EF%BC%8C%E4%BD%86%E6%98%AF%E5%B0%8F%E9%A9%AC%E5%93%A5%E5%8D%9A%E5%AE%A2%E9%87%8C%E7%9A%84%E8%BF%99%E4%B8%AA%E6%96%B9%E6%B3%95%E5%9C%A8centos%E9%87%8C%E6%98%AF%E6%97%A0%E6%B3%95%E5%90%AF%E5%8A%A8%EF%BC%8Czabbix%E4%BC%9A%E6%8A%A5%E8%AF%AD%E6%B3%95%E9%94%99%E8%AF%AF%E3%80%82%E7%94%B1%E4%BA%8E%E5%85%AC%E5%8F%B8%E7%9A%84zabbix%E6%98%AF2.2%E7%89%88%E6%9C%AC%EF%BC%8C%E7%AD%89%E6%88%91%E6%9C%89%E6%97%B6%E9%97%B4%E9%9C%80%E8%A6%81%E7%BB%86%E5%8C%96%E4%B8%80%E4%B8%8B%E8%BF%99%E4%B8%AA%E8%AF%AD%E6%B3%95%E3%80%82">https://www.xiaomastack.com/2015/07/03/zabbix_net-tcp-listen/comment-page-1/#comment-319，很多时候端口监听会出错，于是就用自定义键值的方法，但是小马哥博客里的这个方法在centos里是无法启动，zabbix会报语法错误。由于公司的zabbix是2.2版本，等我有时间需要细化一下这个语法。</a></p>
+<p>2）调整<code>unsupport items</code>检查时间的方法是：在<code>Adiministration</code>里选择<code>General</code>然后在右侧下拉菜单里选择<code>Other</code>，然后修改<code>Refresh unsupported items (in sec)</code>的值，这个值得意思是“每多少秒去重新检查一下那些<code>not_supported</code>的值”。<br><img src="/images/item4.png" alt="paradin"></p>
+<p>3)这种长时间获取key的行为，很容易导致<code>zabbix unreachable poller processes more than 75 busy</code>这个错误，所以尽可能的不要添加这样的监控，而换用其它的方式。导致<code>zabbix unreachable poller processes more than 75 busy</code>这个错误的另一个原因就是可能有某台<code>zabbix-agent</code>死机了。</p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/zabbix/" rel="tag"># zabbix</a>
+              <a href="/tags/%E8%BF%90%E7%BB%B4%E7%9B%91%E6%8E%A7/" rel="tag"># 运维监控</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/02/07/%E5%8D%81%E5%85%AD%E5%B9%B4%EF%BC%8C%E4%B9%9D%E4%B8%AA%E9%98%9F%E4%BC%8D%EF%BC%8C%E4%B8%80%E4%BB%BD%E7%88%B1/" rel="prev" title="十六年，九个队，一份爱">
+      <i class="fa fa-chevron-left"></i> 十六年，九个队，一份爱
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/02/08/%E5%9C%A8%E7%99%BE%E8%8A%B1%E4%B9%8B%E4%B8%AD%E5%B9%B2%E6%8E%89%E4%B8%80%E4%B8%AA%E6%9D%82%E8%8D%89%E8%BF%9E%E6%8E%A5/" rel="next" title="在百花之中干掉一个杂草连接...">
+      在百花之中干掉一个杂草连接... <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AD%A3%E6%96%87"><span class="nav-number">1.</span> <span class="nav-text">正文</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A1%A5%E5%85%85"><span class="nav-number">2.</span> <span class="nav-text">补充</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

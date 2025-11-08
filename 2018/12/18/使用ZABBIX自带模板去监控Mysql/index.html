@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Zabbix的自带模板搭配连接数监控和数据行监控，争取在我出门这段时间落得一个安心">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用ZABBIX自带模板去监控Mysql">
+<meta property="og:url" content="http://example.com/2018/12/18/%E4%BD%BF%E7%94%A8ZABBIX%E8%87%AA%E5%B8%A6%E6%A8%A1%E6%9D%BF%E5%8E%BB%E7%9B%91%E6%8E%A7Mysql/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="Zabbix的自带模板搭配连接数监控和数据行监控，争取在我出门这段时间落得一个安心">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/mysql-sock4.png">
+<meta property="og:image" content="http://example.com/images/mysql-sock5.png">
+<meta property="og:image" content="http://example.com/images/mysql-sock6.png">
+<meta property="og:image" content="http://example.com/images/mysql-sock8.png">
+<meta property="og:image" content="http://example.com/images/mysql-sock7.png">
+<meta property="article:published_time" content="2018-12-18T06:17:45.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:47:36.548Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="Zabbix">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/mysql-sock4.png">
+
+<link rel="canonical" href="http://example.com/2018/12/18/%E4%BD%BF%E7%94%A8ZABBIX%E8%87%AA%E5%B8%A6%E6%A8%A1%E6%9D%BF%E5%8E%BB%E7%9B%91%E6%8E%A7Mysql/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>使用ZABBIX自带模板去监控Mysql | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2018/12/18/%E4%BD%BF%E7%94%A8ZABBIX%E8%87%AA%E5%B8%A6%E6%A8%A1%E6%9D%BF%E5%8E%BB%E7%9B%91%E6%8E%A7Mysql/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          使用ZABBIX自带模板去监控Mysql
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-12-18 14:17:45" itemprop="dateCreated datePublished" datetime="2018-12-18T14:17:45+08:00">2018-12-18</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:47:36" itemprop="dateModified" datetime="2025-11-08T08:47:36+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>1k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>4 mins.</span>
+            </span>
+            <div class="post-description">Zabbix的自带模板搭配连接数监控和数据行监控，争取在我出门这段时间落得一个安心</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="事前准备"><a href="#事前准备" class="headerlink" title="事前准备"></a>事前准备</h2><p>Zabbix-agent:<code>3.0.8</code>，安装路径是<code>/etc/zabbix/</code><br>Mysql:<code>5.7.10</code>，安装路径是<code>/opt/mysql/</code><br>配置<code>/etc/sudoers</code>让zabbix用户可以使用sudo，如下：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">## <span class="title class_">Allow</span> root to run any commands anywhere</span><br><span class="line">root    <span class="variable constant_">ALL</span>=(<span class="variable constant_">ALL</span>)       <span class="variable constant_">ALL</span></span><br><span class="line">zabbix  <span class="variable constant_">ALL</span>=(<span class="variable constant_">ALL</span>)       <span class="attr">NOPASSWD</span>:<span class="variable constant_">ALL</span></span><br><span class="line"><span class="title class_">Defaults</span>:zabbix !requiretty</span><br></pre></td></tr></table></figure></p>
+<h2 id="配置-my-cnf"><a href="#配置-my-cnf" class="headerlink" title="配置.my.cnf"></a>配置.my.cnf</h2><p>众所周知，Zabbix官方提供了自带监控Mysql的模板，但是这个模板并不能直接使用。所以我们需要有如下的改动：</p>
+<p>首先，先在mysql目录下的etc文件夹里先创建一个<code>.my.cnf</code>文件，全路径是<code>/opt/mysql/etc/.my.cnf</code>，这个文件是zabbix要求的用于存放连接mysql数据库的账户信息的隐藏文件，这样可以避免在命令行里输入密码。整个<code>.my.cnf</code>文件内容如下：<br>	<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[mysql]                     #mysql程序要使用的账户信息</span><br><span class="line">host=localhost</span><br><span class="line">user=用户名</span><br><span class="line">password=&quot;密码&quot;   #此处的密码强烈建议加上引号</span><br><span class="line">socket=/tmp/mysql.sock  #确认mysql的sock文件路径</span><br><span class="line"></span><br><span class="line">[mysqladmin]             #mysqladmin程序要使用的账户信息</span><br><span class="line">host=localhost</span><br><span class="line">user=用户名</span><br><span class="line">password=&quot;密码&quot;</span><br><span class="line">socket=/tmp/mysql.sock</span><br></pre></td></tr></table></figure></p>
+<p>这里建议在mysql里插入一个叫zabbix的用户，密码自己设定，然后在<code>.my.cnf</code>里就是用这个用户即可。此时，在命令行直接输入<code>HOME=/opt/mysql/etc/ mysql</code>和<code>HOME=/opt/mysql/etc/ mysqladmin ping</code>都应该是直接出结果，而不是用输入账号和密码，如图：<br><img src="/images/mysql-sock4.png" alt="akb48"></p>
+<p><font color=red>注意!</font>这个<code>.my.cnf</code>的权限是644，用户和用户组是root，如果权限过大，那么启动mysql时就会报错：<code>Warning: World-writable config file &#39;/opt/mysql/etc/.my.cnf&#39; is ignored</code>。</p>
+<h2 id="修改userparameter-mysql-conf"><a href="#修改userparameter-mysql-conf" class="headerlink" title="修改userparameter_mysql.conf"></a>修改userparameter_mysql.conf</h2><p>然后在<code>zabbix-agent</code>配置文件的文件夹<code>/etc/zabbix/zabbix_agentd.d/</code>里，会发现一个叫<code>userparameter_mysql.conf</code>的文件，把里面的内容改成如下样子:<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># <span class="title class_">For</span> all the following commands <span class="variable constant_">HOME</span> should be set to the directory that has .<span class="property">my</span>.<span class="property">cnf</span> file <span class="keyword">with</span> password information.</span><br><span class="line"></span><br><span class="line"># <span class="title class_">Flexible</span> parameter to grab <span class="variable language_">global</span> variables. <span class="title class_">On</span> the frontend side, use keys like mysql.<span class="property">status</span>[<span class="title class_">Com</span>_insert].</span><br><span class="line"># <span class="title class_">Key</span> syntax is mysql.<span class="property">status</span>[variable].</span><br><span class="line"><span class="title class_">UserParameter</span>=mysql.<span class="property">status</span>[*],echo <span class="string">&quot;show global status where Variable_name=&#x27;$1&#x27;;&quot;</span> | sudo <span class="variable constant_">HOME</span>=<span class="regexp">/opt/my</span>sql/etc /opt/mysql/bin/mysql -N | awk <span class="string">&#x27;&#123;print $$2&#125;&#x27;</span></span><br><span class="line"><span class="title class_">UserParameter</span>=mysql.<span class="property">ping</span>,sudo <span class="variable constant_">HOME</span>=<span class="regexp">/opt/my</span>sql/etc/ <span class="regexp">/opt/my</span>sql/bin/mysqladmin ping | grep -c alive</span><br><span class="line"><span class="title class_">UserParameter</span>=mysql.<span class="property">version</span>,<span class="regexp">/opt/my</span>sql/bin/mysql -V</span><br></pre></td></tr></table></figure></p>
+<p>这个文件第一行注释的内容就是说明HOME路径就是<code>.my.cnf</code>文件所在的路径，后面的<code>mysql</code>和<code>mysqladmin</code>都要用绝对路径，同时加上<code>sudo</code>，这样zabbix才能正确的调用它。</p>
+<p>来到<code>zabbix-server</code>端使用<code>zabbix-get</code>去试试结果：<br><img src="/images/mysql-sock5.png" alt="akb48"></p>
+<p>然后就是在zabbix网页端将目标机器添加<code>Template DB MySQL</code>，至此，使用zabbix自带的mysql监控模板监控mysql数据库就结束了，效果如下：<br><img src="/images/mysql-sock6.png" alt="akb48"></p>
+<h2 id="监控连接数"><a href="#监控连接数" class="headerlink" title="监控连接数"></a>监控连接数</h2><p>上面那个模板是不带有监控连接数的，要是单纯的去使用netstat获取当前链接值可能会反应较慢，那么就是用mysql自带的查连接数的命令：<code>show status like &#39;%connect%&#39;;</code>，执行效果如下：<br><img src="/images/mysql-sock8.png" alt="akb48"></p>
+<p>简单说下这几个值的含义：</p>
+<ol>
+<li>Connections：试图连接到（不管是否成功）MYSQL服务器的连接总数</li>
+<li>Locked_connects：锁住的链接数</li>
+<li>Max_used_connections：服务器启动后已经同时使用过的连接最大数量（并发）</li>
+<li>Max_used_connections_time：出现Max_used_connections时的时间</li>
+<li>Aborted_connects：尝试连接到MySQL服务器失败的次数</li>
+<li>Threads_connected：当前的连接数</li>
+</ol>
+<p>那么知道了含义，我们就可以对症下药了，这里我们监控两个数值<code>Locked_connects</code>和<code>Threads_connected</code>，那么就把下面的语句添加到<code>userparameter_mysql.conf</code>里：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="title class_">UserParameter</span>=mysql.<span class="property">connections</span>,echo <span class="string">&quot;show status like &#x27;%Threads_connected%&#x27;;&quot;</span> | sudo <span class="variable constant_">HOME</span>=<span class="regexp">/opt/my</span>sql/etc /opt/mysql/bin/mysql -N | awk <span class="string">&#x27;&#123;print $2&#125;&#x27;</span></span><br><span class="line"><span class="title class_">UserParameter</span>=mysql.<span class="property">lockconnections</span>,echo <span class="string">&quot;show status like &#x27;%Locked_connects%&#x27;;&quot;</span> | sudo <span class="variable constant_">HOME</span>=<span class="regexp">/opt/my</span>sql/etc /opt/mysql/bin/mysql -N | awk <span class="string">&#x27;&#123;print $2&#125;&#x27;</span></span><br><span class="line"><span class="title class_">UserParameter</span>=mysql.<span class="property">rowofalarm</span>,echo <span class="string">&quot;select count(*) from alarm.adm_log_alarm;&quot;</span> | sudo <span class="variable constant_">HOME</span>=<span class="regexp">/opt/my</span>sql/etc /opt/mysql/bin/mysql -N | awk <span class="string">&#x27;&#123;print $1&#125;&#x27;</span>	#这个是检测alarm.<span class="property">adm_log_alarm</span>的数据行数</span><br></pre></td></tr></table></figure><br>重启<code>zabbix-agent</code>，配置对应的items和trigger即可。</p>
+<p>额外补充一下，查看mysql数据库对应每个IP的详细链接情况的语句是：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select <span class="title function_">substring_index</span>(host,<span class="string">&#x27;:&#x27;</span>,<span class="number">1</span>) <span class="keyword">as</span> ip , <span class="title function_">count</span>(*) <span class="keyword">from</span> information_schema.<span class="property">processlist</span> group by ip;</span><br></pre></td></tr></table></figure></p>
+<p>效果如下：<br><img src="/images/mysql-sock7.png" alt="akb48"></p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a target="_blank" rel="noopener" href="https://github.com/erasin/notes/blob/master/linux/mysql/monitor.md">https://github.com/erasin/notes/blob/master/linux/mysql/monitor.md</a> （其他mysql状态监控语句）<br><a target="_blank" rel="noopener" href="http://www.cnblogs.com/kerrycode/p/9206787.html">http://www.cnblogs.com/kerrycode/p/9206787.html</a></p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Zabbix/" rel="tag"># Zabbix</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/12/14/%E5%B0%86list%E9%87%8D%E6%96%B0%E6%8E%92%E5%88%97%E5%90%8E%E8%8E%B7%E5%8F%96%E5%8E%9F%E6%9D%A5%E7%9A%84%E7%B4%A2%E5%BC%95/" rel="prev" title="将list重新排列后获取原来的索引">
+      <i class="fa fa-chevron-left"></i> 将list重新排列后获取原来的索引
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/12/19/Django%E5%AE%9E%E7%8E%B0%E5%9B%BE%E7%89%87%E4%B8%8A%E4%BC%A0/" rel="next" title="Django实现文件上传功能">
+      Django实现文件上传功能 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8B%E5%89%8D%E5%87%86%E5%A4%87"><span class="nav-number">1.</span> <span class="nav-text">事前准备</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE-my-cnf"><span class="nav-number">2.</span> <span class="nav-text">配置.my.cnf</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9userparameter-mysql-conf"><span class="nav-number">3.</span> <span class="nav-text">修改userparameter_mysql.conf</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%91%E6%8E%A7%E8%BF%9E%E6%8E%A5%E6%95%B0"><span class="nav-number">4.</span> <span class="nav-text">监控连接数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">5.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

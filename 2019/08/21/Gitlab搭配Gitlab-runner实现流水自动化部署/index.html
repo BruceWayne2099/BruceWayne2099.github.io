@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="如果gitlab的初始密码忘了，可以通过gitlab-rails console production 找回">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Gitlab搭配Gitlab-runner实现流水线自动化部署">
+<meta property="og:url" content="http://example.com/2019/08/21/Gitlab%E6%90%AD%E9%85%8DGitlab-runner%E5%AE%9E%E7%8E%B0%E6%B5%81%E6%B0%B4%E8%87%AA%E5%8A%A8%E5%8C%96%E9%83%A8%E7%BD%B2/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="如果gitlab的初始密码忘了，可以通过gitlab-rails console production 找回">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/gitlab36.png">
+<meta property="og:image" content="http://example.com/images/gitlab37.png">
+<meta property="og:image" content="http://example.com/images/gitlab38.png">
+<meta property="og:image" content="http://example.com/images/gitlab39.png">
+<meta property="og:image" content="http://example.com/images/gitlab40.png">
+<meta property="og:image" content="http://example.com/images/gitlab43.png">
+<meta property="og:image" content="http://example.com/images/gitlab41.png">
+<meta property="og:image" content="http://example.com/images/gitlab42.png">
+<meta property="article:published_time" content="2019-08-21T13:06:35.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:46:55.645Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="ci&#x2F;cd">
+<meta property="article:tag" content="gitlab">
+<meta property="article:tag" content="自动化部署">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/gitlab36.png">
+
+<link rel="canonical" href="http://example.com/2019/08/21/Gitlab%E6%90%AD%E9%85%8DGitlab-runner%E5%AE%9E%E7%8E%B0%E6%B5%81%E6%B0%B4%E8%87%AA%E5%8A%A8%E5%8C%96%E9%83%A8%E7%BD%B2/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>Gitlab搭配Gitlab-runner实现流水线自动化部署 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/08/21/Gitlab%E6%90%AD%E9%85%8DGitlab-runner%E5%AE%9E%E7%8E%B0%E6%B5%81%E6%B0%B4%E8%87%AA%E5%8A%A8%E5%8C%96%E9%83%A8%E7%BD%B2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Gitlab搭配Gitlab-runner实现流水线自动化部署
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-08-21 21:06:35" itemprop="dateCreated datePublished" datetime="2019-08-21T21:06:35+08:00">2019-08-21</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:46:55" itemprop="dateModified" datetime="2025-11-08T08:46:55+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>1.7k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>6 mins.</span>
+            </span>
+            <div class="post-description">如果gitlab的初始密码忘了，可以通过gitlab-rails console production 找回</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>最近跟开发研究给新业务搞一套完整的CI&#x2F;CD流程，据说drone很猛，在github上势头很高。不过缺点也很明显：文档不全+错误提示不到位，于是还是选择了Gitlab，这次不同于以往的Gitlab+jenkins，而是采用了Gitlab+runner。</p>
+<p>名词解释，我这里就不多说了，可以去看<a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000007180257">https://segmentfault.com/a/1190000007180257</a> ，讲解的很全。</p>
+<p>环境介绍：阿里云Centos7 + Docker + Gitlab,gitlab里准备了一个测试用的project。</p>
+<h2 id="配置gitlab-runner"><a href="#配置gitlab-runner" class="headerlink" title="配置gitlab-runner"></a>配置gitlab-runner</h2><p>很多地方都说<code>gitlab-runner</code>是一个比较吃内存的进程，而且处于安全角度考虑都很不推荐它跟gitlab装在一起，不过本文是展示测试而已，我手头也没有其他的服务器了，于是就先装在同一台服务器上。</p>
+<p>用容器装<code>gitlab-runner</code>很简单，语句如下：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">docker run -d --name gitlab-runner --restart always \</span><br><span class="line">  -v /srv/gitlab-runner/config:/etc/gitlab-runner \</span><br><span class="line">  -v /var/run/docker.sock:/var/run/docker.sock \</span><br><span class="line">  gitlab/gitlab-runner:latest</span><br></pre></td></tr></table></figure></p>
+<p>如果你想玩骚的，可以通过一个存储卷容器来保存<code>gitlab-runner</code>的数据，语句如下：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">docker run -d --name gitlab-runner-config \</span><br><span class="line">   -v /etc/gitlab-runner \</span><br><span class="line">   busybox:latest \</span><br><span class="line">   /<span class="built_in">bin</span>/true</span><br><span class="line"></span><br><span class="line">docker run -d --name gitlab-runner --restart always \</span><br><span class="line">   -v /var/run/docker.sock:/var/run/docker.sock \</span><br><span class="line">   --volumes-<span class="keyword">from</span> gitlab-runner-config \</span><br><span class="line">   gitlab/gitlab-runner:latest</span><br></pre></td></tr></table></figure></p>
+<p>此时<code>docker ps -a</code>情况如下:<br><img src="/images/gitlab36.png" alt="抱光妹"></p>
+<p>来到gitlab的WEB页面，进入测试用的project，然后左侧栏里选择<code>settings</code>—-<code>CI/CD</code>—点击<code>runner</code>，就会看到配置的相关信息，如图：<br><img src="/images/gitlab37.png" alt="抱光妹"></p>
+<p>保持这个界面不要动，我们返回命令行进入<code>gitlab-runner</code>容器里，需要把runner注册到我们的gitlab上，执行命令<code>gitlab-runner register</code>，然后就是如下交互对话：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">root@4512a92c8cb2:/<span class="comment"># gitlab-runner register</span></span><br><span class="line">Runtime platform                                    arch=amd64 os=linux pid=<span class="number">26</span> revision=de7731dd version=<span class="number">12.1</span><span class="number">.0</span></span><br><span class="line">Running <span class="keyword">in</span> system-mode.                            </span><br><span class="line">                                                   </span><br><span class="line">Please enter the gitlab-ci coordinator URL (e.g. https://gitlab.com/):	<span class="comment">#这里输入gitlab的域名，如果不是域名就http://IP的形式</span></span><br><span class="line">http://GITLAB的IP</span><br><span class="line">Please enter the gitlab-ci token <span class="keyword">for</span> this runner:</span><br><span class="line">刚刚页面里的token</span><br><span class="line">Please enter the gitlab-ci description <span class="keyword">for</span> this runner:		<span class="comment">#这里写一个注释</span></span><br><span class="line">[4512a92c8cb2]: test</span><br><span class="line">Please enter the gitlab-ci tags <span class="keyword">for</span> this runner (comma separated):</span><br><span class="line">my-tag			<span class="comment">#打一个标签，注意这个标签不能乱写，下面会细说</span></span><br><span class="line">Registering runner... succeeded                     runner=fvyoASC8</span><br><span class="line">Please enter the executor: docker, parallels, virtualbox, kubernetes, custom, shell, ssh, docker+machine, docker-ssh+machine, docker-ssh:</span><br><span class="line">shell			<span class="comment">#选择执行方式，我写了shell，如果你写的是docker，那么会让你填写一个镜像地址，然后默认就会去拉这个镜像地址</span></span><br><span class="line">Runner registered successfully. Feel free to start it, but <span class="keyword">if</span> it<span class="string">&#x27;s running already the config should be automatically reloaded! </span></span><br></pre></td></tr></table></figure></p>
+<p>返回gitlab的web页面刷新一下，就看到刚刚填写的<code>runner</code>已经成功注册上了，如图：<br><img src="/images/gitlab38.png" alt="抱光妹"></p>
+<p>可以看到注释和tag，如果点击小锁头旁边的编辑按钮，就可以编辑刚才命令行里的配置，所以tag啥的写错了请放心。</p>
+<p>如果说想要看到runner的一个概览，那么就点击gitlab上的小扳手，然后<code>overview</code>–<code>runners</code>即可，如图：<br><img src="/images/gitlab39.png" alt="抱光妹"></p>
+<p>至此<code>gitlab-runner</code>已经配置完成！</p>
+<h2 id="搭配GItLab-CI"><a href="#搭配GItLab-CI" class="headerlink" title="搭配GItLab CI"></a>搭配GItLab CI</h2><p>要想在合并请求或者push的时候出发CI流水线，那么就在项目仓库的根目录添加<code>.gitlab-ci.yml</code>文件，for instance:<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">stages:</span><br><span class="line">  - test</span><br><span class="line">  - build</span><br><span class="line">  - deploy</span><br><span class="line"></span><br><span class="line"><span class="comment"># 增加名为test-check的任务</span></span><br><span class="line">test-check:</span><br><span class="line">  stage: test</span><br><span class="line">  tags: <span class="comment"># 指定使用有 my-tag 标签的runner运行该任务</span></span><br><span class="line">    - my-tag</span><br><span class="line">  <span class="comment"># 开始运行之前的操作</span></span><br><span class="line">  before_script:</span><br><span class="line">    - echo <span class="string">&#x27;runner begin...&#x27;</span></span><br><span class="line">  script:</span><br><span class="line">    - hostname &amp;&amp; date</span><br><span class="line">    - whoami</span><br><span class="line">  allow_failure: true	<span class="comment">#job失败了，pipline将会置绿或者置成功显示，可以继续往下走，但是commit页面或者job页面看到一条“CI build passed with warnings”的警告信息</span></span><br><span class="line"></span><br><span class="line">test-check2:</span><br><span class="line">  stage: test</span><br><span class="line">  tags:</span><br><span class="line">    - my-tag2</span><br><span class="line">  script:</span><br><span class="line">    - echo <span class="string">&quot;嘎嘎&quot;</span></span><br><span class="line">    - echo <span class="string">&quot;哈哈哈哈哈&quot;</span></span><br><span class="line">    - echo <span class="string">&quot;--------job2----------&quot;</span></span><br><span class="line">  after_script:</span><br><span class="line">    - echo <span class="string">&quot;FINISH!&quot;</span></span><br><span class="line"></span><br><span class="line">test-deploy:</span><br><span class="line">  stage: deploy</span><br><span class="line">  tags:</span><br><span class="line">    - deploy</span><br><span class="line">  environment:			<span class="comment">#这个环境设定主要是回滚的时候用得到</span></span><br><span class="line">    name: chentest</span><br><span class="line">    url: https://test.example.com</span><br><span class="line">  script:</span><br><span class="line">    - echo <span class="string">&quot;部署啦！！&quot;</span></span><br><span class="line">    - echo <span class="string">&quot;啦啦啦啦！&quot;</span></span><br><span class="line">    - echo <span class="string">&quot;--------job3----------&quot;</span></span><br><span class="line">    - echo <span class="string">&quot;finish&quot;</span> &gt;&gt; /tmp/test.txt</span><br></pre></td></tr></table></figure></p>
+<p>然后触发一下<code>git push</code>，就会在gitlab的页面里看到<code>commit:passed</code>的绿色小勾，如图：<br><img src="/images/gitlab40.png" alt="抱光妹"></p>
+<p>点击这个绿色小勾就能看到status下面的状态是<code>passed</code>，然后可以在<code>pipiline</code>里看到具体的流水线情况：<br><img src="/images/gitlab43.png" alt="抱光妹" title="在相同stage下的job将会被并行的执行"></p>
+<p>然后点击对应的job，就能看到了执行的详情，如图：<br><img src="/images/gitlab41.png" alt="抱光妹"></p>
+<p>可以看到整个过程是在<code>gitlab-runner</code>这个容器里操作的，如果失败了也可以在这里查看具体的原因。<font color=red>注意！.gitlab-ci.yml的任何对文件操作都是在gitlab-runner这个容器内部进行的，而不是它所在的宿主机！</font>也就是说在上面例子里job3最后的<code>/tmp/test.txt</code>是容器里的而不是宿主机的。</p>
+<p>还有一个地方要注意，stage判断结果成功与否的标志是最后一个命令是否返回非零结果<code>($?)</code>，也就是说你的script内容是执行一个shell脚本，假如这个shell脚本中间有某些命令执行失败，但最后一个命令执行成功，stage最终结果也会是成功的。所以推荐shell命令行后面都加上<code>|| { exit 1; }</code>，这样可以避免坑。</p>
+<p><code>.gitlab-ci.yml</code>的语法非常丰富，详情可见官方文档<a target="_blank" rel="noopener" href="https://docs.gitlab.com/ce/ci/yaml/README.html">https://docs.gitlab.com/ce/ci/yaml/README.html</a> 或者是<a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000010442764">https://segmentfault.com/a/1190000010442764</a> ，已经总结的非常全面了。</p>
+<h2 id="高阶玩法"><a href="#高阶玩法" class="headerlink" title="高阶玩法"></a>高阶玩法</h2><p>上面只是gitlab-runner搭配cli的一个小小demo而已。在现实工作中，我们会创建很多个runner，然后给不同的runner分配各自的tag:编译、测试、打包和发布，然后在配合<code>.gitlab-ci.yml</code>文件操作。</p>
+<p>如果想要jobs并发，先进入<code>gitlab-runner</code>容器里，将<code>/etc/gitlab-runner/config.toml</code>文件里的<code>concurrent = 1</code>酌情调大，重启容器生效。</p>
+<p>如果说不想<code>push</code>都触发所有的jobs，而想要某个jobs在<code>merge</code>的时候才执行，可以在<code>.gitlab-ci.yml</code>里对应的job段落改成如下的格式：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">stage: build</span><br><span class="line">script:</span><br><span class="line">  - xxxxx</span><br><span class="line">artifacts:</span><br><span class="line">  paths:</span><br><span class="line">    - xxxxx</span><br><span class="line">tags:</span><br><span class="line">  - xxxx</span><br><span class="line">only:			<span class="comment">#only后面可以跟分支或者标签</span></span><br><span class="line">     - /^issue-.*$/			<span class="comment"># 该job将会只在issue-开头的refs下执行</span></span><br><span class="line">  - merge_requests			<span class="comment"># 只有merge才会触发！</span></span><br></pre></td></tr></table></figure></p>
+<p>如果在触发流水线执行job的时候被提示：<code>job is stuck check runners</code>，那么请检查一下gitlab-ci.yml里是不是没有写明tag。</p>
+<p>除了上面<code>push/merge</code>人为触发之外，gitlab还支持定时触发流水线作业。可以在web界面里的<code>CI/CD</code>—<code>Schedules</code>看到，如图：<br><img src="/images/gitlab42.png" alt="抱光妹"></p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a target="_blank" rel="noopener" href="https://triplecc.github.io/2018/06/23/2018-06-23-ji-gitlabcide-ci-shi-jian/">https://triplecc.github.io/2018/06/23/2018-06-23-ji-gitlabcide-ci-shi-jian/</a><br><a target="_blank" rel="noopener" href="http://jiangbai333.github.io/2018/10/30/gitlab-runner%E5%AE%89%E8%A3%85%E4%B8%8E%E4%BD%BF%E7%94%A8/">http://jiangbai333.github.io/2018/10/30/gitlab-runner%E5%AE%89%E8%A3%85%E4%B8%8E%E4%BD%BF%E7%94%A8/</a><br><a target="_blank" rel="noopener" href="http://walterinsh.github.io/2016/04/18/using-gitlab-ci.html">http://walterinsh.github.io/2016/04/18/using-gitlab-ci.html</a><br><a target="_blank" rel="noopener" href="https://www.chenshaowen.com/blog/gitlab-ci-configuring-runner.html">https://www.chenshaowen.com/blog/gitlab-ci-configuring-runner.html</a><br><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/33633217">https://zhuanlan.zhihu.com/p/33633217</a><br><a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000011890710">https://segmentfault.com/a/1190000011890710</a></p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%87%AA%E5%8A%A8%E5%8C%96%E9%83%A8%E7%BD%B2/" rel="tag"># 自动化部署</a>
+              <a href="/tags/gitlab/" rel="tag"># gitlab</a>
+              <a href="/tags/ci-cd/" rel="tag"># ci/cd</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/08/19/Nginx%E7%9A%84allow%E3%80%81deny%E9%85%8D%E7%BD%AE%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E7%9C%9F%E5%AE%9EIP%E7%9A%84%E6%96%B9%E6%B3%95/" rel="prev" title="Nginx的allow、deny配置负载均衡真实IP的方法">
+      <i class="fa fa-chevron-left"></i> Nginx的allow、deny配置负载均衡真实IP的方法
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/08/22/%E6%90%AD%E9%85%8DInfluxDB-CADvisor-Grafana%E7%BB%84%E5%90%88%E7%9B%91%E6%8E%A7Docker/" rel="next" title="搭配InfluxDB+CADvisor+Grafana组合监控Docker">
+      搭配InfluxDB+CADvisor+Grafana组合监控Docker <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%85%8D%E7%BD%AEgitlab-runner"><span class="nav-number">1.</span> <span class="nav-text">配置gitlab-runner</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%90%AD%E9%85%8DGItLab-CI"><span class="nav-number">2.</span> <span class="nav-text">搭配GItLab CI</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%AB%98%E9%98%B6%E7%8E%A9%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text">高阶玩法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">4.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

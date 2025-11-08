@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="题外话：网站路由url不加斜杠，用户自己加斜杠之后访问404，但是不会出现重定向的问题；路由url加斜杠，用户访问的url无论加不加斜杠均可访问正常，但是不加斜杠的访问链接会做重定向，影响访问速度。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在Django里添加Celery让脚本异步在后台运行">
+<meta property="og:url" content="http://example.com/2019/01/16/%E5%9C%A8Django%E9%87%8C%E6%B7%BB%E5%8A%A0Celery%E5%81%9A%E5%BC%82%E6%AD%A5%E4%BB%BB%E5%8A%A1%E5%A4%84%E7%90%86/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="题外话：网站路由url不加斜杠，用户自己加斜杠之后访问404，但是不会出现重定向的问题；路由url加斜杠，用户访问的url无论加不加斜杠均可访问正常，但是不加斜杠的访问链接会做重定向，影响访问速度。">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/celery1.png">
+<meta property="og:image" content="http://example.com/images/celery2.png">
+<meta property="og:image" content="http://example.com/images/celery3.png">
+<meta property="og:image" content="http://example.com/images/celery4.png">
+<meta property="article:published_time" content="2019-01-16T06:12:00.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:47:52.844Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="Django">
+<meta property="article:tag" content="celery">
+<meta property="article:tag" content="异步任务">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/celery1.png">
+
+<link rel="canonical" href="http://example.com/2019/01/16/%E5%9C%A8Django%E9%87%8C%E6%B7%BB%E5%8A%A0Celery%E5%81%9A%E5%BC%82%E6%AD%A5%E4%BB%BB%E5%8A%A1%E5%A4%84%E7%90%86/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>在Django里添加Celery让脚本异步在后台运行 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/01/16/%E5%9C%A8Django%E9%87%8C%E6%B7%BB%E5%8A%A0Celery%E5%81%9A%E5%BC%82%E6%AD%A5%E4%BB%BB%E5%8A%A1%E5%A4%84%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          在Django里添加Celery让脚本异步在后台运行
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-01-16 14:12:00" itemprop="dateCreated datePublished" datetime="2019-01-16T14:12:00+08:00">2019-01-16</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:47:52" itemprop="dateModified" datetime="2025-11-08T08:47:52+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>1.4k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>5 mins.</span>
+            </span>
+            <div class="post-description">题外话：网站路由url不加斜杠，用户自己加斜杠之后访问404，但是不会出现重定向的问题；路由url加斜杠，用户访问的url无论加不加斜杠均可访问正常，但是不加斜杠的访问链接会做重定向，影响访问速度。</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>当使用Django执行脚本的时候，经常遇到一种情况：跳转到某个url，结果是先在后台执行一个时间较长的脚本，然后才能打开这个url页面，这样用户体验就很不好。</p>
+<p>比如说像这样的<code>views.py</code>配置：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#使用ansible执行远程命令</span></span><br><span class="line"><span class="meta">@csrf_exempt</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">run_command</span>(<span class="params">request</span>):</span><br><span class="line">    command = <span class="string">&quot;ansible all -i /root/.ssh/hosts -m shell -a &#x27;echo &#x27;worinixianren&#x27; &gt;&gt; /tmp/xianren.txt&#x27;&quot;</span>  <span class="comment">#设定ansible远程命令</span></span><br><span class="line">    <span class="keyword">if</span> request.method == <span class="string">&#x27;POST&#x27;</span>:</span><br><span class="line">        <span class="built_in">id</span> = request.POST.getlist(<span class="string">&quot;ecs&quot;</span>)	<span class="comment">#通过html来获取id</span></span><br><span class="line">        num = []</span><br><span class="line">        num.append(<span class="built_in">len</span>(<span class="built_in">id</span>))     <span class="comment">#传递参数，给下一个页面用的</span></span><br><span class="line">        name = []	<span class="comment">#传递参数，给下一个页面用的</span></span><br><span class="line">        db = pymysql.connect(<span class="string">&quot;阿里云数据库&quot;</span>,<span class="string">&quot;数据库账号&quot;</span>,<span class="string">&quot;数据库密码&quot;</span>,<span class="string">&quot;databases名&quot;</span>)		<span class="comment">#根据上面获得的id去数据库里得到对应的内网IP</span></span><br><span class="line">        cursor = db.cursor()</span><br><span class="line">        <span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">&#x27;/root/.ssh/hosts&#x27;</span>,<span class="string">&#x27;w&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">            <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">id</span>:</span><br><span class="line">                sql = <span class="string">&#x27;select * from createyaml_ecs where name = &quot;&#x27;</span>+ i + <span class="string">&#x27;&quot;;&#x27;</span></span><br><span class="line">                cursor.execute(sql)</span><br><span class="line">                ip = cursor.fetchall()[<span class="number">0</span>][<span class="number">3</span>]</span><br><span class="line">                cursor.execute(sql)</span><br><span class="line">                name.append(cursor.fetchall()[<span class="number">0</span>][<span class="number">1</span>])</span><br><span class="line">                f.write(ip+<span class="string">&quot; ansible_ssh_user=root&quot;</span>+<span class="string">&quot;\n&quot;</span>)		<span class="comment">#将得到的内网IP写入到一个文件里</span></span><br><span class="line">        db.close()	<span class="comment">#关闭数据库</span></span><br><span class="line">        child = subprocess.Popen(command,stdout=subprocess.PIPE, stderr=subprocess.PIPE,shell=<span class="literal">True</span>)		<span class="comment">#执行ansible命令</span></span><br><span class="line">        stdout, stderr = child.communicate()</span><br><span class="line">        <span class="keyword">return</span> render(request,<span class="string">&#x27;run_command.html&#x27;</span>,&#123;<span class="string">&#x27;data&#x27;</span>:num[<span class="number">0</span>],<span class="string">&#x27;name&#x27;</span>:name&#125;)	<span class="comment">#将内容反馈到html页面里</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">return</span> render(request,<span class="string">&#x27;homepage.html&#x27;</span>)</span><br></pre></td></tr></table></figure></p>
+<p>像上面这段代码，要看到<code>run_command.html</code>页面就要先把整个ansible部署的脚本全跑完，如果是几百台机器批量操作的脚本，那就要等到海枯石烂水倒流。那遇到这样的情况怎么解决呢？根据不同的请求，有不同的对策：</p>
+<ol>
+<li>单纯的后台跑一个脚本，那么就可以使用<code>Celery</code>；</li>
+<li>在后台跑脚本的同时，还需要不断的向后台发送请求（比如微信上的茶叶妹聊天机器人），那么就要使用<code>Channels</code>；</li>
+</ol>
+<p><code>Celery</code>原理部分和配置定时任务就不多说了，文末的参考资料里有网站，这里主要说的是如何配置<code>Celery</code>。</p>
+<h2 id="环境交代"><a href="#环境交代" class="headerlink" title="环境交代"></a>环境交代</h2><p>存储后端:阿里云redis(需要支持<code>evalsha</code>命令，如果不支持，去控制台<code>升级小版本</code>即可)<br>Python:<code>3.6.5</code><br>Django:<code>2.1.1</code><br>django-celery:<code>3.2.2</code>，安装方法：<code>pip install django-celery</code><br>celery-with-redis：<code>3.0</code>，安装方法<code>pip install celery-with-redis</code><br>celery:<code>3.1.26.post2</code></p>
+<h2 id="具体配置"><a href="#具体配置" class="headerlink" title="具体配置"></a>具体配置</h2><p>首先配置<code>setting.py</code>，全文最后添加这样几句话：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">#celery配置信息</span><br><span class="line">#celery中间人 <span class="attr">redis</span>:<span class="comment">//:redis密码@redis服务所在的ip地址:端口/数据库号，我用的是254号</span></span><br><span class="line">#channels配置redis也是这样配置，如果没有密码，就可以把<span class="string">&#x27;:redis密码@&#x27;</span>省略</span><br><span class="line"><span class="variable constant_">BROKER_URL</span> = <span class="string">&#x27;redis://:redis密码@阿里云redis地址:6379/254&#x27;</span></span><br><span class="line">#celery结果返回，可用于跟踪结果</span><br><span class="line"><span class="variable constant_">CELERY_RESULT_BACKEND</span> = <span class="string">&#x27;redis://:redis密码@阿里云redis地址:6379/254&#x27;</span></span><br><span class="line"></span><br><span class="line">#celery内容等消息的格式设置</span><br><span class="line"><span class="variable constant_">CELERY_ACCEPT_CONTENT</span> = [<span class="string">&#x27;application/json&#x27;</span>,]</span><br><span class="line"><span class="variable constant_">CELERY_TASK_SERIALIZER</span> = <span class="string">&#x27;json&#x27;</span></span><br><span class="line"><span class="variable constant_">CELERY_RESULT_SERIALIZER</span> = <span class="string">&#x27;json&#x27;</span></span><br><span class="line"></span><br><span class="line">#celery时区设置，使用settings中<span class="variable constant_">TIME_ZONE</span>同样的时区</span><br><span class="line"><span class="variable constant_">CELERY_TIMEZONE</span> = <span class="variable constant_">TIME_ZONE</span></span><br></pre></td></tr></table></figure></p>
+<p>在<code>setting.py</code>同级的文件夹里创建<code>celery.py</code>，内容如下：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#coding:utf-8</span></span><br><span class="line"><span class="keyword">from</span> __future__ <span class="keyword">import</span> absolute_import, unicode_literals</span><br><span class="line"> </span><br><span class="line"><span class="keyword">from</span> celery <span class="keyword">import</span> Celery</span><br><span class="line"><span class="keyword">from</span> django.conf <span class="keyword">import</span> settings</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"> </span><br><span class="line"><span class="comment">#获取当前文件夹名，即为该Django的项目名</span></span><br><span class="line">project_name = os.path.split(os.path.abspath(<span class="string">&#x27;.&#x27;</span>))[-<span class="number">1</span>]</span><br><span class="line">project_settings = <span class="string">&#x27;%s.settings&#x27;</span> % project_name</span><br><span class="line"> </span><br><span class="line"><span class="comment">#设置环境变量</span></span><br><span class="line">os.environ.setdefault(<span class="string">&#x27;DJANGO_SETTINGS_MODULE&#x27;</span>, project_settings)</span><br><span class="line"> </span><br><span class="line"><span class="comment">#实例化Celery</span></span><br><span class="line">app = Celery(project_name)</span><br><span class="line"> </span><br><span class="line"><span class="comment">#使用django的settings文件配置celery</span></span><br><span class="line">app.config_from_object(<span class="string">&#x27;django.conf:settings&#x27;</span>)</span><br><span class="line"> </span><br><span class="line"><span class="comment">#Celery加载所有注册的应用</span></span><br><span class="line">app.autodiscover_tasks(<span class="keyword">lambda</span>: settings.INSTALLED_APPS)</span><br></pre></td></tr></table></figure></p>
+<p>还是在同样的文件夹里，编辑<code>__init__.py</code>：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#coding:utf-8</span></span><br><span class="line"><span class="keyword">from</span> __future__ <span class="keyword">import</span> absolute_import, unicode_literals</span><br><span class="line"> </span><br><span class="line"><span class="comment">#引入celery实例对象</span></span><br><span class="line"><span class="keyword">from</span> .celery <span class="keyword">import</span> app <span class="keyword">as</span> celery_app</span><br></pre></td></tr></table></figure></p>
+<p>然后在app（具体应用的文件夹里），创建一个叫<code>tasks.py</code>，这里面就是需要在后台执行的具体脚本：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#coding:utf-8</span></span><br><span class="line"><span class="keyword">from</span> celery.decorators <span class="keyword">import</span> task</span><br><span class="line"><span class="keyword">import</span> subprocess</span><br><span class="line"></span><br><span class="line"><span class="meta">@task	</span><span class="comment">#在原有的方法上加上celery装饰器task</span></span><br><span class="line"><span class="comment">#ansible批量部署命令</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">run_ansible</span>():</span><br><span class="line">    command = <span class="string">&quot;ansible all -i /root/.ssh/hosts -m shell -a &#x27;echo &#x27;worinixianren&#x27; &gt;&gt; /tmp/xianren.txt&#x27;&quot;</span>  <span class="comment">#设定命令</span></span><br><span class="line">	child = subprocess.Popen(command,stdout=subprocess.PIPE, stderr=subprocess.PIPE,shell=<span class="literal">True</span>)</span><br><span class="line">    stdout, stderr = child.communicate()</span><br><span class="line">	<span class="built_in">print</span> (<span class="string">&quot;success!!!&quot;</span>)	<span class="comment">#执行成功！</span></span><br></pre></td></tr></table></figure></p>
+<p>保存退出之后，修改原有的<code>views.py</code>，把原来涉及脚本的字段删除，改成:<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@csrf_exempt</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">run_command</span>(<span class="params">request</span>):</span><br><span class="line">    <span class="keyword">if</span> request.method == <span class="string">&#x27;POST&#x27;</span>:</span><br><span class="line">        <span class="built_in">id</span> = request.POST.getlist(<span class="string">&quot;ecs&quot;</span>)</span><br><span class="line">        num = []</span><br><span class="line">        num.append(<span class="built_in">len</span>(<span class="built_in">id</span>))     <span class="comment">#传递参数，给下一个页面用的</span></span><br><span class="line">        name = []</span><br><span class="line">        db = pymysql.connect(<span class="string">&quot;阿里云数据库&quot;</span>,<span class="string">&quot;数据库账号&quot;</span>,<span class="string">&quot;数据库密码&quot;</span>,<span class="string">&quot;databases名&quot;</span>)</span><br><span class="line">        cursor = db.cursor()</span><br><span class="line">        <span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">&#x27;/root/.ssh/hosts&#x27;</span>,<span class="string">&#x27;w&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">            <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">id</span>:</span><br><span class="line">                sql = <span class="string">&#x27;select * from createyaml_ecs where name = &quot;&#x27;</span>+ i + <span class="string">&#x27;&quot;;&#x27;</span></span><br><span class="line">                cursor.execute(sql)</span><br><span class="line">                ip = cursor.fetchall()[<span class="number">0</span>][<span class="number">3</span>]</span><br><span class="line">                cursor.execute(sql)</span><br><span class="line">                name.append(cursor.fetchall()[<span class="number">0</span>][<span class="number">1</span>])</span><br><span class="line">                f.write(ip+<span class="string">&quot; ansible_ssh_user=root&quot;</span>+<span class="string">&quot;\n&quot;</span>)</span><br><span class="line">        db.close()</span><br><span class="line">        run_ansible.delay()     <span class="comment">#celery异步执行后台ansible程序，使用delay函数</span></span><br><span class="line">        <span class="keyword">return</span> render(request,<span class="string">&#x27;run_command.html&#x27;</span>,&#123;<span class="string">&#x27;data&#x27;</span>:num[<span class="number">0</span>],<span class="string">&#x27;name&#x27;</span>:name&#125;)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">return</span> render(request,<span class="string">&#x27;homepage.html&#x27;</span>)</span><br></pre></td></tr></table></figure><br>	<br>返回到<code>manage.py</code>所在的目录，先正常启动django，然后再<code>/usr/local/python3/bin/celery -A project名称 worker -l info</code>启动celery，如图：<br><img src="/images/celery1.png" alt="akb48"></p>
+<p>看到<code>tasks.py</code>已经成功被celery使用了，然后在页面上去执行原本的命令，就会看到celery页面有刷新：<br><img src="/images/celery2.png" alt="akb48"></p>
+<p>此时再去redis里查看一下存储的效果：<br><img src="/images/celery3.png" alt="akb48"></p>
+<p>可见tasks执行的状态已经被保存到了redis里。但是上面我们是在前台页面启动celery，如果想把celery作为一个后台守护进程，那么命令语句如下：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/usr/local/python3/<span class="built_in">bin</span>/celery multi start worker -A project名称 -l info</span><br></pre></td></tr></table></figure></p>
+<p>效果如图：<br><img src="/images/celery4.png" alt="akb48"></p>
+<p>停止或重启将上面的<code>start</code>换为<code>stop</code>或<code>restart</code>即可。</p>
+<h2 id="补充"><a href="#补充" class="headerlink" title="补充"></a>补充</h2><p>如果<code>tasks.py</code>内容变化了，需要重启celery才能生效。</p>
+<p>如果在启动celery的时候，日志有写<code>UserWarning: Using settings.DEBUG leads to a memory leak, never use this setting in production environments! warnings.warn(&#39;Using settings.DEBUG leads to a memory leak, never &#39;</code>，那么就在<code>settings.py</code>里把<code>DEBUG = True</code>改成<code>DEBUG = False</code>即可。</p>
+<p>查看redis有几个库的命令：<code>config get databases</code>。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a target="_blank" rel="noopener" href="http://yshblog.com/blog/163">http://yshblog.com/blog/163</a> （对照代码做一遍就更有体会了）<br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/wdliu/p/9517535.html">https://www.cnblogs.com/wdliu/p/9517535.html</a> (原理以及如何配置定时任务)<br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/wdliu/p/9530219.html">https://www.cnblogs.com/wdliu/p/9530219.html</a><br><a target="_blank" rel="noopener" href="http://docs.celeryproject.org/en/latest/getting-started/brokers/redis.html">http://docs.celeryproject.org/en/latest/getting-started/brokers/redis.html</a></p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Django/" rel="tag"># Django</a>
+              <a href="/tags/celery/" rel="tag"># celery</a>
+              <a href="/tags/%E5%BC%82%E6%AD%A5%E4%BB%BB%E5%8A%A1/" rel="tag"># 异步任务</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/01/14/%E5%A4%A7%E9%87%8F%E4%BB%BB%E5%8A%A1%E5%86%B2%E5%87%BB%E4%B8%8B%E7%9A%84activeMQ%E6%8A%A5%E9%94%99GC-overhead-limit-exceeded/" rel="prev" title="大量任务冲击下的activeMQ报错"GC overhead limit exceeded"">
+      <i class="fa fa-chevron-left"></i> 大量任务冲击下的activeMQ报错"GC overhead limit exceeded"
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/01/16/%E6%90%AD%E5%BB%BAKakfa2-11%E4%B8%BAELK%E6%9C%8D%E5%8A%A1/" rel="next" title="搭建Kakfa2.11为ELK服务">
+      搭建Kakfa2.11为ELK服务 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%8E%AF%E5%A2%83%E4%BA%A4%E4%BB%A3"><span class="nav-number">2.</span> <span class="nav-text">环境交代</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B7%E4%BD%93%E9%85%8D%E7%BD%AE"><span class="nav-number">3.</span> <span class="nav-text">具体配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A1%A5%E5%85%85"><span class="nav-number">4.</span> <span class="nav-text">补充</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">5.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

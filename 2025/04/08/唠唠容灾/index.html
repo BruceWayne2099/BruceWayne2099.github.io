@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="设预期，勤演练，接快恢，定责轻">
+<meta property="og:type" content="article">
+<meta property="og:title" content="唠唠同城容灾">
+<meta property="og:url" content="http://example.com/2025/04/08/%E5%94%A0%E5%94%A0%E5%AE%B9%E7%81%BE/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="设预期，勤演练，接快恢，定责轻">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/%E5%AE%B9%E7%81%BE1.png">
+<meta property="og:image" content="http://example.com/images/%E5%AE%B9%E7%81%BE2.png">
+<meta property="article:published_time" content="2025-04-08T12:02:03.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:47:51.101Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="SRE">
+<meta property="article:tag" content="容灾">
+<meta property="article:tag" content="稳定性">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/%E5%AE%B9%E7%81%BE1.png">
+
+<link rel="canonical" href="http://example.com/2025/04/08/%E5%94%A0%E5%94%A0%E5%AE%B9%E7%81%BE/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>唠唠同城容灾 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2025/04/08/%E5%94%A0%E5%94%A0%E5%AE%B9%E7%81%BE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          唠唠同城容灾
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2025-04-08 20:02:03" itemprop="dateCreated datePublished" datetime="2025-04-08T20:02:03+08:00">2025-04-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:47:51" itemprop="dateModified" datetime="2025-11-08T08:47:51+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%A4%A7%E7%89%9B%E4%B9%8B%E8%B7%AF/" itemprop="url" rel="index"><span itemprop="name">大牛之路</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>1.6k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>6 mins.</span>
+            </span>
+            <div class="post-description">设预期，勤演练，接快恢，定责轻</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>作为一个SRE，其实要面对的故障原因主要就是这么几个：</p>
+<ol>
+<li>基础设施</li>
+<li>生产系统</li>
+<li>操作人</li>
+<li>操作流程</li>
+</ol>
+<p>既然基础设施肯定会出问题（挖断光缆、火灾等等），那么容灾这个课题是每一个SRE必须要研究的事情。不过相比较火灾这种影响面是一栋楼的，洪水+大风这种影响一片楼的天灾更吓人。</p>
+<p>此时SRE就要跟基础的同学一起制定演练规则、演练机制、容灾架构和具体的演练方案，通过定期的演练可以验收如下事情：<br>● 容灾能力检验：检验集团业务线核心业务的容灾能力（恢复能力、恢复时长）；<br>● 容灾预案有效性检验：检查核心业务机房级故障容灾预案有效性；<br>● 容灾风险透视：预先透视容灾风险，降低风险转化为线上故障的的机率；<br>● 容灾应急能力提升：通过演练，提升灾难场景下业务团队的协作能力；</p>
+<p>这里本文先唠唠“同城容灾”。</p>
+<p>首先同城要有多个机房，而且每个机房都要投入生产，而不是一个机房工作另一个机房闲着，这要做的目的第一是对成本友好，第二是确认两个机房都是能正常接入业务流量的。</p>
+<p>其次业务应该优先接入同城容灾，同时接入层aserver、数据库（三节点）、Tair（缓存主备）、中间件早已标配同城容灾能力，因此对于业务而言接入同城容灾成本是非常低的，基本上只要应用容器在双机房部署，并且将HSF服务规则和VIPServer对称调用策略都开启同机房优先即可(非必选，可通过CDR执行CS拉黑预案；能接受更长RTO可等待中间件健康检测感知断网自动收敛)。</p>
+<p>那么啥样的业务优先接入呢？肯定是核心链路，比如我司是负责电商的，那么“核心链路”指用户完成“选购，下单”这条动线上所必需的界面和功能，至少包括“首页、搜索、店铺、详情、购物车、下单页、支付、订单列表与详情”等。当出现区域或AZ类型的故障时，必须保证这些功能的迅速恢复和可用，同时不断提升其他增值功能的保障能力，逐步对齐核心链路。</p>
+<p><img src="/images/%E5%AE%B9%E7%81%BE1.png" alt="paradin" title="日常态的架构"></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">入口流量按照<span class="number">1</span>:<span class="number">1</span>均衡分布到两个机房的接入层，接入层通过VIPServer获取upstream列表，并按照同机房转发以保证入口流量尽量在机房内封闭。</span><br><span class="line">应用间HSF服务调用通过HSF服务接口的同机房优先策略保证RPC流量尽量在机房内封闭。</span><br><span class="line">Notify和MetaQ：消息双机房随机收发。</span><br><span class="line">MDB定制版：应用读写本机房的集群，两个机房的集群会双向同步删除操作。这里解释一下为啥要这样，因为降低延迟，提升性能。电商里很多的秒杀、实时风控的场景，这些都是对延迟敏感的业务，所以RT不能太高。同时每个机房也可以根据负载来独立扩容，比如增加只读实例。为啥要双向同步删除操作，是为了保障数据的一致性，用户在一个机房删除数据后，若另一机房未同步删除就会有数据不一致（重复订单）的问题。</span><br><span class="line">MDB标准版：应用跨机房读写。</span><br><span class="line">LDB：主备模式，其中一个机房的应用需要跨机房读写。</span><br><span class="line">数据库：主备模式，<span class="number">3</span>节点分布在张北 NA61 NA62 NA63 <span class="number">3</span>机房，<span class="number">3</span>节点强一致数据同步，由于同城机房网络时延&lt;1ms，因此对业务几乎无感知。</span><br></pre></td></tr></table></figure>
+
+<p>当进入容灾态的时候，就是这样了：<br><img src="/images/%E5%AE%B9%E7%81%BE2.png" alt="paradin" title="接入层（例如aserver）、应用层都在演练范围、Tair部分加白，xdb数据库不在演练范围。"></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">入口流量由GOC统一切到非故障机房的接入层，接入层通过VIPServer获取upstream列表，并按照同机房转发以保证入口流量尽量在机房内封闭。</span><br><span class="line">应用间HSF服务调用通过HSF服务接口的同机房优先策略保证RPC流量尽量在机房内封闭。如未设置同机房优先则会出现跨机房的HSF调用超时，需要等待CS感知心跳并自动收敛或者通过CDR主动拉黑断网容器IP。</span><br><span class="line">Notify和MetaQ：故障时变成同机房收发消息；如有消费者仅在故障机房部署，此时消息会堆积，但不会丢。</span><br><span class="line">MDB定制版：应用读写本机房的集群，两个机房的集群会双向同步删除操作。故障时无需切换，网络恢复后故障机房的缓存数据会被清空。</span><br><span class="line">MDB标准版：应用跨机房读写部分会失败，命中率下降超过<span class="number">50</span>%。</span><br><span class="line">LDB：主备模式，由GOC统一切到非故障机房进行读写。</span><br><span class="line">数据库：主备模式，<span class="number">3</span>节点分布在张北 NA61 NA62 NA63 <span class="number">3</span>机房，强一致数据同步，Leader节点所在机房故障会自动切到Follower节点进行读写。</span><br></pre></td></tr></table></figure>
+
+<p>所以说整个同城容灾的精华就是“HSF同机房优先”，这里面还有一个Config server，这个Config server也是主备的，主down机之后，备cs会立即接管集群。数据库leader心跳异常后自动切到follower也是非常重要。</p>
+<p>如果是要做容灾的演习，事前需要先跟业务约定，每次的断网只会断一个机房的网，同时发布演练计划。这样避免届时断网的时候有大量报警而产生不必要的惊慌。然后组织方需要发布演练公告，让参与的业务方SRE加入沟通群，方便及时交流。大部分SRE oncall 即可，核心领域的SRE需要现场值班。</p>
+<p>然后组织方开始准备工作，比如白名单和打标。在注入故障的时候，就要应用的负责人和SRE通过日志和监控链接来确认“机房切换（DNS，tair和中间件）是否成功”、“自动容灾预案是否生效”、“业务的异常日志是否有预期内的收敛”以及“业务成功率是否在预期内恢复”。</p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/SRE/" rel="tag"># SRE</a>
+              <a href="/tags/%E5%AE%B9%E7%81%BE/" rel="tag"># 容灾</a>
+              <a href="/tags/%E7%A8%B3%E5%AE%9A%E6%80%A7/" rel="tag"># 稳定性</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2025/03/12/%E5%A6%82%E4%BD%95%E5%81%9A%E5%A5%BDtl/" rel="prev" title="如何做好tl">
+      <i class="fa fa-chevron-left"></i> 如何做好tl
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2025/05/15/%E5%85%A8%E9%93%BE%E8%B7%AF%E5%8E%8B%E6%B5%8B%E4%B8%AD%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%B8%AA%E5%A5%87%E8%91%A9%E9%97%AE%E9%A2%98/" rel="next" title="全链路压测中遇到的一个奇葩问题">
+      全链路压测中遇到的一个奇葩问题 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

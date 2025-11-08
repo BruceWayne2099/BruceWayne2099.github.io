@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="为了自动化部署和持续集成">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Jenkins的安装与创建简单任务">
+<meta property="og:url" content="http://example.com/2018/02/05/Jenkins%E5%AE%89%E8%A3%85%E4%B8%8E%E5%88%9B%E5%BB%BA%E7%AE%80%E5%8D%95%E4%BB%BB%E5%8A%A1/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="为了自动化部署和持续集成">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/jenkins1.png">
+<meta property="og:image" content="http://example.com/images/jenkins2.png">
+<meta property="og:image" content="http://example.com/images/jenkins3.png">
+<meta property="og:image" content="http://example.com/images/jenkins4.png">
+<meta property="og:image" content="http://example.com/images/jenkins5.png">
+<meta property="og:image" content="http://example.com/images/jenkins6.png">
+<meta property="og:image" content="http://example.com/images/jenkins7.png">
+<meta property="og:image" content="http://example.com/images/jenkins8.png">
+<meta property="og:image" content="http://example.com/images/jenkins9.png">
+<meta property="og:image" content="http://example.com/images/jenkins10.png">
+<meta property="og:image" content="http://example.com/images/jenkins11.png">
+<meta property="article:published_time" content="2018-02-05T03:23:04.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:46:59.428Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="Jenkins">
+<meta property="article:tag" content="持续集成">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/jenkins1.png">
+
+<link rel="canonical" href="http://example.com/2018/02/05/Jenkins%E5%AE%89%E8%A3%85%E4%B8%8E%E5%88%9B%E5%BB%BA%E7%AE%80%E5%8D%95%E4%BB%BB%E5%8A%A1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>Jenkins的安装与创建简单任务 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2018/02/05/Jenkins%E5%AE%89%E8%A3%85%E4%B8%8E%E5%88%9B%E5%BB%BA%E7%AE%80%E5%8D%95%E4%BB%BB%E5%8A%A1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Jenkins的安装与创建简单任务
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-02-05 11:23:04" itemprop="dateCreated datePublished" datetime="2018-02-05T11:23:04+08:00">2018-02-05</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:46:59" itemprop="dateModified" datetime="2025-11-08T08:46:59+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>1k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>4 mins.</span>
+            </span>
+            <div class="post-description">为了自动化部署和持续集成</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="安装与启动"><a href="#安装与启动" class="headerlink" title="安装与启动"></a>安装与启动</h2><p>环境：<code>CentOS 7.0</code> + <code>java 1.8</code></p>
+<p>安装方式：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">yum install yum-fastestmirror -y  #安装自动选择最快源的插件</span><br><span class="line">#添加<span class="title class_">Jenkins</span>源:</span><br><span class="line">sudo wget -O /etc/yum.<span class="property">repos</span>.<span class="property">d</span>/jenkins.<span class="property">repo</span> <span class="attr">http</span>:<span class="comment">//jenkins-ci.org/redhat/jenkins.repo</span></span><br><span class="line">sudo rpm --<span class="keyword">import</span> <span class="attr">http</span>:<span class="comment">//pkg.jenkins-ci.org/redhat/jenkins-ci.org.key</span></span><br><span class="line">yum install jenkins               #安装jenkins</span><br></pre></td></tr></table></figure></p>
+<p>启动方式：<code>sudo service jenkins start</code>，如果没有java是无法启动的。</p>
+<p>Jenkins默认端口是<code>8080</code>，如果要更改端口，需要先<code>vim /etc/sysconfig/jenkins</code>，然后修改<code>JENKINS_PORT=&quot;8080&quot;</code>为自己想要的端口号即可。</p>
+<p>访问方式：浏览器输入<code>http://your server ip:8080/</code>，然后会看到这样的一个界面，打开这个文件，输入里面的key就可以访问jenkins了。<br><img src="/images/jenkins1.png" alt="paradin"></p>
+<p>然后就是让你安装插件，如果是新手的话，可以安装系统推荐的插件，如果插件安装失败不要怕，可以日后手动补上。<br><img src="/images/jenkins2.png" alt="paradin"></p>
+<p>插件安装完毕之后，就是自己创建一个管理员账号和密码，输入之后，点击右下角<code>保存并完成</code>。<br><img src="/images/jenkins3.png" alt="paradin"></p>
+<p>然后就可以看到Jenkins初始化的首页。<br><img src="/images/jenkins4.png" alt="paradin"></p>
+<h2 id="镜像安装"><a href="#镜像安装" class="headerlink" title="镜像安装"></a>镜像安装</h2><p>docker安装jenkins也很简单粗暴，但是官方的jenkins镜像可能拉取比较慢，推荐先去加速，国内docker加速的方法在此：<a target="_blank" rel="noopener" href="https://rorschachchan.github.io/2018/04/20/%E5%9B%BD%E5%86%85Docker%E7%9A%84%E5%8A%A0%E9%80%9F%E6%96%B9%E6%B3%95/">https://rorschachchan.github.io/2018/04/20/%E5%9B%BD%E5%86%85Docker%E7%9A%84%E5%8A%A0%E9%80%9F%E6%96%B9%E6%B3%95/</a> 。</p>
+<p>安装步骤如下：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">docker pull jenkins		</span><br><span class="line">cd /data/</span><br><span class="line">docker run -d --name jenkins -p <span class="number">8080</span>:<span class="number">8080</span> -v /data/<span class="attr">jenkins</span>:<span class="regexp">/var/</span>jenkins_home jenkins	#做了一个挂载</span><br><span class="line">chown -R <span class="number">1000</span> /data/jenkins		#将权限打开，不然的话jenkins无法正常启动</span><br><span class="line">docker start jenkins</span><br><span class="line">cat /data/jenkins/secrets/initialAdminPassword		#网页需要的验证码</span><br></pre></td></tr></table></figure></p>
+<p>此时登录<code>http://your server ip:8080/</code>就会正常访问了，其余的步骤跟上面的一致。不过镜像安装有点瑕疵，就是tag是V2.60.3，有点老，有些插件已经不支持了。</p>
+<h2 id="创建任务"><a href="#创建任务" class="headerlink" title="创建任务"></a>创建任务</h2><p>假设现在要创建一个Job(任务)，这个任务就是输出当前服务器的外网IP地址，那么就点击首页里的<code>新建任务</code>，然后输入任务名，补充一句，生产环境里的Job名最好不用中文，不做死就不会死，然后选择<code>构建一个自由风格的软件项目</code>，如图：<br><img src="/images/jenkins5.png" alt="paradin"></p>
+<p>在<code>源码管理</code>的地方，我们暂时选择<code>None</code>，待日后把jenkins与github相关联之后，就可以通过github来配置源码了。在<code>构建触发器</code>的地方，我们选择<code>Poll SCM</code>，这里说一下这几个触发器选项的意思：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="title class_">Build</span> after other projects are built：	</span><br><span class="line"><span class="title class_">Build</span> periodically ： 周期进行项目构建（它不关心源码是否发生变化），可以配置如下：<span class="number">0</span> <span class="number">2</span> * * *（每天<span class="number">2</span>:<span class="number">00</span> 必须build一次源码）</span><br><span class="line"><span class="title class_">Build</span> when a change is pushed to <span class="title class_">GitHub</span>： 只要github上有提交了，jenkins没有自动检测到并构建，这设置之后在github中也需要设置才能生效</span><br><span class="line"><span class="title class_">Poll</span> <span class="variable constant_">SCM</span>：定时检查源码变更（根据<span class="variable constant_">SCM</span>软件的版本号），如果有更新就checkout最新code下来，然后执行构建动作。可以配置如下：*/<span class="number">10</span> * * * *  （每<span class="number">5</span>分钟检查一次源码变化）</span><br></pre></td></tr></table></figure><br><img src="/images/jenkins6.png" alt="paradin"></p>
+<p><code>构建步骤</code>这里有很多的选项，我们选择<code>Execute Shell</code>，里面可以写shell命令也可以写shell脚本，这里我就写入一个很简单的ifconfig命令去查看一下IP地址，如图：<br><img src="/images/jenkins7.png" alt="paradin"></p>
+<p><code>构建后操作</code>这里也有很多的选项，这里我选择<code>E-mail Notification</code>，然后输入自己的邮箱地址，这样如果构建失败了，就可以发邮件提醒。如图：<br><img src="/images/jenkins8.png" alt="paradin"></p>
+<p>配置完毕之后，点击左下角<code>保存</code>即可。</p>
+<h2 id="查看任务效果"><a href="#查看任务效果" class="headerlink" title="查看任务效果"></a>查看任务效果</h2><p>返回到Jenkins的首页，我们看到多了那个刚才新建的任务，然后点击任务名旁边的小三角，选择<code>立即构建</code>，如图：<br><img src="/images/jenkins9.png" alt="paradin"></p>
+<p>然后就会看到构建的历史，点击任意历史记录的<code>控制台输出</code>，就会看到效果，的确是操作了<code>ifconfig</code>命令的效果：<br><img src="/images/jenkins10.png" alt="paradin"><br><img src="/images/jenkins11.png" alt="paradin"></p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Jenkins/" rel="tag"># Jenkins</a>
+              <a href="/tags/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90/" rel="tag"># 持续集成</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/02/05/Zookeeper%E9%9B%86%E7%BE%A4%E7%9A%84%E6%90%AD%E5%BB%BA%E4%B8%8E%E9%85%8D%E7%BD%AE/" rel="prev" title="Zookeeper集群的搭建与配置">
+      <i class="fa fa-chevron-left"></i> Zookeeper集群的搭建与配置
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/02/05/Jenkins%E4%B8%8EGithub%E7%BB%84%E5%90%88%E6%88%90%E6%8C%81%E7%BB%AD%E9%9B%86%E5%90%88%E7%8E%AF%E5%A2%83/" rel="next" title="Jenkins与Github组合成持续集合环境">
+      Jenkins与Github组合成持续集合环境 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85%E4%B8%8E%E5%90%AF%E5%8A%A8"><span class="nav-number">1.</span> <span class="nav-text">安装与启动</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%95%9C%E5%83%8F%E5%AE%89%E8%A3%85"><span class="nav-number">2.</span> <span class="nav-text">镜像安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E4%BB%BB%E5%8A%A1"><span class="nav-number">3.</span> <span class="nav-text">创建任务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B%E4%BB%BB%E5%8A%A1%E6%95%88%E6%9E%9C"><span class="nav-number">4.</span> <span class="nav-text">查看任务效果</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="如果不小心drop了表，使用“python manage.py sqlmigrate APP名称 对应文件编号”可以生成SQL语句，然后在SQL里执行">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Zabbix-api获取值在Django页面展示">
+<meta property="og:url" content="http://example.com/2019/04/02/Zabbix-api%E8%8E%B7%E5%8F%96%E5%80%BC%E5%9C%A8Django%E9%A1%B5%E9%9D%A2%E5%B1%95%E7%A4%BA/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="如果不小心drop了表，使用“python manage.py sqlmigrate APP名称 对应文件编号”可以生成SQL语句，然后在SQL里执行">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/gateone6.png">
+<meta property="og:image" content="http://example.com/images/gateone7.png">
+<meta property="og:image" content="http://example.com/images/gateone8.png">
+<meta property="og:image" content="http://example.com/images/gateone9.png">
+<meta property="og:image" content="http://example.com/images/gateone10.png">
+<meta property="article:published_time" content="2019-04-02T08:38:51.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:47:14.538Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="MySQL">
+<meta property="article:tag" content="django">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/gateone6.png">
+
+<link rel="canonical" href="http://example.com/2019/04/02/Zabbix-api%E8%8E%B7%E5%8F%96%E5%80%BC%E5%9C%A8Django%E9%A1%B5%E9%9D%A2%E5%B1%95%E7%A4%BA/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>Zabbix-api获取值在Django页面展示 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/04/02/Zabbix-api%E8%8E%B7%E5%8F%96%E5%80%BC%E5%9C%A8Django%E9%A1%B5%E9%9D%A2%E5%B1%95%E7%A4%BA/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Zabbix-api获取值在Django页面展示
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-04-02 16:38:51" itemprop="dateCreated datePublished" datetime="2019-04-02T16:38:51+08:00">2019-04-02</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:47:14" itemprop="dateModified" datetime="2025-11-08T08:47:14+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>1.3k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>5 mins.</span>
+            </span>
+            <div class="post-description">如果不小心drop了表，使用“python manage.py sqlmigrate APP名称 对应文件编号”可以生成SQL语句，然后在SQL里执行</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="背景交代"><a href="#背景交代" class="headerlink" title="背景交代"></a>背景交代</h2><p>私有云的同学要求把几个涉及录像的模块带宽每小时从zabbix获取一次，然后在django页面展示出来。由于django跟zabbix并不在一个服务器，那么就采取“zabbix上跑脚本，脚本将实时的带宽值存储到某个数据库里，然后django去数据库取值并且展示”这样的思路来解决问题。</p>
+<p>python3 + Django 2.1.1<br>APP：accessgateway</p>
+<h2 id="建立数据库"><a href="#建立数据库" class="headerlink" title="建立数据库"></a>建立数据库</h2><p>首先需要先建立数据模型，在app下的<code>models.py</code>里添加如下：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#这里是数据模型</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">lbmrs</span>(models.Model):</span><br><span class="line">    host = models.CharField(verbose_name=<span class="string">&#x27;MRS服务器名称&#x27;</span>,max_length=<span class="number">50</span>)</span><br><span class="line">    inbandwidth = models.FloatField(verbose_name=<span class="string">&#x27;入网带宽&#x27;</span>)</span><br><span class="line">    outbandwidth = models.FloatField(verbose_name=<span class="string">&#x27;出网带宽&#x27;</span>)</span><br><span class="line">	date = models.DateField(auto_now_add=<span class="literal">True</span>)</span><br><span class="line">    time = models.TimeField(auto_now_add=<span class="literal">False</span>, auto_now=<span class="literal">True</span>)	<span class="comment">#获取录入时间，而且有新录入就会覆盖</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__unicode__</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">return</span> <span class="variable language_">self</span>.host</span><br></pre></td></tr></table></figure></p>
+<p><code>admin.py</code>里添加对应的值：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> .models <span class="keyword">import</span> lbmrs</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">lbmrsAdmin</span>(admin.ModelAdmin):</span><br><span class="line">    list_display = (<span class="string">&#x27;host&#x27;</span>,<span class="string">&#x27;inbandwidth&#x27;</span>,<span class="string">&#x27;outbandwidth&#x27;</span>,<span class="string">&#x27;date&#x27;</span>,<span class="string">&#x27;time&#x27;</span>)</span><br><span class="line">admin.site.register(lbmrs,lbmrsAdmin)</span><br></pre></td></tr></table></figure></p>
+<p>注意!由于我们使用了<code>TimeField</code>，所以要修改一下<code>setting.py</code>:<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">TIME_ZONE = <span class="string">&#x27;Asia/Shanghai&#x27;</span></span><br><span class="line">USE_TZ = <span class="literal">False</span></span><br></pre></td></tr></table></figure></p>
+<p>这样就能输入准确的时间，不然就是UTC时间。然后就是<code>python manage.py makemigrations</code>和<code>python manage.py migrate</code>，如果在<code>python manage.py migrate</code>的时候出现如下<code>MySQL Strict Mode is not set for database connection &#39;default&#39;</code>的提示，如图：<br><img src="/images/gateone6.png" alt="akb48"></p>
+<p>这提示其实不重要，主要是说当前连接mysql的方式不严谨，如果要避免还是修改一下<code>setting.py</code>，新加一个<code>OPTIONS</code>:<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">DATABASES = &#123;</span><br><span class="line">    <span class="string">&#x27;default&#x27;</span>: &#123;</span><br><span class="line"><span class="comment">#        &#x27;ENGINE&#x27;: &#x27;django.db.backends.sqlite3&#x27;,</span></span><br><span class="line"><span class="comment">#        &#x27;NAME&#x27;: os.path.join(BASE_DIR, &#x27;db.sqlite3&#x27;),</span></span><br><span class="line">        <span class="string">&#x27;ENGINE&#x27;</span>: <span class="string">&#x27;django.db.backends.mysql&#x27;</span>,</span><br><span class="line">        <span class="string">&#x27;NAME&#x27;</span>: <span class="string">&#x27;这里是database名&#x27;</span>,  </span><br><span class="line">        <span class="string">&#x27;USER&#x27;</span>: <span class="string">&#x27;这里是用户名&#x27;</span>,</span><br><span class="line">        <span class="string">&#x27;PASSWORD&#x27;</span>: <span class="string">&#x27;这里是密码&#x27;</span>,</span><br><span class="line">        <span class="string">&#x27;HOST&#x27;</span>: <span class="string">&#x27;这里是数据库地址&#x27;</span>,</span><br><span class="line">        <span class="string">&#x27;OPTIONS&#x27;</span>: &#123;</span><br><span class="line">            <span class="string">&quot;init_command&quot;</span>: <span class="string">&quot;SET sql_mode=&#x27;STRICT_TRANS_TABLES&#x27;&quot;</span>,</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>数据库方面完成，在后台界面里随便添加一个值，如下：<br><img src="/images/gateone7.png" alt="akb48"></p>
+<p>然后在mysql命令行看一下效果：<br><img src="/images/gateone8.png" alt="akb48"></p>
+<h2 id="将值录入数据库"><a href="#将值录入数据库" class="headerlink" title="将值录入数据库"></a>将值录入数据库</h2><p>由于我使用的是阿里云数据库，所以要现在阿里云数据库里对django服务器和zabbix服务器同时开放白名单。</p>
+<p>使用zabbix-api获取zabbix数值的脚本以前在 <a target="_blank" rel="noopener" href="https://rorschachchan.github.io/2019/01/09/%E4%BD%BF%E7%94%A8Zabbix%E7%9A%84python-api%E5%8E%BB%E8%8E%B7%E5%8F%96%E5%BD%93%E5%89%8D%E7%9B%91%E6%8E%A7%E5%80%BC/">https://rorschachchan.github.io/2019/01/09/%E4%BD%BF%E7%94%A8Zabbix%E7%9A%84python-api%E5%8E%BB%E8%8E%B7%E5%8F%96%E5%BD%93%E5%89%8D%E7%9B%91%E6%8E%A7%E5%80%BC/</a> 里面说过了，要把获取的值保存到mysql里，只需要添加下面的代码：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#将值保存到mysql</span></span><br><span class="line">connection = pymysql.connect(host=<span class="string">&#x27;Mysql地址&#x27;</span>, port=<span class="number">3306</span>, user=<span class="string">&#x27;账号&#x27;</span>, passwd=<span class="string">&#x27;密码&#x27;</span>, db=<span class="string">&#x27;databases名称&#x27;</span>)</span><br><span class="line">cursor = connection.cursor()        <span class="comment"># 创建游标</span></span><br><span class="line"><span class="comment"># 执行SQL,插入多行数据并返回受影响行数</span></span><br><span class="line">sql = cursor.executemany(<span class="string">&quot;insert into accessgateway_ldmrs (host,inbandwidth,outbandwidth,time,date) values (%s,%s,%s,now(),curdate()))&quot;</span>,[(<span class="string">&quot;第一台机器&quot;</span>,firstin,firstout),(<span class="string">&quot;第二台机器&quot;</span>,secondin,secondout),(<span class="string">&quot;第三台机器&quot;</span>,thirdin,thirdout), (<span class="string">&quot;第四台机器&quot;</span>,fourthin,fourthout),(<span class="string">&quot;第五台机器&quot;</span>,fivethin,fivethout)])</span><br><span class="line">connection.commit() <span class="comment"># 提交,不然无法保存修改</span></span><br><span class="line">cursor.close()      <span class="comment"># 关闭游标</span></span><br><span class="line">connection.close()  <span class="comment"># 关闭连接</span></span><br></pre></td></tr></table></figure></p>
+<p>依旧是每小时执行一次，看见mysql能成功存储到值，如图：<br><img src="/images/gateone9.png" alt="akb48"></p>
+<h2 id="将数据库的值反馈到页面上"><a href="#将数据库的值反馈到页面上" class="headerlink" title="将数据库的值反馈到页面上"></a>将数据库的值反馈到页面上</h2><p>数据库现在已经取到了值，那么思路就很简单了：在<code>views.py</code>里设定变量，让变量可以去数据库里通过<code>objects.values</code>取到相应的值，然后再把这个变量通过<code>render</code>反应到前端页面。<code>url.py</code>很简单：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#前略</span></span><br><span class="line">path(<span class="string">r&#x27;lb_mrs_flow.html&#x27;</span>,views.lb_mrs_flow,name=<span class="string">&quot;lb_mrs_flow&quot;</span>),</span><br></pre></td></tr></table></figure></p>
+<p>这次需求要取到以下几个值，分别是“此时的带宽”，“前一小时的带宽”，“昨天此时的带宽”。在数据库里我们也设定了date和time这两个列，所以通过限制条件就能获取到对应的值了！<code>views.py</code>如下：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> datetime</span><br><span class="line"><span class="comment">#展示服务器1.1.1.1当前流量</span></span><br><span class="line"><span class="meta">@login_required	</span><span class="comment">#需要登陆才能访问</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">lb_mrs_flow</span>(<span class="params">request</span>):</span><br><span class="line">    today = <span class="built_in">str</span>(datetime.date.today())	<span class="comment">#获取当前日期</span></span><br><span class="line">    yesterday = <span class="built_in">str</span>(datetime.date.today() - datetime.timedelta(days=<span class="number">1</span>))	<span class="comment">#获取昨天日期</span></span><br><span class="line">    hour = <span class="built_in">str</span>(datetime.datetime.now().hour)	<span class="comment">#获取现在小时</span></span><br><span class="line">	lasthour = <span class="built_in">str</span>((datetime.datetime.now() - datetime.timedelta(hours=<span class="number">1</span>)).hour)		<span class="comment">#获取前一小时</span></span><br><span class="line">    <span class="built_in">print</span> (today,yesterday,hour)</span><br><span class="line">    firstin = lbmrs.objects.values(<span class="string">&quot;inbandwidth&quot;</span>).<span class="built_in">filter</span>(host=<span class="string">&#x27;1.1.1.1&#x27;</span>,date=today,time__istartswith=hour))	<span class="comment">#当前值</span></span><br><span class="line">	firstin_last = lbmrs.objects.values(<span class="string">&quot;inbandwidth&quot;</span>).<span class="built_in">filter</span>(host=<span class="string">&#x27;1.1.1.1&#x27;</span>,date=today,time__istartswith=lasthour)	<span class="comment">#前一个小时值</span></span><br><span class="line">	firstin_yes = lbmrs.objects.values(<span class="string">&quot;inbandwidth&quot;</span>).<span class="built_in">filter</span>(host=<span class="string">&#x27;1.1.1.1&#x27;</span>,date=yesterday,time__istartswith=hour)	<span class="comment">#昨天的值</span></span><br><span class="line">    <span class="built_in">print</span> (firstin，firstin_last，firstin_yes)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> render(request, <span class="string">&#x27;lb_mrs_flow.html&#x27;</span>,&#123;<span class="string">&#x27;firstin&#x27;</span>:firstin,<span class="string">&#x27;firstin_last&#x27;</span>:firstin_last,<span class="string">&#x27;firstin_yes&#x27;</span>:firstin_yes,&#125;)	<span class="comment">#传递到前端</span></span><br></pre></td></tr></table></figure></p>
+<p>数据库里我们只需要<code>inbandwidth</code>这一列的值，所以这里就不用<code>get()</code>方法了，改用<code>vales()</code>方法，同时搭配<code>filter()</code>添加条件筛选。但是这样获取到的结果是一个<code>QuerySet</code>（查询集），元素为字典，如果要获得里面具体的值，那么就是<code>QuerySet[0][&#39;inbandwidth&#39;]</code>,用上面的<code>firstin</code>为例子，如果想要得到具体的值就要改成下面：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">firstin = lbmrs.objects.values(<span class="string">&quot;inbandwidth&quot;</span>).<span class="built_in">filter</span>(host=<span class="string">&#x27;172.1.1.19&#x27;</span>,date=today,time__istartswith=hour)[<span class="number">0</span>][<span class="string">&#x27;inbandwidth&#x27;</span>]</span><br></pre></td></tr></table></figure></p>
+<p><code>value</code>和<code>value_list</code>都可以获取指定的字段，但是<code>value_list</code>获得是元素是元组。<code>value_list</code>和<code>value</code>返回的并不是真正的<code>列表</code>或<code>字典</code>，通俗地说，就是用的时候才真正的去数据库查，如果查询后没有使用，在数据库更新后再使用，得到的是新内容。</p>
+<p>然后就是前端html文件<code>lb_mrs_flow.html</code>里写一个简单的表格，前端内容就略过不表了，直接来看结果：<br><img src="/images/gateone10.png" alt="akb48" title="由于数据库刚启动，还没有昨天和前一个小时的值，就随机编几个值"></p>
+<p>可以看到如果<code>value()</code>方法得不到值的话，返回一个<code>&lt;QuerySet []&gt;</code>，如果是<code>get()</code>的话，返回就是一个错误，所以从友好度来说，还是<code>value()</code>更佳。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/geerniya/article/details/78549182">https://blog.csdn.net/geerniya/article/details/78549182</a><br><a target="_blank" rel="noopener" href="http://yshblog.com/blog/157">http://yshblog.com/blog/157</a><br><a target="_blank" rel="noopener" href="https://www.kancloud.cn/hiyang/py/348229">https://www.kancloud.cn/hiyang/py/348229</a> （跨表取字段的方法）</p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/django/" rel="tag"># django</a>
+              <a href="/tags/MySQL/" rel="tag"># MySQL</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/04/01/%E5%B0%86Gateone%E6%B7%BB%E5%8A%A0%E5%88%B0django%EF%BC%8C%E5%AE%9E%E7%8E%B0WEB%E7%9A%84ssh%E9%93%BE%E6%8E%A5/" rel="prev" title="将Gateone添加到django，实现WEB的ssh链接">
+      <i class="fa fa-chevron-left"></i> 将Gateone添加到django，实现WEB的ssh链接
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/04/04/Gitlab%E9%85%8D%E7%BD%AEHttps/" rel="next" title="Apache配置Https">
+      Apache配置Https <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%83%8C%E6%99%AF%E4%BA%A4%E4%BB%A3"><span class="nav-number">1.</span> <span class="nav-text">背景交代</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BB%BA%E7%AB%8B%E6%95%B0%E6%8D%AE%E5%BA%93"><span class="nav-number">2.</span> <span class="nav-text">建立数据库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%86%E5%80%BC%E5%BD%95%E5%85%A5%E6%95%B0%E6%8D%AE%E5%BA%93"><span class="nav-number">3.</span> <span class="nav-text">将值录入数据库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%86%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9A%84%E5%80%BC%E5%8F%8D%E9%A6%88%E5%88%B0%E9%A1%B5%E9%9D%A2%E4%B8%8A"><span class="nav-number">4.</span> <span class="nav-text">将数据库的值反馈到页面上</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">5.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

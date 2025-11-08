@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="面试的时候你不得好好看看这玩意么？">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mysql稳定性相关的几个小tips">
+<meta property="og:url" content="http://example.com/2023/06/18/%E6%85%A2sql%E4%BC%98%E5%8C%96%E6%96%B9%E6%B3%95/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="面试的时候你不得好好看看这玩意么？">
+<meta property="og:locale">
+<meta property="article:published_time" content="2023-06-18T15:03:28.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:48:02.730Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="mysql">
+<meta property="article:tag" content="数据库">
+<meta property="article:tag" content="稳定性">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2023/06/18/%E6%85%A2sql%E4%BC%98%E5%8C%96%E6%96%B9%E6%B3%95/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>mysql稳定性相关的几个小tips | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/06/18/%E6%85%A2sql%E4%BC%98%E5%8C%96%E6%96%B9%E6%B3%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          mysql稳定性相关的几个小tips
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-06-18 23:03:28" itemprop="dateCreated datePublished" datetime="2023-06-18T23:03:28+08:00">2023-06-18</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:48:02" itemprop="dateModified" datetime="2025-11-08T08:48:02+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>1.5k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>6 mins.</span>
+            </span>
+            <div class="post-description">面试的时候你不得好好看看这玩意么？</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <ol>
+<li>浮点数用decimal类型,不要用double和float，因为他俩是近似，不准确。</li>
+<li>状态类型用tinyint。</li>
+<li>时间类型用datetime,不推荐用时间戳timestamp，因为timestamp只到2038年，除非你的业务只能活到2038年，非要用时间戳的话就用bigint来替代timestamp。</li>
+<li>自增主键推荐用bigint,因为业务增长快的话，它范围更大，绝对够你用了。</li>
+<li>比varchar更大的字段，比如text等等，就不推荐用mysql来存储了，这些大字段性能低于varchar，而且占用内存更多。</li>
+</ol>
+<p>比如有这样一个表：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE `LOGS` (</span><br><span class="line">  `PP` INT(<span class="number">11</span>) NOT NULL AUTO_INCREMENT,</span><br><span class="line">  `ID` INT(<span class="number">11</span>) NOT NULL,</span><br><span class="line">  `DAY` VARCHAR(<span class="number">20</span>) NOT NULL,</span><br><span class="line">  `VIEW` TEXT NOT NULL,</span><br><span class="line">  `SHARE` TEXT NOT NULL,</span><br><span class="line">   .........</span><br><span class="line">   </span><br><span class="line">  `FROMFRIENDSHARE` TEXT NOT NULL,</span><br><span class="line">  PRIMARY KEY (`PP`),</span><br><span class="line">  KEY `ID` (`ID`,`DAY`)</span><br><span class="line">) ENGINE=INNODB </span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>这个设计行为就很颠，推荐改成两个表：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">		CREATE TABLE `LOGS` (</span><br><span class="line">	  `PP` INT(<span class="number">11</span>) NOT NULL AUTO_INCREMENT,</span><br><span class="line">	  `ID` INT(<span class="number">11</span>) NOT NULL,</span><br><span class="line">	  `DAY` VARCHAR(<span class="number">20</span>) NOT NULL,</span><br><span class="line">	  `VIEW` TEXT NOT NULL,</span><br><span class="line">	  `SHARE` TEXT NOT NULL,</span><br><span class="line">	   .........</span><br><span class="line">	  </span><br><span class="line">	  PRIMARY KEY (`PP`),</span><br><span class="line">	  KEY `ID` (`ID`,`DAY`)</span><br><span class="line">	) ENGINE=INNODB </span><br><span class="line"></span><br><span class="line">	CREATE TABLE `LOGS_T` (</span><br><span class="line">	  `PP` INT(<span class="number">11</span>) NOT NULL AUTO_INCREMENT,</span><br><span class="line">	  `FROMFRIENDSHARE` TEXT NOT NULL,</span><br><span class="line">	  PRIMARY KEY (`PP`),</span><br><span class="line">	) ENGINE=INNODB </span><br><span class="line"></span><br><span class="line">或者 FROMFRIENDSHARE 直接放云存储里，不香么？</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<ol start="6">
+<li>如果非要用大字段，那么就“压缩存储”或者“单独表存储”，好处是“降低binlog大小”和“降低engine到server的传输”。</li>
+<li>比如一个很大的json如果只是更新一个小value，那么用text的话，性能得不偿失，因为要“读出来再写进去，这里面有大量网络交互，同时还要写到binlog里，有大量性能损耗，还会强制生成硬盘临时表”。</li>
+<li>数据库的字段越简单越好，大小越小，16k索引页就能放越多的索引字段，查起来更快。B+树高降低。</li>
+<li>op操作可能会导致抖动和主从延迟，建议放业务低峰期操作。</li>
+<li>大sql会造成脏页，会刷binlog，要避免。</li>
+<li>长事务可能会有很长时间的锁。</li>
+<li>单个数据库实例不要订阅太多东西，比如一个实例上绑了好几个数据传输dts，因为一次数据库的更新变更，可能会binlog爆发好几个，对物理机的网卡会有影响。</li>
+<li>尽量不要用数据库去计算！把计算交给代码去实现。也尽量不要去整体的join。</li>
+<li>数据库字段越精确越好，用where去过滤的话，比如数字的比较成本比字符串的比较成本更低。字符串要进行编码转换且要挨个比对，有一个排序的过程。</li>
+<li>尽量多用组合索引,比如索引 ： idx_abc(a,b,c) 能走索引的Case:<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">   a. where a=<span class="number">1</span>   / where a=<span class="number">1</span>  order by b  /  where a=<span class="number">1</span> order by b,c  (利用a过滤，b,c排序)</span><br><span class="line">   b. where a=<span class="number">1</span> <span class="keyword">and</span> b=<span class="number">1</span>  / where  a=<span class="number">1</span> <span class="keyword">and</span> b=<span class="number">1</span> order by c (利用a，b过滤，c排序)</span><br><span class="line">   c. where a=<span class="number">1</span> <span class="keyword">and</span> b=<span class="number">1</span> <span class="keyword">and</span> c=<span class="number">1</span></span><br><span class="line">注意：如果后面的排序需要走到索引，需要保证前面的过滤必须是等值</span><br></pre></td></tr></table></figure></li>
+<li>唯一键是最好的索引。</li>
+<li>尽量不要用null，因为null的优化很复杂，也会让索引统计变得复杂。而且null占用的空间更多，尽量用0，’’这样的东西。</li>
+<li>不要让索引参与计算。比如 select id from XXX where id+1&#x3D;5;这句话不会让mysql先算出来id&#x3D;4，反而会把索引的值都取出来一个一个比对，直到&#x3D;5，这样会导致全表扫和全索引扫。</li>
+<li>索引是不是越多越好？不是的。很多开发在创建索引时想法很简单，就是希望动态生成SQL时，无论传什么where条件，都可以走到一个对应的索引，创建了一大片索引。但很明显这是一个反面教材，把数据库当成了搜索引擎，这样建索引对数据库来说，基本是个事故现场。原因是：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">1. 因为“当执行DML语句时，除了维护正常的表数据之外，还需要同步更新索引列的数据，索引越多，写放大效应越厉害”。</span><br><span class="line">2. 索引为了维护其有序性，更新是删除旧值再在对应顺序位置插入新值，如果新插入位置所在的数据块已经写满，那就需要把当前数据块部份内容移动一个新的数据块，再修改前后叶子块甚至是分枝块的链式指针，然后再写入数据，这就是我们前面说的块分裂，块分裂非常影响数据库性能，那么索引越多，也会加大了块分裂的可能性。</span><br><span class="line">3. MySQL优化器相对其他商业数据库还外于一个很初级的阶段，它每次执行SQL时都会重新生成执行计划，而在生成执行计划时，如果有多个索引可被使用时，这些索引会进入possible_key，然后优化器会对每一个possible_key进行采样并计算数据分布情况，进而最终确认使用哪个真实的索引（key）去执行SQL。</span><br><span class="line">4. 索引并不是越多越好，索引固然可以提高相应的 select 的效率，但同时也降低了 insert 及 update 的效率，    因为 insert 或 update 时有可能会重建索引，所以怎样建索引需要慎重考虑，视具体情况而定。    一个表的索引数最好不要超过6个，若太多则应考虑一些不常使用到的列上建的索引是否有必要。</span><br></pre></td></tr></table></figure></li>
+<li>最后来做一道选择题吧：<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">如果表没有主键或唯一索引，对主从复制的影响应该选择啥？</span><br><span class="line"></span><br><span class="line">A. 在binlog格式为statement时，可能导致数据不一致。</span><br><span class="line">B. 在binlog格式为row时，可能导致从库删除或者更新错误的行数超出预期。</span><br><span class="line">C. 在高并发下，即使WHERE条件字段有索引，复制的延迟相比有主键的表延迟更大。</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+答案：A</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/mysql/" rel="tag"># mysql</a>
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag"># 数据库</a>
+              <a href="/tags/%E7%A8%B3%E5%AE%9A%E6%80%A7/" rel="tag"># 稳定性</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/05/18/%E5%A4%A7%E9%98%AA%E4%BA%8C%E5%88%B7%E8%A1%8C/" rel="prev" title="大阪二刷行">
+      <i class="fa fa-chevron-left"></i> 大阪二刷行
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/06/25/%E9%95%9C%E5%83%8F%E6%89%93%E5%8C%85Dockerfile%E6%96%87%E4%BB%B6%E5%B8%B8%E8%A7%81%E8%A7%84%E8%8C%83%E9%97%AE%E9%A2%98/" rel="next" title="镜像打包Dockerfile文件常见规范问题">
+      镜像打包Dockerfile文件常见规范问题 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

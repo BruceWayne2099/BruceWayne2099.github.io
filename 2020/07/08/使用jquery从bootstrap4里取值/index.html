@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="jq现在已经慢慢被vue取代了，但是作为一个非专业前端，还是要把这里弄明白的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用jquery从bootstrap4的模态框（model）里取值">
+<meta property="og:url" content="http://example.com/2020/07/08/%E4%BD%BF%E7%94%A8jquery%E4%BB%8Ebootstrap4%E9%87%8C%E5%8F%96%E5%80%BC/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="jq现在已经慢慢被vue取代了，但是作为一个非专业前端，还是要把这里弄明白的">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/HTML%E9%A1%B5%E9%9D%A2.png">
+<meta property="og:image" content="http://example.com/images/jQuery%E5%8F%96%E5%80%BC%E4%B8%8A%E4%BC%A0.gif">
+<meta property="article:published_time" content="2020-07-08T03:46:39.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:47:39.230Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="bootstrap">
+<meta property="article:tag" content="jquery">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/HTML%E9%A1%B5%E9%9D%A2.png">
+
+<link rel="canonical" href="http://example.com/2020/07/08/%E4%BD%BF%E7%94%A8jquery%E4%BB%8Ebootstrap4%E9%87%8C%E5%8F%96%E5%80%BC/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>使用jquery从bootstrap4的模态框（model）里取值 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2020/07/08/%E4%BD%BF%E7%94%A8jquery%E4%BB%8Ebootstrap4%E9%87%8C%E5%8F%96%E5%80%BC/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          使用jquery从bootstrap4的模态框（model）里取值
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-07-08 11:46:39" itemprop="dateCreated datePublished" datetime="2020-07-08T11:46:39+08:00">2020-07-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:47:39" itemprop="dateModified" datetime="2025-11-08T08:47:39+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>1.9k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>7 mins.</span>
+            </span>
+            <div class="post-description">jq现在已经慢慢被vue取代了，但是作为一个非专业前端，还是要把这里弄明白的</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h2><p>我们在用Django框架做前端页面的时候经常有这样的需求：某一个表格页面，点击“添加”这个button，然后弹出来一个窗口（术语叫模态框），填写对应的资料提交后，这个表格页面直接刷新，最新添加的数据赫然在列。这个设计里面主要有3个part：<br>1）通过前端模态框输入值可以被Django后台顺利获取；<br>2）获取的值记录到数据库里；<br>3）自动刷新对应页面，将数据库最新的值展现出来；</p>
+<p>第二part不是难点。这里先解决第一part。</p>
+<p>这里假设我们有一个基于adminLTE的HTML页面，内容如下：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;meta charset=<span class="string">&quot;utf-8&quot;</span>&gt;</span><br><span class="line">  &lt;meta http-equiv=<span class="string">&quot;X-UA-Compatible&quot;</span> content=<span class="string">&quot;IE=edge&quot;</span>&gt;</span><br><span class="line">  &lt;title&gt;阿里供应链平台 | 历次大促列表&lt;/title&gt;</span><br><span class="line">  &lt;!-- Tell the browser to be responsive to screen width --&gt;</span><br><span class="line">  &lt;meta name=<span class="string">&quot;viewport&quot;</span> content=<span class="string">&quot;width=device-width, initial-scale=1&quot;</span>&gt;</span><br><span class="line"></span><br><span class="line">  &lt;!-- Font Awesome --&gt;</span><br><span class="line">  &lt;link rel=<span class="string">&quot;stylesheet&quot;</span> href=<span class="string">&quot;/static/plugins/fontawesome-free/css/all.min.css&quot;</span>&gt;</span><br><span class="line">  &lt;!-- Ionicons --&gt;</span><br><span class="line">  &lt;link rel=<span class="string">&quot;stylesheet&quot;</span> href=<span class="string">&quot;https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css&quot;</span>&gt;</span><br><span class="line">  &lt;!-- Theme style --&gt;</span><br><span class="line">  &lt;link rel=<span class="string">&quot;stylesheet&quot;</span> href=<span class="string">&quot;/static/dist/css/adminlte.min.css&quot;</span>&gt;</span><br><span class="line">  &lt;!-- Google Font: Source Sans Pro --&gt;</span><br><span class="line">  &lt;link href=<span class="string">&quot;https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&quot;</span> rel=<span class="string">&quot;stylesheet&quot;</span>&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body <span class="keyword">class</span>=<span class="string">&quot;hold-transition sidebar-mini&quot;</span>&gt;</span><br><span class="line">&lt;div <span class="keyword">class</span>=<span class="string">&quot;wrapper&quot;</span>&gt;</span><br><span class="line"></span><br><span class="line">  &lt;!-- Content Wrapper. Contains page content --&gt;</span><br><span class="line">  &lt;div <span class="keyword">class</span>=<span class="string">&quot;content-wrapper&quot;</span>&gt;</span><br><span class="line">    &lt;!-- Content Header (Page header) --&gt;</span><br><span class="line">    &lt;section <span class="keyword">class</span>=<span class="string">&quot;content-header&quot;</span>&gt;</span><br><span class="line">      &lt;div <span class="keyword">class</span>=<span class="string">&quot;container-fluid&quot;</span>&gt;</span><br><span class="line">        &lt;div <span class="keyword">class</span>=<span class="string">&quot;row mb-2&quot;</span>&gt;</span><br><span class="line">          &lt;div <span class="keyword">class</span>=<span class="string">&quot;col-sm-6&quot;</span>&gt;</span><br><span class="line">            &lt;h1&gt;历次大促阵型&lt;/h1&gt;</span><br><span class="line">          &lt;/div&gt;</span><br><span class="line">        &lt;/div&gt;</span><br><span class="line">      &lt;/div&gt;&lt;!-- /.container-fluid --&gt;</span><br><span class="line">    &lt;/section&gt;</span><br><span class="line"></span><br><span class="line">    &lt;!-- Main content --&gt;</span><br><span class="line">    &lt;section <span class="keyword">class</span>=<span class="string">&quot;content&quot;</span>&gt;</span><br><span class="line">      &lt;div <span class="keyword">class</span>=<span class="string">&quot;row&quot;</span>&gt;</span><br><span class="line">        &lt;div <span class="keyword">class</span>=<span class="string">&quot;col-12&quot;</span>&gt;</span><br><span class="line">          &lt;div <span class="keyword">class</span>=<span class="string">&quot;card&quot;</span>&gt;</span><br><span class="line">            &lt;div <span class="keyword">class</span>=<span class="string">&quot;card-header&quot;</span>&gt;</span><br><span class="line">              &lt;!-- 按钮触发模态框 --&gt;</span><br><span class="line">              &lt;div <span class="keyword">class</span>=<span class="string">&quot;columns columns-right btn-group pull-right&quot;</span>&gt;</span><br><span class="line">                  &lt;button <span class="built_in">type</span>=<span class="string">&quot;button&quot;</span> <span class="keyword">class</span>=<span class="string">&quot;btn btn-primary&quot;</span> data-toggle=<span class="string">&quot;modal&quot;</span> data-target=<span class="string">&quot;#myModal&quot;</span>&gt;新增大促记录&lt;/button&gt;</span><br><span class="line">              &lt;/div&gt;</span><br><span class="line">              &lt;!-- 新增模态框（Modal） --&gt;</span><br><span class="line">                &lt;form <span class="built_in">id</span>=<span class="string">&quot;add-project-form&quot;</span> action=<span class="string">&quot;#&quot;</span> method=<span class="string">&quot;post&quot;</span> <span class="keyword">class</span>=<span class="string">&quot;form-horizontal&quot;</span> role=<span class="string">&quot;form&quot;</span>&gt;</span><br><span class="line">                  &lt;div <span class="keyword">class</span>=<span class="string">&quot;modal fade&quot;</span> <span class="built_in">id</span>=<span class="string">&quot;myModal&quot;</span> tabindex=<span class="string">&quot;-1&quot;</span> role=<span class="string">&quot;dialog&quot;</span> aria-labelledby=<span class="string">&quot;myModalLabel&quot;</span> aria-hidden=<span class="string">&quot;true&quot;</span>&gt;</span><br><span class="line">                    &lt;div <span class="keyword">class</span>=<span class="string">&quot;modal-dialog&quot;</span>&gt;</span><br><span class="line">                      &lt;div <span class="keyword">class</span>=<span class="string">&quot;modal-content&quot;</span>&gt;</span><br><span class="line">                        &lt;div <span class="keyword">class</span>=<span class="string">&quot;modal-header&quot;</span>&gt;</span><br><span class="line">                         &lt;h5 <span class="keyword">class</span>=<span class="string">&quot;modal-title&quot;</span> <span class="built_in">id</span>=<span class="string">&quot;myModalLabel&quot;</span>&gt;请填写&lt;/h5&gt;</span><br><span class="line">                          &lt;button <span class="built_in">type</span>=<span class="string">&quot;button&quot;</span> <span class="keyword">class</span>=<span class="string">&quot;close&quot;</span> data-dismiss=<span class="string">&quot;modal&quot;</span> aria-hidden=<span class="string">&quot;true&quot;</span>&gt;</span><br><span class="line">                            &amp;times;</span><br><span class="line">                          &lt;/button&gt;</span><br><span class="line">                        &lt;/div&gt;</span><br><span class="line">                     &lt;div <span class="keyword">class</span>=<span class="string">&quot;modal-body&quot;</span> style=<span class="string">&quot;height: 100%;&quot;</span>&gt;</span><br><span class="line">                      &lt;div <span class="keyword">class</span>=<span class="string">&quot;form-group&quot;</span>&gt;</span><br><span class="line">                          &lt;label <span class="keyword">for</span>=<span class="string">&quot;firstname&quot;</span> <span class="keyword">class</span>=<span class="string">&quot;col-sm-3 control-label&quot;</span>&gt;项目名称&lt;/label&gt;</span><br><span class="line">                          &lt;div <span class="keyword">class</span>=<span class="string">&quot;col-sm-7&quot;</span>&gt;</span><br><span class="line">                          &lt;select data-placeholder=<span class="string">&quot;选择大促项目...&quot;</span> <span class="keyword">class</span>=<span class="string">&quot;form-control&quot;</span> name=<span class="string">&quot;project_name&quot;</span> required=<span class="string">&quot;required&quot;</span>&gt;</span><br><span class="line">                              &lt;option value=<span class="string">&quot;&quot;</span>&gt;请选择项目&lt;/option&gt;</span><br><span class="line">                              &lt;option&gt;三八女神节&lt;/option&gt;</span><br><span class="line">                              &lt;option&gt;<span class="number">618</span>精品生活节&lt;/option&gt;</span><br><span class="line">                              &lt;option&gt;九九划算节&lt;/option&gt;</span><br><span class="line">                              &lt;option&gt;双十一购物狂欢节&lt;/option&gt;</span><br><span class="line">                              &lt;option&gt;双十二购物狂欢节&lt;/option&gt;</span><br><span class="line">                              &lt;option&gt;新春购物年货节&lt;/option&gt;</span><br><span class="line">                          &lt;/select&gt;</span><br><span class="line">                          &lt;/div&gt;</span><br><span class="line">                      &lt;/div&gt;</span><br><span class="line"></span><br><span class="line">                      &lt;/div&gt;</span><br><span class="line">                          &lt;div <span class="keyword">class</span>=<span class="string">&quot;modal-footer&quot;</span>&gt;</span><br><span class="line">                            &lt;button <span class="built_in">type</span>=<span class="string">&quot;button&quot;</span> data-dismiss=<span class="string">&quot;modal&quot;</span> <span class="keyword">class</span>=<span class="string">&quot;btn btn-danger&quot;</span>&gt; CLOSE &lt;/button&gt;</span><br><span class="line">                          &lt;/div&gt;</span><br><span class="line">                        &lt;/div&gt;</span><br><span class="line">                      &lt;/div&gt;&lt;!-- /.modal-content --&gt;</span><br><span class="line">                  &lt;/div&gt;&lt;!-- /.modal --&gt;</span><br><span class="line">                &lt;/div&gt;</span><br><span class="line">             &lt;/form&gt;</span><br><span class="line">            &lt;/div&gt;</span><br><span class="line">            &lt;!-- /.card-header --&gt;</span><br><span class="line"></span><br><span class="line">            &lt;div <span class="keyword">class</span>=<span class="string">&quot;card-body&quot;</span>&gt;</span><br><span class="line">            &lt;/div&gt;</span><br><span class="line">            &lt;!-- /.card-body --&gt;</span><br><span class="line">          &lt;/div&gt;</span><br><span class="line">          &lt;!-- /.card --&gt;</span><br><span class="line">        &lt;/div&gt;</span><br><span class="line">        &lt;!-- /.col --&gt;</span><br><span class="line">      &lt;/div&gt;</span><br><span class="line">      &lt;!-- /.row --&gt;</span><br><span class="line">    &lt;/section&gt;</span><br><span class="line">    &lt;!-- /.content --&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">  &lt;!-- /.content-wrapper --&gt;</span><br><span class="line">  &lt;footer <span class="keyword">class</span>=<span class="string">&quot;main-footer&quot;</span>&gt;</span><br><span class="line">    &lt;div <span class="keyword">class</span>=<span class="string">&quot;float-right d-none d-sm-block&quot;</span>&gt;</span><br><span class="line">      &lt;b&gt;Version&lt;/b&gt; <span class="number">3.0</span><span class="number">.2</span></span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;strong&gt;Copyright &amp;copy; <span class="number">2014</span>-<span class="number">2019</span> &lt;a href=<span class="string">&quot;http://adminlte.io&quot;</span>&gt;AdminLTE.io&lt;/a&gt;.&lt;/strong&gt; All rights</span><br><span class="line">    reserved.</span><br><span class="line">  &lt;/footer&gt;</span><br><span class="line"></span><br><span class="line">  &lt;!-- Control Sidebar --&gt;</span><br><span class="line">  &lt;aside <span class="keyword">class</span>=<span class="string">&quot;control-sidebar control-sidebar-dark&quot;</span>&gt;</span><br><span class="line">    &lt;!-- Control sidebar content goes here --&gt;</span><br><span class="line">  &lt;/aside&gt;</span><br><span class="line">  &lt;!-- /.control-sidebar --&gt;</span><br><span class="line">&lt;/div&gt;</span><br><span class="line">&lt;!-- ./wrapper --&gt;</span><br><span class="line"></span><br><span class="line">&lt;!-- jQuery --&gt;</span><br><span class="line">&lt;script src=<span class="string">&quot;/static/plugins/jquery/jquery.min.js&quot;</span>&gt;&lt;/script&gt;</span><br><span class="line">&lt;!-- Bootstrap <span class="number">4</span> --&gt;</span><br><span class="line">&lt;script src=<span class="string">&quot;/static/plugins/bootstrap/js/bootstrap.bundle.min.js&quot;</span>&gt;&lt;/script&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure><br>效果如图：<br><img src="/images/HTML%E9%A1%B5%E9%9D%A2.png" alt="akb48" title="左边的空栏不用管，那是原来放导航栏的"></p>
+<p>现在我们要点击“新增大促记录”，然后选择大促对应的名称，同时在页面进行反馈，那么现在就要用到jquery来取model的值。</p>
+<p>首先我先在页面空白处创建一个div，<code>&lt;div id=&quot;result&quot;&gt; &lt;/div&gt;</code>，再给“新增大促记录”的button添加一个id叫<code>addproject</code>，再输入框添加一个id叫<code>project_name</code>，然后添加对应的script如下:<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;-- 添加获取值的脚本 --&gt;</span><br><span class="line">&lt;script <span class="built_in">type</span>=<span class="string">&quot;text/javascript&quot;</span>&gt;</span><br><span class="line">  $(document).ready(function()&#123;</span><br><span class="line">    $(<span class="string">&#x27;#addproject&#x27;</span>).click(function()&#123;</span><br><span class="line">      var data = $(<span class="string">&quot;#myModal #project_name&quot;</span>).val().trim();</span><br><span class="line">        $(<span class="string">&#x27;#result&#x27;</span>).html(data);</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;);</span><br></pre></td></tr></table></figure></p>
+<p>整个脚本很简单，通过点击<code>#addproject</code>给data这个变量赋值，这个data赋值是myModal里的project_name。然后将这个值在result的地方展示出来。</p>
+<p>完整的HTML如下：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">  &lt;meta charset=<span class="string">&quot;utf-8&quot;</span>&gt;</span><br><span class="line">  &lt;meta http-equiv=<span class="string">&quot;X-UA-Compatible&quot;</span> content=<span class="string">&quot;IE=edge&quot;</span>&gt;</span><br><span class="line">  &lt;title&gt;阿里供应链平台 | 历次大促列表&lt;/title&gt;</span><br><span class="line">  &lt;!-- Tell the browser to be responsive to screen width --&gt;</span><br><span class="line">  &lt;meta name=<span class="string">&quot;viewport&quot;</span> content=<span class="string">&quot;width=device-width, initial-scale=1&quot;</span>&gt;</span><br><span class="line"></span><br><span class="line">  &lt;!-- Font Awesome --&gt;</span><br><span class="line">  &lt;link rel=<span class="string">&quot;stylesheet&quot;</span> href=<span class="string">&quot;/static/plugins/fontawesome-free/css/all.min.css&quot;</span>&gt;</span><br><span class="line">  &lt;!-- Ionicons --&gt;</span><br><span class="line">  &lt;link rel=<span class="string">&quot;stylesheet&quot;</span> href=<span class="string">&quot;https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css&quot;</span>&gt;</span><br><span class="line">  &lt;!-- Theme style --&gt;</span><br><span class="line">  &lt;link rel=<span class="string">&quot;stylesheet&quot;</span> href=<span class="string">&quot;/static/dist/css/adminlte.min.css&quot;</span>&gt;</span><br><span class="line">  &lt;!-- Google Font: Source Sans Pro --&gt;</span><br><span class="line">  &lt;link href=<span class="string">&quot;https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&quot;</span> rel=<span class="string">&quot;stylesheet&quot;</span>&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body <span class="keyword">class</span>=<span class="string">&quot;hold-transition sidebar-mini&quot;</span>&gt;</span><br><span class="line">&lt;div <span class="keyword">class</span>=<span class="string">&quot;wrapper&quot;</span>&gt;</span><br><span class="line"></span><br><span class="line">  &lt;!-- Content Wrapper. Contains page content --&gt;</span><br><span class="line">  &lt;div <span class="keyword">class</span>=<span class="string">&quot;content-wrapper&quot;</span>&gt;</span><br><span class="line">    &lt;!-- Content Header (Page header) --&gt;</span><br><span class="line">    &lt;section <span class="keyword">class</span>=<span class="string">&quot;content-header&quot;</span>&gt;</span><br><span class="line">      &lt;div <span class="keyword">class</span>=<span class="string">&quot;container-fluid&quot;</span>&gt;</span><br><span class="line">        &lt;div <span class="keyword">class</span>=<span class="string">&quot;row mb-2&quot;</span>&gt;</span><br><span class="line">          &lt;div <span class="keyword">class</span>=<span class="string">&quot;col-sm-6&quot;</span>&gt;</span><br><span class="line">            &lt;h1&gt;历次大促阵型&lt;/h1&gt;</span><br><span class="line">          &lt;/div&gt;</span><br><span class="line">        &lt;/div&gt;</span><br><span class="line">      &lt;/div&gt;&lt;!-- /.container-fluid --&gt;</span><br><span class="line">    &lt;/section&gt;</span><br><span class="line"></span><br><span class="line">    &lt;!-- Main content --&gt;</span><br><span class="line">    &lt;section <span class="keyword">class</span>=<span class="string">&quot;content&quot;</span>&gt;</span><br><span class="line">      &lt;div <span class="keyword">class</span>=<span class="string">&quot;row&quot;</span>&gt;</span><br><span class="line">        &lt;div <span class="keyword">class</span>=<span class="string">&quot;col-12&quot;</span>&gt;</span><br><span class="line">          &lt;div <span class="keyword">class</span>=<span class="string">&quot;card&quot;</span>&gt;</span><br><span class="line">            &lt;div <span class="keyword">class</span>=<span class="string">&quot;card-header&quot;</span>&gt;</span><br><span class="line">              &lt;!-- 按钮触发模态框 --&gt;</span><br><span class="line">              &lt;div <span class="keyword">class</span>=<span class="string">&quot;columns columns-right btn-group pull-right&quot;</span>&gt;</span><br><span class="line">                  &lt;button <span class="built_in">type</span>=<span class="string">&quot;button&quot;</span> <span class="keyword">class</span>=<span class="string">&quot;btn btn-primary&quot;</span> data-toggle=<span class="string">&quot;modal&quot;</span> data-target=<span class="string">&quot;#myModal&quot;</span>&gt;新增大促记录&lt;/button&gt;</span><br><span class="line">              &lt;/div&gt;</span><br><span class="line">              &lt;!-- 新增模态框（Modal） --&gt;</span><br><span class="line">                &lt;form <span class="built_in">id</span>=<span class="string">&quot;add-project-form&quot;</span> action=<span class="string">&quot;#&quot;</span> method=<span class="string">&quot;post&quot;</span> <span class="keyword">class</span>=<span class="string">&quot;form-horizontal&quot;</span> role=<span class="string">&quot;form&quot;</span>&gt;</span><br><span class="line">                  &lt;div <span class="keyword">class</span>=<span class="string">&quot;modal fade&quot;</span> <span class="built_in">id</span>=<span class="string">&quot;myModal&quot;</span> tabindex=<span class="string">&quot;-1&quot;</span> role=<span class="string">&quot;dialog&quot;</span> aria-labelledby=<span class="string">&quot;myModalLabel&quot;</span> aria-hidden=<span class="string">&quot;true&quot;</span>&gt;</span><br><span class="line">                    &lt;div <span class="keyword">class</span>=<span class="string">&quot;modal-dialog&quot;</span>&gt;</span><br><span class="line">                      &lt;div <span class="keyword">class</span>=<span class="string">&quot;modal-content&quot;</span>&gt;</span><br><span class="line">                        &lt;div <span class="keyword">class</span>=<span class="string">&quot;modal-header&quot;</span>&gt;</span><br><span class="line">                         &lt;h5 <span class="keyword">class</span>=<span class="string">&quot;modal-title&quot;</span> <span class="built_in">id</span>=<span class="string">&quot;myModalLabel&quot;</span>&gt;请填写&lt;/h5&gt;</span><br><span class="line">                          &lt;button <span class="built_in">type</span>=<span class="string">&quot;button&quot;</span> <span class="keyword">class</span>=<span class="string">&quot;close&quot;</span> data-dismiss=<span class="string">&quot;modal&quot;</span> aria-hidden=<span class="string">&quot;true&quot;</span>&gt;</span><br><span class="line">                            &amp;times;</span><br><span class="line">                          &lt;/button&gt;</span><br><span class="line">                        &lt;/div&gt;</span><br><span class="line">                     &lt;div <span class="keyword">class</span>=<span class="string">&quot;modal-body&quot;</span> style=<span class="string">&quot;height: 100%;&quot;</span>&gt;</span><br><span class="line">                      &lt;div <span class="keyword">class</span>=<span class="string">&quot;form-group&quot;</span>&gt;</span><br><span class="line">                          &lt;label <span class="keyword">for</span>=<span class="string">&quot;firstname&quot;</span> <span class="keyword">class</span>=<span class="string">&quot;col-sm-3 control-label&quot;</span>&gt;项目名称&lt;/label&gt;</span><br><span class="line">                          &lt;div <span class="keyword">class</span>=<span class="string">&quot;col-sm-7&quot;</span>&gt;</span><br><span class="line">                          &lt;select data-placeholder=<span class="string">&quot;选择大促项目...&quot;</span> <span class="keyword">class</span>=<span class="string">&quot;form-control&quot;</span> name=<span class="string">&quot;project_name&quot;</span> <span class="built_in">id</span>=<span class="string">&quot;project_name&quot;</span> required=<span class="string">&quot;required&quot;</span>&gt;</span><br><span class="line">                              &lt;option value=<span class="string">&quot;&quot;</span>&gt;请选择项目&lt;/option&gt;</span><br><span class="line">                              &lt;option&gt;三八女神节&lt;/option&gt;</span><br><span class="line">                              &lt;option&gt;<span class="number">618</span>精品生活节&lt;/option&gt;</span><br><span class="line">                              &lt;option&gt;九九划算节&lt;/option&gt;</span><br><span class="line">                              &lt;option&gt;双十一购物狂欢节&lt;/option&gt;</span><br><span class="line">                              &lt;option&gt;双十二购物狂欢节&lt;/option&gt;</span><br><span class="line">                              &lt;option&gt;新春购物年货节&lt;/option&gt;</span><br><span class="line">                          &lt;/select&gt;</span><br><span class="line">                          &lt;/div&gt;</span><br><span class="line">                      &lt;/div&gt;</span><br><span class="line"></span><br><span class="line">                      &lt;/div&gt;</span><br><span class="line">                          &lt;div <span class="keyword">class</span>=<span class="string">&quot;modal-footer&quot;</span>&gt;</span><br><span class="line">                            &lt;button <span class="built_in">type</span>=<span class="string">&quot;button&quot;</span> data-dismiss=<span class="string">&quot;modal&quot;</span> <span class="built_in">id</span>=<span class="string">&quot;addproject&quot;</span> <span class="keyword">class</span>=<span class="string">&quot;btn btn-danger&quot;</span>&gt; CLOSE &lt;/button&gt;</span><br><span class="line">                          &lt;/div&gt;</span><br><span class="line">                        &lt;/div&gt;</span><br><span class="line">                      &lt;/div&gt;&lt;!-- /.modal-content --&gt;</span><br><span class="line">                  &lt;/div&gt;&lt;!-- /.modal --&gt;</span><br><span class="line">                &lt;/div&gt;</span><br><span class="line">             &lt;/form&gt;</span><br><span class="line">            &lt;/div&gt;</span><br><span class="line">            &lt;!-- /.card-header --&gt;</span><br><span class="line"></span><br><span class="line">            &lt;div <span class="built_in">id</span>=<span class="string">&quot;result&quot;</span>&gt; &lt;/div&gt;</span><br><span class="line"></span><br><span class="line">            &lt;div <span class="keyword">class</span>=<span class="string">&quot;card-body&quot;</span>&gt;</span><br><span class="line">            &lt;/div&gt;</span><br><span class="line">            &lt;!-- /.card-body --&gt;</span><br><span class="line">          &lt;/div&gt;</span><br><span class="line">          &lt;!-- /.card --&gt;</span><br><span class="line">        &lt;/div&gt;</span><br><span class="line">        &lt;!-- /.col --&gt;</span><br><span class="line">      &lt;/div&gt;</span><br><span class="line">      &lt;!-- /.row --&gt;</span><br><span class="line">    &lt;/section&gt;</span><br><span class="line">    &lt;!-- /.content --&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">  &lt;!-- /.content-wrapper --&gt;</span><br><span class="line">  &lt;footer <span class="keyword">class</span>=<span class="string">&quot;main-footer&quot;</span>&gt;</span><br><span class="line">    &lt;div <span class="keyword">class</span>=<span class="string">&quot;float-right d-none d-sm-block&quot;</span>&gt;</span><br><span class="line">      &lt;b&gt;Version&lt;/b&gt; <span class="number">3.0</span><span class="number">.2</span></span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;strong&gt;Copyright &amp;copy; <span class="number">2014</span>-<span class="number">2019</span> &lt;a href=<span class="string">&quot;http://adminlte.io&quot;</span>&gt;AdminLTE.io&lt;/a&gt;.&lt;/strong&gt; All rights</span><br><span class="line">    reserved.</span><br><span class="line">  &lt;/footer&gt;</span><br><span class="line"></span><br><span class="line">  &lt;!-- Control Sidebar --&gt;</span><br><span class="line">  &lt;aside <span class="keyword">class</span>=<span class="string">&quot;control-sidebar control-sidebar-dark&quot;</span>&gt;</span><br><span class="line">    &lt;!-- Control sidebar content goes here --&gt;</span><br><span class="line">  &lt;/aside&gt;</span><br><span class="line">  &lt;!-- /.control-sidebar --&gt;</span><br><span class="line">&lt;/div&gt;</span><br><span class="line">&lt;!-- ./wrapper --&gt;</span><br><span class="line"></span><br><span class="line">&lt;!-- jQuery --&gt;</span><br><span class="line">&lt;script src=<span class="string">&quot;/static/plugins/jquery/jquery.min.js&quot;</span>&gt;&lt;/script&gt;</span><br><span class="line">&lt;!-- Bootstrap <span class="number">4</span> --&gt;</span><br><span class="line">&lt;script src=<span class="string">&quot;/static/plugins/bootstrap/js/bootstrap.bundle.min.js&quot;</span>&gt;&lt;/script&gt;</span><br><span class="line">&lt;script <span class="built_in">type</span>=<span class="string">&quot;text/javascript&quot;</span>&gt;</span><br><span class="line">  $(document).ready(function()&#123;</span><br><span class="line">    $(<span class="string">&#x27;#addproject&#x27;</span>).click(function()&#123;</span><br><span class="line">      var databack = $(<span class="string">&quot;#myModal #project_name&quot;</span>).val().trim();</span><br><span class="line">        $(<span class="string">&#x27;#result&#x27;</span>).html(databack);</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;);</span><br><span class="line">  </span><br><span class="line">&lt;/script&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure></p>
+<p>这样你在模态框里输入值的话，result的div就会变成你输入值的样子。</p>
+<h2 id="Django从jQuery取值"><a href="#Django从jQuery取值" class="headerlink" title="Django从jQuery取值"></a>Django从jQuery取值</h2><p>上面的内容可以在HTML里获取到JS的值。那如果要从Django的后台<code>views.py</code>里获取到<code>project_name</code>怎么办呢?我们就要改一下jquery：<br>	<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">&quot;text/javascript&quot;</span>&gt;</span><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript">  $(<span class="variable language_">document</span>).<span class="title function_">ready</span>(<span class="keyword">function</span>(<span class="params"></span>)&#123;</span></span><br><span class="line"><span class="language-javascript">    $(<span class="string">&#x27;#addproject&#x27;</span>).<span class="title function_">click</span>(<span class="keyword">function</span>(<span class="params"></span>)&#123;</span></span><br><span class="line"><span class="language-javascript">      <span class="keyword">var</span> project_name =  $(<span class="string">&quot;#project_name&quot;</span>).<span class="title function_">val</span>();		<span class="comment">// 这样就获取到了</span></span></span><br><span class="line"><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript">    $.<span class="title function_">ajax</span>(&#123;</span></span><br><span class="line"><span class="language-javascript">    <span class="attr">cache</span>:<span class="literal">false</span>,</span></span><br><span class="line"><span class="language-javascript">    <span class="attr">type</span>: <span class="string">&quot;POST&quot;</span>,<span class="comment">//方法类型</span></span></span><br><span class="line"><span class="language-javascript">    <span class="attr">dataType</span>: <span class="string">&quot;json&quot;</span>,<span class="comment">//预期服务器返回的数据类型</span></span></span><br><span class="line"><span class="language-javascript">    <span class="attr">url</span>: <span class="string">&#x27;&#123;% url &quot;add_activity&quot; %&#125;&#x27;</span> ,<span class="comment">// 添加的url，这里需要去url.py里指定一下</span></span></span><br><span class="line"><span class="language-javascript">    <span class="attr">data</span>: $(<span class="string">&#x27;#add-project-form&#x27;</span>).<span class="title function_">serialize</span>(), <span class="comment">//将模态框的form表单数据序列化，以便提交到后台</span></span></span><br><span class="line"><span class="language-javascript">    <span class="attr">async</span>: <span class="literal">false</span>,  <span class="comment">//如果是true是异步方式，$.ajax执行后，会继续执行ajax后面的脚本，直到服务器端返回数据后，触发$.ajax里的success方法</span></span></span><br><span class="line"><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript">    <span class="attr">success</span>: <span class="keyword">function</span> (<span class="params">data</span>) &#123;</span></span><br><span class="line"><span class="language-javascript">          <span class="variable language_">console</span>.<span class="title function_">log</span>(data);    <span class="comment">//打印服务端返回的数据(调试用)</span></span></span><br><span class="line"><span class="language-javascript">          <span class="keyword">if</span>(data.<span class="property">status</span> == <span class="string">&quot;success&quot;</span>)&#123;</span></span><br><span class="line"><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript">              <span class="comment">// 关闭模态框并清除框内数据，否则下次打开还是上次的数据</span></span></span><br><span class="line"><span class="language-javascript">              <span class="variable language_">document</span>.<span class="title function_">getElementById</span>(<span class="string">&quot;add-project-form&quot;</span>).<span class="title function_">reset</span>();</span></span><br><span class="line"><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript">              <span class="comment">// 判断确实正确入库之后提示</span></span></span><br><span class="line"><span class="language-javascript">              <span class="title function_">alert</span>(<span class="string">&#x27;提交数据成功&#x27;</span> + data);</span></span><br><span class="line"><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript">              location.<span class="title function_">reload</span>(); <span class="comment">// 直接刷新当前页面，这样新加的数据就展示出来了</span></span></span><br><span class="line"><span class="language-javascript">           &#125;</span></span><br><span class="line"><span class="language-javascript">       &#125;,</span></span><br><span class="line"><span class="language-javascript">    error : <span class="keyword">function</span>(<span class="params"></span>) &#123;</span></span><br><span class="line"><span class="language-javascript">        <span class="title function_">alert</span>(<span class="string">&quot;数据存入数据库失败，请检查...&quot;</span>);</span></span><br><span class="line"><span class="language-javascript">           &#125;</span></span><br><span class="line"><span class="language-javascript">      &#125;); </span></span><br><span class="line"><span class="language-javascript">     &#125;);</span></span><br><span class="line"><span class="language-javascript">   &#125;)</span></span><br></pre></td></tr></table></figure></p>
+<p>后台的views.py如下：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.http <span class="keyword">import</span> JsonResponse</span><br><span class="line"><span class="keyword">from</span> .models <span class="keyword">import</span> Promotion   <span class="comment">#这里需要先去model.py创建一个叫promotion的class用来存储数据</span></span><br><span class="line"><span class="comment"># 大促信息展示</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">activity</span>(<span class="params">request</span>):</span><br><span class="line">    context = &#123;&#125;</span><br><span class="line">    context[<span class="string">&quot;activities&quot;</span>] = Promotion.objects.<span class="built_in">all</span>()</span><br><span class="line">    <span class="keyword">return</span> render_to_response(<span class="string">&#x27;activity.html&#x27;</span>,context)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 大促信息录入到数据库</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">add_activity</span>(<span class="params">request</span>):</span><br><span class="line">    <span class="keyword">if</span> request.method == <span class="string">&quot;POST&quot;</span>:  <span class="comment"># 这里是修改添加操作，所以要有CSRFtoken的控制</span></span><br><span class="line">        project = request.POST.get(<span class="string">&quot;project_name&quot;</span>, <span class="literal">None</span>)</span><br><span class="line"></span><br><span class="line">    <span class="built_in">print</span>(project）</span><br><span class="line">    activity_data = Promotion.objects.create(promotionname=project）</span><br><span class="line">   	activity_data.save()  <span class="comment">#保存到数据库里</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> JsonResponse(&#123;<span class="string">&#x27;status&#x27;</span>: <span class="string">&#x27;success&#x27;</span>&#125;)  <span class="comment"># 这个信息返回给AJAX,django 2.1的写法</span></span><br></pre></td></tr></table></figure></p>
+<p>这样就实现了“弹出模态框输入内容保存到数据库里，同时界面刷新”的效果了，如下：<br><img src="/images/jQuery%E5%8F%96%E5%80%BC%E4%B8%8A%E4%BC%A0.gif" alt="akb48" title="这个图是加了其他效果的展示"></p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a target="_blank" rel="noopener" href="https://www.runoob.com/jquery/jquery-dom-get.html">https://www.runoob.com/jquery/jquery-dom-get.html</a><br><a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=8zTL1LMxBqc">https://www.youtube.com/watch?v=8zTL1LMxBqc</a><br><a target="_blank" rel="noopener" href="https://github.com/YoLoveLife/DevOps/issues/22">https://github.com/YoLoveLife/DevOps/issues/22</a><br><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/26cd9f442a13">https://www.jianshu.com/p/26cd9f442a13</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/gcgc/p/11176389.html">https://www.cnblogs.com/gcgc/p/11176389.html</a></p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/jquery/" rel="tag"># jquery</a>
+              <a href="/tags/bootstrap/" rel="tag"># bootstrap</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/07/02/%E8%B5%84%E6%8D%9F%E9%98%B2%E6%8E%A7%E7%9A%84%E6%84%9F%E6%82%9F/" rel="prev" title="资损防控的感悟">
+      <i class="fa fa-chevron-left"></i> 资损防控的感悟
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/07/13/Django%E5%89%8D%E7%AB%AF%E5%AE%9E%E7%8E%B0%E6%95%B0%E6%8D%AE%E5%BA%93%E5%88%A0%E9%99%A4%E4%BF%AE%E6%94%B9%E6%93%8D%E4%BD%9C/" rel="next" title="Django前端实现数据库删除修改操作">
+      Django前端实现数据库删除修改操作 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AD%A3%E6%96%87"><span class="nav-number">1.</span> <span class="nav-text">正文</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Django%E4%BB%8EjQuery%E5%8F%96%E5%80%BC"><span class="nav-number">2.</span> <span class="nav-text">Django从jQuery取值</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">3.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

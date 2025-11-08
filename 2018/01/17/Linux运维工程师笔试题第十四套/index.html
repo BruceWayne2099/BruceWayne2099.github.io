@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="大牛之路，如此辛苦">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux运维工程师笔试题第十四套">
+<meta property="og:url" content="http://example.com/2018/01/17/Linux%E8%BF%90%E7%BB%B4%E5%B7%A5%E7%A8%8B%E5%B8%88%E7%AC%94%E8%AF%95%E9%A2%98%E7%AC%AC%E5%8D%81%E5%9B%9B%E5%A5%97/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="大牛之路，如此辛苦">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/cdnyuanli.png">
+<meta property="article:published_time" content="2018-01-17T14:18:33.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:47:03.599Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="职场">
+<meta property="article:tag" content="面试">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/cdnyuanli.png">
+
+<link rel="canonical" href="http://example.com/2018/01/17/Linux%E8%BF%90%E7%BB%B4%E5%B7%A5%E7%A8%8B%E5%B8%88%E7%AC%94%E8%AF%95%E9%A2%98%E7%AC%AC%E5%8D%81%E5%9B%9B%E5%A5%97/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>Linux运维工程师笔试题第十四套 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2018/01/17/Linux%E8%BF%90%E7%BB%B4%E5%B7%A5%E7%A8%8B%E5%B8%88%E7%AC%94%E8%AF%95%E9%A2%98%E7%AC%AC%E5%8D%81%E5%9B%9B%E5%A5%97/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Linux运维工程师笔试题第十四套
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-01-17 22:18:33" itemprop="dateCreated datePublished" datetime="2018-01-17T22:18:33+08:00">2018-01-17</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:47:03" itemprop="dateModified" datetime="2025-11-08T08:47:03+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%A4%A7%E7%89%9B%E4%B9%8B%E8%B7%AF/" itemprop="url" rel="index"><span itemprop="name">大牛之路</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>2.8k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>10 mins.</span>
+            </span>
+            <div class="post-description">大牛之路，如此辛苦</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>这几天一边看着《nginx高性能WEB服务器详解》，一边看着基础知识。那么最容易入眼的基础知识是什么呢？当然是面试题了，于是乎就找出来一些阿里（含滴滴和蚂蚁金服）的运维面试题，以题带看。</p>
+<p>看完之后觉得阿里真的不是盖的，面试题的质量比那些晚上乱七八糟的题质量好多了，细节抠的真是非常细。我记得曾经有一个前辈曾经说过，工作中我们经常注意一些奇淫技巧，但是忽视了基础知识的重要性，现在好多程序员不会认认真真地读本书，喜欢快餐文化，受了市面上很多培训机构的影响，这是要不得的。</p>
+<p>最后再说一句，以下所有的题都属于“开放性”试题，可以根据基本点去发散，说出你的理解和认识。但是注意，不要避重就轻耍滑头，问A，可以发散到A1、A2…但是不要发散到X、Y、Z，然后大谈特谈XYZ，这种“小聪明”就是找死的行为。</p>
+<h2 id="废话到此为止，上题"><a href="#废话到此为止，上题" class="headerlink" title="废话到此为止，上题"></a>废话到此为止，上题</h2><p>1）<font color=blue>http一般是无状态的，怎么让它变成有状态的？</font><br>[我的答案]http协议跟IP协议、UDP协议一样都是无状态的，http的无状态意思是“每次的请求都是独立的，它的执行情况和结果与前面的请求和之后的请求是无直接关系的，它不会受前面的请求应答情况直接影响，也不会直接影响后面的请求应答情况”。<font color=green>补充一下，TCP是有状态的，它的请求并不独立，它通过包头的一些控制字段来分别包的关系，这里可以自行脑补一下“三次握手”的图。</font></p>
+<p>那么http是无状态的这一点是无法改变的，那么要变得“有状态”，就需要引入<code>cookie</code>和<code>session</code>，通过这两个机制去实现一个有状态的WEB应用。用一个表达式可以这么理解：<code>Web应用=http协议+session、cookies等状态机制+其他辅助的机制</code>。</p>
+<p>2）<font color=blue>解释一下cookie和session的区别</font><br>[我的答案]<code>session</code>是在服务端保存的一个数据结构，用来跟踪用户的状态，这个数据可以保存在集群、数据库、文件中，<code>session</code>是一个抽象概念，开发者为了实现中断和继续等操作，抽象出来的一个“会话”，接上面那道题，<code>session</code>这个东西是有状态的，服务器要维护一个有状态的东西是很消耗资源的（比如内存和空间），我估计天猫京东那规模的电商，肯定有一个专门的<code>session</code>集群。</p>
+<p><code>Cookie</code>是客户端保存用户信息的一种机制，用来记录用户的一些信息，也是实现<code>Session</code>的一种方式，<code>cookie</code>是一个实际存在的东西，它是在http协议中定义在<code>header</code>中的字段。同一个域名给的<code>cookie</code>肯定是一样的，所以每一个<code>cookie（key）</code>对应的<code>session（value）</code>是唯一的。</p>
+<p><code>session</code>的常见实现要借助<code>cookie</code>来发送<code>sessionID</code>给客户端，如果浏览器禁用<code>cookie</code>，那么就要通过重写<code>url</code>来获取<code>sessionid</code>，各位可以联想一下电商的购物车，购物车可以实现在一个网站的不同页面把东西都放进一个购物车，这就是<code>session</code>的重点应用。现在也很流行一个<code>token</code>，其实<code>token</code>和<code>sessionid</code>是一个意思。</p>
+<p>3）<font color=blue>多进程和多线程的区别，自己喜欢用哪个？为什么？</font><br>[我的答案]多进程：服务器每当接收到一个客户端信息的时候，从主进程里生成一个<font color=red>子进程</font>与客户端建立连接开始交互，每一个子进程之间互相独立不受干扰，完成任务就收回资源，内存等也会被回收；<br>多线程：服务器每当接收到一个客户端信息的时候，从主进程里生成一个<font color=red>线程</font>与客户端建立连接开始交互,多个线程位于同一个进程内，可以互相访问同样的内存等资源，彼此之间会有影响；<br>我个人更喜欢多进程，因为简单粗暴！<br><PS>关于多进程、多线程、同步、异步的原理，可以去看一下《nginx高性能WEB服务器详解》，第54页到56页的内容。</p>
+<ol start="4">
+<li><font color=blue>lvs脑裂如何解决，为什么会产生双master？双master时VIP通不通?</font><br>[我的答案]产生双master的原因：1）服务器开启了iptables防火墙，阻碍了心跳信息传输；2）服务器心跳网卡等信息写错了，导致心跳信息发送失败；3）心跳方式不搭配，心跳广播冲突；4）软件出bug了；</li>
+</ol>
+<p>额外补充一句，<font color=red>要排除脑裂问题，第一步是检查<code>iptables</code>,很可能是由于<code>iptables</code>把心跳信息隔断了，重要的话不说三遍也重要！</font></p>
+<p>其他两个问题不会了，我在实际工作里没有接触到。</p>
+<ol start="5">
+<li><p><font color=blue>为什么TCP比UDP的信息更加可靠？详细说说tcp滑动窗口原理，窗口的大小如何确定。</font><br><code>TCP</code>可靠性由三个机制保证：1. 序号（<code>TCP</code>报文的序号）2. 确认（<code>ACK</code>机制）3. 重传（超时或者冗余的 <code>ACK</code>）<br><code>tcp</code>在传输的时候，因为接受方B能力有限，不可能一口气吃下所有发送方A所有的数据流信息，所以B要限制A每次发送的字节数量，并且一一确认，确认了之后A才可以继续发。<br>这样的话，A的在发送数据流的时候就会有四种形态：<br>1.已发送已确认；<br>2.已发送但没被确认；<br>3.未发送但是接受方已经准备好空间来接收；<br>4.未发送但是接受方尚未准备好空间来接收；<br>随着数据流的传输，这个形态是会时刻发生变化的，通过接受方B返回的确认信息来改变2的大小，同时B也会根据一次关于发送方A要发送多少字节确认自己的空间来改变3的大小。</p>
+</li>
+<li><p><font color=blue>简单说说cdn的工作原理，如何评估一个cdn sp做的好不好。</font><br>[我的答案]cdn的工作原理：通过权威dns服务器来实现优质节点的选择，通过缓存来减少源站的压力。</p>
+</li>
+</ol>
+<p>IT界有个很有名的比喻，正向代理是“找马云借钱”，反向代理是“给10086打电话”，而反向代理就是CDN的实现原理雏形的一部分。详情可以看：<a target="_blank" rel="noopener" href="http://www.iweir.cn/zheng-xiang-dai-li-yu-fan-xiang-dai-li/">http://www.iweir.cn/zheng-xiang-dai-li-yu-fan-xiang-dai-li/</a> 。</p>
+<p>7）<font color=blue>dns查询的过程说一下，为什么要有cname而不是直接返回一个cdn边缘节点的ip。</font><br>[我的答案]先说一句题外话，<code>dns</code>主要是基于<code>udp</code>的！<br><code>dns</code>查询的过程以<code>www.taobao.com</code>为例：<br>1.在浏览器键入<code>www.taobao.com</code>,其实真正dns协议里用到的是<code>www.taobao.com.</code>最后还有一个点，可能是因为美观等原因，一般都不显示;<br>2.查询本地缓存（host文件或者是浏览器的缓存）中有没有该域名对应的记录，有的话就直接用了;<br>3.向运营商的DNS服务器发起dns解析的请求，一般称运营商的DNS服务器为<code>local dns</code>;<br>4.<code>local dns</code>会查询本地的缓存，<code>local dns</code>设置的缓存时间是有讲究的，过长过短都不好。另外<code>local dns</code>的查询是运营商的事，这里面水很深，外部不可控(这也是天朝能搭建特色墙的根源的思想雏形)；<br>5.<code>local dns</code>如果没有缓存，会把域名从右往左扫描，依次请求对应的服务器，例如对于域名<code>www.taobao.com.</code>，先去问负责.的根域名服务器，就是传说中全球只有几台的那些服务器，他们会答复<code>.com</code>是谁管理的，然后<code>local dns</code>又去找管理<code>.com</code>的服务器（假设名字为S1），去问问<code>taobao.com</code>是谁管，一般来说，在S1查到的记录是一条<code>cname</code>记录（阿里毕竟大公司，自己管理自己旗下的域名），然后就转到了阿里自己的DNS服务器上来了，一般称之为权威服务器；<br>6.权威服务器是阿里自己建的，然后根据公司内部的一些配置啊，调整啊，查到<code>www.taobao.com.</code>对应的服务器是谁，返回一个<code>IP</code>地址；<br>7.<code>local dns</code>缓存这个<code>IP</code>地址，并且回复浏览器；<br>8.浏览器和对应的<code>IP</code>地址的服务器建立<code>TCP</code>连接，发送<code>HTTP</code>报文；</p>
+<p>用图表示就是：<br><img src="/images/cdnyuanli.png" alt="akb48"></p>
+<p>至于说为什么不返回cdn边缘节点IP，是因为使用CNAME记录可以很方便地变更IP地址，毕竟服务商掌握着IP的生杀大权，哪一天需要换IP了，在这方面很不方便。</p>
+<p>8）<font color=blue>举例说下正则表达式和扩展正则表达式、例如：url、ip、邮箱的正则表达式？</font><br>[我的答案]这三个都是网上找的，正则这个东西还是要多练多写。<br>url的正则表达式：<br><code>([/w-]+/.)+[/w-]+.([^a-z])(/[/w- ./?%&amp;=]*)?|[a-zA-Z0-9/-/.][/w-]+.([^a-z])(/[/w- ./?%&amp;=]*)? </code><br>ip的正则表达式：<br>^(1\d{2}|2[0-4]\d|25[0-5]|[1-9]\d|[1-9])\.”+”(1\d{2}|2[0-4]\d|25[0-5]|[1-9]\d|\d)\.”+”(1\d{2}|2[0-4]\d|25[0-5]|[1-9]\d|\d)\.”+”(1\d{2}|2[0-4]\d|25[0-5]|[1-9]\d|\d)$<br>邮箱的正则表达式：<br>^[a-zA-Z0-9.!#$%&amp;’<em>+/&#x3D;?^_&#96;{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61} [a-zA-Z0-9])?(?:.<a href="?:%5Ba-zA-Z0-9-%5D%7B0,61%7D%5Ba-zA-Z0-9%5D">a-zA-Z0-9</a>?)</em>$</p>
+<p>9）<font color=blue>解释raid0、raid1、raid01、raid10、raid5、raid6，并分析各自读写性能？</font><br>[我的答案]<a target="_blank" rel="noopener" href="https://rorschachchan.github.io/2018/01/31/%E7%AE%80%E6%9E%90raid0-raid1-raid10-raid01%E7%AD%89%E7%AD%89%E7%A1%AC%E7%9B%98%E6%90%AD%E9%85%8D/">https://rorschachchan.github.io/2018/01/31/简析raid0-raid1-raid10-raid01等等硬盘搭配/</a></p>
+<p>10）<font color=blue>raid为什么不搞个raid50、raid15，不能搞是因为有什么冲突还是什么等等?</font><br>[我的答案]raid50是有的，但是用途不广泛。<br>raid15我是没听说过，因为raid1的写本身就不强（一样的内容要写两个盘里），raid5的写入能力更烂，那么raid15的磁盘写能力简直就是灾难。而且花了硬盘的钱只能存实际一半的量，正常人都不会这么做的。</p>
+<h2 id="拓展阅读"><a href="#拓展阅读" class="headerlink" title="拓展阅读"></a>拓展阅读</h2><p><a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000007243675">https://segmentfault.com/a/1190000007243675</a><br><a target="_blank" rel="noopener" href="http://mertensming.github.io/2016/10/19/cookie-session/">http://mertensming.github.io/2016/10/19/cookie-session/</a><br><a target="_blank" rel="noopener" href="https://wizardforcel.gitbooks.io/network-basic/content/index.html">https://wizardforcel.gitbooks.io/network-basic/content/index.html</a><br><a target="_blank" rel="noopener" href="https://coolshell.cn/articles/11564.html">https://coolshell.cn/articles/11564.html</a><br><a target="_blank" rel="noopener" href="https://coolshell.cn/articles/11609.html">https://coolshell.cn/articles/11609.html</a><br><a target="_blank" rel="noopener" href="http://blog.sina.com.cn/s/blog_93b45b0f0101a4ix.html">http://blog.sina.com.cn/s/blog_93b45b0f0101a4ix.html</a><br><a target="_blank" rel="noopener" href="http://www.cnblogs.com/549294286/p/5172435.html">http://www.cnblogs.com/549294286/p/5172435.html</a><br><a target="_blank" rel="noopener" href="https://wizardforcel.gitbooks.io/network-basic/content/7.html%EF%BC%88%E8%BF%99%E4%B8%AA%E5%A2%99%E8%A3%82%E6%8E%A8%E8%8D%90%EF%BC%8C%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%EF%BC%89">https://wizardforcel.gitbooks.io/network-basic/content/7.html（这个墙裂推荐，基础知识）</a><br><a target="_blank" rel="noopener" href="http://blog.jobbole.com/105500/">http://blog.jobbole.com/105500/</a><br><a target="_blank" rel="noopener" href="http://www.austintek.com/LVS/LVS-HOWTO/HOWTO/LVS-HOWTO.failover.html">http://www.austintek.com/LVS/LVS-HOWTO/HOWTO/LVS-HOWTO.failover.html</a></p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E9%9D%A2%E8%AF%95/" rel="tag"># 面试</a>
+              <a href="/tags/%E8%81%8C%E5%9C%BA/" rel="tag"># 职场</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/01/17/%E5%AE%9E%E6%88%98Kibana%E7%9A%84%E6%97%A5%E5%BF%97%E5%85%B3%E9%94%AE%E8%AF%8D%E6%90%9C%E7%B4%A2%E5%92%8C%E6%97%A5%E5%BF%97%E5%8F%AF%E8%A7%86%E5%8C%96/" rel="prev" title="实战Kibana的日志关键词搜索和日志可视化">
+      <i class="fa fa-chevron-left"></i> 实战Kibana的日志关键词搜索和日志可视化
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/01/18/%E5%B0%86%E7%94%B5%E5%95%86%E5%B9%B3%E5%8F%B0%E6%B5%8B%E8%AF%95%E7%8E%AF%E5%A2%83%E6%B7%BB%E5%8A%A0%E4%BA%86%E5%9F%9F%E5%90%8D%E5%92%8Chttps/" rel="next" title="将电商平台测试环境添加了域名和https">
+      将电商平台测试环境添加了域名和https <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BA%9F%E8%AF%9D%E5%88%B0%E6%AD%A4%E4%B8%BA%E6%AD%A2%EF%BC%8C%E4%B8%8A%E9%A2%98"><span class="nav-number">2.</span> <span class="nav-text">废话到此为止，上题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8B%93%E5%B1%95%E9%98%85%E8%AF%BB"><span class="nav-number">3.</span> <span class="nav-text">拓展阅读</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

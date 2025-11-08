@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="$query_string搞不定的事情，$arg来！">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Query String跟Arg的差异">
+<meta property="og:url" content="http://example.com/2018/01/09/Query-String%E8%B7%9Farg%E7%9A%84%E5%BC%82%E5%90%8C/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="$query_string搞不定的事情，$arg来！">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/%E5%AE%B6%E6%9C%89%E5%96%9C%E4%BA%8B.gif">
+<meta property="article:published_time" content="2018-01-09T12:47:40.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:47:11.739Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="Nginx">
+<meta property="article:tag" content="运维">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/%E5%AE%B6%E6%9C%89%E5%96%9C%E4%BA%8B.gif">
+
+<link rel="canonical" href="http://example.com/2018/01/09/Query-String%E8%B7%9Farg%E7%9A%84%E5%BC%82%E5%90%8C/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>Query String跟Arg的差异 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2018/01/09/Query-String%E8%B7%9Farg%E7%9A%84%E5%BC%82%E5%90%8C/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Query String跟Arg的差异
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-01-09 20:47:40" itemprop="dateCreated datePublished" datetime="2018-01-09T20:47:40+08:00">2018-01-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:47:11" itemprop="dateModified" datetime="2025-11-08T08:47:11+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>749</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>3 mins.</span>
+            </span>
+            <div class="post-description">$query_string搞不定的事情，$arg来！</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言与需求"><a href="#前言与需求" class="headerlink" title="前言与需求"></a>前言与需求</h2><p>在<a target="_blank" rel="noopener" href="https://rorschachchan.github.io/2018/01/09/%E8%AE%B0%E4%B8%80%E6%AC%A1%E9%85%8D%E7%BD%AErewrite%E5%92%8Creturn%E7%9A%84%E7%BB%8F%E5%8E%86/">https://rorschachchan.github.io/2018/01/09/记一次配置rewrite和return的经历/</a> 里记录了一次rewrite和return的故事，不过我当时在最后的return里是把域名给写死了：<code>rewrite ^.*$ http://dvlshop.lechange.com/index.php/wap/$id$query last;</code>。</p>
+<p>现在新的需求又来了，说域名不要写死，<code>http://dvlshop.lechange.com/index.php/</code>这部分要跟整个uri的state部分保持一致。</p>
+<p>于是我这里再把整个uri贴出来，辣一下各位的眼睛：<br><a target="_blank" rel="noopener" href="http://dvlshop.lechange.com/index.php/wap/">http://dvlshop.lechange.com/index.php/wap/</a>?<br><em>client_id</em>&#x3D;lc_mall_m&amp;<br><em>redirect_uri</em>&#x3D;https%3A%2F%2Fdvlshop.lechange.com%2Fopenapi%2Ftrustlogin_api%2Fparse%2Fwap_trustlogin_lecheng%2Fcallback&amp;<br><em>response_type</em>&#x3D;code&amp;	<code>#满足条件的话把这个改成+auto+</code><br><em>scope</em>&#x3D;read&amp;<br><em>state</em>&#x3D;http%3A%2F%2Fdvlshop.lechange.com%2Findex.php%2Fwap&amp;<br><em>user</em>&#x3D;token%2Flcid_9f9lmo2u6i7hkl6t6eaodn2blmg5jbsg&amp;<br><em>expire</em>&#x3D;1514191636&amp;<br><em>source_type</em>&#x3D;lc_app&amp;<br><em>nonce</em>&#x3D;cdizHO6uvSx5JK79Kmtz5RBpSi0ROhpF&amp;signature&#x3D;VeCceYCWDE6BZjIdni&#x2F;68YCmhqc&#x3D;%27 </p>
+<p>也就是说现在只需要变量state那点部分，那么这个时候就不能再使用$query_string了，要使用$arg。</p>
+<p>$arg可以精确匹配变量，比如说我有一个参数（uri里？后面的那部分全叫参数）：&amp;p&#x3D;你大爷&amp;q&#x3D;你大娘，用$query_string和$arg就是获取所有，而使用$arg_p就是可以获取“你大爷”。</p>
+<p>于是说动手就动手，把nginx.conf改成了：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">location ~ .*\.<span class="property">php</span>.*</span><br><span class="line">&#123;</span><br><span class="line">    include php_fcgi.<span class="property">conf</span>;</span><br><span class="line">    include pathinfo.<span class="property">conf</span>;</span><br><span class="line">    set $flag <span class="string">&quot;0&quot;</span>;</span><br><span class="line">    <span class="keyword">if</span> ( $args ~ <span class="string">&quot;source_type=lc_app&quot;</span> ) &#123;</span><br><span class="line">       set $flag  <span class="string">&quot;1&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> ( $args ~ <span class="string">&quot;(.*)response_type(.*)&quot;</span> )&#123;</span><br><span class="line">       set $Flag  <span class="string">&quot;$flag$flag&quot;</span>;</span><br><span class="line">       set $id $1;</span><br><span class="line">       set $query $2;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> ($Flag = <span class="string">&quot;11&quot;</span>)&#123;</span><br><span class="line">        set $flag <span class="string">&quot;0&quot;</span>;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">301</span>  $arg_state$id+auto+$query;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>但是通过日志查看，发现$arg_state得到的是<code>/http%3A%2F%2Fdvlshop.lechange.com%2Fproduct-79.html</code>,这就很囧了，我希望获取<code>http%3A%2F%2Fdvlshop.lechange.com%2Fproduct-79.html</code>（不要前面的反斜杠）或者是<code>/product-79.html</code>（不要中间的网站）。这可怎么办？</p>
+<p>答案是，**原生的nginx是做不到这一点，因为nginx不参与业务层逻辑方面的业务。**如果说要达到改写的目的，就要搭配lua或者把nginx换成openresty。于是乎就让开发修改一下传递的state来达到目的。</p>
+<h2 id="扩展与补充"><a href="#扩展与补充" class="headerlink" title="扩展与补充"></a>扩展与补充</h2><p>看到这个结果突然让我想起来一道面试题，说开发有一个模块，同时这个模块会给nginx提供几个状态码，比如状态码是111，那就是代表OK，状态码不是111，那就是代表不OK，现在想写一个语句，如果nginx获得的状态码不是111，返回一个404的页面，怎么写？</p>
+<p>没错，答案也是“原生nginx写不了”，原因跟上面的一样，应用模块状态码是业务层的，nginx是http层的，不在一层压根就无法交流。</p>
+<p>在这里也顺道补充一下“在浏览器中输入一个URL后都发生了什么？”，以下是一个大概流程：</p>
+<ol>
+<li>浏览器向DNS服务器查找输入URL对应的IP地址；</li>
+<li>DNS服务器返回网站的IP地址；</li>
+<li>浏览器根据IP地址与目标web服务器建立TCP连接；</li>
+<li>发送HTTP请求；</li>
+<li>服务器处理请求；</li>
+<li>返回响应结果；</li>
+<li>关闭TCP连接；</li>
+<li>浏览器解析HTML；</li>
+<li>浏览器布局渲染；</li>
+</ol>
+<p><img src="/images/%E5%AE%B6%E6%9C%89%E5%96%9C%E4%BA%8B.gif" alt="星爷、李丽珍、张曼玉" title="《家有喜事》"></p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%BF%90%E7%BB%B4/" rel="tag"># 运维</a>
+              <a href="/tags/Nginx/" rel="tag"># Nginx</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/01/09/%E8%AE%B0%E4%B8%80%E6%AC%A1%E9%85%8D%E7%BD%AErewrite%E5%92%8Creturn%E7%9A%84%E7%BB%8F%E5%8E%86/" rel="prev" title="记一次配置rewrite和return的经历">
+      <i class="fa fa-chevron-left"></i> 记一次配置rewrite和return的经历
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/01/10/%E8%87%AA%E5%B7%B1%E5%8A%A8%E6%89%8B%E6%90%AD%E5%BB%BA%E4%B8%80%E4%B8%AAhexo%E5%8D%9A%E5%AE%A2demo/" rel="next" title="自己动手搭建一个hexo博客demo">
+      自己动手搭建一个hexo博客demo <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80%E4%B8%8E%E9%9C%80%E6%B1%82"><span class="nav-number">1.</span> <span class="nav-text">前言与需求</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%89%A9%E5%B1%95%E4%B8%8E%E8%A1%A5%E5%85%85"><span class="nav-number">2.</span> <span class="nav-text">扩展与补充</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

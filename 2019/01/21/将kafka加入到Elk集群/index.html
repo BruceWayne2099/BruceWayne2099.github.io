@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="elk6跟elk5有了很大的变化，很多文本格式都已经不识别了。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="将kafka加入到Elk集群">
+<meta property="og:url" content="http://example.com/2019/01/21/%E5%B0%86kafka%E5%8A%A0%E5%85%A5%E5%88%B0Elk%E9%9B%86%E7%BE%A4/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="elk6跟elk5有了很大的变化，很多文本格式都已经不识别了。">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/elk19.png">
+<meta property="og:image" content="http://example.com/images/elk23.png">
+<meta property="og:image" content="http://example.com/images/elk20.png">
+<meta property="article:published_time" content="2019-01-21T07:08:31.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:47:59.164Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="elk">
+<meta property="article:tag" content="kafka">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/elk19.png">
+
+<link rel="canonical" href="http://example.com/2019/01/21/%E5%B0%86kafka%E5%8A%A0%E5%85%A5%E5%88%B0Elk%E9%9B%86%E7%BE%A4/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>将kafka加入到Elk集群 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/01/21/%E5%B0%86kafka%E5%8A%A0%E5%85%A5%E5%88%B0Elk%E9%9B%86%E7%BE%A4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          将kafka加入到Elk集群
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-01-21 15:08:31" itemprop="dateCreated datePublished" datetime="2019-01-21T15:08:31+08:00">2019-01-21</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:47:59" itemprop="dateModified" datetime="2025-11-08T08:47:59+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>1.5k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>5 mins.</span>
+            </span>
+            <div class="post-description">elk6跟elk5有了很大的变化，很多文本格式都已经不识别了。</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="环境交代"><a href="#环境交代" class="headerlink" title="环境交代"></a>环境交代</h2><p>架构如图：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">（目标模块 ---&gt;filebeat） ---&gt;（kafka ---&gt;logstash） ---&gt;（es ---&gt;kibana）</span><br></pre></td></tr></table></figure></p>
+<p>具体服务器信息如下：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">172.16</span><span class="number">.0</span><span class="number">.207</span>	工作模块+filebeat	<span class="title class_">CentOS</span> <span class="number">7.4</span> <span class="number">64</span>位		阿里云<span class="number">1</span>核2G</span><br><span class="line"><span class="number">172.31</span><span class="number">.0</span><span class="number">.84</span>		kafka+logstash		<span class="title class_">CentOS</span> <span class="number">7.4</span> <span class="number">64</span>位		阿里云<span class="number">2</span>核4G</span><br><span class="line"><span class="number">172.31</span><span class="number">.0</span><span class="number">.76</span>		es+es-head+kibana	<span class="title class_">CentOS</span> <span class="number">7.4</span> <span class="number">64</span>位		阿里云<span class="number">2</span>核16G</span><br><span class="line">安全组已经开放了elk相应的端口</span><br></pre></td></tr></table></figure></p>
+<p>首先先执行<code>yum update -y &amp;&amp; yum install java-1.8.0-openjdk* -y</code>，在更新的时候不要闲着，在<code>https://www.elastic.co/downloads</code>网站下载所有的elk模块，然后上传到对应的服务器里。 </p>
+<h2 id="filebeat的部署、配置和启动"><a href="#filebeat的部署、配置和启动" class="headerlink" title="filebeat的部署、配置和启动"></a>filebeat的部署、配置和启动</h2><p>filebeat与目标机器安装在一起，它是用<code>6.5.4</code>版本，先从官网上下载rpm包，然后上传到服务器里。<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">#假设已经下载好了filebeat-<span class="number">6.5</span><span class="number">.4</span>-x86_64.<span class="property">rpm</span></span><br><span class="line">rpm -ivh filebeat-<span class="number">6.5</span><span class="number">.4</span>-x86_64.<span class="property">rpm</span></span><br><span class="line">cd /etc/filebeat</span><br><span class="line">cp filebeat.<span class="property">yml</span> filebeat.<span class="property">yml</span>-<span class="keyword">default</span>	#备份模板配置文件</span><br></pre></td></tr></table></figure></p>
+<p>修改<code>filebeat.yml</code>如下：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">filebeat.<span class="property">prospectors</span>:</span><br><span class="line">- <span class="attr">type</span>: log</span><br><span class="line">  <span class="attr">enabled</span>: <span class="literal">true</span></span><br><span class="line">  <span class="attr">paths</span>:</span><br><span class="line">    - <span class="regexp">/var/</span>log/messages		#设定日志输入源</span><br><span class="line"></span><br><span class="line">output.<span class="property">kafka</span>:</span><br><span class="line">  <span class="attr">enabled</span>: <span class="literal">true</span></span><br><span class="line">  <span class="attr">hosts</span>: [<span class="string">&quot;172.31.0.84:9092&quot;</span>]	#这里填入kafka的地址和端口</span><br><span class="line">  <span class="attr">topic</span>: <span class="string">&#x27;system-secure&#x27;</span>	#指定一个topic</span><br></pre></td></tr></table></figure></p>
+<p>配置文件说明了数据的来源和目的地，使用<code>/etc/init.d/filebeat start -e -c /etc/filebeat/filebeat.yml</code>启动filebeat，然后<code>ps -aux|grep filebeat</code>查看一下进程。而filebeat的日志地址是在<code>/var/log/filebeat</code>目录下。</p>
+<h2 id="logstash的部署、配置和启动"><a href="#logstash的部署、配置和启动" class="headerlink" title="logstash的部署、配置和启动"></a>logstash的部署、配置和启动</h2><p>logstash是跟kafka在一台服务器里，首先是下载包并且解压缩：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">wget <span class="attr">https</span>:<span class="comment">//artifacts.elastic.co/downloads/logstash/logstash-6.5.4.tar.gz</span></span><br><span class="line">tar -zxvf logstash-<span class="number">6.5</span><span class="number">.4</span>.<span class="property">tar</span>.<span class="property">gz</span> -C /opt/</span><br><span class="line">cd /opt/logstash-<span class="number">6.5</span><span class="number">.4</span>/config</span><br></pre></td></tr></table></figure></p>
+<p>新建一个配置文件，叫<code>logstash_kafka2ES.conf</code>：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">input &#123;</span><br><span class="line">        kafka&#123;</span><br><span class="line">                <span class="function"><span class="params">bootstrap_servers</span>=&gt;</span><span class="string">&quot;172.31.0.84:9092&quot;</span>	#kafka的地址和端口</span><br><span class="line">                topics=&gt;<span class="string">&quot;system-secure&quot;</span>		#topic要一致</span><br><span class="line">                codec=&gt;plain</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br><span class="line">output &#123;</span><br><span class="line">        elasticsearch &#123;</span><br><span class="line">                <span class="function"><span class="params">hosts</span>=&gt;</span>[<span class="string">&quot;172.31.0.76:9200&quot;</span>]		#es的地址和端口</span><br><span class="line">                index=&gt;<span class="string">&quot;system-secure-%&#123;+YYYY-MM&#125;&quot;</span>	#规定es使用的索引，按月份分类</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>配置文件里规定数据来源是kafka的<code>system-secure</code>这个topic，再修改同目录下的<code>jvm.options</code>：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">-<span class="title class_">Xms512</span>m	#根据自己实际情况来</span><br><span class="line">-<span class="title class_">Xmx512</span>m	#根据自己实际情况来</span><br></pre></td></tr></table></figure></p>
+<p>保存退出，<code>./bin/logstash -f ./config/logstash_kafka2ES.conf &amp;</code>启动之，日志是logstash目录<code>/logs/logstash-plain.log</code>。</p>
+<p>kafka的配置和启动已经在<a target="_blank" rel="noopener" href="https://rorschachchan.github.io/2019/01/16/%E6%90%AD%E5%BB%BAKakfa2-11%E4%B8%BAELK%E6%9C%8D%E5%8A%A1/">https://rorschachchan.github.io/2019/01/16/%E6%90%AD%E5%BB%BAKakfa2-11%E4%B8%BAELK%E6%9C%8D%E5%8A%A1/</a> 里说过了，这里略过。</p>
+<h2 id="elasticsearch-6-5-4的部署、配置和启动"><a href="#elasticsearch-6-5-4的部署、配置和启动" class="headerlink" title="elasticsearch-6.5.4的部署、配置和启动"></a>elasticsearch-6.5.4的部署、配置和启动</h2><p>登录到es的服务器上，首先先下载安装包并且解压缩：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">wget <span class="attr">https</span>:<span class="comment">//artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.5.4.tar.gz</span></span><br><span class="line">tar -zxvf elasticsearch-<span class="number">6.5</span><span class="number">.4</span>.<span class="property">tar</span>.<span class="property">gz</span> -C /opt/</span><br><span class="line">cd  elasticsearch-<span class="number">6.5</span><span class="number">.4</span>/</span><br><span class="line">useradd elk		#es不能用root启动，需要新建一个用户</span><br><span class="line">chown -R <span class="attr">elk</span>:elk elasticsearch-<span class="number">6.5</span><span class="number">.4</span>/	#整个文件夹都给elk了</span><br></pre></td></tr></table></figure></p>
+<p>修改一下<code>elasticsearch.yml</code>：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">#cluster.<span class="property">name</span>: my-application	#由于实验环境是一个es，就没写集群名称</span><br><span class="line">node.<span class="property">name</span>: lcshopelk</span><br><span class="line">path.<span class="property">data</span>: <span class="regexp">/opt/</span>elasticsearch-<span class="number">6.5</span><span class="number">.4</span>/data/		#存数据的地方</span><br><span class="line">path.<span class="property">logs</span>: <span class="regexp">/data/</span>tmp/elklog		#存日志的路径</span><br><span class="line">bootstrap.<span class="property">memory_lock</span>: <span class="literal">true</span>		#为了防止swapping，官方建议设定为<span class="literal">true</span>，阿里云的云服务器是没有swap，可以不写</span><br><span class="line">network.<span class="property">host</span>: <span class="number">0.0</span><span class="number">.0</span><span class="number">.0</span></span><br><span class="line">http.<span class="property">port</span>: <span class="number">9200</span></span><br><span class="line">http.<span class="property">cors</span>.<span class="property">enabled</span>: <span class="literal">true</span>		#准许es-head</span><br><span class="line">http.<span class="property">cors</span>.<span class="property">allow</span>-<span class="attr">origin</span>: <span class="string">&quot;*&quot;</span>	</span><br></pre></td></tr></table></figure></p>
+<p>保存之后修改同目录的<code>jvm.options</code>：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">-<span class="title class_">Xms2</span>g	#根据自己实际情况来</span><br><span class="line">-<span class="title class_">Xmx2</span>g	#根据自己实际情况来</span><br></pre></td></tr></table></figure></p>
+<p>这里的配置，官网标准的建议是把50％的可用内存作为<code>Elasticsearch</code>的堆内存，保留剩下的50％。当然它也不会被浪费，<code>Lucene</code>会很乐意利用起余下的内存。查看node下是否开启了<code>Mem_lock</code>的语句是：<code>curl &#39;localhost:9200/_nodes?filter_path=**.mlockall&#39;</code>。</p>
+<p>保存完毕，还没完,<code>vim /etc/security/limits.conf</code>，最后两行改成如下:<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">* soft nofile <span class="number">65536</span></span><br><span class="line">* hard nofile <span class="number">65536</span></span><br><span class="line"># allow user <span class="string">&#x27;elk&#x27;</span> mlockall</span><br><span class="line">elk soft memlock unlimited</span><br><span class="line">elk hard memlock unlimited</span><br></pre></td></tr></table></figure></p>
+<p>然后切换成elk用户，执行<code>./elasticsearch -d</code>就是后台启动了。</p>
+<p>简单的几句es命令：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">curl -<span class="variable constant_">XGET</span> <span class="attr">http</span>:<span class="comment">//127.0.0.1:9200/_cat/allocation?v	#查看本机node磁盘容量</span></span><br><span class="line">curl -<span class="variable constant_">XGET</span> <span class="attr">http</span>:<span class="comment">//127.0.0.1:9200/_cat/nodes?v	#能查看node的CPU和负载情况</span></span><br><span class="line">curl -<span class="variable constant_">XGET</span> <span class="attr">http</span>:<span class="comment">//127.0.0.1:9200/_aliases	#查看所有的索引</span></span><br><span class="line">curl <span class="string">&#x27;http://localhost:9200/_search?pretty&#x27;</span> 	#查看索引一些细节</span><br><span class="line">curl -<span class="variable constant_">XDELETE</span> <span class="string">&#x27;localhost:9200/shoporder-log-2019-02?pretty&amp;pretty&#x27;</span> 	#删除shoporder-log-<span class="number">2019</span>-<span class="number">02</span>这个索引，同时磁盘释放空间</span><br></pre></td></tr></table></figure></p>
+<h2 id="kibana和es-head的部署、配置和启动"><a href="#kibana和es-head的部署、配置和启动" class="headerlink" title="kibana和es-head的部署、配置和启动"></a>kibana和es-head的部署、配置和启动</h2><p><code>es-head</code>是用docker部署的，语句如下：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#假设docker已经安装好了</span><br><span class="line">docker run --name es-head -p <span class="number">9100</span>:<span class="number">9100</span> tobias74/elasticsearch-<span class="attr">head</span>:<span class="number">6</span>	#这里必须安装<span class="number">6</span>版本，不然的话，数据不会显示</span><br></pre></td></tr></table></figure></p>
+<p>运行完之后，要进入到容器里修改一下对应的配置文件<code>Gruntfile.js</code>，修改一下<code>connect</code>段落：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">connect</span>: &#123;</span><br><span class="line">		<span class="attr">server</span>: &#123;</span><br><span class="line">			<span class="attr">options</span>: &#123;</span><br><span class="line">				<span class="attr">port</span>: <span class="number">9100</span>,</span><br><span class="line">				<span class="attr">base</span>: <span class="string">&#x27;.&#x27;</span>,</span><br><span class="line">				<span class="attr">keepalive</span>: <span class="literal">true</span>,</span><br><span class="line">				<span class="attr">hostname</span>: <span class="string">&#x27;*&#x27;</span>		#新增加这样一句话</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure></p>
+<p>保存文件，<code>docker restart es-head</code>即可。在浏览器里访问<code>外网ip地址:9100</code>，如图：<br><img src="/images/elk19.png" alt="akb48"></p>
+<p><code>Kibana</code>也是用docker部署的，语句如下：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#假设docker已经安装好了</span><br><span class="line">docker run --name kibana -p <span class="number">5601</span>:<span class="number">5601</span> docker.<span class="property">elastic</span>.<span class="property">co</span>/kibana/<span class="attr">kibana</span>:<span class="number">6.5</span><span class="number">.4</span></span><br></pre></td></tr></table></figure></p>
+<p>运行完之后，要进入到容器里修改一下对应的配置文件<code>kibana.yml</code>：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">---</span><br><span class="line"># <span class="title class_">Default</span> <span class="title class_">Kibana</span> configuration <span class="keyword">from</span> kibana-docker.</span><br><span class="line"></span><br><span class="line">server.<span class="property">name</span>: kibana</span><br><span class="line">server.<span class="property">host</span>: <span class="string">&quot;0.0.0.0&quot;</span>	#准许所有人访问</span><br><span class="line">elasticsearch.<span class="property">url</span>: <span class="attr">http</span>:<span class="comment">//es外网IP:9200</span></span><br><span class="line">xpack.<span class="property">monitoring</span>.<span class="property">ui</span>.<span class="property">container</span>.<span class="property">elasticsearch</span>.<span class="property">enabled</span>: <span class="literal">false</span></span><br><span class="line"></span><br><span class="line"># <span class="variable constant_">SSL</span> <span class="keyword">for</span> outgoing requests <span class="keyword">from</span> the <span class="title class_">Kibana</span> <span class="title class_">Server</span> (<span class="variable constant_">PEM</span> formatted)</span><br><span class="line">server.<span class="property">ssl</span>.<span class="property">enabled</span>: <span class="literal">true</span></span><br><span class="line">server.<span class="property">ssl</span>.<span class="property">key</span>: <span class="regexp">/usr/</span>share/kibana/config/mykey.<span class="property">key</span>	#这里是https证书</span><br><span class="line">server.<span class="property">ssl</span>.<span class="property">certificate</span>: <span class="regexp">/usr/</span>share/kibana/config/mycert.<span class="property">crt</span>		#这里是https证书</span><br><span class="line"></span><br></pre></td></tr></table></figure></p>
+<p>修改完事之后，<code>docker restart kibana</code>，此时进入到kibana容器发现5601的端口并没有与任何的程序相关联，如图：<br><img src="/images/elk23.png" alt="akb48"></p>
+<p>其实这是没关系的，可以无视掉。然后在浏览器里访问<code>外网ip地址:5601</code>就可以查看kibana了，先去<code>menagement</code> —&gt;<code>index pattern</code>填入刚刚生成的index，然后在<code>discover</code>页面里选择刚刚生成的index就能看到日志内容了：<br><img src="/images/elk20.png" alt="akb48"></p>
+<p>如果kibana在某一天突然出现了”重定向过多”,重启kibana进程可破，但是index都会消失…但愿你永远不会遇到这样的bug情况…</p>
+<p><code>X-pack</code>目前还不支持6.2以上的版本，故此先略。因为没有<code>X-pack</code>，所以再<code>kibana.yml</code>里的<code>elasticsearch.url</code>我们还是写http，有了<code>X-pack</code>就要改成<code>elasticsearch.url: &quot;https://&lt;your_elasticsearch_host&gt;.com:9200&quot;</code>的样子，让es与kibana之间的传输是加密的。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a target="_blank" rel="noopener" href="https://dzone.com/articles/just-say-no-swapping">https://dzone.com/articles/just-say-no-swapping</a><br><a target="_blank" rel="noopener" href="https://www.elastic.co/guide/cn/elasticsearch/guide/cn/heap-sizing.html">https://www.elastic.co/guide/cn/elasticsearch/guide/cn/heap-sizing.html</a><br><a target="_blank" rel="noopener" href="https://www.elastic.co/guide/cn/kibana/current/settings.html">https://www.elastic.co/guide/cn/kibana/current/settings.html</a></p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/elk/" rel="tag"># elk</a>
+              <a href="/tags/kafka/" rel="tag"># kafka</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/01/16/%E6%90%AD%E5%BB%BAKakfa2-11%E4%B8%BAELK%E6%9C%8D%E5%8A%A1/" rel="prev" title="搭建Kakfa2.11为ELK服务">
+      <i class="fa fa-chevron-left"></i> 搭建Kakfa2.11为ELK服务
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/01/21/%E8%BE%83%E6%B7%B1%E5%85%A5%E8%A7%A3%E6%9E%90filebeat-yml%E5%90%84%E5%AD%97%E6%AE%B5%E5%8A%9F%E8%83%BD/" rel="next" title="较深入解析filebeat.yml各字段功能">
+      较深入解析filebeat.yml各字段功能 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%8E%AF%E5%A2%83%E4%BA%A4%E4%BB%A3"><span class="nav-number">1.</span> <span class="nav-text">环境交代</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#filebeat%E7%9A%84%E9%83%A8%E7%BD%B2%E3%80%81%E9%85%8D%E7%BD%AE%E5%92%8C%E5%90%AF%E5%8A%A8"><span class="nav-number">2.</span> <span class="nav-text">filebeat的部署、配置和启动</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#logstash%E7%9A%84%E9%83%A8%E7%BD%B2%E3%80%81%E9%85%8D%E7%BD%AE%E5%92%8C%E5%90%AF%E5%8A%A8"><span class="nav-number">3.</span> <span class="nav-text">logstash的部署、配置和启动</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#elasticsearch-6-5-4%E7%9A%84%E9%83%A8%E7%BD%B2%E3%80%81%E9%85%8D%E7%BD%AE%E5%92%8C%E5%90%AF%E5%8A%A8"><span class="nav-number">4.</span> <span class="nav-text">elasticsearch-6.5.4的部署、配置和启动</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#kibana%E5%92%8Ces-head%E7%9A%84%E9%83%A8%E7%BD%B2%E3%80%81%E9%85%8D%E7%BD%AE%E5%92%8C%E5%90%AF%E5%8A%A8"><span class="nav-number">5.</span> <span class="nav-text">kibana和es-head的部署、配置和启动</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">6.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

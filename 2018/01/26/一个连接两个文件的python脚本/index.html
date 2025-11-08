@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="看了今年的阿里云账单，大领导眉头一皱，发现事情不是那么简单">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一个连接两个文件的python脚本">
+<meta property="og:url" content="http://example.com/2018/01/26/%E4%B8%80%E4%B8%AA%E8%BF%9E%E6%8E%A5%E4%B8%A4%E4%B8%AA%E6%96%87%E4%BB%B6%E7%9A%84python%E8%84%9A%E6%9C%AC/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="看了今年的阿里云账单，大领导眉头一皱，发现事情不是那么简单">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/mrs1.png">
+<meta property="og:image" content="http://example.com/images/mrs2.png">
+<meta property="article:published_time" content="2018-01-26T07:13:26.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:47:25.104Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="python">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/mrs1.png">
+
+<link rel="canonical" href="http://example.com/2018/01/26/%E4%B8%80%E4%B8%AA%E8%BF%9E%E6%8E%A5%E4%B8%A4%E4%B8%AA%E6%96%87%E4%BB%B6%E7%9A%84python%E8%84%9A%E6%9C%AC/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>一个连接两个文件的python脚本 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2018/01/26/%E4%B8%80%E4%B8%AA%E8%BF%9E%E6%8E%A5%E4%B8%A4%E4%B8%AA%E6%96%87%E4%BB%B6%E7%9A%84python%E8%84%9A%E6%9C%AC/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          一个连接两个文件的python脚本
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-01-26 15:13:26" itemprop="dateCreated datePublished" datetime="2018-01-26T15:13:26+08:00">2018-01-26</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:47:25" itemprop="dateModified" datetime="2025-11-08T08:47:25+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>1.2k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>4 mins.</span>
+            </span>
+            <div class="post-description">看了今年的阿里云账单，大领导眉头一皱，发现事情不是那么简单</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="背景交代"><a href="#背景交代" class="headerlink" title="背景交代"></a>背景交代</h1><p>公司在阿里云上有一个模块叫mrs，一共120台，它是跟云录像有关的，这个服务一直都是云服务器里没有公网但是购买了公网SLB，然后20个为一组配置到一个SLB里，这个SLB是按流量收费的。但是最近到了年末，各种账目审核，领导发现这个SLB的费用太惊人了，这么搞不够挣的。但是实在没办法，因为云录像嘛，肯定流量很大，如图：<br><img src="/images/mrs1.png"></p>
+<p>纵然流量大，但是开源节流也是必须的，于是领导就责令开发赶快想出一个办法，减少SLB的费用。于是开发们拉上运维就吭哧吭哧的开始算经济账，最后确定每一个云服务器买7M带宽，然后流量全部走公网，把SLB的架构舍弃掉。</p>
+<p>但是开发在这个模块V2.0里有一个变化，就是Zookeeper需要读取到每一台设备的外网IP，同时这个外网IP必须跟机器是一一对应的，这样模块才能正常工作。</p>
+<p>原来的zookeeper在servermap是长这样的：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[<span class="string">&quot;内网IP&quot;</span>] = &#123;app = <span class="string">&quot;mrs&quot;</span>, weight = <span class="number">100</span>&#125;,</span><br><span class="line">[<span class="string">&quot;内网IP&quot;</span>] = &#123;app = <span class="string">&quot;mrs&quot;</span>, weight = <span class="number">100</span>&#125;,</span><br><span class="line">[<span class="string">&quot;内网IP&quot;</span>] = &#123;app = <span class="string">&quot;mrs&quot;</span>, weight = <span class="number">100</span>&#125;,</span><br><span class="line">剩下略</span><br></pre></td></tr></table></figure></p>
+<p>而现在开发要求改成这样：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[<span class="string">&quot;内网IP&quot;</span>] = &#123;app = <span class="string">&quot;mrs&quot;</span>,mrsReportIp = <span class="string">&quot;对应的外网IP&quot;</span>,weight = <span class="number">100</span>&#125;,</span><br><span class="line">[<span class="string">&quot;内网IP&quot;</span>] = &#123;app = <span class="string">&quot;mrs&quot;</span>,mrsReportIp = <span class="string">&quot;对应的外网IP&quot;</span>,weight = <span class="number">100</span>&#125;,</span><br><span class="line">[<span class="string">&quot;内网IP&quot;</span>] = &#123;app = <span class="string">&quot;mrs&quot;</span>,mrsReportIp = <span class="string">&quot;对应的外网IP&quot;</span>,weight = <span class="number">100</span>&#125;,</span><br><span class="line">剩下略</span><br></pre></td></tr></table></figure></p>
+<p>那么这就要把两个文件合并起来了，而且是在合并后做到一对一，不能把IP搭配串了。</p>
+<h1 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h1><p>首先，阿里云的网页控制台是无法做到“包年包月的服务器批量永久升级基础带宽”的，只能通过API实现。那么开启了外网IP之后，服务器就会有一个对应的外网IP地址，然后在控制台里，点击“导出资源列表”，只选择<code>服务器名称</code>、<code>内网IP</code>和<code>外网IP</code>。<br><img src="/images/mrs2.png"></p>
+<p>然后在生成的excel表格里，剪除掉不需要的服务器以及服务器名称，然后保证“内网IP”在前，“外网IP”在后的样式，而且不要服务器名只保留IP,然后把这个文件复制到linux里，起个名，比如叫<code>IP.txt</code>,如图：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@paas-online-crs-<span class="number">001</span> tmp]# cat <span class="variable constant_">IP</span>.<span class="property">txt</span></span><br><span class="line"><span class="number">10.161</span><span class="number">.236</span><span class="number">.231</span>	<span class="number">3.3</span><span class="number">.3</span><span class="number">.3</span></span><br><span class="line"><span class="number">10.161</span><span class="number">.235</span><span class="number">.150</span>  <span class="number">2.2</span><span class="number">.2</span><span class="number">.2</span></span><br><span class="line"><span class="number">10.51</span><span class="number">.10</span><span class="number">.182</span>	<span class="number">4.4</span><span class="number">.4</span><span class="number">.4</span></span><br><span class="line"><span class="number">10.117</span><span class="number">.219</span><span class="number">.72</span>   <span class="number">1.1</span><span class="number">.1</span><span class="number">.1</span></span><br></pre></td></tr></table></figure></p>
+<p>再把已经使用的zookeeper复制一下，放到一个叫<code>mingdan.txt</code>的文件里，如图：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@paas-online-crs-<span class="number">001</span> tmp]# cat mingdan.<span class="property">txt</span></span><br><span class="line">[<span class="string">&quot;10.117.219.72&quot;</span>] = &#123;app = <span class="string">&quot;mrs&quot;</span>, weight = <span class="number">100</span>&#125;,</span><br><span class="line">[<span class="string">&quot;10.161.235.150&quot;</span>] = &#123;app = <span class="string">&quot;mrs&quot;</span>, weight = <span class="number">100</span>&#125;,</span><br><span class="line">[<span class="string">&quot;10.161.236.231&quot;</span>] = &#123;app = <span class="string">&quot;mrs&quot;</span>, weight = <span class="number">100</span>&#125;,</span><br><span class="line">[<span class="string">&quot;10.51.10.182&quot;</span>] = &#123;app = <span class="string">&quot;mrs&quot;</span>, weight = <span class="number">100</span>&#125;,</span><br></pre></td></tr></table></figure></p>
+<h1 id="脚本思路"><a href="#脚本思路" class="headerlink" title="脚本思路"></a>脚本思路</h1><p>我最开始打算用<code>awk</code>的<code>NR</code>、<code>FNR</code>去写，但是发现由于我这个文本的结构太过复杂。<code>awk</code>对付这样的力不从心，稍不好就把人搞得无法自拔，于是就考虑使用python的字典。</p>
+<p>各位都知道，字典里key是不能重复的，而我又不想把这个脚本搞得太复杂，就想在<code>mingdan.txt</code>里的每一行加上序号，用这个序号去当key，而后面的内网IP就作为value，这样保证一一对应。加序号的方法很多，你可以在<code>vim</code>状态下<code>:set number</code>，然后手动复制粘贴。不过我是用的是如下两个命令：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sed -i <span class="string">&#x27;s/^[ \t]*//g&#x27;</span> mingdan.<span class="property">txt</span>	#这一步是添加每一行序号</span><br><span class="line">sed -i <span class="string">&#x27;s/\t/ /g&#x27;</span>  mingdan.<span class="property">txt</span>		#添加序号之后，会生成一个ta</span><br></pre></td></tr></table></figure></p>
+<p>然后<code>mingdan.txt</code>就成了这样：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@paas-online-crs-<span class="number">001</span> tmp]# cat mingdan.<span class="property">txt</span> </span><br><span class="line"><span class="number">1</span> [<span class="string">&quot;10.117.219.72&quot;</span>] = &#123;app = <span class="string">&quot;mrs&quot;</span>, weight = <span class="number">100</span>&#125;,</span><br><span class="line"><span class="number">2</span> [<span class="string">&quot;10.161.235.150&quot;</span>] = &#123;app = <span class="string">&quot;mrs&quot;</span>, weight = <span class="number">100</span>&#125;,</span><br><span class="line"><span class="number">3</span> [<span class="string">&quot;10.161.236.231&quot;</span>] = &#123;app = <span class="string">&quot;mrs&quot;</span>, weight = <span class="number">100</span>&#125;,</span><br><span class="line"><span class="number">4</span> [<span class="string">&quot;10.51.10.182&quot;</span>] = &#123;app = <span class="string">&quot;mrs&quot;</span>, weight = <span class="number">100</span>&#125;,</span><br></pre></td></tr></table></figure></p>
+<p>万事俱备，现在就要把<code>IP.txt</code>和<code>mingdan.txt</code>按照相同的内网IP整合成一个文件！</p>
+<h1 id="脚本正文"><a href="#脚本正文" class="headerlink" title="脚本正文"></a>脚本正文</h1><p>这个脚本是不怕<code>mingdan.txt</code>和<code>IP.txt</code>的IP顺序的。<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">#!<span class="regexp">/usr/</span>bin/env python</span><br><span class="line">#coding=utf-<span class="number">8</span></span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"></span><br><span class="line">fd = &#123;&#125;		#先设置一个新的空字典叫fd</span><br><span class="line">#以下都是最后拼字符串用的</span><br><span class="line">aaa = <span class="string">&#x27;[&quot;&#x27;</span></span><br><span class="line">bbb = <span class="string">&#x27;&quot;] = &#123;app = &quot;mrs&quot;,mrsReportIp = &quot;&#x27;</span></span><br><span class="line">ccc = <span class="string">&#x27;&quot;,weight = 100&#125;,&#x27;</span>	</span><br><span class="line"> </span><br><span class="line">#首先先判断mingdan.<span class="property">txt</span>里是否存在</span><br><span class="line"><span class="keyword">for</span> l <span class="keyword">in</span> <span class="title function_">open</span>(<span class="string">&#x27;mingdan.txt&#x27;</span>, <span class="string">&#x27;r&#x27;</span>):</span><br><span class="line">        ar = re.<span class="title function_">split</span>(r<span class="string">&#x27;[ &quot;&quot;]&#x27;</span>,l)		#做分割，把内网<span class="variable constant_">IP</span>切出来</span><br><span class="line">        print <span class="string">&quot;ip is :&quot;</span> + ar[<span class="number">2</span>]			#确认是否分割出来的是内网<span class="variable constant_">IP</span>地址</span><br><span class="line">        fd[ar[<span class="number">0</span>]] = ar[<span class="number">2</span>]				#把这个内网<span class="variable constant_">IP</span>地址当作value，前面的序号就是key</span><br><span class="line"> </span><br><span class="line"><span class="keyword">with</span> <span class="title function_">open</span>(<span class="string">&#x27;out.txt&#x27;</span>, <span class="string">&#x27;w&#x27;</span>) <span class="keyword">as</span> <span class="attr">fw</span>:	</span><br><span class="line">        <span class="keyword">for</span> l <span class="keyword">in</span> <span class="title function_">open</span>(<span class="string">&#x27;IP.txt&#x27;</span>, <span class="string">&#x27;r&#x27;</span>):	</span><br><span class="line">                ar = l.<span class="title function_">split</span>()</span><br><span class="line">	                <span class="keyword">if</span> ar[<span class="number">0</span>] <span class="keyword">in</span> fd.<span class="title function_">values</span>():	#如果<span class="variable constant_">IP</span>.<span class="property">txt</span>里面的内网<span class="variable constant_">IP</span>与字典fd里的value相符合</span><br><span class="line">                       	fw.<span class="title function_">write</span>(aaa + ar[<span class="number">0</span>] + bbb + ar[<span class="number">1</span>] + ccc)	#拼成一个完整的字符串</span><br><span class="line">                       	fw.<span class="title function_">write</span>(<span class="string">&#x27;\n&#x27;</span>)				#保存文件</span><br><span class="line"><span class="title function_">print</span>(<span class="string">&#x27;文件整合完毕，请查看out.txt的结果！&#x27;</span>)</span><br></pre></td></tr></table></figure></p>
+<h1 id="执行结果"><a href="#执行结果" class="headerlink" title="执行结果"></a>执行结果</h1><p>执行效果输出如下：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@paas-online-crs-<span class="number">001</span> tmp]# cat out.<span class="property">txt</span> </span><br><span class="line">[<span class="string">&quot;10.117.219.72&quot;</span>] = &#123;app = <span class="string">&quot;mrs&quot;</span>,mrsReportIp = <span class="string">&quot;1.1.1.1&quot;</span>,weight = <span class="number">100</span>&#125;,</span><br><span class="line">[<span class="string">&quot;10.161.235.150&quot;</span>] = &#123;app = <span class="string">&quot;mrs&quot;</span>,mrsReportIp = <span class="string">&quot;2.2.2.2&quot;</span>,weight = <span class="number">100</span>&#125;,</span><br><span class="line">[<span class="string">&quot;10.161.236.231&quot;</span>] = &#123;app = <span class="string">&quot;mrs&quot;</span>,mrsReportIp = <span class="string">&quot;3.3.3.3&quot;</span>,weight = <span class="number">100</span>&#125;,</span><br><span class="line">[<span class="string">&quot;10.51.10.182&quot;</span>] = &#123;app = <span class="string">&quot;mrs&quot;</span>,mrsReportIp = <span class="string">&quot;4.4.4.4&quot;</span>,weight = <span class="number">100</span>&#125;,</span><br><span class="line">[root@paas-online-crs-<span class="number">001</span> tmp]# </span><br></pre></td></tr></table></figure></p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/python/" rel="tag"># python</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/01/26/Zabbix-proxy%E7%9A%84%E6%90%AD%E5%BB%BA%E5%92%8C%E9%85%8D%E7%BD%AE%E5%85%A8%E8%BF%87%E7%A8%8B/" rel="prev" title="Zabbix-proxy的搭建和配置全过程">
+      <i class="fa fa-chevron-left"></i> Zabbix-proxy的搭建和配置全过程
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/01/26/CentOS-6-x%E5%AE%89%E8%A3%85php-5-6%E5%92%8Credis%E6%89%A9%E5%B1%95%E7%9A%84%E5%85%A8%E8%BF%87%E7%A8%8B/" rel="next" title="CentOS 6.x安装php 5.6和redis扩展的全过程">
+      CentOS 6.x安装php 5.6和redis扩展的全过程 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%83%8C%E6%99%AF%E4%BA%A4%E4%BB%A3"><span class="nav-number">1.</span> <span class="nav-text">背景交代</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C"><span class="nav-number">2.</span> <span class="nav-text">准备工作</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%84%9A%E6%9C%AC%E6%80%9D%E8%B7%AF"><span class="nav-number">3.</span> <span class="nav-text">脚本思路</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%84%9A%E6%9C%AC%E6%AD%A3%E6%96%87"><span class="nav-number">4.</span> <span class="nav-text">脚本正文</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%89%A7%E8%A1%8C%E7%BB%93%E6%9E%9C"><span class="nav-number">5.</span> <span class="nav-text">执行结果</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

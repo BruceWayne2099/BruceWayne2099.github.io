@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="真正站在运维的层面讲nginx的书不多的...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="记一次nginx负载均衡配置问题">
+<meta property="og:url" content="http://example.com/2018/04/28/%E8%AE%B0%E4%B8%80%E6%AC%A1nginx%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E9%85%8D%E7%BD%AE%E9%97%AE%E9%A2%98/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="真正站在运维的层面讲nginx的书不多的...">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/aliCDN2.png">
+<meta property="og:image" content="http://example.com/images/aliCDN6.png">
+<meta property="og:image" content="http://example.com/images/aliCDN3.png">
+<meta property="og:image" content="http://example.com/images/aliCDN1.png">
+<meta property="og:image" content="http://example.com/images/aliCDN5.png">
+<meta property="article:published_time" content="2018-04-28T13:48:40.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:48:16.976Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="nginx">
+<meta property="article:tag" content="负载均衡">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/aliCDN2.png">
+
+<link rel="canonical" href="http://example.com/2018/04/28/%E8%AE%B0%E4%B8%80%E6%AC%A1nginx%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E9%85%8D%E7%BD%AE%E9%97%AE%E9%A2%98/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>记一次nginx负载均衡配置问题 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2018/04/28/%E8%AE%B0%E4%B8%80%E6%AC%A1nginx%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E9%85%8D%E7%BD%AE%E9%97%AE%E9%A2%98/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          记一次nginx负载均衡配置问题
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-04-28 21:48:40" itemprop="dateCreated datePublished" datetime="2018-04-28T21:48:40+08:00">2018-04-28</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:48:16" itemprop="dateModified" datetime="2025-11-08T08:48:16+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>640</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>2 mins.</span>
+            </span>
+            <div class="post-description">真正站在运维的层面讲nginx的书不多的...</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="故障背景"><a href="#故障背景" class="headerlink" title="故障背景"></a>故障背景</h2><p>公司有三个实体服务器，内网IP分别是<code>10.1.82.83</code>、<code>10.1.82.84</code>、<code>10.1.82.113</code>，这三个作为源站使用专线连接到了阿里云的一台nginx服务器上，并且通过这个nginx做负载均衡展示这三个服务器里面的网页。负载均衡使用的是<code>nginx 1.12</code>版本，最外面在上一个CDN起到静态页面加速的作用。整个架构如图：<br><img src="/images/aliCDN2.png" alt="paradin"></p>
+<p>CDN的配置界面如下：<br><img src="/images/aliCDN6.png" alt="paradin"></p>
+<p>但是现在很奇怪的是，所有节点启动之后，外网用户通过负载后访问均指向了<code>10.1.82.84</code>这一台服务器，<code>nginx.conf</code>配置是<code>最小连接数</code>的配置，如下：<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">upstream eln.<span class="property">dahuatech</span>.<span class="property">com</span> &#123;</span><br><span class="line">      #ip_hash;</span><br><span class="line">      #hash $http_x_forwarded_for;</span><br><span class="line">      #sticky;</span><br><span class="line">      least_conn;</span><br><span class="line">      server  <span class="number">10.1</span><span class="number">.82</span><span class="number">.83</span> max_fails=<span class="number">2</span> fail_timeout=30s;</span><br><span class="line">      server  <span class="number">10.1</span><span class="number">.82</span><span class="number">.84</span> max_fails=<span class="number">2</span> fail_timeout=30s;</span><br><span class="line">      server  <span class="number">10.1</span><span class="number">.82</span><span class="number">.113</span> max_fails=<span class="number">2</span> fail_timeout=30s;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">server &#123;</span><br><span class="line">        server_name  eln.<span class="property">dahuatech</span>.<span class="property">com</span>;</span><br><span class="line">            listen     <span class="number">80</span>;</span><br><span class="line">            listen     <span class="number">443</span> ssl;</span><br><span class="line"></span><br><span class="line">        access_log logs/eln.<span class="property">dahuatech</span>.<span class="property">com</span>.<span class="property">access</span>.<span class="property">log</span> main;</span><br><span class="line">        error_log  logs/eln.<span class="property">dahuatech</span>.<span class="property">com</span>.<span class="property">error</span>.<span class="property">log</span>;</span><br><span class="line"></span><br><span class="line">        proxy_set_header <span class="title class_">Host</span> <span class="attr">$host</span>:$server_port;</span><br><span class="line">        proxy_set_header X-<span class="title class_">Real</span>-<span class="variable constant_">IP</span> $remote_addr;</span><br><span class="line">        proxy_set_header <span class="variable constant_">REMOTE</span>-<span class="variable constant_">HOST</span> $remote_addr;</span><br><span class="line">        proxy_set_header X-<span class="title class_">Forwarded</span>-<span class="title class_">For</span> $proxy_add_x_forwarded_for;</span><br><span class="line"></span><br><span class="line">   location / &#123;</span><br><span class="line">            proxy_pass <span class="attr">http</span>:<span class="comment">//eln.dahuatech.com;</span></span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>测试的时候发现，即使绑定美国和香港的节点去<code>curl</code>，是能正常解析到其他机器上的。如下：<br><img src="/images/aliCDN3.png" alt="paradin"></p>
+<p>然而源站过来的请求IP集中到了只有一个，这太奇怪了。</p>
+<h2 id="故障解决"><a href="#故障解决" class="headerlink" title="故障解决"></a>故障解决</h2><p>后来发现<font color=red>ngnix后端会把http1.1转换成1.0变成短连接</font>，这个连接存在的时间非常短，因为后端响应非常快。所以即使配上了<code>least_conn</code>，其实是没有任何效果的。这样负载均衡的nginx看到所有源站其实一直都是没有连接的，所以也就一直在给第一个转。</p>
+<p>既然这样，就取消了<code>least_conn</code>改用轮询，nginx.conf也改成如下的样子：<br><img src="/images/aliCDN1.png" alt="paradin"></p>
+<p>最后终于均衡了，大功告成！<br><img src="/images/aliCDN5.png" alt="paradin"></p>
+<p>后来琢磨了一下，是用sticky其实也是OK的。</p>
+<p>所以说，有些情景使用域名不通的情况下，可以考虑直接使用IP，这样就绕过nginx了，不会破坏原来的长连接。</p>
+<h2 id="几个主流负载均衡软件配置cookie的方法"><a href="#几个主流负载均衡软件配置cookie的方法" class="headerlink" title="几个主流负载均衡软件配置cookie的方法"></a>几个主流负载均衡软件配置cookie的方法</h2><p>1.Apache的话首先打开<code>httpd.conf</code>配置文件，确保如下配置没有被注释。<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="title class_">LoadModule</span> usertrack_module modules/mod_usertrack.<span class="property">so</span></span><br></pre></td></tr></table></figure></p>
+<p>再在<code>virtual host</code>中添加以下配置。<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="title class_">CookieName</span> name</span><br><span class="line"><span class="title class_">CookieExpires</span> <span class="string">&quot;1 days&quot;</span></span><br><span class="line"><span class="title class_">CookieStyle</span> <span class="title class_">Cookie</span></span><br><span class="line"><span class="title class_">CookieTracking</span> on</span><br></pre></td></tr></table></figure></p>
+<p>2.Nginx参考以下配置，设置Cookie。<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    listen <span class="number">8080</span>;</span><br><span class="line">    server_name wqwq.<span class="property">example</span>.<span class="property">com</span>;</span><br><span class="line">    location / &#123;</span><br><span class="line">      add_header <span class="title class_">Set</span>-<span class="title class_">Cookie</span> name=xxxx;</span><br><span class="line">        root   html;</span><br><span class="line">        index  index.<span class="property">html</span> index.<span class="property">htm</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>3.Lighttpd参考以下配置，设置Cookie。<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">server.<span class="property">modules</span>  = ( <span class="string">&quot;mod_setenv&quot;</span> )</span><br><span class="line">$HTTP[<span class="string">&quot;host&quot;</span>] == <span class="string">&quot;test.example.com&quot;</span> &#123;</span><br><span class="line">      server.<span class="property">document</span>-root = <span class="string">&quot;/var/www/html/&quot;</span></span><br><span class="line">      setenv.<span class="property">add</span>-response-header = ( <span class="string">&quot;Set-Cookie&quot;</span> =&gt; <span class="string">&quot;name=XXXXXX&quot;</span>      &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="扩展阅读"><a href="#扩展阅读" class="headerlink" title="扩展阅读"></a>扩展阅读</h2><p><a target="_blank" rel="noopener" href="https://cloud.tencent.com/document/product/214/2736">https://cloud.tencent.com/document/product/214/2736</a><br><a target="_blank" rel="noopener" href="http://blog.text.wiki/2015/08/01/nginx-sticky-problem.html">http://blog.text.wiki/2015/08/01/nginx-sticky-problem.html</a><br><a target="_blank" rel="noopener" href="https://cloud.tencent.com/developer/article/1004547">https://cloud.tencent.com/developer/article/1004547</a></p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/nginx/" rel="tag"># nginx</a>
+              <a href="/tags/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" rel="tag"># 负载均衡</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/04/27/%E8%AE%B0%E4%B8%80%E6%AC%A1%E9%98%BF%E9%87%8C%E4%BA%91oss%E4%BA%91%E5%AD%98%E5%82%A8%E5%88%A0%E9%99%A4%E5%A4%B1%E8%B4%A5%E7%9A%84%E9%97%AE%E9%A2%98/" rel="prev" title="记一次阿里云oss云存储删除失败的问题">
+      <i class="fa fa-chevron-left"></i> 记一次阿里云oss云存储删除失败的问题
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/05/07/%E9%80%9A%E8%BF%87%E9%98%BF%E9%87%8C%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8ID%E6%B7%BB%E5%8A%A0%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%B5%84%E6%96%99%E5%88%B0django%E7%9A%84%E8%84%9A%E6%9C%AC/" rel="next" title="通过阿里云服务器ID添加服务器资料到django的脚本">
+      通过阿里云服务器ID添加服务器资料到django的脚本 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%85%E9%9A%9C%E8%83%8C%E6%99%AF"><span class="nav-number">1.</span> <span class="nav-text">故障背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%85%E9%9A%9C%E8%A7%A3%E5%86%B3"><span class="nav-number">2.</span> <span class="nav-text">故障解决</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%A0%E4%B8%AA%E4%B8%BB%E6%B5%81%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E8%BD%AF%E4%BB%B6%E9%85%8D%E7%BD%AEcookie%E7%9A%84%E6%96%B9%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text">几个主流负载均衡软件配置cookie的方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%89%A9%E5%B1%95%E9%98%85%E8%AF%BB"><span class="nav-number">4.</span> <span class="nav-text">扩展阅读</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

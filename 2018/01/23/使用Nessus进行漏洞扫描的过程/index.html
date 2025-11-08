@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="传说中最流行的漏洞扫描程序...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用Nessus进行漏洞扫描的过程">
+<meta property="og:url" content="http://example.com/2018/01/23/%E4%BD%BF%E7%94%A8Nessus%E8%BF%9B%E8%A1%8C%E6%BC%8F%E6%B4%9E%E6%89%AB%E6%8F%8F%E7%9A%84%E8%BF%87%E7%A8%8B/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="传说中最流行的漏洞扫描程序...">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/nessus1.png">
+<meta property="og:image" content="http://example.com/images/nessus2.png">
+<meta property="og:image" content="http://example.com/images/nessus3.png">
+<meta property="og:image" content="http://example.com/images/nessus4.png">
+<meta property="og:image" content="http://example.com/images/nessus5.png">
+<meta property="og:image" content="http://example.com/images/nessus6.png">
+<meta property="og:image" content="http://example.com/images/nessus7.png">
+<meta property="og:image" content="http://example.com/images/nessus8.png">
+<meta property="og:image" content="http://example.com/images/nessus9.png">
+<meta property="og:image" content="http://example.com/images/nessus10.png">
+<meta property="og:image" content="http://example.com/images/nessus11.png">
+<meta property="og:image" content="http://example.com/images/nessus12.png">
+<meta property="og:image" content="http://example.com/images/nessus13.png">
+<meta property="og:image" content="http://example.com/images/nessus14.png">
+<meta property="og:image" content="http://example.com/images/nessus15.png">
+<meta property="og:image" content="http://example.com/images/nessus16.png">
+<meta property="og:image" content="http://example.com/images/nessus17.png">
+<meta property="og:image" content="http://example.com/images/nessus18.png">
+<meta property="og:image" content="http://example.com/images/nessus19.png">
+<meta property="og:image" content="http://example.com/images/nessus20.png">
+<meta property="og:image" content="http://example.com/images/nessus21.png">
+<meta property="og:image" content="http://example.com/images/nessus22.png">
+<meta property="article:published_time" content="2018-01-23T04:53:51.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:47:35.214Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="nessus">
+<meta property="article:tag" content="运维技术">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/nessus1.png">
+
+<link rel="canonical" href="http://example.com/2018/01/23/%E4%BD%BF%E7%94%A8Nessus%E8%BF%9B%E8%A1%8C%E6%BC%8F%E6%B4%9E%E6%89%AB%E6%8F%8F%E7%9A%84%E8%BF%87%E7%A8%8B/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>使用Nessus进行漏洞扫描的过程 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2018/01/23/%E4%BD%BF%E7%94%A8Nessus%E8%BF%9B%E8%A1%8C%E6%BC%8F%E6%B4%9E%E6%89%AB%E6%8F%8F%E7%9A%84%E8%BF%87%E7%A8%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          使用Nessus进行漏洞扫描的过程
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-01-23 12:53:51" itemprop="dateCreated datePublished" datetime="2018-01-23T12:53:51+08:00">2018-01-23</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:47:35" itemprop="dateModified" datetime="2025-11-08T08:47:35+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>1.6k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>6 mins.</span>
+            </span>
+            <div class="post-description">传说中最流行的漏洞扫描程序...</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>对于一个服务器运维工作者，掌握和运用一门漏洞扫描的工具也是行走江湖的必备项，Nessus就是漏洞扫描的强力武器。Nessus为一款当下比较流行的系统弱点扫描与分析软件，他的优点是操作简单（配置几乎全web化），而且页面精美、扫描项广泛；缺点就是目前不支持中文…</p>
+<h2 id="下载与安装"><a href="#下载与安装" class="headerlink" title="下载与安装"></a>下载与安装</h2><p>要安装Nessus，需要登陆<code>https://www.tenable.com/products/nessus/select-your-operating-system</code>,选择对应的系统，我这个服务器是centos 7，那么就选择下图里红色的那个rpm包：<br><img src="/images/nessus1.png" alt="paradin"></p>
+<p>点击之后，出来一个同意条款，同意之后就开始自动下载。但是要安装nessus仅仅有程序是不够的，还需要一个对应的验证码，在上面那个界面里，下拉一点有一个<code>get an activation code</code>的check，点击之后跳转到<code>https://www.tenable.com/products/nessus/nessus-plugins/obtain-an-activation-code</code>，里选择家用free版，点击下面的<code>register now</code>：<br><img src="/images/nessus2.png" alt="paradin"></p>
+<p>注册是很简单的，填写名称和电邮就可以了。不久后就会在电子邮件里面获得一个校验码。</p>
+<p>把下载的那个Nessus-6.11.1-es7.x86_64.rpm包上传到centos之后，<code>rpm -ivh Nessus-6.11.1-es7.x86_64.rpm</code>进行安装，安装完成之后，<code>service nessusd start</code>启动进程，启动完毕之后，使用<code>netstat -lnpt|grep 8834</code>，来检查一下8834端口是否被监听，如图：<br><img src="/images/nessus3.png" alt="paradin"></p>
+<p>端口监听OK，那么在浏览器里输入<code>https://服务器外网IP地址:8834</code>打开控制web界面，如果有提示当前连接不安全，无视掉就可以。nessus的欢迎界面如下：<br><img src="/images/nessus4.png" alt="paradin"></p>
+<p>注册一个账号之后，在这个界面里面选择home那一条，输入邮箱里面获得的那个注册码：<br><img src="/images/nessus5.png" alt="paradin"></p>
+<p>整个的配置就完事了，继而就是nessus自动安装的过程，大约需要几分钟：<br><img src="/images/nessus6.png" alt="paradin"></p>
+<p>整个安装完毕之后，就会看到nessus的主界面，简单明了的风格：<br><img src="/images/nessus7.png" alt="paradin"></p>
+<p>至此整个nessus的安装过程结束。</p>
+<h2 id="配置扫描策略以及启动扫描任务"><a href="#配置扫描策略以及启动扫描任务" class="headerlink" title="配置扫描策略以及启动扫描任务"></a>配置扫描策略以及启动扫描任务</h2><p>nessus扫描漏洞的流程很简单：需要先”制定策略”，然后在这个策略的基础上建立”扫描任务”，然后执行任务。首先，我们先建立一个<code>policy</code>，如图：<br><img src="/images/nessus8.png" alt="paradin"></p>
+<p>点击<code>New Policy</code>之后，就会出现很多种扫描策略，这里我们选择<code>Advanced Scan</code>(高级扫描)：<br><img src="/images/nessus9.png" alt="paradin"> </p>
+<p>我给这个测试的扫描策略，起名叫”chenchenchen”，如图：<br><img src="/images/nessus10.png" alt="paradin"> </p>
+<p>对于上面这个图，<code>Permissions</code>是权限管理，是否可以准许其他的nessus用户来使用你这个策略；<code>Discovery</code>里面有主机发现、端口扫描和服务发现等功能；<code>assessment</code>里面有对于暴力攻击的一些设定；<code>Report</code>里面是报告的一些设定；Advanced里面是一些超时、每秒扫描多少项等基础设定，一般来说这里默认就好。我们主要来看看那个<code>plugins</code>。</p>
+<p><code>Plugins</code>里面就是具体的策略，里面有父策略，具体的父策略下面还有子策略，把这些策略制定得体的话，使用者可以更加有针对性的进行扫描。比如我这个策略是针对于centos系统的扫描策略，那么一些冗余的项目大可以完全不要，举个例子：<br><img src="/images/nessus11.png" alt="paradin"> </p>
+<p>在上面这个图里面，我不需要<code>amazon linux local security checks</code>这个“亚马逊linux本地安全检查”父策略，那就把它disabled掉，而对于<code>centos local security checks</code>这个父策略呢，我又不需要那几个关于bind的子策略，那我就单独把那些子策略disabled掉，这样等等操作，就搭配成为了一个用时不长但是又包含了所有制定的检查项的策略，然后点击<code>save</code>保存。</p>
+<p>保存完后，我们就发现policy里多了一条<code>chenchenchen</code>的记录：<br><img src="/images/nessus12.png" alt="paradin"> </p>
+<p>既然策略有了，现在我们就来制定一个任务。在主界面里选择<code>My Scans</code>,点击<code>New Scans</code>,这个时候还是有很多个图标，但是我们选择后面的<code>User defined</code>，如图：<br><img src="/images/nessus13.png" alt="paradin"> </p>
+<p>这里我们就看到了我们已经制定好的那个chenchenchen策略，点击这个chenchenchen之后，就要给这个依赖chenchenchen策略的任务起名字以及需要扫描的网络段，由于我这个测试机的内网ip段是10.132.27.0，于是我就写了“10.132.27.0&#x2F;24”，任务名字叫chentest：<br><img src="/images/nessus14.png" alt="paradin"> </p>
+<h2 id="启动扫描任务"><a href="#启动扫描任务" class="headerlink" title="启动扫描任务"></a>启动扫描任务</h2><p>点击save保存之后，就会看到My Scans里多了这个chentest的任务，点击三角播放箭头，那么这个任务就开始执行了！如图：<br><img src="/images/nessus15.png" alt="paradin"> </p>
+<p>从该界面可以看到扫描任务的状态为Running（正在运行），表示chentest扫描任务添加成功。如果想要停止扫描，可以单击方块（停止一下）按钮。如果暂停扫描任务，单击暂停按钮。</p>
+<p>扫描完毕之后，我们就会看到一个结果反馈，如图：<br><img src="/images/nessus16.png" alt="paradin"> </p>
+<p>具体的颜色代表，在旁边有描述，例子里这些蓝色的info代表没有重大漏洞，点击一下蓝色，还会出现更加详细的信息，包括IP地址、操作系统类型、扫描的起始时间和结束时间：<br><img src="/images/nessus17.png" alt="paradin"> </p>
+<p><img src="/images/nessus18.png" alt="paradin"> </p>
+<p>同时，nessus还支持pdf、web、csv等多种方式汇报扫描结果，至此，整个nessus漏洞扫描的全过程就结束了。</p>
+<h2 id="Nessus配置smtp"><a href="#Nessus配置smtp" class="headerlink" title="Nessus配置smtp"></a>Nessus配置smtp</h2><p>Nessus漏洞扫描是提供邮件服务，可以将扫描的结果发送给指定的邮箱。配置它的方法很简单，先登陆Nessus的界面，点击左上角的<code>settings</code>，然后选择左侧菜单栏里的<code>Smtp server</code>，如图：<br><img src="/images/nessus19.png" alt="paradin"></p>
+<p>再就是填写对应的项目，我这里发送邮件的地址是：<code>chenx3314@sina.com</code>，接受的地址是<code>124208739@qq.com</code>，由于发送邮件使用的是新浪的邮箱，那么host就填写新浪的smtp服务器，即smtp.sina.com，如果是要SSL加密的话，端口写465，同时在Encryption那里选择<code>Force SSL</code>，在Auth Method那里选择<code>login</code>的鉴权方式，然后输入<a href="mailto:&#x63;&#x68;&#x65;&#x6e;&#120;&#x33;&#51;&#x31;&#52;&#x40;&#115;&#x69;&#110;&#97;&#46;&#99;&#111;&#x6d;">chenx3314@sina.com</a>的账号密码，如图：<br><img src="/images/nessus20.png" alt="paradin"></p>
+<p>点击<code>Send Test Email</code>，然后输入接收的邮箱，如果是多个邮箱那么就用英文逗号隔开。看到成功的提示就是OK了：<br><img src="/images/nessus21.png" alt="paradin"></p>
+<p>然后就可以到邮箱里面看到那个测试的邮件内容：<br><img src="/images/nessus22.png" alt="paradin"></p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%BF%90%E7%BB%B4%E6%8A%80%E6%9C%AF/" rel="tag"># 运维技术</a>
+              <a href="/tags/nessus/" rel="tag"># nessus</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/01/23/mysql%E6%B8%85%E9%99%A4%E7%A3%81%E7%9B%98%E7%A2%8E%E7%89%87/" rel="prev" title="mysql清除磁盘碎片">
+      <i class="fa fa-chevron-left"></i> mysql清除磁盘碎片
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/01/23/Zabbix%E6%B7%BB%E5%8A%A0%E7%BD%91%E5%8D%A1%E5%86%85%E5%A4%96%E6%B5%81%E9%87%8F%E7%9B%91%E6%8E%A7/" rel="next" title="Zabbix添加网卡内外流量监控">
+      Zabbix添加网卡内外流量监控 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8B%E8%BD%BD%E4%B8%8E%E5%AE%89%E8%A3%85"><span class="nav-number">1.</span> <span class="nav-text">下载与安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E6%89%AB%E6%8F%8F%E7%AD%96%E7%95%A5%E4%BB%A5%E5%8F%8A%E5%90%AF%E5%8A%A8%E6%89%AB%E6%8F%8F%E4%BB%BB%E5%8A%A1"><span class="nav-number">2.</span> <span class="nav-text">配置扫描策略以及启动扫描任务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8%E6%89%AB%E6%8F%8F%E4%BB%BB%E5%8A%A1"><span class="nav-number">3.</span> <span class="nav-text">启动扫描任务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Nessus%E9%85%8D%E7%BD%AEsmtp"><span class="nav-number">4.</span> <span class="nav-text">Nessus配置smtp</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

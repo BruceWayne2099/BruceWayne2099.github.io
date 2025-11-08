@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="查看连接创建的时间，可以先lsof -p pid获取端口连接的文件编号，再根据ll &#x2F;proc&#x2F;pid&#x2F;fd&#x2F;文件编号获取到建立创建的时间">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Python3从jenkins爬取连接并且上传到文件服务器的脚本">
+<meta property="og:url" content="http://example.com/2019/07/31/Python3%E4%BB%8Ejenkins%E7%88%AC%E5%8F%96%E8%BF%9E%E6%8E%A5%E5%B9%B6%E4%B8%94%E4%B8%8A%E4%BC%A0%E5%88%B0%E6%96%87%E4%BB%B6%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%9A%84%E8%84%9A%E6%9C%AC/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="查看连接创建的时间，可以先lsof -p pid获取端口连接的文件编号，再根据ll &#x2F;proc&#x2F;pid&#x2F;fd&#x2F;文件编号获取到建立创建的时间">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/jenkins20.png">
+<meta property="og:image" content="http://example.com/images/jenkins21.png">
+<meta property="article:published_time" content="2019-07-31T02:24:58.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:47:09.565Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="python3">
+<meta property="article:tag" content="爬虫">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/jenkins20.png">
+
+<link rel="canonical" href="http://example.com/2019/07/31/Python3%E4%BB%8Ejenkins%E7%88%AC%E5%8F%96%E8%BF%9E%E6%8E%A5%E5%B9%B6%E4%B8%94%E4%B8%8A%E4%BC%A0%E5%88%B0%E6%96%87%E4%BB%B6%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%9A%84%E8%84%9A%E6%9C%AC/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>Python3从jenkins爬取连接并且上传到文件服务器的脚本 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/07/31/Python3%E4%BB%8Ejenkins%E7%88%AC%E5%8F%96%E8%BF%9E%E6%8E%A5%E5%B9%B6%E4%B8%94%E4%B8%8A%E4%BC%A0%E5%88%B0%E6%96%87%E4%BB%B6%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%9A%84%E8%84%9A%E6%9C%AC/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Python3从jenkins爬取连接并且上传到文件服务器的脚本
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-07-31 10:24:58" itemprop="dateCreated datePublished" datetime="2019-07-31T10:24:58+08:00">2019-07-31</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:47:09" itemprop="dateModified" datetime="2025-11-08T08:47:09+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>910</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>3 mins.</span>
+            </span>
+            <div class="post-description">查看连接创建的时间，可以先lsof -p pid获取端口连接的文件编号，再根据ll /proc/pid/fd/文件编号获取到建立创建的时间</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>以前部署的流程是这样的：开发给运维一个jenkins地址，运维在桌面打开jenkins页面下载zip包，然后Xftp传递到nfs共享挂载盘里。不过我们现在开发都把模块的名字取得特别长而且易混（天才一般的取名方式），最重要的是遇到大型上线，jenkins里会有N多个zip包，如图：<br><img src="/images/jenkins20.png" alt="抱光妹"></p>
+<p>这样一个一个点下来，连点十多下然后再上传的行为不仅蠢还很容易遗漏，于是就写一个脚本来解决这个问题，实现“一键传包”。脚本如下：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># !/usr/bin/env python </span></span><br><span class="line"><span class="comment"># -*- coding:utf-8 -*-</span></span><br><span class="line"><span class="comment"># 作者：ChrisChan</span></span><br><span class="line"><span class="comment"># 用途：爬取jenkins网页的所有的zip连接，下载完毕之后上传到文件服务器里，脚本需要安装paramiko,tqdm和BeautifulSoup</span></span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">from</span> bs4 <span class="keyword">import</span> BeautifulSoup</span><br><span class="line"><span class="keyword">from</span> tqdm <span class="keyword">import</span> tqdm</span><br><span class="line"><span class="keyword">import</span> paramiko</span><br><span class="line"><span class="keyword">import</span> datetime</span><br><span class="line"></span><br><span class="line">zip_url = []</span><br><span class="line">zip_name = []</span><br><span class="line"></span><br><span class="line">folder_path = <span class="string">r&#x27;F:/Jenkins/&#x27;</span></span><br><span class="line"><span class="keyword">if</span> os.path.exists(folder_path) == <span class="literal">False</span>:  	<span class="comment"># 判断文件夹是否已经存在</span></span><br><span class="line">    os.makedirs(folder_path)   	 <span class="comment"># 创建文件夹</span></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;jenkins文件夹已经创建完毕！&quot;</span>)</span><br><span class="line"></span><br><span class="line">BASE_URL = <span class="built_in">input</span>(<span class="string">&quot;请输入jenkins网址：&quot;</span>)       <span class="comment"># 由于input输入http地址自带超链接，回车就直接弹开网页，所以url末尾是以 空格 结束</span></span><br><span class="line"><span class="keyword">if</span> BASE_URL.endswith(<span class="string">&#x27;/ &#x27;</span>):</span><br><span class="line">    url = <span class="built_in">str</span>.rstrip(BASE_URL) + <span class="string">&quot;artifact/artifacts/Modules/&quot;</span>   <span class="comment"># 去掉末尾空格</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    url = <span class="built_in">str</span>.rstrip(BASE_URL) + <span class="string">&quot;/artifact/artifacts/Modules/&quot;</span>  <span class="comment"># 补全</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;准备去&quot;</span>,url,<span class="string">&quot;里下载所有的zip文件&quot;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 爬取页面所有的zip地址</span></span><br><span class="line">page = requests.get(url).text</span><br><span class="line">pagesoup = BeautifulSoup(page,<span class="string">&#x27;lxml&#x27;</span>)</span><br><span class="line"><span class="keyword">for</span> link <span class="keyword">in</span> pagesoup.find_all(name=<span class="string">&#x27;a&#x27;</span>,attrs=&#123;<span class="string">&quot;href&quot;</span>:re.<span class="built_in">compile</span>(<span class="string">r&#x27;.zip$&#x27;</span>)&#125;):        <span class="comment"># 获取所有zip结尾的，如果是开头就是^</span></span><br><span class="line">    zipname = link.get(<span class="string">&#x27;href&#x27;</span>)</span><br><span class="line">    zip_url.append(url + zipname)</span><br><span class="line">    zip_name.append(zipname)</span><br><span class="line"><span class="comment">#print(zip_url)       # 得到完整的zip包下载链接</span></span><br><span class="line"></span><br><span class="line">zip_dict = <span class="built_in">dict</span>(<span class="built_in">zip</span>(zip_name, zip_url))     <span class="comment">#把下载包名和链接做成字典</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (<span class="string">&quot;./*zip*/Modules.zip&quot;</span>) <span class="keyword">in</span> zip_dict.keys(): <span class="comment"># 判断字典里是否存在这个元素</span></span><br><span class="line">    zip_dict.pop(<span class="string">&quot;./*zip*/Modules.zip&quot;</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;该页面有 %s 个zip文件：&quot;</span> % <span class="built_in">len</span>(zip_dict))</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;该页面有 %s 个zip文件：&quot;</span> % <span class="built_in">len</span>(zip_dict))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 下载文件</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">downloadFile</span>(<span class="params">name,file_url</span>):</span><br><span class="line">    resp = requests.get(url=file_url, stream=<span class="literal">True</span>)</span><br><span class="line">    content_size = <span class="built_in">int</span>(resp.headers[<span class="string">&#x27;Content-Length&#x27;</span>]) / <span class="number">1024</span></span><br><span class="line">    <span class="keyword">with</span> <span class="built_in">open</span>(folder_path+name, <span class="string">&quot;wb&quot;</span>) <span class="keyword">as</span> f:</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;安装包整个大小是：&quot;</span>, content_size, <span class="string">&#x27;k，开始下载...&#x27;</span>)</span><br><span class="line">        <span class="keyword">for</span> data <span class="keyword">in</span> tqdm(iterable=resp.iter_content(<span class="number">1024</span>), total=content_size, unit=<span class="string">&#x27;k&#x27;</span>, desc=name):	<span class="comment">#使用tqdm做了一个进度条</span></span><br><span class="line">            <span class="keyword">try</span>:</span><br><span class="line">                f.write(data)</span><br><span class="line">            <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">                <span class="built_in">print</span>(<span class="built_in">repr</span>(e))</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&#x27;\r\n&#x27;</span> + name + <span class="string">&quot;已经下载完毕！&quot;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 上传到share盘</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">uploadFile</span>(<span class="params">_localDir, _remoteDir</span>):</span><br><span class="line">    _localDir = folder_path</span><br><span class="line">    _remoteDir = remote_path</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        t = paramiko.Transport((hostIP, port))      <span class="comment"># 这里一定是双括号！</span></span><br><span class="line">        t.connect(username=username, password=password)</span><br><span class="line">        sftp = paramiko.SFTPClient.from_transport(t)</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&#x27;现在开始上传文件到/share/bag %s &#x27;</span> % datetime.datetime.now())</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> root, dirs, files <span class="keyword">in</span> os.walk(_localDir):</span><br><span class="line">            <span class="comment"># 相对与_localDir的路径</span></span><br><span class="line">            remoteRoot = root.replace(<span class="string">&quot;\\&quot;</span>, <span class="string">&quot;/&quot;</span>)</span><br><span class="line">            <span class="comment"># 文件名，不包括路径</span></span><br><span class="line">            <span class="keyword">for</span> filespath <span class="keyword">in</span> files:</span><br><span class="line">                local_file = os.path.join(root, filespath)</span><br><span class="line">                remote_file = remote_path + <span class="string">&quot;/&quot;</span> + filespath</span><br><span class="line">                remote_file = remote_file.replace(<span class="string">&quot;//&quot;</span>, <span class="string">&quot;/&quot;</span>)</span><br><span class="line">                <span class="keyword">try</span>:</span><br><span class="line">                    sftp.put(local_file, remote_file)</span><br><span class="line">                <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">                    sftp.mkdir(os.path.split(remote_file)[<span class="number">0</span>])</span><br><span class="line">                    sftp.put(local_file, remote_file)</span><br><span class="line">                <span class="built_in">print</span>(<span class="string">&quot;%s 上传成功！远程地址是 %s &quot;</span> % (local_file, remote_file))</span><br><span class="line">            <span class="keyword">for</span> name <span class="keyword">in</span> dirs:</span><br><span class="line">                remoteDir = _remoteDir + <span class="string">&quot;/&quot;</span> + remoteRoot + <span class="string">&quot;/&quot;</span> + name</span><br><span class="line">                remoteDir = remoteDir.replace(<span class="string">&quot;//&quot;</span>, <span class="string">&quot;/&quot;</span>)</span><br><span class="line">                <span class="built_in">print</span>(<span class="string">&quot;remoteDir &quot;</span>, remoteDir)</span><br><span class="line">                <span class="keyword">try</span>:</span><br><span class="line">                    sftp.mkdir(remoteDir)</span><br><span class="line">                    <span class="built_in">print</span>(<span class="string">&quot;mkdir path %s&quot;</span> % remoteDir)</span><br><span class="line">                <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">                    <span class="keyword">pass</span></span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&#x27;文件已经全部上传完毕！ %s &#x27;</span> % datetime.datetime.now())</span><br><span class="line">        t.close()</span><br><span class="line">    <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">        <span class="built_in">print</span>(e)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    <span class="keyword">for</span> item <span class="keyword">in</span> zip_dict:</span><br><span class="line">        <span class="keyword">if</span> item:</span><br><span class="line">             downloadFile(item, zip_dict[item])</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">&quot;文件不存在，无法下载！&quot;</span>)</span><br><span class="line"></span><br><span class="line">    hostIP = <span class="string">&quot;文件服务器的外网IP&quot;</span></span><br><span class="line">    port = 目标端口</span><br><span class="line">    username = <span class="string">&quot;连接账号&quot;</span></span><br><span class="line">    password = <span class="string">&quot;连接密码&quot;</span></span><br><span class="line">    remote_path = <span class="string">&quot;远程路径&quot;</span>		<span class="comment"># 这里注意文件夹权限</span></span><br><span class="line">    uploadFile(folder_path, remote_path)</span><br></pre></td></tr></table></figure></p>
+<p>执行效果如下：<br><img src="/images/jenkins21.png" alt="抱光妹"></p>
+<p>脚本可以改进的几个地方：</p>
+<ol>
+<li>使用多进程，提高下载和上传效率；</li>
+<li>不使用服务器，而是本地将文件上传到云存储，然后在部署的时候，模块服务器通过内网下载对应的zip包或者在dockerfile里就可以直接<code>ADD 云存储路径</code>；</li>
+<li>服务器或者是oss信息，单独保存在配置文件里，然后使用<code>configparser</code>方法读取出来；</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/python3/" rel="tag"># python3</a>
+              <a href="/tags/%E7%88%AC%E8%99%AB/" rel="tag"># 爬虫</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/07/25/%E4%BD%BF%E7%94%A8Rancher%E6%90%AD%E9%85%8DHarbor%E9%83%A8%E7%BD%B2Kafka/" rel="prev" title="使用Rancher搭配Harbor部署Kafka集群">
+      <i class="fa fa-chevron-left"></i> 使用Rancher搭配Harbor部署Kafka集群
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/08/02/Ansible-playbook%E6%89%B9%E9%87%8F%E6%9B%B4%E6%94%B9sudoers%E6%96%87%E4%BB%B6%E9%87%8C%E7%9A%84NOPASSWD-ALL/" rel="next" title="Ansible-playbook批量更改sudoers文件里的NOPASSWD:ALL">
+      Ansible-playbook批量更改sudoers文件里的NOPASSWD:ALL <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

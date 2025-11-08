@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="实现session共享的集群要点：首先搭建好单机版的tomcat将session持久化到redis中，然后配置nginx轮询tomcat（负载均衡）">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Tomcat8配置apr">
+<meta property="og:url" content="http://example.com/2019/09/30/Tomcat8%E9%85%8D%E7%BD%AEapr/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="实现session共享的集群要点：首先搭建好单机版的tomcat将session持久化到redis中，然后配置nginx轮询tomcat（负载均衡）">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/tomcat1.png">
+<meta property="og:image" content="http://example.com/images/tomcat2.png">
+<meta property="og:image" content="http://example.com/images/tomcat3.png">
+<meta property="article:published_time" content="2019-09-30T02:06:35.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:47:13.406Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="java">
+<meta property="article:tag" content="tomcat">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/tomcat1.png">
+
+<link rel="canonical" href="http://example.com/2019/09/30/Tomcat8%E9%85%8D%E7%BD%AEapr/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>Tomcat8配置apr | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/09/30/Tomcat8%E9%85%8D%E7%BD%AEapr/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Tomcat8配置apr
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-09-30 10:06:35" itemprop="dateCreated datePublished" datetime="2019-09-30T10:06:35+08:00">2019-09-30</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:47:13" itemprop="dateModified" datetime="2025-11-08T08:47:13+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>1.6k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>6 mins.</span>
+            </span>
+            <div class="post-description">实现session共享的集群要点：首先搭建好单机版的tomcat将session持久化到redis中，然后配置nginx轮询tomcat（负载均衡）</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="基础知识开场"><a href="#基础知识开场" class="headerlink" title="基础知识开场"></a>基础知识开场</h2><p>先以一个面试题作为本文的开场白：tomcat与nginx都是<code>Seb Server</code>，他们有什么区别？<br>首先先说明一下Tomcat更应该被叫做<code>Web Container</code>，当然它可以被认为是HTTP服务器，它的主要内容是处理<code>动态请求</code>，而nginx主要是用来处理<code>静态请求</code>。所以一般的设计都是把Nginx放在前端处理静态资源，如果有对应的Java编写的服务器端程序请求，则通过AJP转给后面的Tomcat、Jetty进行处理。</p>
+<h2 id="tomcat的部署"><a href="#tomcat的部署" class="headerlink" title="tomcat的部署"></a>tomcat的部署</h2><p>首先先确认服务器是否有java，没有的话就<code>yum install java-1.8.0-openjdk* -y</code>，然后在&#x2F;etc&#x2F;profile最下面添加：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">export JAVA_HOME=/usr/lib/jvm/java-<span class="number">1.8</span><span class="number">.0</span>-openjdk-<span class="number">1.8</span><span class="number">.0</span><span class="number">.222</span>.b10-<span class="number">1.</span>el7_7.x86_64</span><br><span class="line">export JRE_HOME=$JAVA_HOME/jre</span><br><span class="line">export CLASSPATH=$JAVA_HOME/lib:$JRE_HOME/lib:$CLASSPATH</span><br><span class="line">export PATH=$JAVA_HOME/<span class="built_in">bin</span>:$JRE_HOME/<span class="built_in">bin</span>:$PATH </span><br></pre></td></tr></table></figure></p>
+<p>然后<code>source /etc/profile</code>配置环境变量，然后开始安装。<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">mkdir /usr/local/tomcat	<span class="comment">#创建文件夹</span></span><br><span class="line">wget http://apache.fayea.com/tomcat/tomcat-<span class="number">8</span>/v8<span class="number">.5</span><span class="number">.46</span>/<span class="built_in">bin</span>/apache-tomcat-<span class="number">8.5</span><span class="number">.46</span>.tar.gz -P /usr/local/tomcat	<span class="comment">#直接下载tomcat8到目标文件夹</span></span><br><span class="line">cd /usr/local/tomcat</span><br><span class="line">tar -zxvf apache-tomcat-<span class="number">8.5</span><span class="number">.46</span>.tar.gz</span><br><span class="line">   cd apache-tomcat-<span class="number">8.5</span><span class="number">.46</span>/<span class="built_in">bin</span></span><br><span class="line">./catalina.sh start  <span class="comment">#.启动tomcat。使用./catalina.sh stop停止tomcat。</span></span><br></pre></td></tr></table></figure></p>
+<p>为了安全我们都会更改一下默认的8080端口，那么就修改<code>apache-tomcat-8.5.46/conf/server.xml</code>：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;Connector port=<span class="string">&quot;33664&quot;</span> protocol=<span class="string">&quot;HTTP/1.1&quot;</span></span><br><span class="line">           connectionTimeout=<span class="string">&quot;20000&quot;</span></span><br><span class="line">           redirectPort=<span class="string">&quot;8443&quot;</span> </span><br><span class="line">           server=<span class="string">&quot;kan ni daye a kan&quot;</span>/&gt;		<span class="comment"># 服务器信息，可以通过curl -I来查看</span></span><br></pre></td></tr></table></figure></p>
+<p>确保iptables和安全组放行33664端口之后，既可以在页面查看情况。<br><img src="/images/tomcat1.png" alt="akb48"></p>
+<p>虽然现在程序已经正常启动了，但是还需要配置开机自启动和service控制开启关闭等其他工作。</p>
+<p>首先要使用service命令控制tomcat启停，新编辑<code>/etc/init.d/tomcat</code>文件：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/bin/bash</span></span><br><span class="line"><span class="comment"># description: Tomcat8 Start Stop Restart</span></span><br><span class="line"><span class="comment"># processname: tomcat8</span></span><br><span class="line"><span class="comment"># chkconfig: 234 20 80</span></span><br><span class="line"></span><br><span class="line">CATALINA_HOME=/usr/local/tomcat/apache-tomcat-<span class="number">8.5</span><span class="number">.46</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">case</span> $<span class="number">1</span> <span class="keyword">in</span></span><br><span class="line">        start)</span><br><span class="line">                sh $CATALINA_HOME/<span class="built_in">bin</span>/startup.sh</span><br><span class="line">                ;;</span><br><span class="line">        stop)</span><br><span class="line">                sh $CATALINA_HOME/<span class="built_in">bin</span>/shutdown.sh</span><br><span class="line">                ;;</span><br><span class="line">        restart)</span><br><span class="line">                sh $CATALINA_HOME/<span class="built_in">bin</span>/shutdown.sh</span><br><span class="line">                sh $CATALINA_HOME/<span class="built_in">bin</span>/startup.sh</span><br><span class="line">                ;;</span><br><span class="line">        *)</span><br><span class="line">                echo <span class="string">&#x27;please use : tomcat &#123;start | stop | restart&#125;&#x27;</span></span><br><span class="line">        ;;</span><br><span class="line">esac</span><br><span class="line">exit <span class="number">0</span></span><br></pre></td></tr></table></figure></p>
+<p>保存之后给予这个tomcat文件可执行权限，就可以通过<code>service tomcat restart/stop/start</code>来控制程序启停了。</p>
+<p>开启自启动比较简单了：<code>chkconfig --add tomcat &amp;&amp; chkconfig tomcat on</code>。</p>
+<p>基本上准备工作就到此为止了。</p>
+<h2 id="配置apr"><a href="#配置apr" class="headerlink" title="配置apr"></a>配置apr</h2><p>Tomcat支持三种接收请求的处理方式：<code>BIO（阻塞式）</code>、<code>NIO（非阻塞式）</code>、<code>APR（基于本地库）</code>。采用APR是比较符合更高要求的场景，连接建立的速度会有50%～100%的提升。直接调用操作系统层果然神速啊，所以强烈推荐使用apr方式！而tomcat8默认情况下使用的是nio模式：<br><img src="/images/tomcat2.png" alt="akb48"></p>
+<p>apr模式本质是使用JNI技术调用操作系统IO接口，需要用到相关API的头文件，先<code>yum install apr-devel openssl-devel gcc make -y</code>安装相关依赖库。</p>
+<p>然后在tomcat的bin文件夹下，会看到一个<code>tomcat-native.tar.gz</code>，解压之。然后在<code>tomcat-native-1.2.23-src/native</code>下执行<code>./configure &amp;&amp; make &amp;&amp; make install</code>安装。</p>
+<p>安装完毕之后，返回到Tomcat的bin里编辑<code>catalina.sh</code>，在虚拟机启动参数<code>JAVA_OPTS</code>中添加<code>java.library.path</code>参数，指定apr库的路径：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">JAVA_OPTS=<span class="string">&quot;$JAVA_OPTS -Djava.library.path=/usr/local/apr/lib&quot;</span></span><br></pre></td></tr></table></figure></p>
+<p>再去tomcat的conf里<code>server.xml</code>修改一下：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;Connector port=<span class="string">&quot;33664&quot;</span> protocol=<span class="string">&quot;org.apache.coyote.http11.Http11AprProtocol&quot;</span></span><br><span class="line">           connectionTimeout=<span class="string">&quot;20000&quot;</span></span><br><span class="line">           redirectPort=<span class="string">&quot;8443&quot;</span></span><br><span class="line">  maxThreads=<span class="string">&quot;800&quot;</span> acceptCount=<span class="string">&quot;1000&quot;</span>	<span class="comment">#这两个数在下面细说</span></span><br><span class="line">           server=<span class="string">&quot;kan ni daye a kan&quot;</span>/&gt;</span><br></pre></td></tr></table></figure></p>
+<p>重启一下tomcat，就会看到现在使用的是apr模式了：<br><img src="/images/tomcat3.png" alt="akb48"></p>
+<h2 id="多tomcat负载均衡"><a href="#多tomcat负载均衡" class="headerlink" title="多tomcat负载均衡"></a>多tomcat负载均衡</h2><p>复制tomcat成多份，然后修改<code>tomcat路径下/webapps/ROOT/index.jsp</code>的内容作为标识，然后分别启动不同的端口，如：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=<span class="string">&quot;1.0&quot;</span> encoding=<span class="string">&quot;UTF-8&quot;</span>?&gt;</span><br><span class="line"></span><br><span class="line">&lt;!-- <span class="number">1</span> 默认<span class="number">8005</span>改成<span class="number">8008</span> --&gt;</span><br><span class="line">&lt;Server port=<span class="string">&quot;8008&quot;</span> shutdown=<span class="string">&quot;SHUTDOWN&quot;</span>&gt;</span><br><span class="line">    &lt;!-- <span class="number">2</span> Http默认<span class="number">8080</span> 改成自己喜欢的端口 --&gt;</span><br><span class="line">    &lt;Connector port=<span class="string">&quot;第三个端口&quot;</span> protocol=<span class="string">&quot;HTTP/1.1&quot;</span></span><br><span class="line">               connectionTimeout=<span class="string">&quot;20000&quot;</span></span><br><span class="line">               redirectPort=<span class="string">&quot;8443&quot;</span> /&gt;</span><br><span class="line">     &lt;!-- <span class="number">3</span> AJP默认<span class="number">8009</span> 改成<span class="number">8011</span> --&gt;         </span><br><span class="line">    &lt;Connector port=<span class="string">&quot;8011&quot;</span> protocol=<span class="string">&quot;AJP/1.3&quot;</span> redirectPort=<span class="string">&quot;8443&quot;</span> /&gt;  </span><br></pre></td></tr></table></figure></p>
+<p>启动之后，一个服务器里就运行了多个tomcat。然后修改<code>nginx.conf</code>：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">http &#123;</span><br><span class="line">    <span class="comment"># 省略代码....</span></span><br><span class="line">   </span><br><span class="line">    <span class="comment"># 增加  upstream, 名称为 serverlist</span></span><br><span class="line">    upstream serverlist&#123;</span><br><span class="line">        server localhost:第一个端口 weight=<span class="number">1</span>;  <span class="comment"># weigh表示权重，越大访问的机率越多</span></span><br><span class="line">        server localhost:第二个端口 weight=<span class="number">1</span>;</span><br><span class="line">        server localhost:第三个端口 weight=<span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 编辑</span></span><br><span class="line">    server &#123;</span><br><span class="line">        listen       <span class="number">80</span>;</span><br><span class="line">        server_name  www.yourdomian.com;</span><br><span class="line"></span><br><span class="line">        location / &#123;</span><br><span class="line">            <span class="comment"># 这里使用定义 serverlist</span></span><br><span class="line">            proxy_pass http://serverlist;</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure></p>
+<p>重新nginx就能通过你的域名进行访问了，多次刷新就可以看到网站显示是哪个tomcat的内容。</p>
+<p><font color=red>注意！</font>强烈建议不要使用 Tomcat 的虚拟主机，推荐每个站点使用一个实例。即，可以启动多个 Tomcat，而不是启动一个 Tomcat 里面包含多个虚拟主机。因为 Tomcat是多线程，共享内存，任何一个虚拟主机中的应用崩溃，都会影响到所有应用程序。虽然采用多实例的方式会产生过多的开销，但至少保障了应用程序的隔离和安全。</p>
+<h2 id="运维注意点"><a href="#运维注意点" class="headerlink" title="运维注意点"></a>运维注意点</h2><ol>
+<li><p>不要使用root用户启动tomcat，Java程序与C程序不同。你使用什么用户启动Tomcat，那么Tomcat就会继承该所有者的权限。那么解决这个问题的办法：</p>
+ <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">groupadd -g <span class="number">80</span> daemon</span><br><span class="line">adduser -o --home /daemon --shell /sbin/nologin --uid <span class="number">80</span> --gid <span class="number">80</span> -c <span class="string">&quot;Web Server&quot;</span> daemon	<span class="comment">#注意/sbin/nologin,意味着该用户不能登录，同时我也没有给它指定密码，这个用户只能用于启动tomcat</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>修改tomcat的conf里<code>server.xml</code>：关闭war自动部署<code>unpackWARs=&quot;false&quot; autoDeploy=&quot;false&quot;</code>，防止被植入木马等恶意程序；</p>
+</li>
+<li><p><code>maxThreads</code>：tomcat起动的最大线程数，即同时处理的任务个数，默认值为200；<code>acceptCount</code>：当tomcat起动的线程数达到最大时，接受排队的请求个数，默认值为100。这俩个值要根据业务合理分配，不是越大越好。一般来说<code>acceptCount</code>的配置是设置的跟<code>maxThreads</code>一样大；</p>
+</li>
+<li><p><code>server.xml</code>中定义了可以直接关闭Tomcat实例的管理端口。我们通过telnet连接上该端口之后，输入SHUTDOWN（此为默认关闭指令）即可关闭Tomcat实例（注意，此时虽然实例关闭了，但是进程还是存在的）。所以为了避免这样的情景，就把SHUTDOWN改成乱码：</p>
+ <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;Server port=<span class="string">&quot;8005&quot;</span> shutdown=<span class="string">&quot;9SDKJ29jksjf23sjf0LSDF92JKS9DKkjsd&quot;</span>&gt;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a target="_blank" rel="noopener" href="https://lanjingling.github.io/2015/12/15/tomcat-redis-session/">https://lanjingling.github.io/2015/12/15/tomcat-redis-session/</a><br><a target="_blank" rel="noopener" href="https://qq343509740.gitee.io/2018/07/24/Linux/CentOS/CentOS%207%20&%20Tomcat%208%20%E5%AE%89%E8%A3%85%E4%B8%8E%E9%85%8D%E7%BD%AE/#%E6%B7%BB%E5%8A%A0%E9%85%8D%E7%BD%AE">https://qq343509740.gitee.io/2018/07/24/Linux/CentOS/CentOS%207%20&amp;%20Tomcat%208%20%E5%AE%89%E8%A3%85%E4%B8%8E%E9%85%8D%E7%BD%AE/#%E6%B7%BB%E5%8A%A0%E9%85%8D%E7%BD%AE</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/meetrice/p/5695127.html">https://www.cnblogs.com/meetrice/p/5695127.html</a></p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/java/" rel="tag"># java</a>
+              <a href="/tags/tomcat/" rel="tag"># tomcat</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/09/26/%E4%BD%BF%E7%94%A8GTID%E5%A4%87%E4%BB%BD%E9%98%BF%E9%87%8C%E4%BA%91RDS%E5%88%B0%E8%87%AA%E5%BB%BAMYSQL/" rel="prev" title="使用GTID主从同步阿里云RDS到自建Mysql">
+      <i class="fa fa-chevron-left"></i> 使用GTID主从同步阿里云RDS到自建Mysql
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/10/08/%E4%BD%BF%E7%94%A8Docker%E9%83%A8%E7%BD%B2Prometheus/" rel="next" title="使用Docker部署Prometheus">
+      使用Docker部署Prometheus <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E5%BC%80%E5%9C%BA"><span class="nav-number">1.</span> <span class="nav-text">基础知识开场</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#tomcat%E7%9A%84%E9%83%A8%E7%BD%B2"><span class="nav-number">2.</span> <span class="nav-text">tomcat的部署</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%85%8D%E7%BD%AEapr"><span class="nav-number">3.</span> <span class="nav-text">配置apr</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%9Atomcat%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1"><span class="nav-number">4.</span> <span class="nav-text">多tomcat负载均衡</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%90%E7%BB%B4%E6%B3%A8%E6%84%8F%E7%82%B9"><span class="nav-number">5.</span> <span class="nav-text">运维注意点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">6.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

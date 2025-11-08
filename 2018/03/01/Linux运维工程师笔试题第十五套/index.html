@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="大牛之路，如此辛苦">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux运维工程师笔试题第十五套">
+<meta property="og:url" content="http://example.com/2018/03/01/Linux%E8%BF%90%E7%BB%B4%E5%B7%A5%E7%A8%8B%E5%B8%88%E7%AC%94%E8%AF%95%E9%A2%98%E7%AC%AC%E5%8D%81%E4%BA%94%E5%A5%97/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="大牛之路，如此辛苦">
+<meta property="og:locale">
+<meta property="article:published_time" content="2018-03-01T05:50:16.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:47:02.901Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="大牛之路">
+<meta property="article:tag" content="面试经验">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2018/03/01/Linux%E8%BF%90%E7%BB%B4%E5%B7%A5%E7%A8%8B%E5%B8%88%E7%AC%94%E8%AF%95%E9%A2%98%E7%AC%AC%E5%8D%81%E4%BA%94%E5%A5%97/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>Linux运维工程师笔试题第十五套 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2018/03/01/Linux%E8%BF%90%E7%BB%B4%E5%B7%A5%E7%A8%8B%E5%B8%88%E7%AC%94%E8%AF%95%E9%A2%98%E7%AC%AC%E5%8D%81%E4%BA%94%E5%A5%97/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Linux运维工程师笔试题第十五套
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-03-01 13:50:16" itemprop="dateCreated datePublished" datetime="2018-03-01T13:50:16+08:00">2018-03-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:47:02" itemprop="dateModified" datetime="2025-11-08T08:47:02+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>2.7k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>10 mins.</span>
+            </span>
+            <div class="post-description">大牛之路，如此辛苦</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h2><p>1.粘包是什么意思？<code>TCP</code>和<code>UDP</code>是否会出现粘包？出现了粘包如何处理？<br>[我的答案]粘包就是当客户端连续不断的往服务端发送数据包的时候，服务端接收的数据会出现两个数据包粘在一起的情况；UDP（非面向连接）是不会出现粘包的，因为UDP协议是基于报文的，UDP首部采用了16bit来指示UDP数据报文的长度，因此在应用层能很好的将不同的数据报文区分开，从而避免粘包和拆包的问题。而TCP（面向连接）是基于字节流的，它无法识别包的长度，所以会出现粘包的现象。</p>
+<p>解决办法主要有以下三种：<br>1）发送端给每个数据包添加包首部，首部中应该至少包含数据包的长度，这样接收端在接收到数据后，通过读取包首部的长度字段，便知道每一个数据包的实际长度了，有较高的效率而且少冗余，但是编程较复杂；<br>2）发送端将每个数据包封装为固定长度（不够的可以通过补0填充），这样接收端每次从接收缓冲区中读取固定长度的数据就自然而然的把每个数据包拆分开来，编程简单但是效率一般甚至很低；<br>3）可以在数据包之间设置边界，如添加特殊符号，这样，接收端通过这个边界就可以将不同的数据包拆分开；</p>
+<p>2.<code>time_wait</code>是什么情况？如果出现了过多的<code>close_wait</code>可能是什么原因？<br>[我的答案]<code>TIME_WAIT</code>是主动关闭连接的一方保持的状态，在保持这个状态2MSL<code>max segment lifetime</code>时间之后，彻底关闭回收资源。遇到<code>TIME_WAIT</code>数过大导致的服务器异常，很容易解决，修改下<code>/etc/sysctl.conf</code>就ok了。</p>
+<p>如果一直保持在<code>CLOSE_WAIT</code>状态，那么只有一种情况，就是在对方关闭连接之后服务器程序自己没有进一步发出<code>ack</code>信号。换句话说，就是在对方连接关闭之后，程序里没有检测到，或者程序压根就忘记了这个时候需要关闭连接，于是这个资源就一直被程序占着。这个情况多半是代码的问题，在服务器端是无能为力的，要检查代码。</p>
+<p>3.<code>epoll</code>和<code>select</code>的区别？边缘触发和水平触发的区别？<br>[我的答案]<code>select</code>查询速度较慢，因为他每次产生<code>fd</code>时候会有整体<code>fdset</code>的拷贝，而且每次有回送，<code>select</code>要查询整个<code>fdset</code>；<code>epoll</code>查询速度较快，因为他为每个<code>fd</code>都<code>regist</code>了一个单独的回调函数。</p>
+<p>水平触发(LT)：当<code>epoll</code>检测到其上有事件发生并通知应用程序时，应用程序可以不立即处理，这样当应用程序再次调用<code>epoll</code>中调用函数时，<code>epoll</code>会再次通知应用程序此事件,直到被处理。</p>
+<p>边沿触发(ET)：当<code>epoll</code>检测到其上有事件发生并通知应用程序时，应用程序必须立即处理，并且下一次的<code>epoll</code>调用，不会再向应用程序通知此事件。</p>
+<p>所以<code>ET</code>模式大大得降低了同一个<code>epoll</code>事件被重复触发的次数，因此<code>ET</code>模式工作效率比<code>LT</code>模式更高。<code>select</code>、<code>poll</code>、<code>epoll</code>的默认工作模式都是水平触发(<code>LT</code>)模式，但是epoll是支持边沿触发(<code>ET</code>)模式的。 </p>
+<p>4.<code>varchar</code>和<code>char</code>的区别是什么？utf8字符集下<code>varchar</code>最多存多少个字符？<br>[我的答案]前面那个问题去看<a target="_blank" rel="noopener" href="http://blog.51cto.com/chenx1242/1742467%EF%BC%8C%E8%BF%99%E9%87%8C%E8%AF%B4%E5%90%8E%E9%9D%A2%E9%82%A3%E4%B8%AA%E3%80%82">http://blog.51cto.com/chenx1242/1742467，这里说后面那个。</a><br>在<code>utf-8</code>状态下的<code>varchar</code>，最大只能到 <code>(65535 - 2) / 3 = 21844 余 1</code>。<br>在<code>gbk</code>状态下的<code>varchar</code>, 最大只能到 <code>(65535 - 2) / 2 = 32766 余 1</code>。</p>
+<p>5.<code>primary key</code>和<code>unique</code>的区别？<br>[我的答案]首先先说明<code>primary key = unique +  not null</code>，其次<code>Unique Key</code>可以是空，可以在一个表里的一个或多个字段定义，也就是爱有几个有几个，同时存在也可以；但是<code>Primary Key</code>不能为空不能重复，而其一个表里只能有一个<code>Primary Key</code>。</p>
+<p>6.乐观锁是啥，悲观锁是啥？<br>[我的答案]悲观锁<code>Pessimistic Lock</code>, 顾名思义，就是很悲观，每次去拿数据的时候都认为别人会修改，所以每次在拿数据的时候都会上锁，这样别人想拿这个数据就会<code>block</code>直到它拿到锁。传统的关系型数据库里边就用到了很多这种锁机制，比如行锁，表锁等，读锁，写锁等，都是在做操作之前先上锁。</p>
+<p>乐观锁<code>Optimistic Lock</code>, 顾名思义，就是很乐观，每次去拿数据的时候都认为别人不会修改，所以不会上锁，但是在更新的时候会判断一下在此期间别人有没有去更新这个数据，可以使用版本号等机制。乐观锁适用于多读的应用类型，这样可以提高吞吐量，像数据库如果提供类似于<code>write_condition</code>机制的其实都是提供的乐观锁。</p>
+<p>两种锁各有优缺点，不可认为一种好于另一种，像乐观锁适用于写比较少的情况下，即冲突真的很少发生的时候，这样可以省去了锁的开销，加大了系统的整个吞吐量。但如果经常产生冲突，上层应用会不断的进行retry，这样反倒是降低了性能，所以这种情况下用悲观锁就比较合适。</p>
+<p>7.如何在python的三引号里添加变量？<br>[我的答案]<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">~$ python</span><br><span class="line"><span class="title class_">Python</span> <span class="number">2.7</span><span class="number">.3</span> (<span class="keyword">default</span>, <span class="title class_">Jan</span>  <span class="number">2</span> <span class="number">2013</span>, <span class="number">16</span>:<span class="number">53</span>:<span class="number">07</span>) </span><br><span class="line">[<span class="variable constant_">GCC</span> <span class="number">4.7</span><span class="number">.2</span>] on linux2</span><br><span class="line"><span class="title class_">Type</span> <span class="string">&quot;help&quot;</span>, <span class="string">&quot;copyright&quot;</span>, <span class="string">&quot;credits&quot;</span> or <span class="string">&quot;license&quot;</span> <span class="keyword">for</span> more information.</span><br><span class="line">&gt;&gt;&gt; </span><br><span class="line">&gt;&gt;&gt; context = <span class="string">&quot;&quot;</span><span class="string">&quot;Here is an example block template:</span></span><br><span class="line"><span class="string">...     name: %(name)s</span></span><br><span class="line"><span class="string">...     age: %(age)d</span></span><br><span class="line"><span class="string">...     job: %(job)s</span></span><br><span class="line"><span class="string">... &quot;</span><span class="string">&quot;&quot;</span></span><br><span class="line">&gt;&gt;&gt; </span><br><span class="line">&gt;&gt;&gt; print context % <span class="title function_">dict</span>(name=<span class="string">&quot;Tim Wang&quot;</span>, age=<span class="number">45</span>, job=<span class="string">&quot;Coder&quot;</span>)</span><br><span class="line"><span class="title class_">Here</span> is an example block <span class="attr">template</span>:</span><br><span class="line">    <span class="attr">name</span>: <span class="title class_">Tim</span> <span class="title class_">Wang</span></span><br><span class="line">    <span class="attr">age</span>: <span class="number">45</span></span><br><span class="line">    <span class="attr">job</span>: <span class="title class_">Coder</span></span><br><span class="line"> &gt;&gt;&gt;</span><br></pre></td></tr></table></figure></p>
+<p>8.<code>redis</code>满了会怎么样？<br>[我的答案]默认情况下<code>redis</code>满了就不会存储新的数据了，不过这个可以调整，<code>redis</code>在达到指定内存的时候可以通过设定的策略来做不同的动作，常见策略如下：<br>1）<code>noeviction</code>:返回错误当内存限制达到并且客户端尝试执行会让更多内存被使用的命令（大部分的写入指令，但DEL和几个例外）<br>2）<code>allkeys-lru</code>: 尝试回收最少使用的键（LRU），使得新添加的数据有空间存放。<br>3）<code>volatile-lru</code>: 尝试回收最少使用的键（LRU），但仅限于在过期集合的键,使得新添加的数据有空间存放。<br>4）<code>allkeys-random</code>: 回收随机的键使得新添加的数据有空间存放。<br>5）<code>volatile-random</code>: 回收随机的键使得新添加的数据有空间存放，但仅限于在过期集合的键。<br>6）<code>volatile-ttl</code>: 回收在过期集合的键，并且优先回收存活时间（TTL）较短的键,使得新添加的数据有空间存放。</p>
+<p>9.啥是“脏读”、“不可重复读”、“幻读”？<br>[我的答案]<code>脏读</code>又称无效数据的读出，是指在数据库访问中，事务T1将某一值修改，然后事务T2读取该值，此后T1因为某种原因撤销对该值的修改，这就导致了T2所读取到的数据是无效的。</p>
+<p><code>不可重复读</code>是指在数据库访问中，一个事务范围内两个相同的查询却返回了不同数据。这是由于查询时系统中其他事务修改的提交而引起的。比如事务T1读取某一数据，事务T2读取并修改了该数据，T1为了对读取值进行检验而再次读取该数据，便得到了不同的结果。</p>
+<p><code>幻读</code>是指当事务不是独立执行时发生的一种现象，例如第一个事务对一个表中的数据进行了修改，比如这种修改涉及到表中的“全部数据行”。同时，第二个事务也修改这个表中的数据，这种修改是向表中插入“一行新数据”。那么，以后就会发生操作第一个事务的用户发现表中还有没有修改的数据行，就好象发生了幻觉一样。</p>
+<p>10.ext2、ext3、ext4的区别是啥？<br>[我的答案]<code>ext3</code>和<code>ext2</code>的主要区别在于，<code>ext3</code>引入<code>Journal</code>。<br><code>ext2</code>和<code>ext3</code>的格式完全相同，只是在<code>ext3</code>硬盘最后面有一部分空间用来存放<code>Journal</code>（日志）的记录；<br>在<code>ext2</code>中，写资料到硬盘中时，先将资料写入缓存中，当缓存写满时才会写入硬盘中；<br>在<code>ext3</code>中，写资料到硬盘中时，先将资料写入缓存中，待缓存写满时系统先通知<code>Journal</code>，再将资料写入硬盘，完成后再通知<code>Journal</code>，资料已完成写入工作；<br>在<code>ext3</code>中，也就是有<code>Journal</code>机制里，系统开机时检查<code>Journal</code>的资料，来查看是否有错误产生，这样就快了很多；</p>
+<p><code>ext4</code>和<code>ext3</code>的主要区别在于:首先<code>ext4</code>与<code>ext3</code>兼容,<code>ext3</code>只支持32,000个子目录，而额<code>ext4</code>支持无限数量的子目录;<code>ext3</code>所支持的16TB文件系统和最大的2TB的文件，而<code>ext4</code>分别支持1EB（1,048,576TB，1EB&#x3D;1024PB，1PB&#x3D;1024TB）的文件系统，以及16TB的文件;<code>ext3</code>的数据块分配策略是尽快分配，而<code>ext4</code>是尽可能地延迟分配，直到文件在<code>cache</code>中写完才开始分配数据块并写入磁盘;<code>ext4</code>允许关闭日志，以便某些有特殊需求的用户可以借此进一步提升性能等等等等。</p>
+<p>11.简述一下A记录与NS记录的区别<br>1.A记录是名称解析的重要记录，它用于将特定的主机名映射到对应主机的IP地址上。你可以在DNS服务器中手动创建或通过DNS客户端动态更新来创建。<br>2.NS记录此记录指定负责此DNS区域的权威名称服务器。<br>3.A记录和NS记录的区别是，A记录直接给出目的IP，NS记录将DNS解析任务交给特定的服务器，NS记录中记录的IP即为该特定服务器的IP地址。<br>4.NS记录优先于A记录，A记录优先于CNAME记录。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a target="_blank" rel="noopener" href="https://blog.insanecoder.top/tcp-packet-splice-and-split-issue/">https://blog.insanecoder.top/tcp-packet-splice-and-split-issue/</a><br><a target="_blank" rel="noopener" href="http://blog.csdn.net/tiandijun/article/details/41961785">http://blog.csdn.net/tiandijun/article/details/41961785</a><br><a target="_blank" rel="noopener" href="http://www.redis.cn/topics/lru-cache.html">http://www.redis.cn/topics/lru-cache.html</a><br><a target="_blank" rel="noopener" href="http://blog.csdn.net/d_guco/article/details/53166722">http://blog.csdn.net/d_guco/article/details/53166722</a><br><a target="_blank" rel="noopener" href="http://www.hollischuang.com/archives/934">http://www.hollischuang.com/archives/934</a><br><a target="_blank" rel="noopener" href="http://zhaodedong.leanote.com/post/Linux%EF%BC%9AExt2-Ext3-Ext4%E7%9A%84%E5%8C%BA%E5%88%AB">http://zhaodedong.leanote.com/post/Linux%EF%BC%9AExt2-Ext3-Ext4%E7%9A%84%E5%8C%BA%E5%88%AB</a></p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%A4%A7%E7%89%9B%E4%B9%8B%E8%B7%AF/" rel="tag"># 大牛之路</a>
+              <a href="/tags/%E9%9D%A2%E8%AF%95%E7%BB%8F%E9%AA%8C/" rel="tag"># 面试经验</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/02/28/%E8%B0%83%E7%94%A8%E9%98%BF%E9%87%8C%E4%BA%91api%E8%8E%B7%E5%8F%96%E9%98%BF%E9%87%8C%E4%BA%91%E6%95%B0%E6%8D%AE%E5%90%8C%E6%AD%A5%E6%9C%8D%E5%8A%A1%EF%BC%88DTS%EF%BC%89%E5%B9%B6%E4%B8%94%E4%BD%9C%E5%9B%BE%E5%8F%91%E9%80%81%E9%82%AE%E4%BB%B6%E7%9A%84%E6%95%B4%E4%B8%AA%E6%B5%81%E7%A8%8B/" rel="prev" title="调用阿里云api获取阿里云数据同步服务（DTS）并且作图发送邮件的整个流程">
+      <i class="fa fa-chevron-left"></i> 调用阿里云api获取阿里云数据同步服务（DTS）并且作图发送邮件的整个流程
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/03/02/%E5%8A%A8%E6%89%8B%E5%81%9A%E4%B8%80%E4%B8%AA%E7%BD%91%E7%BB%9C%E7%AE%80%E5%8E%86%E5%B9%B6%E4%B8%94%E4%BF%9D%E5%AD%98%E6%88%90PDF/" rel="next" title="动手做一个网络简历并且保存成PDF">
+      动手做一个网络简历并且保存成PDF <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AD%A3%E6%96%87"><span class="nav-number">1.</span> <span class="nav-text">正文</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">2.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

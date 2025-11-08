@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="包和模块相关用法，总结一下">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python包和模块">
+<meta property="og:url" content="http://example.com/2018/05/26/python%E5%8C%85%E5%92%8C%E6%A8%A1%E5%9D%97/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="包和模块相关用法，总结一下">
+<meta property="og:locale">
+<meta property="article:published_time" content="2018-05-26T14:16:37.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:47:22.107Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="python">
+<meta property="article:tag" content="基础知识">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2018/05/26/python%E5%8C%85%E5%92%8C%E6%A8%A1%E5%9D%97/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>python包和模块 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2018/05/26/python%E5%8C%85%E5%92%8C%E6%A8%A1%E5%9D%97/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          python包和模块
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-05-26 22:16:37" itemprop="dateCreated datePublished" datetime="2018-05-26T22:16:37+08:00">2018-05-26</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:47:22" itemprop="dateModified" datetime="2025-11-08T08:47:22+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>1.6k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>6 mins.</span>
+            </span>
+            <div class="post-description">包和模块相关用法，总结一下</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="包和模块的概念"><a href="#包和模块的概念" class="headerlink" title="包和模块的概念"></a>包和模块的概念</h2><p>当前目录结构为:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ tree .</span><br><span class="line">--------</span><br><span class="line">.</span><br><span class="line">└── mypackage</span><br><span class="line">    └── mymodule.py</span><br></pre></td></tr></table></figure>
+<p>mypackage是一个文件夹，就是一个包。mymodule.py是一个python文件，就是一个模块。所以简单来说，一个包就是一个文件夹，一个模块就是一个.py文件。其中mymodule.py内容为：<code>print(&#39;I am mymodule.py&#39;)</code>。</p>
+<h2 id="运行python"><a href="#运行python" class="headerlink" title="运行python"></a>运行python</h2><p>那么运行方式1：（指定文件路径）</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ python3 mypackage/mymodule.py</span><br><span class="line">I am mymodule.py</span><br></pre></td></tr></table></figure>
+<p>运行方式2：（使用-m参数）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ python3 -m mypackage.mymodule</span><br><span class="line">I am mymodule.py</span><br></pre></td></tr></table></figure>
+<p>方式1简单粗暴，指定python文件路径，将其作为可执行文件执行，是执行入口文件。方式2则使用包的概念，执行mypackage这个包里面的mymodule这个模块，依然是将<code>mymodule.py</code>作为执行入口文件。</p>
+<p>补充说明1：使用方式2，需要搜索包和模块， 搜索包和模块的顺序是（查找是否有mypackage的包和mymodule这个模块）<br>1.	builtin<br>	a.系统内置包和模块中<br>2.	sys.path<br>	a.当前目录下<br>	b.PYTHONPATH这个环境变量目录下<br>	c.Python的安装目录下的site_packages中</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">$ tree .</span><br><span class="line">.</span><br><span class="line">└── mypackage</span><br><span class="line">    └── __main__.py</span><br><span class="line">    </span><br><span class="line">$ cat mypackage/__main__.py</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;I am __main__.py&#x27;</span>)</span><br><span class="line"></span><br><span class="line">$ python3 -m mypackage</span><br><span class="line">I am __main__.py</span><br></pre></td></tr></table></figure>
+
+
+<p>补充说明2：<br>若-m后面只有一个参数， 比如 <code>python3 -m xxx</code><br>1.	优先将xxx理解为包，若该包下有<code>__main__.py</code>文件，则理解为 <code>python3 -m xxx.__main__</code><br>2.	否则将xxx理解为模块，若当前目录下有<code>xxx.py</code>, 则理解为 <code>python3 xxx.py</code><br>3.	以上两种都不是，则报错。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$ tree .</span><br><span class="line">.</span><br><span class="line">└── mymodule.py</span><br><span class="line"></span><br><span class="line">$ cat mymodule.py</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;I am mymodule.py&#x27;</span>)</span><br><span class="line"></span><br><span class="line">$ python3 -m mymodule</span><br><span class="line">I am mymodule.py</span><br></pre></td></tr></table></figure>
+
+
+<p>总结：【-m的用法】仅仅是比【直接指定路径用法】多个一个【去系统搜索】的步骤而已，其他无区别。</p>
+<h2 id="入口文件和模块文件"><a href="#入口文件和模块文件" class="headerlink" title="入口文件和模块文件"></a>入口文件和模块文件</h2><p>上面描述的两种运行方式，<code>mymodule.py</code>都是入口文件，而其他python文件就是模块文件了。每次运行，只能有一个文件是入口文件。</p>
+<p>若一个文件是入口文件，那么这个<code>.py</code>文件中的<code>__name__</code> 就是 <code>__main__</code>。<br>若一个文件不是入口文件，比如被别的<code>.py</code>文件引用，那么<code>__name__</code>就是<code>包名.模块名</code>。</p>
+<h2 id="模块文件如何被导入？"><a href="#模块文件如何被导入？" class="headerlink" title="模块文件如何被导入？"></a>模块文件如何被导入？</h2><p>既然其他文件就是模块文件了，那么其他模块怎么运行呢? 需要被入口文件导入。导入有三类:</p>
+<h3 id="导入包"><a href="#导入包" class="headerlink" title="导入包"></a>导入包</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">$ tree .</span><br><span class="line">--------</span><br><span class="line">.</span><br><span class="line">├── mainmodule.py</span><br><span class="line">└── mypackage</span><br><span class="line">    └── mymodule.py</span><br><span class="line">-----------------------------------------------------------------------------------------------</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line">$ cat mainmodule.py</span><br><span class="line">-------------------</span><br><span class="line"><span class="keyword">import</span> mypackage</span><br><span class="line">-----------------------------------------------------------------------------------------------</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">$ cat mypackage/mymodule.py</span><br><span class="line">---------------------------</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;I am mymodule&#x27;</span>)</span><br><span class="line">-----------------------------------------------------------------------------------------------</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">$ python3 mainmodule.py</span><br><span class="line">-----------------------</span><br></pre></td></tr></table></figure>
+
+<p>这样<code>python3 mainmodule.py</code>就执行成功了， 没有报错，但也没有发生任何事情。<br>注意：<br>● mainmodule.py所在的目录非常关键，它代表了顶层包的上一层目录。<br>● 其实导入包并没有任何意义，因为不会发生任何变化，后续你导入模块依然要填写包名。<br>● 那么为什么导入包语法没错呢，其实它默认导入的还是模块，叫做__init__.py模块，这样的话就相当于实现了导入模块</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">$ tree .</span><br><span class="line">--------</span><br><span class="line">.</span><br><span class="line">├── mainmodule.py</span><br><span class="line">└── mypackage</span><br><span class="line">    ├── __init__.py</span><br><span class="line">    └── mymodule.py</span><br><span class="line">----------------------------------------------------------------------------------------------</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">$ cat mainmodule.py</span><br><span class="line">-------------------</span><br><span class="line"><span class="keyword">import</span> mypackage <span class="comment"># 相当于默认执行 import mypackage.__init__</span></span><br><span class="line">----------------------------------------------------------------------------------------------</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">$ cat mypackage/__init__.py</span><br><span class="line">---------------------------</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;I am __init__.py&#x27;</span>)</span><br><span class="line">----------------------------------------------------------------------------------------------</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">$ cat mypackage/mymodule.py</span><br><span class="line">---------------------------</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;I am mymodule&#x27;</span>)</span><br><span class="line">----------------------------------------------------------------------------------------------</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">$ python3 mainmodule.py</span><br><span class="line">-----------------------</span><br><span class="line">I am __init__.py</span><br></pre></td></tr></table></figure>
+
+<p>此时你会发现mypackage&#x2F;<strong>init</strong>.py中的代码被自动执行了，其实也就是导入__init__这个模块了。<br>另外解释一下什么是导入，导入一个模块，就是把该模块中的代码从头到尾执行一遍。</p>
+<p>导入一个模块成员，就是声明一下这个模块中的 函数，类，变量等成员，后面可以直接用。比如：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">$ tree .</span><br><span class="line">--------</span><br><span class="line">.</span><br><span class="line">├── mainmodule.py</span><br><span class="line">└── mypackage</span><br><span class="line">    ├── __init__.py</span><br><span class="line">    └── mymodule.py</span><br><span class="line">----------------------------------------------------------------------------------------------</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line">$ cat mainmodule.py</span><br><span class="line">-------------------</span><br><span class="line"><span class="keyword">import</span> mypackage <span class="comment"># 相当于默认执行 import mypackage.__init__</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;a = &#x27;</span> + <span class="built_in">str</span>(mypackage.a))</span><br><span class="line">----------------------------------------------------------------------------------------------</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">$ cat mypackage/__init__.py</span><br><span class="line">---------------------------</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;I am __init__.py&#x27;</span>)</span><br><span class="line">a = <span class="number">100</span></span><br><span class="line">----------------------------------------------------------------------------------------------</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">$ cat mypackage/mymodule.py</span><br><span class="line">---------------------------</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;I am mymodule&#x27;</span>)</span><br><span class="line">----------------------------------------------------------------------------------------------</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">$ python3 mainmodule.py</span><br><span class="line">-----------------------</span><br><span class="line">I am __init__.py</span><br><span class="line">a = <span class="number">100</span></span><br></pre></td></tr></table></figure>
+
+<p>但是import mypackage 和 import mypackage.<strong>init__还是有点区别的。区别在于import mypackage是隐式导入__init</strong>，所以调用的时候，你不能直接使用__init__这个模块名，也就是直接用mypackage.a而不是mypackage.<strong>init</strong>.a</p>
+<p>当然__init__.py也可以像其他普通模块一样被显式导入，行为和同普通模块是一样的。</p>
+<p>另外 import mypackage的语法，由于没有导入模块，所以你用的所有模块都必须带上mymodule这个前缀。</p>
+<h3 id="导入模块"><a href="#导入模块" class="headerlink" title="导入模块"></a>导入模块</h3><p>导入模块的语法是<code>import 包名.模块名</code>。很简单，举个例子：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">$ tree .</span><br><span class="line">.</span><br><span class="line">├── mainmodule.py</span><br><span class="line">└── mypackage</span><br><span class="line">    ├── __pycache__</span><br><span class="line">    │   └── mymodule.cpython-<span class="number">312.</span>pyc</span><br><span class="line">    └── mymodule.py</span><br><span class="line">    </span><br><span class="line">$ cat mainmodule.py</span><br><span class="line"><span class="keyword">import</span> mypackage.mymodule</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;a=&#x27;</span> + <span class="built_in">str</span>(mypackage.mymodule.a))</span><br><span class="line"></span><br><span class="line">$ cat mypackage/mymodule.py</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;I am mymodule&#x27;</span>)</span><br><span class="line">a = <span class="number">100</span></span><br><span class="line"></span><br><span class="line">$ python3 mainmodule.py</span><br><span class="line">I am mymodule</span><br><span class="line">a=<span class="number">100</span></span><br></pre></td></tr></table></figure>
+
+<p>很简单，<code>mainmodule.py</code>中导入了<code>mypackage.mymodule</code>,所以可以引用其中的a变量。</p>
+<p>不过如果包层级太多，比如<code>mypackage.mymodule</code>太长了，所以可以一步到位，直接导入模块，比如<code>from mypackage import mymodule</code>，这样的话，直接用<code>mymodule.a</code>就可以了,这种语法就是 <code>from 包名 import 模块名</code>。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> mypackage <span class="keyword">import</span> mymodule</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;a=&#x27;</span> + <span class="built_in">str</span>(mymodule.a))</span><br></pre></td></tr></table></figure>
+
+<p>这样的话，效果和刚才是一样的。</p>
+<p>另外，如果<code>mypackage</code>目录下有很多模块，可以一下子都导入吗？可以的，用<code>*</code>代替就可以了。<br>不过有个前提，就是<code>mypackage</code>目录下要有个<code>__init__.py</code>, 且内容定义了<code>__all__ = [&#39;mymodule&#39;, &#39;mymodule2&#39;, &#39;mymodule3&#39;]</code>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">$ tree .</span><br><span class="line">.</span><br><span class="line">├── mainmodule.py</span><br><span class="line">└── mypackage</span><br><span class="line">    ├── __init__.py</span><br><span class="line">    └── mymodule.py</span><br><span class="line"></span><br><span class="line">$ cat mainmodule.py</span><br><span class="line"><span class="keyword">from</span> mypackage <span class="keyword">import</span> *</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;a=&#x27;</span> + <span class="built_in">str</span>(mymodule.a))</span><br><span class="line"></span><br><span class="line">$ cat mypackage/__init__.py</span><br><span class="line">__all__ = [<span class="string">&#x27;mymodule&#x27;</span>]</span><br><span class="line"></span><br><span class="line">$ cat mypackage/mymodule.py</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;I am mymodule&#x27;</span>)</span><br><span class="line">a = <span class="number">100</span></span><br><span class="line"></span><br><span class="line">$ python3 mainmodule.py</span><br><span class="line">I am mymodule</span><br><span class="line">a=<span class="number">100</span></span><br></pre></td></tr></table></figure>
+
+<p>不过 <strong>all</strong> 不能指定为*，从而导入所有包，也是为了保护不被滥用吧。另外也不能 <code>from mypackage import *</code>。</p>
+<h3 id="导入成员"><a href="#导入成员" class="headerlink" title="导入成员"></a>导入成员</h3><p>上面说的是导入包，导入模块，接下来还可以导入成员，这个成员是指模块成员，也就是函数，类，变量等。</p>
+<p>注意，成员的导入:<code>from 包名.模块名 import 成员名</code>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">$ tree .</span><br><span class="line">.</span><br><span class="line">├── mainmodule.py</span><br><span class="line">└── mypackage</span><br><span class="line">    └── mymodule.py</span><br><span class="line"></span><br><span class="line">$ cat mainmodule.py</span><br><span class="line"><span class="keyword">from</span> mypackage.mymodule <span class="keyword">import</span> a</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;a=&#x27;</span> + <span class="built_in">str</span>(a))</span><br><span class="line"></span><br><span class="line">$ cat mypackage/mymodule.py</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;I am mymodule&#x27;</span>)</span><br><span class="line">a = <span class="number">100</span></span><br><span class="line"></span><br><span class="line">$ python3 mainmodule.py</span><br><span class="line">I am mymodule</span><br><span class="line">a=<span class="number">100</span></span><br></pre></td></tr></table></figure>
+
+<p>导入成员之后，引用的时候就不要加命名空间了（也就是包名.模块名），直接用成员名就可以了。注意可以 <code>from mymoudle import *</code>,  此时<code>*</code>默认是所有，若<code>mymodule.py</code>中有<code>__all__</code>变量，那么就以<code>__all__</code>为准。</p>
+<p>所以总结一下。</p>
+<p>导入包：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">a.import mypackage  # 等价于 import mypackage.__init__，备注：只要涉及包都会自动隐式导入这个</span><br></pre></td></tr></table></figure>
+<p>导入模块：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">a.import mypackage.mymodule</span><br><span class="line">b.from mypackage import mymodule</span><br><span class="line">c.from mypackage import *  # 若存在__init__.py且存在__all__变量，则导入__all__所指定；否则 无</span><br></pre></td></tr></table></figure>
+<p>导入成员</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">a.from mypackage.mymodule import member1， member2，member3 # 可以用括号或者反斜杠跨行</span><br><span class="line">b.from mypackage.mymodule import *  # 若mymodule存在__all__变量，则导入__all__所指定；否则 所有</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/python/" rel="tag"># python</a>
+              <a href="/tags/%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/" rel="tag"># 基础知识</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/05/25/%E8%B6%85%E8%B5%9E%E7%9A%84%E4%BA%AC%E9%83%BD%E5%A4%A7%E9%98%AA%E4%BA%94%E6%97%A5%E6%B8%B8/" rel="prev" title="超赞的京都大阪五日游">
+      <i class="fa fa-chevron-left"></i> 超赞的京都大阪五日游
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/05/30/%E8%8B%B9%E6%9E%9C%E6%89%8B%E6%9C%BA%E6%97%A0%E4%BF%A1%E7%94%A8%E5%8D%A1%E6%B3%A8%E5%86%8C%E5%8C%BA%E7%BE%8E%E5%9B%BDapple-store%E7%9A%84%E5%8A%9E%E6%B3%95/" rel="next" title="苹果手机无信用卡注册区美国apple store的办法">
+      苹果手机无信用卡注册区美国apple store的办法 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8C%85%E5%92%8C%E6%A8%A1%E5%9D%97%E7%9A%84%E6%A6%82%E5%BF%B5"><span class="nav-number">1.</span> <span class="nav-text">包和模块的概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%90%E8%A1%8Cpython"><span class="nav-number">2.</span> <span class="nav-text">运行python</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%A5%E5%8F%A3%E6%96%87%E4%BB%B6%E5%92%8C%E6%A8%A1%E5%9D%97%E6%96%87%E4%BB%B6"><span class="nav-number">3.</span> <span class="nav-text">入口文件和模块文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E5%9D%97%E6%96%87%E4%BB%B6%E5%A6%82%E4%BD%95%E8%A2%AB%E5%AF%BC%E5%85%A5%EF%BC%9F"><span class="nav-number">4.</span> <span class="nav-text">模块文件如何被导入？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%BC%E5%85%A5%E5%8C%85"><span class="nav-number">4.1.</span> <span class="nav-text">导入包</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%BC%E5%85%A5%E6%A8%A1%E5%9D%97"><span class="nav-number">4.2.</span> <span class="nav-text">导入模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%BC%E5%85%A5%E6%88%90%E5%91%98"><span class="nav-number">4.3.</span> <span class="nav-text">导入成员</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

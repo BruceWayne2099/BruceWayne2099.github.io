@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="这是一个理论学习文章，以备将来不时之需">
+<meta property="og:type" content="article">
+<meta property="og:title" content="阿里云RDS的内存增高与临时表">
+<meta property="og:url" content="http://example.com/2019/10/11/%E9%98%BF%E9%87%8C%E4%BA%91RDS%E7%9A%84%E5%86%85%E5%AD%98%E5%A2%9E%E9%AB%98%E7%9A%84%E5%8E%9F%E5%9B%A0/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="这是一个理论学习文章，以备将来不时之需">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/mysql7.png">
+<meta property="og:image" content="http://example.com/images/mysql8.png">
+<meta property="article:published_time" content="2019-10-11T07:33:07.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:48:27.341Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="RDS">
+<meta property="article:tag" content="mysql">
+<meta property="article:tag" content="阿里云">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/mysql7.png">
+
+<link rel="canonical" href="http://example.com/2019/10/11/%E9%98%BF%E9%87%8C%E4%BA%91RDS%E7%9A%84%E5%86%85%E5%AD%98%E5%A2%9E%E9%AB%98%E7%9A%84%E5%8E%9F%E5%9B%A0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>阿里云RDS的内存增高与临时表 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/10/11/%E9%98%BF%E9%87%8C%E4%BA%91RDS%E7%9A%84%E5%86%85%E5%AD%98%E5%A2%9E%E9%AB%98%E7%9A%84%E5%8E%9F%E5%9B%A0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          阿里云RDS的内存增高与临时表
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-10-11 15:33:07" itemprop="dateCreated datePublished" datetime="2019-10-11T15:33:07+08:00">2019-10-11</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:48:27" itemprop="dateModified" datetime="2025-11-08T08:48:27+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>1.1k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>4 mins.</span>
+            </span>
+            <div class="post-description">这是一个理论学习文章，以备将来不时之需</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h2><p>mysql查看当前内存使用细节的语句是：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">show variables where variable_name <span class="keyword">in</span> (</span><br><span class="line"><span class="string">&#x27;innodb_buffer_pool_size&#x27;</span>,<span class="string">&#x27;innodb_log_buffer_size&#x27;</span>,<span class="string">&#x27;innodb_additional_mem_pool_size&#x27;</span>,<span class="string">&#x27;key_buffer_size&#x27;</span>,<span class="string">&#x27;query_cache_size&#x27;</span></span><br><span class="line">);</span><br></pre></td></tr></table></figure></p>
+<p>大部分内存占用告警，都是因为<code>buffer pool</code>增长导致，而<code>buffer pool</code>的增长是正常的，如图：<br><img src="/images/mysql7.png" alt="akb48"></p>
+<p>如果说这个值高的令人发指（超过90%），那么基本就是两种可能：</p>
+<ol>
+<li>当前session太多，<code>show full processlist；</code>看一下是不是有太多空闲的对话，如果有，酌情调整timeout断开；</li>
+<li>session不多，但是session里的私有内存占用过多，那么就要检查一下对应的sql语句，是不是语句里有大量的临时表、sort(排序)和join操作；</li>
+</ol>
+<p>如何判断是否使用了临时表？使用<code>explain</code>查看执行的sql语句，在Extra列看到<code>Using temporary</code>就意味着使用了临时表。比如这个：<br><img src="/images/mysql8.png" alt="akb48"></p>
+<p>一般情况下，用到临时表就意味着性能较低。查看临时表大小的语句是<code>show global variables like &#39;%table_size%&#39;;</code>。</p>
+<p>如果说某个SQL语句，它查询的内容非常的多（select *这种的），然后又对这个查询的内容进行了二次加工（sort或者join)就会生成一个巨大的临时表，那么内存可能就会放不下，导致mysql将这个表全部放到磁盘里，那么这样mysql的IO就会出现飙升、sql执行缓慢的现象。</p>
+<p>查看临时表是在内存还是在磁盘上，可以通过<code>show global status like &#39;%Created_tmp%&#39;;</code>：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">MySQL [(none)]&gt;  show <span class="keyword">global</span> status like <span class="string">&#x27;%Created_tmp%&#x27;</span>;</span><br><span class="line">+-------------------------+-----------+</span><br><span class="line">| Variable_name           | Value     |</span><br><span class="line">+-------------------------+-----------+</span><br><span class="line">| Created_tmp_disk_tables | <span class="number">53585768</span>  |			<span class="comment">#服务器在磁盘上创建表（最初或通过转换内存中的表）</span></span><br><span class="line">| Created_tmp_files       | <span class="number">807803</span>    |</span><br><span class="line">| Created_tmp_tables      | <span class="number">167011673</span> |			<span class="comment">#服务器创建内部临时表（在内存或磁盘上）</span></span><br><span class="line">+-------------------------+-----------+</span><br><span class="line"><span class="number">3</span> rows <span class="keyword">in</span> <span class="built_in">set</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure></p>
+<p>遇到这样的情况，建议是将原语句拆成两个sql，然后用<code>in</code>操作拼接。</p>
+<p>最后结论，MYSQL在上线部署后，导致内存激增，请检查是否出现了临时表。临时表如果大出了指定范围，写入到磁盘里，就会导致IO上升，拖垮SQL执行速度。</p>
+<h2 id="补充"><a href="#补充" class="headerlink" title="补充"></a>补充</h2><p>在网站开发里，排序究竟是在程序(PHP)里排还是在数据库(mysql)里排？</p>
+<p>在 PHP 中执行排序更优的情况举例如下：</p>
+<ol>
+<li>数据源不在MySQL中，存在硬盘、内存或者来自网络的请求等；</li>
+<li>数据存在MySQL中，量不大，而且没有相应的索引，此时把数据取出来用PHP排序更快；</li>
+<li>数据源来自于多个MySQL服务器，此时从多个MySQL中取出数据，然后在PHP中排序更快；</li>
+<li>除了MySQL之外，存在其他数据源，比如硬盘、内存或者来自网络的请求等，此时不适合把这些数据存入MySQL后再排序。</li>
+</ol>
+<p>必须在MySQL中排序的实例如下：</p>
+<ol>
+<li>MySQL中已经存在这个排序的索引；</li>
+<li>MySQL中数据量较大，而结果集需要其中很小的一个子集，比如1000000行数据，取TOP10；</li>
+<li>对于一次排序、多次调用的情况，比如统计聚合的情形，可以提供给不同的服务使用，那么在MySQL中排序是首选的。另外，对于数据深度挖掘，通常做法是在应用层做完排序等复杂操作，把结果存入MySQL即可，便于多次使用。</li>
+<li>不论数据源来自哪里，当数据量大到一定的规模后，由于占用内存的关系，不再适合PHP中排序了；此时把数据复制、导入或者存在MySQL，并用INDEX优化，是优于PHP的。不过，用Java，甚至C++ 来处理这类操作会更好。</li>
+</ol>
+<p>结论：从网站整体考虑，就必须加入人力和成本的考虑。假如网站规模和负载较小，而人力有限（人数和能力都可能有限），此时在应用层（PHP）做排序要做不少开发和调试工作，耗费时间，得不偿失；不如在 DB 中处理，简单快速。对于大规模的网站，电力、服务器的费用很高，在系统架构上精打细算，可以节约大量的费用，是公司持续发展之必要；此时如果能在应用层 (PHP) 进行排序并满足业务需求，尽量在应用层进行。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a target="_blank" rel="noopener" href="https://dp.imysql.com:8080/node/97">https://dp.imysql.com:8080/node/97</a><br><a target="_blank" rel="noopener" href="http://mysql.taobao.org/monthly/2019/04/01/">http://mysql.taobao.org/monthly/2019/04/01/</a><br><a target="_blank" rel="noopener" href="http://blog.sae.sina.com.cn/archives/4096">http://blog.sae.sina.com.cn/archives/4096</a></p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/mysql/" rel="tag"># mysql</a>
+              <a href="/tags/%E9%98%BF%E9%87%8C%E4%BA%91/" rel="tag"># 阿里云</a>
+              <a href="/tags/RDS/" rel="tag"># RDS</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/10/08/%E4%BD%BF%E7%94%A8Docker%E9%83%A8%E7%BD%B2Prometheus/" rel="prev" title="使用Docker部署Prometheus">
+      <i class="fa fa-chevron-left"></i> 使用Docker部署Prometheus
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/10/11/%E5%9B%BD%E5%BA%86%E6%AD%A6%E6%B1%89%E9%95%BF%E6%B2%99%E5%85%AD%E6%97%A5%E6%B8%B8/" rel="next" title="国庆武汉长沙五日游">
+      国庆武汉长沙五日游 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AD%A3%E6%96%87"><span class="nav-number">1.</span> <span class="nav-text">正文</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A1%A5%E5%85%85"><span class="nav-number">2.</span> <span class="nav-text">补充</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">3.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

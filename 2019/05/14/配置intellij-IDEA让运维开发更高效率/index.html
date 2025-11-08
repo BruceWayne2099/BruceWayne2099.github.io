@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="lanyu激活码好像不好用了，只能先用免费的对付一个月...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="配置Intellij IDEA进行高效率运维开发">
+<meta property="og:url" content="http://example.com/2019/05/14/%E9%85%8D%E7%BD%AEintellij-IDEA%E8%AE%A9%E8%BF%90%E7%BB%B4%E5%BC%80%E5%8F%91%E6%9B%B4%E9%AB%98%E6%95%88%E7%8E%87/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="lanyu激活码好像不好用了，只能先用免费的对付一个月...">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/intellij9.png">
+<meta property="og:image" content="http://example.com/images/intellij10.png">
+<meta property="og:image" content="http://example.com/images/intellij7.png">
+<meta property="og:image" content="http://example.com/images/intellij6.png">
+<meta property="og:image" content="http://example.com/images/intellij5.png">
+<meta property="og:image" content="http://example.com/images/intellij3.png">
+<meta property="og:image" content="http://example.com/images/intellij4.png">
+<meta property="og:image" content="http://example.com/images/intellij8.png">
+<meta property="article:published_time" content="2019-05-14T08:58:50.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:48:25.395Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="intellij idea">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/intellij9.png">
+
+<link rel="canonical" href="http://example.com/2019/05/14/%E9%85%8D%E7%BD%AEintellij-IDEA%E8%AE%A9%E8%BF%90%E7%BB%B4%E5%BC%80%E5%8F%91%E6%9B%B4%E9%AB%98%E6%95%88%E7%8E%87/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>配置Intellij IDEA进行高效率运维开发 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/05/14/%E9%85%8D%E7%BD%AEintellij-IDEA%E8%AE%A9%E8%BF%90%E7%BB%B4%E5%BC%80%E5%8F%91%E6%9B%B4%E9%AB%98%E6%95%88%E7%8E%87/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          配置Intellij IDEA进行高效率运维开发
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-05-14 16:58:50" itemprop="dateCreated datePublished" datetime="2019-05-14T16:58:50+08:00">2019-05-14</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:48:25" itemprop="dateModified" datetime="2025-11-08T08:48:25+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>719</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>3 mins.</span>
+            </span>
+            <div class="post-description">lanyu激活码好像不好用了，只能先用免费的对付一个月...</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>以前我写python用的是pycharm2018，但是发现我的pycharm里没有go插件，脱机安装也报错，于是乎我就干脆下载了一个interllij IDEA2019，打算把python、go、yaml文件都用它来编辑和管理。</p>
+<h2 id="配置python开发环境"><a href="#配置python开发环境" class="headerlink" title="配置python开发环境"></a>配置python开发环境</h2><p>首先先去File–Settings–Plugins搜索python，下载对应插件，下载完毕之后需要重启IDE，重启完毕之后，<code>File--New--Module--Python</code>，选择对应的SDK即可。</p>
+<p>若需要添加样式，还是在File–Settings–Editer–File and Code Templates里找到python script，增添文件的通用版面即可，如图：<br><img src="/images/intellij9.png" alt="akb48"></p>
+<p>输出结果换行也很简单，在File–Settings–Editer–Console里，勾选<code>Use soft wraps in console</code>即可，如图：<br><img src="/images/intellij10.png" alt="akb48"></p>
+<p>如果控制每行的长度，修改<code>Console commands history size</code>即可。</p>
+<h2 id="配置go开发环境"><a href="#配置go开发环境" class="headerlink" title="配置go开发环境"></a>配置go开发环境</h2><p>首先安装go语言，配置好GOROOT和GOPATH，然后去File–Settings–Plugins搜索go，下载对应插件，下载完毕之后需要重启IDE，重启完毕之后，在<code>File--Settings--Languages &amp; Frameworks</code>里选择Go，配置好GOROOT和GOPATH。注意，GOPATH填的是Go的src文件地址。保存之后，就可以正常启动go文件了。</p>
+<h2 id="配置k8s-yaml开发环境"><a href="#配置k8s-yaml开发环境" class="headerlink" title="配置k8s yaml开发环境"></a>配置k8s yaml开发环境</h2><p>首先先去File–Settings–Plugins搜索yaml和kubernetes，下载对应的插件之后，直接创建新的project，就会自动补齐，如图：<br><img src="/images/intellij7.png" alt="akb48"></p>
+<h2 id="调节字体大小"><a href="#调节字体大小" class="headerlink" title="调节字体大小"></a>调节字体大小</h2><p>调节菜单等字体大小：<code>File--Settings--Appearance &amp; Behavior--Appearance--Use custom font(Size)</code>，如图：<br><img src="/images/intellij6.png" alt="akb48"></p>
+<p>调节代码的字体大小：<code>File--Settings--Font--Size</code>，如图：<br><img src="/images/intellij5.png" alt="akb48"></p>
+<h2 id="配置与远程服务器同步"><a href="#配置与远程服务器同步" class="headerlink" title="配置与远程服务器同步"></a>配置与远程服务器同步</h2><p>写完了代码，总不能lrzsz的去上传到服务器里，我们要用一个优雅的方式去达到这个目的，首先在顶级菜单里选择<code>Tools--Deployment--Configuration</code>，点击+创建一个新的链接：<br><img src="/images/intellij3.png" alt="akb48"></p>
+<p>检查可以成功连接到远程服务器之后，保存此链接。右键点击文件，选择<code>Deployment---Upload to XXX</code>，然后就可以看到上传成功。<br><img src="/images/intellij4.png" alt="akb48"></p>
+<p>最后，分享两个比较柔和的xshell配色方案：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">[Solarized Dark]</span><br><span class="line">text(bold)=<span class="number">839496</span></span><br><span class="line">magenta(bold)=6c71c4</span><br><span class="line">text=<span class="number">839496</span></span><br><span class="line">white(bold)=fdf6e3</span><br><span class="line">green=<span class="number">859900</span></span><br><span class="line">red(bold)=cb4b16</span><br><span class="line">green(bold)=<span class="number">586e75</span></span><br><span class="line">black(bold)=073642</span><br><span class="line">red=dc322f</span><br><span class="line">blue=268bd2</span><br><span class="line">black=002b36</span><br><span class="line">blue(bold)=<span class="number">839496</span></span><br><span class="line">yellow(bold)=657b83</span><br><span class="line">cyan(bold)=93a1a1</span><br><span class="line">yellow=b58900</span><br><span class="line">magenta=dd3682</span><br><span class="line">background=042028</span><br><span class="line">white=eee8d5</span><br><span class="line">cyan=2aa198</span><br><span class="line">[Names]</span><br><span class="line">count=<span class="number">1</span></span><br><span class="line">name0=Solarized Dark</span><br></pre></td></tr></table></figure></p>
+<p>将文件命名为solarized-dark.xcs文件，在xshell配色方案中导入该文件即可。颜色对比如下：<br><img src="/images/intellij8.png" alt="akb48" title="左边是柔和的，右边是默认的"></p>
+<p>第二个方案如下：<br>	<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">[mycolor]</span><br><span class="line">text(bold)=e9e9e9</span><br><span class="line">magenta(bold)=ff00ff</span><br><span class="line">text=00ff80</span><br><span class="line">white(bold)=fdf6e3</span><br><span class="line">green=80ff00</span><br><span class="line">red(bold)=ff0000</span><br><span class="line">green(bold)=3c5a38</span><br><span class="line">black(bold)=808080</span><br><span class="line">red=ff4500</span><br><span class="line">blue=00bfff</span><br><span class="line">black=000000</span><br><span class="line">blue(bold)=1e90ff</span><br><span class="line">yellow(bold)=ffff00</span><br><span class="line">cyan(bold)=00ffff</span><br><span class="line">yellow=c0c000</span><br><span class="line">magenta=c000c0</span><br><span class="line">background=042028</span><br><span class="line">white=c0c0c0</span><br><span class="line">cyan=00c0c0</span><br><span class="line">[Names]</span><br><span class="line">count=1</span><br><span class="line">name0=mycolor</span><br></pre></td></tr></table></figure></p>
+<p>将此文件保存较mycolor.xcs，然后同上面一样导入即可。如果想要xshell自动加载此配色，需要将上面里所有mycolor改名叫Xterm，并且删除掉原有的Xterm配色方案，重启Xshell即看到效果。</p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/intellij-idea/" rel="tag"># intellij idea</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/05/13/%E4%BD%BF%E7%94%A8Python-GUI%E5%8E%BB%E5%B0%86%E6%9C%AC%E5%9C%B0%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E9%98%BF%E9%87%8C%E4%BA%91OSS/" rel="prev" title="使用Python GUI去将本地文件上传阿里云OSS">
+      <i class="fa fa-chevron-left"></i> 使用Python GUI去将本地文件上传阿里云OSS
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/05/20/%E6%91%86%E5%BC%84%E6%91%86%E5%BC%84iptables/" rel="next" title="摆弄摆弄iptables">
+      摆弄摆弄iptables <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%85%8D%E7%BD%AEpython%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83"><span class="nav-number">1.</span> <span class="nav-text">配置python开发环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%85%8D%E7%BD%AEgo%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83"><span class="nav-number">2.</span> <span class="nav-text">配置go开发环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%85%8D%E7%BD%AEk8s-yaml%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83"><span class="nav-number">3.</span> <span class="nav-text">配置k8s yaml开发环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B0%83%E8%8A%82%E5%AD%97%E4%BD%93%E5%A4%A7%E5%B0%8F"><span class="nav-number">4.</span> <span class="nav-text">调节字体大小</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E4%B8%8E%E8%BF%9C%E7%A8%8B%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%90%8C%E6%AD%A5"><span class="nav-number">5.</span> <span class="nav-text">配置与远程服务器同步</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

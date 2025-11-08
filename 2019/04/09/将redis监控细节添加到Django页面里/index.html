@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="有些docker容器没有带有&#x2F;bin&#x2F;bash文件，遇到这样的现象就直接使用“docker exec -ti 容器ID 具体的bash命令”即可达到目的。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="将Redis监控细节添加到Django页面里">
+<meta property="og:url" content="http://example.com/2019/04/09/%E5%B0%86redis%E7%9B%91%E6%8E%A7%E7%BB%86%E8%8A%82%E6%B7%BB%E5%8A%A0%E5%88%B0Django%E9%A1%B5%E9%9D%A2%E9%87%8C/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="有些docker容器没有带有&#x2F;bin&#x2F;bash文件，遇到这样的现象就直接使用“docker exec -ti 容器ID 具体的bash命令”即可达到目的。">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/gateone12.png">
+<meta property="og:image" content="http://example.com/images/gateone13.png">
+<meta property="og:image" content="http://example.com/images/gateone14.png">
+<meta property="og:image" content="http://example.com/images/gateone15.gif">
+<meta property="article:published_time" content="2019-04-09T12:50:31.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:48:00.227Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="django">
+<meta property="article:tag" content="redis">
+<meta property="article:tag" content="shell">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/gateone12.png">
+
+<link rel="canonical" href="http://example.com/2019/04/09/%E5%B0%86redis%E7%9B%91%E6%8E%A7%E7%BB%86%E8%8A%82%E6%B7%BB%E5%8A%A0%E5%88%B0Django%E9%A1%B5%E9%9D%A2%E9%87%8C/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>将Redis监控细节添加到Django页面里 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/04/09/%E5%B0%86redis%E7%9B%91%E6%8E%A7%E7%BB%86%E8%8A%82%E6%B7%BB%E5%8A%A0%E5%88%B0Django%E9%A1%B5%E9%9D%A2%E9%87%8C/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          将Redis监控细节添加到Django页面里
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-04-09 20:50:31" itemprop="dateCreated datePublished" datetime="2019-04-09T20:50:31+08:00">2019-04-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:48:00" itemprop="dateModified" datetime="2025-11-08T08:48:00+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%9B%91%E6%8E%A7%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">监控与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>1.2k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>4 mins.</span>
+            </span>
+            <div class="post-description">有些docker容器没有带有/bin/bash文件，遇到这样的现象就直接使用“docker exec -ti 容器ID 具体的bash命令”即可达到目的。</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>Redis的监控一直是重点中的重点，市面上开源的Redis界面监控也不在少数了，但是自己做一个监控页面更加有针对性，而且更加有逼格。我们主要监控redis除了常规的cpu、内存、Key数之外，还有如下几个方面：阻塞客户端数量、使用内存峰值、内存碎片率、缓存命中率、失效KEY、慢日志和连接数。这里挑几个简单的说。</p>
+<h2 id="获取连接细节情况"><a href="#获取连接细节情况" class="headerlink" title="获取连接细节情况"></a>获取连接细节情况</h2><p>首先先来搞定“获取redis的连接细节”。在django里先做一个model,如下：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">redisconnection</span>(models.Model):</span><br><span class="line">	rank = models.CharField(verbose_name=<span class="string">&#x27;排名&#x27;</span>,max_length=<span class="number">10</span>)</span><br><span class="line">    num = models.CharField(verbose_name=<span class="string">&#x27;服务器连接数&#x27;</span>,max_length=<span class="number">50</span>)</span><br><span class="line">    ip = models.GenericIPAddressField(verbose_name=<span class="string">&#x27;服务器内网IP地址&#x27;</span>)</span><br><span class="line">    date = models.DateField(auto_now_add=<span class="literal">True</span>)</span><br><span class="line">    time = models.TimeField(auto_now_add=<span class="literal">False</span>, auto_now=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__unicode__</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">return</span> <span class="variable language_">self</span>.host</span><br></pre></td></tr></table></figure></p>
+<p>可见我们只是需要排名、具体的IP、当时有多少连接以及当时时间这4个指标而已。</p>
+<p>我承认我道行不够，捅咕两个小时也没有研究出来怎么用python2.7去获取redis的连接数细节，于是乎就用shell写了一个简单的脚本。如下：<br>	<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/bash</span><br><span class="line">#获取当前连接最多的前五个IP地址和数量到Mysql</span><br><span class="line">redis-cli -h redis地址 -p 6379 -a redis密码 client list | awk &#x27;&#123;print $2&#125;&#x27;| cut -d = -f 2| cut -d : -f 1 | sort | uniq -c | sort -rn |head -5 &gt; clientip.txt</span><br><span class="line">MYSQL=&quot;mysql -h数据库地址 -u数据库账号 -p数据库密码 --default-character-set=utf8 -A -N&quot;</span><br><span class="line">cat -n clientip.txt | while read rank num IP</span><br><span class="line">do</span><br><span class="line">        echo $&#123;num&#125;</span><br><span class="line">        echo $&#123;IP&#125; </span><br><span class="line">        sql=&quot;insert into databases.table(num,ip,date,time,rank) values(&#x27;$&#123;num&#125;&#x27;,&#x27;$&#123;IP&#125;&#x27;,curdate(),now(),&#x27;$&#123;rank&#125;&#x27;);&quot;</span><br><span class="line">        $MYSQL -e &quot;$sql&quot;</span><br><span class="line">done</span><br></pre></td></tr></table></figure></p>
+<p>这里先简单解释一下：<br>1.<code>client list</code>是查看redis连接细节的命令，然后通过awk获取第二列，再分别通过“&#x3D;”和“，”来分割两次，排序去重统计个数最后取出前五名输入到<code>clientip.txt</code>这个文件里；<br>2.连接mysql，-A的含义是不去预读全部数据表信息；-N的含义是获取数据信息省去列名称;<br>3.使用<code>cat -n</code>自动获取到行号当做排名，循环赋值；<br>4.<code>curdate()</code>,<code>now()</code>这俩是sql，但是需要shell里正确使用sql就要<code>-e</code>;</p>
+<p>执行效果如下：<br><img src="/images/gateone12.png" alt="akb48"></p>
+<p>剩下的内容就是在<code>views.py</code>里拿值然后通过<code>render</code>反馈到前端页面，这里不说了。</p>
+<p>如果使用了Redis中间件，那么就不能统计redis的<code>client list</code>了，而是到中间件服务器里，使用<code>ss -art | awk &#39;{print $5}&#39; | grep &#39;^[1-9]&#39; | cut -d : -f 1 | sort | uniq -dc | sort -nr</code>获取详细连接情况。</p>
+<h2 id="获取缓存命中率"><a href="#获取缓存命中率" class="headerlink" title="获取缓存命中率"></a>获取缓存命中率</h2><p>缓存命中率是<code>info Stats</code>命令里<code>keyspace_hits/(keyspace_hits+keyspace_misses)</code>的值，比如我这个redis：<br><img src="/images/gateone13.png" alt="akb48"></p>
+<p>这个值正常来说应该是90%以上，如果缓存命中率过低，那么要排查对缓存的用法是否有问题，我这个就很不合格…</p>
+<p>获取缓存命中率的shell脚本如下：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/bin/bash</span></span><br><span class="line"><span class="comment">#获取当前缓存命中率到Mysql</span></span><br><span class="line">hit=$(redis-cli -h redis地址 -p <span class="number">6379</span> -a redis密码 info Stats | grep <span class="string">&quot;keyspace_hits&quot;</span> | cut -d : -f <span class="number">2</span>)	</span><br><span class="line">miss=$(redis-cli -h redis地址 -p <span class="number">6379</span> -a redis密码 info Stats | grep <span class="string">&quot;keyspace_misses&quot;</span> | cut -d : -f <span class="number">2</span>)</span><br><span class="line">HIT=$(echo $hit | tr -d <span class="string">&#x27;\r&#x27;</span>)</span><br><span class="line">MISS=$(echo $miss | tr -d <span class="string">&#x27;\r&#x27;</span>)</span><br><span class="line">total=$(expr $HIT + $MISS)</span><br><span class="line">percent=$(awk <span class="string">&#x27;BEGIN&#123;printf &quot;%.2f\n&quot;,&#x27;</span>$HIT<span class="string">&#x27;/&#x27;</span>$total<span class="string">&#x27;&#125;&#x27;</span>)</span><br><span class="line">MYSQL=<span class="string">&quot;mysql -h数据库地址 -u数据库账号 -p数据库密码 --default-character-set=utf8 -A -N&quot;</span></span><br><span class="line">sql=<span class="string">&quot;insert into databases.table(num,date,time) values(&#x27;$&#123;percent&#125;&#x27;,curdate(),now());&quot;</span></span><br><span class="line">$MYSQL -e <span class="string">&quot;$sql&quot;</span></span><br></pre></td></tr></table></figure></p>
+<p>这里要注意！<code>hit</code>和<code>miss</code>结果是自带”\r”的，所以要去掉。不然的话就会有<code>expr: non-numeric argument</code>。而且如果用bc命令获取除法结果的话，低于1的值是不会出现整数0，即如果得到的结果是0.97，那么只会显示.97，至于如何出现这个0，可以去看 <a target="_blank" rel="noopener" href="http://www.361way.com/linux-bc-point-zero/4960.html">http://www.361way.com/linux-bc-point-zero/4960.html</a> 。</p>
+<p>现在已经通过脚本取到了值，那么剩下的内容就是django去弄一个model，之后在<code>views.py</code>里拿值然后通过<code>render</code>反馈到前端页面，这里不说了。执行效果如下：<br><img src="/images/gateone14.png" alt="akb48"></p>
+<h2 id="其他补充"><a href="#其他补充" class="headerlink" title="其他补充"></a>其他补充</h2><p>redis的慢日志操作也是我们比较关注的一点。一般来说我们使用<code>slowlog len</code>来获取当前慢日志的总条数，而是用<code>slowlog reset</code>对其进行清理工作。获取它的shell脚本跟上面两个大同小异，这里也略过不表了。</p>
+<p>如果要是想获取redis的cpu和内存，最好的方法通过zabbix拿值，CPU使用率的item是：<code>system.cpu.util[]</code>，内存使用率的item是：<code>vm.memory.size[pavailable]</code>。</p>
+<p>整个页面做完的效果如下：<br><img src="/images/gateone15.gif" alt="akb48"></p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000009915519">https://segmentfault.com/a/1190000009915519</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/secretx/article/details/73498148">https://blog.csdn.net/secretx/article/details/73498148</a><br><a target="_blank" rel="noopener" href="http://www.cnblogs.com/iforever/p/4459857.html">http://www.cnblogs.com/iforever/p/4459857.html</a><br><a target="_blank" rel="noopener" href="https://morrisjs.github.io/morris.js/lines.html">https://morrisjs.github.io/morris.js/lines.html</a></p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/redis/" rel="tag"># redis</a>
+              <a href="/tags/django/" rel="tag"># django</a>
+              <a href="/tags/shell/" rel="tag"># shell</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/04/04/Gitlab%E9%85%8D%E7%BD%AEHttps/" rel="prev" title="Apache配置Https">
+      <i class="fa fa-chevron-left"></i> Apache配置Https
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/04/12/%E4%B8%80%E4%B8%AA%E6%89%B9%E9%87%8F%E9%83%A8%E7%BD%B2%E8%84%9A%E6%9C%AC/" rel="next" title="一个批量部署脚本（未完成）">
+      一个批量部署脚本（未完成） <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E8%BF%9E%E6%8E%A5%E7%BB%86%E8%8A%82%E6%83%85%E5%86%B5"><span class="nav-number">1.</span> <span class="nav-text">获取连接细节情况</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E7%BC%93%E5%AD%98%E5%91%BD%E4%B8%AD%E7%8E%87"><span class="nav-number">2.</span> <span class="nav-text">获取缓存命中率</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E8%A1%A5%E5%85%85"><span class="nav-number">3.</span> <span class="nav-text">其他补充</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">4.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

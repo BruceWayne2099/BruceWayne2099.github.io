@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="搞明白这个，就算明白django之间几个核心文件的关系了。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="浅析django里models.py、views.py与网页之间的爱恨纠葛">
+<meta property="og:url" content="http://example.com/2018/05/14/%E6%B5%85%E6%9E%90django%E9%87%8Cmodels-py%E3%80%81views-py%E3%80%81page%E4%B9%8B%E9%97%B4%E7%9A%84%E7%BA%A0%E8%91%9B/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="搞明白这个，就算明白django之间几个核心文件的关系了。">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/type_name1.png">
+<meta property="og:image" content="http://example.com/images/type_name2.png">
+<meta property="article:published_time" content="2018-05-14T14:04:16.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:48:06.318Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="django">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/type_name1.png">
+
+<link rel="canonical" href="http://example.com/2018/05/14/%E6%B5%85%E6%9E%90django%E9%87%8Cmodels-py%E3%80%81views-py%E3%80%81page%E4%B9%8B%E9%97%B4%E7%9A%84%E7%BA%A0%E8%91%9B/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>浅析django里models.py、views.py与网页之间的爱恨纠葛 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2018/05/14/%E6%B5%85%E6%9E%90django%E9%87%8Cmodels-py%E3%80%81views-py%E3%80%81page%E4%B9%8B%E9%97%B4%E7%9A%84%E7%BA%A0%E8%91%9B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          浅析django里models.py、views.py与网页之间的爱恨纠葛
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-05-14 22:04:16" itemprop="dateCreated datePublished" datetime="2018-05-14T22:04:16+08:00">2018-05-14</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:48:06" itemprop="dateModified" datetime="2025-11-08T08:48:06+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>1.3k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>5 mins.</span>
+            </span>
+            <div class="post-description">搞明白这个，就算明白django之间几个核心文件的关系了。</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p><code>Django + Boostrap</code>现在是运维开发的必备技能，因为他俩是运维可视化的关键技术，而本文就是简单说一下整个Django的<code>数据库---后台---前端</code>的工作原理。其实所谓Django开发，就是熟悉了 Django的规则之后，按照它的规则去填空，填你自己想要展现的东西。</p>
+<p>环境：<code>django 2.0</code> + <code>python 3.6</code> + <code>pycharm 2018</code>  </p>
+<p>django建立一个app之后就会有<code>models.py</code>、<code>views.py</code>、<code>admin.py</code>这几个文件，他们三个分别的用途如下： </p>
+<p>1. <code>models.py</code>主要是用来设置数据在数据库的存储格式（比如默认值，字段类型和字段长度等等）;<br>2. <code>admin.py</code>是用来设置在&#x2F;admin&#x2F;后台里面的显示样式;<br>3. <code>views.py</code>是用来设置在前台网页里的显示样式；<br>4. <code>urls.py</code>是用来编辑域名规则；</p>
+<p>上面4个文件里，重中之重的就是<code>views.py</code>，说它是整个django的灵魂都不为过！所以要是掌握了它，基本就明白了大半个django了。  </p>
+<h2 id="举个例子"><a href="#举个例子" class="headerlink" title="举个例子"></a>举个例子</h2><p>假设有一个<code>models.py</code>，内容如下：     <br>	<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">from django.db import models     </span><br><span class="line">from django.contrib.auth.models import User   </span><br><span class="line">   </span><br><span class="line">class BlogType(models.Model):         </span><br><span class="line">	type_name = models.CharField(max_length=15)    #规定type_name是一个最大为15字节的charfield          </span><br><span class="line">def __str__(self):             </span><br><span class="line">	return &#x27;&lt;BlogType:%s&gt;&#x27; % self.type_name     </span><br></pre></td></tr></table></figure><br>	<br>然后随便加入一些内容，如图：<br><img src="/images/type_name1.png" alt="paradin"><br>	<br>而在<code>views.py</code>里，要求在前端网页里如此的显示：     <br>	<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">from django.shortcuts import render_to_response,get_object_or_404     </span><br><span class="line">from .models import BlogType    #这里引用了models.py里的那个class </span><br><span class="line">    </span><br><span class="line">def blog_list(request):         </span><br><span class="line">	context = &#123;&#125;         </span><br><span class="line">	context[&#x27;blog_types&#x27;] = BlogType.objects.all()         </span><br><span class="line">	return render_to_response(&#x27;pageblog/blog_list.html&#x27;,context)     </span><br></pre></td></tr></table></figure></p>
+<p>在<code>views.py</code>里规定，如果有访问域名是<code>/blog_list/</code>的网页，就返回<code>pageblog/blog_list.html</code>这个页面，而这个<code>blog_list.html</code>只是一个框架，里面的内容是<code>context</code>。<code>context</code>本身是一个字典，里面的key对应的value是用ojbects这个函数获得的，<code>objects.all()</code>就是获取全部的意思。用来填充<code>blog_list.html</code>的context里面有<code>blog_types</code>这个key。</p>
+<p>那么现在就可以在<code>blog_list.html</code>里使用<code>blog_types</code>这个key了，如下：     <br>	<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- 前面略 --&gt;     </span><br><span class="line">&lt;h4&gt;博客分类&lt;/h4&gt;     </span><br><span class="line">&lt;h3&gt; &#123;&#123; blog_types &#125;&#125; &lt;/h3&gt;     &lt;!-- html文件要用views.py里的变量要加上&#123;&#123;&#125;&#125; --&gt;</span><br><span class="line">&lt;!-- 后面略 --&gt;     </span><br></pre></td></tr></table></figure></p>
+<p>这样的效果如下：<br><img src="/images/type_name2.png" alt="paradin">  </p>
+<p>返回的是<code>QuerySet</code>类型，<code>QuerySet</code>是Django的查询集，可以通过<code>QuerySet</code>条件查询得到对应模型的对象集合。由此看出<code>blog_types</code>已经成功的引入到了<code>blog_list.html</code>里。</p>
+<p>至于拆成每一个“博客类型”就很简单了，html部分如下：    <br>	<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;h4&gt;博客分类&lt;/h4&gt;                 </span><br><span class="line">&lt;!-- ul是无项目的标签 --&gt;                 </span><br><span class="line">&lt;ul&gt;                     </span><br><span class="line">	&#123;% for blog_type in blog_types%&#125;    #开始一个for循环                         </span><br><span class="line">		&lt;li&gt;&lt;a href=&quot;&#123;% url &#x27;blogs_with_type&#x27; blog_type.pk %&#125;&quot;&gt;&#123;&#123; blog_type.type_name &#125;&#125; &lt;/a&gt;&lt;/li&gt;        #对每一个类型加上一个a链接                     </span><br><span class="line">	&#123;% empty %&#125;        #如果为空就说“暂无分类”                         </span><br><span class="line">		&lt;!--  li是具体的项目 --&gt;                         </span><br><span class="line">		&lt;li&gt; 暂无分类 &lt;/li&gt;                     </span><br><span class="line">	&#123;% endfor %&#125;                     </span><br><span class="line">&lt;/ul&gt;     </span><br></pre></td></tr></table></figure></p>
+<h2 id="再说urls-py"><a href="#再说urls-py" class="headerlink" title="再说urls.py"></a>再说urls.py</h2><p>上面说过了，<code>urls.py</code>是配置域名路由规则的。它的格式比较简单，就是<code>path(&#39;域名&#39;，views.py里的函数，name=&#39;自定义名称&#39;)</code>。比如下面这<code>个urls.py</code>：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.<span class="property">contrib</span> <span class="keyword">import</span> admin</span><br><span class="line"><span class="keyword">from</span> django.<span class="property">urls</span> <span class="keyword">import</span> include,path</span><br><span class="line"><span class="keyword">from</span> article.<span class="property">views</span> <span class="keyword">import</span> blog_list		#article是django项目里自己创建的一个app</span><br><span class="line"></span><br><span class="line">urlpatterns = [</span><br><span class="line">    <span class="title function_">path</span>(<span class="string">&#x27;&#x27;</span>,blog_list,name=<span class="string">&#x27;home&#x27;</span>),	#这里的name可写可不写，如果写的话，在href跳转的时候就可以直接用</span><br><span class="line">    <span class="title function_">path</span>(<span class="string">&#x27;admin/&#x27;</span>, admin.<span class="property">site</span>.<span class="property">urls</span>),</span><br><span class="line">    <span class="title function_">path</span>(<span class="string">&#x27;blog/&#x27;</span>,<span class="title function_">include</span>(<span class="string">&#x27;article.urls&#x27;</span>)),	#引用的的include方法用在这里</span><br><span class="line">]</span><br></pre></td></tr></table></figure></p>
+<p>上面这个是总的路由文件，当然可以把所有的app的路由都写到里面去，也可以在各自的app下写各自的路由，这样方便管理。比如我就在<code>article</code>这个app文件夹下面又单独了一个<code>urls.py</code>，这里面所有的域名就会自动添加<code>blog/</code>这个路径，而整个<code>urls.py</code>内容如下：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.<span class="property">urls</span> <span class="keyword">import</span> path</span><br><span class="line"><span class="keyword">from</span> . <span class="keyword">import</span> views</span><br><span class="line"></span><br><span class="line">urlpatterns = [</span><br><span class="line">    <span class="title function_">path</span>(<span class="string">&#x27;&lt;int:blog_pk&gt;&#x27;</span>,views.<span class="property">blog_detail</span>,name=<span class="string">&#x27;blog_detail&#x27;</span>),	</span><br><span class="line">    <span class="title function_">path</span>(<span class="string">&#x27;type/&lt;int:blog_type_pk&gt;&#x27;</span>,views.<span class="property">blogs_with_type</span>,name=<span class="string">&#x27;blogs_with_type&#x27;</span>),</span><br><span class="line">]</span><br></pre></td></tr></table></figure><br>在上面的第一个path里，目的就是传入一个值<code>blog_pk</code>，而这个<code>blog_pk</code>就是在<code>views.py</code>里的<code>blog_detail</code>函数需要传入的参数，跟<code>request</code>一样。上面也说过了，这个两个path都会自动在前面加上<code>/blog/</code>路径。</p>
+<h2 id="views-py与前端"><a href="#views-py与前端" class="headerlink" title="views.py与前端"></a>views.py与前端</h2><p>如何把数据库里的内容映射到前端页面呢？就是用<code>views.py</code>里的<code>render_to_response</code>，它是负责渲染的。<code>render_to_response</code>的用法是后面要加上对应的html页面和要映射的内容，比如下面这个<code>views.py</code>:<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.<span class="property">shortcuts</span> <span class="keyword">import</span> render_to_response,get_object_or_404</span><br><span class="line"><span class="keyword">from</span> .<span class="property">models</span> <span class="keyword">import</span> <span class="title class_">Blog</span>		#这里引用了models.<span class="property">py</span>里面的类：<span class="title class_">Blog</span></span><br><span class="line"></span><br><span class="line">def <span class="title function_">blog_detail</span>(request,blog_pk):		#每一次使用这个函数都要传入一个参数：blog_pk</span><br><span class="line">    context = &#123;&#125;</span><br><span class="line">    context[<span class="string">&#x27;blog&#x27;</span>] = <span class="title function_">get_object_or_404</span>(<span class="title class_">Blog</span>,pk=blog_pk)	#通过get_object_or_404这个方法生成一个字典</span><br><span class="line">    <span class="keyword">return</span> <span class="title function_">render_to_response</span>(<span class="string">&#x27;blog_detail.html&#x27;</span>,context)	#这个blog_detail.<span class="property">html</span>就是对应的前端页面</span><br></pre></td></tr></table></figure></p>
+<p>从上面可以看到，<code>views.py</code>先引入了数据库文件<code>models.py</code>里的<code>Blog</code>这个class，然后设定一个空字典，将这个字典按照对应数据库默认的主键pk与浏览器输入的pk一一对应填满，最后就是按照<code>blog_detail.html</code>为前端框架，里面赋予整个填满值的context字典。</p>
+<p>而对应的前端页面<code>blog_detail.html</code>如下：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">&lt;!<span class="variable constant_">DOCTYPE</span> html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">        &lt;meta charset=&#x27;UTF-8&#x27;&gt;</span><br><span class="line">        &lt;title&gt;&#123;&#123; blog.title &#125;&#125;&lt;/title&gt;		&lt;!-- 这里的blog就是views.py里context[&#x27;blog&#x27;]里的blog --&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">        &lt;div&gt;</span><br><span class="line">                &lt;a href=&quot;&#123;% url &#x27;home&#x27; %&#125;&quot;&gt;		&lt;!-- 这里就是返回首页，home是在urls.py里设定的 --&gt;</span><br><span class="line">                        &lt;h2&gt;BACK TO HOMEPAGE&lt;/h2&gt;</span><br><span class="line">                &lt;/a&gt;</span><br><span class="line">        &lt;/div&gt;</span><br><span class="line">        &lt;h3&gt;&#123;&#123; blog.title &#125;&#125;&lt;/h3&gt;</span><br><span class="line">        &lt;p&gt;作者：&#123;&#123; blog.author &#125;&#125;&lt;/p&gt;</span><br><span class="line">        &lt;p&gt;分类：</span><br><span class="line">                &lt;a href=&quot;&#123;% url &#x27;blogs_with_type&#x27; blog.blog_type.pk %&#125;&quot;&gt;	&lt;!-- 就是将blog.blog_type.pk作为views.py里blog_detail函数的传入值 --&gt;</span><br><span class="line">                        &#123;&#123; blog.blog_type &#125;&#125;	</span><br><span class="line">                &lt;/a&gt;</span><br><span class="line">        &lt;/p&gt;</span><br><span class="line">        &lt;p&gt; &#123;&#123; blog.blog_type.pk &#125;&#125;&lt;/p&gt;</span><br><span class="line">        &lt;p&gt;发表时间：&#123;&#123; blog.created_time|date:&quot;Y-m-d H:i:s&quot;&#125;&#125;&lt;/p&gt;	&lt;!-- 这里将输出时间做了规范化 --&gt;</span><br><span class="line">        &lt;hr&gt;</span><br><span class="line">        &lt;p&gt;&#123;&#123; blog.content &#125;&#125;&lt;/p&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure></p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/django/" rel="tag"># django</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/05/12/%E5%8A%A0%E8%BD%BDcss%E6%A0%B7%E5%BC%8F%E7%9A%84%E4%B8%A4%E4%B8%AA%E6%96%B9%E6%B3%95/" rel="prev" title="加载css样式的两个方法">
+      <i class="fa fa-chevron-left"></i> 加载css样式的两个方法
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/05/15/Gitlab%E7%9A%84%E6%B1%89%E5%8C%96%E8%BF%87%E7%A8%8B/" rel="next" title="Gitlab的汉化过程">
+      Gitlab的汉化过程 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BE%E4%B8%AA%E4%BE%8B%E5%AD%90"><span class="nav-number">2.</span> <span class="nav-text">举个例子</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%8D%E8%AF%B4urls-py"><span class="nav-number">3.</span> <span class="nav-text">再说urls.py</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#views-py%E4%B8%8E%E5%89%8D%E7%AB%AF"><span class="nav-number">4.</span> <span class="nav-text">views.py与前端</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

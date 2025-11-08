@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="这次是跟docker相关的题">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux运维工程师笔试题第十八套">
+<meta property="og:url" content="http://example.com/2019/03/04/Linux%E8%BF%90%E7%BB%B4%E5%B7%A5%E7%A8%8B%E5%B8%88%E7%AC%94%E8%AF%95%E9%A2%98%E7%AC%AC%E5%8D%81%E5%85%AB%E5%A5%97/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="这次是跟docker相关的题">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/mysql-sock9.png">
+<meta property="article:published_time" content="2019-03-04T03:52:02.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:47:03.117Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="docker">
+<meta property="article:tag" content="面试">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/mysql-sock9.png">
+
+<link rel="canonical" href="http://example.com/2019/03/04/Linux%E8%BF%90%E7%BB%B4%E5%B7%A5%E7%A8%8B%E5%B8%88%E7%AC%94%E8%AF%95%E9%A2%98%E7%AC%AC%E5%8D%81%E5%85%AB%E5%A5%97/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>Linux运维工程师笔试题第十八套 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/03/04/Linux%E8%BF%90%E7%BB%B4%E5%B7%A5%E7%A8%8B%E5%B8%88%E7%AC%94%E8%AF%95%E9%A2%98%E7%AC%AC%E5%8D%81%E5%85%AB%E5%A5%97/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Linux运维工程师笔试题第十八套
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-03-04 11:52:02" itemprop="dateCreated datePublished" datetime="2019-03-04T11:52:02+08:00">2019-03-04</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:47:03" itemprop="dateModified" datetime="2025-11-08T08:47:03+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%A4%A7%E7%89%9B%E4%B9%8B%E8%B7%AF/" itemprop="url" rel="index"><span itemprop="name">大牛之路</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>1.6k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>6 mins.</span>
+            </span>
+            <div class="post-description">这次是跟docker相关的题</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="试题内容"><a href="#试题内容" class="headerlink" title="试题内容"></a>试题内容</h2><p>1.docker的exec与attach命令有啥区别？<br><code>attach</code>开启一个和正在运行的进程交互的终端，如果该进程结束，原docker container的进程也会结束。<br><code>exec</code>可以开启多个终端实例，<code>exec -i /bin/bash</code>，由此可见exec其实是在运行中的容器中执行一个命令。</p>
+<p>2.docker的CMD与ENTRYPOINT命令有啥区别？<br><code>CMD</code>的命令会被<code>docker run</code>里的命令覆盖，而<code>ENTRYPOINT</code>命令不会。<br>如果要覆盖<code>ENTRYPOINT</code>，则在<code>docker run</code>里添加<code>--entrypoint</code>标签来覆盖即可。<br>如果dockerfile里指定了<code>WORKDIR</code>，那么无论是<code>CMD</code>还是<code>ENTRYPOINT</code>命令都是在这个WORKDIR目录里执行。</p>
+<p>3.docker的kill和stop命令有啥区别？<br>stop是“优雅退出”，先发送SIGTERM信号，在一段时间之后（10s）再发送SIGKILL信号。Docker内部的应用程序可以接收SIGTERM信号，然后做一些“退出前工作”，比如保存状态、处理当前请求等。<br>kill是“暴力退出”，即发送SIGKILL信号，应用程序直接退出。</p>
+<p>4.假设有一个AAA的容器，现在需要备份它的挂载卷&#x2F;DATA里的数据，请问如何操作？<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run --volumes-form A -v /tmp:/backup --name BACKUP ubuntu tar cvf /backup/A.tar /DATA</span><br></pre></td></tr></table></figure></p>
+<p>上面这个语句新建立一个叫BACKUP的容器，它与A容器挂载情况相同（即都是挂载&#x2F;DATA），同时将本地的&#x2F;tmp挂载到容器的&#x2F;backup，在容器生成的时候，执行了<code>tar cvf /backup/A.tar /DATA</code>将DATA文件夹的内容进行了打包，又由于&#x2F;tmp已经与&#x2F;backup挂载，所以就可以直接从宿主机上的&#x2F;tmp里得到A.tar了。</p>
+<p>4.linux里删除某个用户的所有进程的语句？<br>ps -u username | grep -v PID | awk ‘{print$1}’| xargs kill -9<br>或者killall -u username</p>
+<p>5.linux如何彻底删除一个用户？<br>userdel -r zhidao（前提是这个用户下已经没有程序运行了）</p>
+<p>6.杀死某进程的命令？<br>ps -ef |grep 进程名 |grep -v grep|awk ‘{print $2}’|xargs kill -9<br>注意！这里awk后面是单引号不是双引号 </p>
+<p>7.普通用户如何访问docker?<br>使用<code>gpasswd -a lcshop docker</code>把该用户添加到docker组即可。</p>
+<p>8.输入ping IP后敲回车，发包前会发生什么？<br>首先要知道，ICMP协议是三层（网络层协议），因为不带端口所以肯定不是四层，又因为依赖IP地址所以肯定比2层高。</p>
+<p>其次ping可以帮我们了解到是否能够与对方连通，但是ping如果能不开就不开，因为网络上会有无聊的人给你发大量的ping包把你的带宽占满。</p>
+<p>回到题目中，假设是下图中的A在ping B:<br><img src="/images/mysql-sock9.png" alt="akb48"></p>
+<p>回车之后，主机A就要封装二层报文，它会先查自己的MAC地址表，如果没有B的MAC地址，就会向外发送一个ARP广播包。交换机会收到这个报文后，由于交换机有学习MAC地址的功能，所以他会检索自己有没有保存主机B的MAC，如果有，就直接返回给主机A；如果没有，就会向所有端口发送ARP广播，其它主机收到后，发现不是在找自己，就纷纷丢弃了该报文，不去理会。直到主机B收到了报文后，就立即响应，我的MAC地址是多少，同时它也学到主机A的MAC地址，并按同样的ARP报文格式返回给主机A，这时候主机A学到了主机B的MAC，就把B的MAC地址封装到ICMP包中，向主机B发送一个回显请求，主机B收到该报文后，知道是主机A的一个回显请求，就会返回一个相同格式的报文。这样就完成了同一个网段的Ping的过程。</p>
+<p>如果主机A要ping主机C，那么主机A发现主机C的IP和自己不是同一网段，它就去找网关转发，但是它也不知道网关的MAC情况下呢?就会像之前那个步骤一样：先发送一个ARP广播，学到网关的MAC，再发封装ICMP报文给网关路由器。当路由器收到主机A发过来的ICMP报文，发现自己的目的地址是其本身MAC地址，根据目的的IP2.1.1.1查路由表，发现2.1.1.1&#x2F;24的路由表项，得到一个出口指针，去掉原来的MAC头部加上自己的MAC地址向主机C转发。如果网关也没有主机C的MAC地址,还是要向前面一个步骤一样,ARP广播一下即可相互学到。路由器2端口能学到主机D的MAC,主机D也能学到路由器2端口的MAC。最后，在主机C已学到路由器2端口MAC，路由器2端口转发给路由器1端口，路由1端口学到主机A的MAC的情况下，他们就不需要再做ARP解析，就将ICMP的回显请求回复过来。</p>
+<p>9.MySQL的数据如何恢复到任意时间点？</p>
+<p>10.假设有一个dockerfile内容如下：<br>	<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">FROM ubuntu</span><br><span class="line">ENTRYPOINT [&quot;top&quot;, &quot;-b&quot;]</span><br><span class="line">CMD [&quot;-c&quot;]</span><br></pre></td></tr></table></figure></p>
+<p>然后凭借此dockerfile创建一个镜像，然后<code>docker run -it --rm --name test 镜像名称 -H</code>的实际结果是什么？</p>
+<p>实际执行结果是相当于执行<code>top -b -H</code>，没有<code>-c</code>。因为使用exec格式（只能加双引号），在<code>docker run &lt;image&gt;</code>的所有参数，都会追加到<code>ENTRYPOINT</code>之后，并且会覆盖<code>CMD</code>所指定的参数。CMD与ENTRYPOINT一样，如果dockerfile有多个的话，只有最后一个生效。</p>
+<p>11.假设有一个dockerfile A内容如下：<br>	<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ENV name Cloud Man</span><br><span class="line">ENTRYPOINT [&quot;/bin/echo&quot;, &quot;Hello, $name&quot;]</span><br></pre></td></tr></table></figure><br>还有一个B dockerfile内容如下：<br>	<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ENV name Cloud Man  </span><br><span class="line">ENTRYPOINT echo &quot;Hello, $name&quot; </span><br></pre></td></tr></table></figure></p>
+<p>请问两者分别运行容器结果是啥？<br>A是<code>Hello, $name</code>，B是<code>Hello, Cloud Man</code>。A的环境变量并没有达到效果，如果想要达到效果，应该改成如下：<br>	<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ENV name Cloud Man  </span><br><span class="line">ENTRYPOINT [&quot;/bin/sh&quot;, &quot;-c&quot;, &quot;echo Hello, $name&quot;]</span><br></pre></td></tr></table></figure></p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/30960686/difference-between-docker-attach-and-docker-exec">https://stackoverflow.com/questions/30960686/difference-between-docker-attach-and-docker-exec</a><br><a target="_blank" rel="noopener" href="http://dockone.io/question/469">http://dockone.io/question/469</a><br><a target="_blank" rel="noopener" href="https://www.ibm.com/developerworks/community/blogs/132cfa78-44b0-4376-85d0-d3096cd30d3f/entry/RUN_vs_CMD_vs_ENTRYPOINT_%E6%AF%8F%E5%A4%A95%E5%88%86%E9%92%9F%E7%8E%A9%E8%BD%AC_Docker_%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF_17?lang=en">https://www.ibm.com/developerworks/community/blogs/132cfa78-44b0-4376-85d0-d3096cd30d3f/entry/RUN_vs_CMD_vs_ENTRYPOINT_%E6%AF%8F%E5%A4%A95%E5%88%86%E9%92%9F%E7%8E%A9%E8%BD%AC_Docker_%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF_17?lang=en</a><br><a target="_blank" rel="noopener" href="https://c.isme.pub/2018/07/11/python-interview/">https://c.isme.pub/2018/07/11/python-interview/</a></p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/docker/" rel="tag"># docker</a>
+              <a href="/tags/%E9%9D%A2%E8%AF%95/" rel="tag"># 面试</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/03/01/h5%E7%95%8C%E9%9D%A2%E5%AE%9E%E7%8E%B0%E6%A1%8C%E9%9D%A2%E6%8E%A8%E9%80%81%E9%80%9A%E7%9F%A5/" rel="prev" title="H5界面实现桌面推送通知">
+      <i class="fa fa-chevron-left"></i> H5界面实现桌面推送通知
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/03/04/%E4%B8%8D%E8%A6%81%E8%BD%BB%E6%98%93%E5%8E%BB%E6%89%93%E5%BC%80tcp-tw-recycle%EF%BC%81/" rel="next" title="不要轻易去打开tcp_tw_recycle！">
+      不要轻易去打开tcp_tw_recycle！ <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%95%E9%A2%98%E5%86%85%E5%AE%B9"><span class="nav-number">1.</span> <span class="nav-text">试题内容</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">2.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

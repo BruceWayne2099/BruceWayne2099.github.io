@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="这次是nginx和CDN相关的题目">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux运维工程师笔试题第十七套">
+<meta property="og:url" content="http://example.com/2019/02/19/Linux%E8%BF%90%E7%BB%B4%E5%B7%A5%E7%A8%8B%E5%B8%88%E7%AC%94%E8%AF%95%E9%A2%98%E7%AC%AC%E5%8D%81%E4%B8%83%E5%A5%97/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="这次是nginx和CDN相关的题目">
+<meta property="og:locale">
+<meta property="article:published_time" content="2019-02-19T03:22:07.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:47:02.384Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="nginx">
+<meta property="article:tag" content="面试笔试">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2019/02/19/Linux%E8%BF%90%E7%BB%B4%E5%B7%A5%E7%A8%8B%E5%B8%88%E7%AC%94%E8%AF%95%E9%A2%98%E7%AC%AC%E5%8D%81%E4%B8%83%E5%A5%97/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>Linux运维工程师笔试题第十七套 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/02/19/Linux%E8%BF%90%E7%BB%B4%E5%B7%A5%E7%A8%8B%E5%B8%88%E7%AC%94%E8%AF%95%E9%A2%98%E7%AC%AC%E5%8D%81%E4%B8%83%E5%A5%97/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Linux运维工程师笔试题第十七套
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-02-19 11:22:07" itemprop="dateCreated datePublished" datetime="2019-02-19T11:22:07+08:00">2019-02-19</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:47:02" itemprop="dateModified" datetime="2025-11-08T08:47:02+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%A4%A7%E7%89%9B%E4%B9%8B%E8%B7%AF/" itemprop="url" rel="index"><span itemprop="name">大牛之路</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>1.9k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>7 mins.</span>
+            </span>
+            <div class="post-description">这次是nginx和CDN相关的题目</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="试题内容"><a href="#试题内容" class="headerlink" title="试题内容"></a>试题内容</h2><ol>
+<li>如果网站配置了多域名，要根据不同的域名分别https访问，应该怎么配置？<br>在rewrite的时候使用$host，如下： <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">server</span><br><span class="line">&#123;</span><br><span class="line">        listen       <span class="number">80</span>;</span><br><span class="line">        server_name www.test.com www.test.com.cn;</span><br><span class="line">        index index.html index.htm index.php;</span><br><span class="line">		root /home/wwwroot;</span><br><span class="line"></span><br><span class="line">        location / &#123;</span><br><span class="line">                rewrite ^/(.*)$ https://$host/$<span class="number">1</span> permanent;</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<p>如果是要笨一点的方法就是：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">server  </span><br><span class="line">   &#123;  </span><br><span class="line">       listen       <span class="number">80</span>;  </span><br><span class="line">       server_name www.test.com www.test.com.cn;  </span><br><span class="line">       index index.html index.htm index.php;  </span><br><span class="line">       root /home/wwwroot;  </span><br><span class="line"> </span><br><span class="line">       <span class="keyword">if</span> ($host = <span class="string">&#x27;www.test.com.cn&#x27;</span> ) &#123;  </span><br><span class="line">               rewrite ^/(.*)$ https://www.test.com.cn/$<span class="number">1</span> permanent;  </span><br><span class="line">       &#125;  </span><br><span class="line">       <span class="keyword">if</span> ($host = <span class="string">&#x27;www.test.com&#x27;</span> ) &#123;  </span><br><span class="line">               rewrite ^/(.*)$ https://www.test.com/$<span class="number">1</span> permanent;  </span><br><span class="line">       &#125;</span><br></pre></td></tr></table></figure></p>
+<p>ps.阿里云的SLB绑定多个HTTPS证书的文档：<a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/87023.html?spm=a2c4g.11186623.6.741.7e11301bVLBAJz">https://help.aliyun.com/document_detail/87023.html?spm=a2c4g.11186623.6.741.7e11301bVLBAJz</a></p>
+<ol start="2">
+<li>在Nginx中，如何使用未定义的服务器名称来阻止处理请求?<br>只需将请求删除的服务器就可以定义为： <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Server &#123;</span><br><span class="line">	listen <span class="number">80</span>;</span><br><span class="line">	server_name <span class="string">&quot; &quot;</span>;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">444</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<p>这里，服务器名被保留为一个空字符串，它将在没有“主机”头字段的情况下匹配请求，而一个特殊的Nginx的非标准代码444被返回，从而终止连接。</p>
+<ol start="3">
+<li>ajax是同步还是异步，怎么样实现同步?<br>ajax里async属性默认的设置值为<code>true</code>，这种情况为<code>异步方式</code>。即网页里有两个函数func(x)和func(y)，在打开网页的时候，后台会先去执行func(x)，然后等待server返回结果，同时还有一个线程会去执行func(y)。</li>
+</ol>
+<p>当把async设为<code>false</code>时，这时ajax的请求是<code>同步</code>的，也就是说，这个时候ajax块发出请求后，他会等待在func(x)这个地方，不会去执行func(y)，直到func(x)部分执行完毕。</p>
+<ol start="4">
+<li><p>nginx如何实现http跳转https?<br>需要用到地址重写代码，用以下代码能让http强制跳转到https:</p>
+ <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    listen <span class="number">80</span>;</span><br><span class="line">    listen [::]:<span class="number">80</span>;		<span class="comment">#支持ipv6</span></span><br><span class="line">    server_name www.test.com;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">301</span> https://$server_name$request_uri;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>如果某个网站做了两个域名，分别是<a target="_blank" rel="noopener" href="https://www.aaa.com和https//www.bbb.com%EF%BC%8C%E5%A6%82%E6%9E%9C%E5%81%9A%E4%BA%86www.aaa.com">https://www.aaa.com和https://www.bbb.com，如果做了www.aaa.com</a> cname到<a href="http://www.bbb.com，那么浏览器打开www.aaa.com会是什么界面？">www.bbb.com，那么浏览器打开www.aaa.com会是什么界面？</a><br>打开页面会出现“https证书不正确”的风险提示。</p>
+</li>
+<li><p>接着上面问题，在nginx里做了rewrite或者配置了显性URL，此时取消掉<a href="http://www.aaa.com本身的ip（即www.aaa.com没有ip,但是www.bbb.com有ip），浏览器里打开www.aaa.com会是什么界面？">www.aaa.com本身的ip（即www.aaa.com没有ip,但是www.bbb.com有ip），浏览器里打开www.aaa.com会是什么界面？</a><br>会显示“无法找到<a target="_blank" rel="noopener" href="http://www.aaa.com的ip地址”(第一步就失败了...)./">www.aaa.com的IP地址”（第一步就失败了...）。</a></p>
+</li>
+<li><p>要求<code>a.com</code>和<code>www.a.com</code>都跳到<code>www.b.com</code>，而<code>www.a.com/123</code>不跳，如何配置？<br>配置如下：</p>
+ <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">        listen   <span class="number">80</span>;</span><br><span class="line">        server_name www.a.com a.com;</span><br><span class="line"></span><br><span class="line">        <span class="comment">#根目录跳转</span></span><br><span class="line">        location / &#123;</span><br><span class="line">                rewrite .+ http://www.b.com/ permanent;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">#非根目录本地执行</span></span><br><span class="line">        location ~* /.+ &#123;</span><br><span class="line">            <span class="comment">#已省略余下通用配置内容</span></span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>为了安全，Web服务器不要求启用所有可用的方法，只允许<code>GET</code>，<code>HEAD</code>和<code>POST</code>方法，其他的全部过滤掉。实现其功能的代码如下：</p>
+ <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> ($request_method !~ ^(GET|HEAD|POST)$ ) &#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">444</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>对&#x2F;download&#x2F;目录做“最大下载速度20K，同时最多2个并发链接的限制”</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">http &#123;</span><br><span class="line">        limit_zone my_zone $binary_remote_addr 10m;	<span class="comment">#在 http 段配置定义一个limit_zone</span></span><br><span class="line">        server &#123;</span><br><span class="line">                 location /download/ &#123;</span><br><span class="line">                                       limit_conn my_zone <span class="number">2</span>;	<span class="comment">#limit_conn和 limit_rate参数进行限速设置</span></span><br><span class="line">                                       limit_rate 20k;</span><br><span class="line">                                     &#125;</span><br><span class="line">               &#125;</span><br><span class="line">     &#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>limit_zone</code>:针对每个 IP 定义一个存储 session 状态的容器。本例中定义了一个my_zone的10m大小的容器。</p>
+</li>
+<li><p><code>limit_conn my_zone 2</code>：限制在my_zone中记录状态的每个IP只能发起2个并发连接。本例中，客户端访问&#x2F;download目录时，会限制2个并发连接。 </p>
+</li>
+<li><p><code>limit_rate 20k</code>：对每个连接限速20k。注意，这里是对连接限速，而不是对IP限速。如果一个IP允许2个并发连接，那么这个IP就是限速为<code>limit_rate*2</code>，在设置的时候要根据自己的需要做设置调整。</p>
+</li>
+<li><p>简单说明nginx配置文件里面alias和root的区别<br>Nginx配置文件server中指定两个location执行，分别为root和alias指令：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">location /test/ &#123;</span><br><span class="line">           alias /www/test/;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<p>按照上述配置，则访问&#x2F;test&#x2F;目录里面的文件时，nginx会去<code>/www/test/</code>目录找文件：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">location /test/ &#123;</span><br><span class="line">          root /www/test;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>按照这种配置，则访问&#x2F;test&#x2F;目录下的文件时，nginx会去<code>/www/test/test/</code>目录下找文件。</p>
+<p>另一个区别是alias后面必须要用<code>/</code>结束，否则会找不到文件，而root则对<code>/</code>可有可无。</p>
+<p><font color=red>注意！location后面的&#x2F;test&#x2F;如果是&#x2F;test的话（没有用&#x2F;收尾），而同时alias的文件夹是有&#x2F;收尾的话，就会出现“目录穿越”漏洞，即外来人可以访问你&#x2F;www&#x2F;test..&#x2F;即www文件夹的内容。</font>详情可见 <a target="_blank" rel="noopener" href="https://www.leavesongs.com/PENETRATION/nginx-insecure-configuration.html">https://www.leavesongs.com/PENETRATION/nginx-insecure-configuration.html</a> 。</p>
+<ol start="12">
+<li><p>CDN缓存命中率下降的因素有哪些？</p>
+</li>
+<li><p>客户是否刷新过缓存？<br>答：如果刷新缓存，有可能会短时间表现命中率下降。特别说明下：CDN的url或者目录刷新是清除CDN缓存的动作（这个比较容易理解偏差）</p>
+</li>
+<li><p>带宽是否突增？并且访问的都是新的URL？<br>答：带宽突增或者访问的新URL较多，会导致CDN节点回源较多，命中率会表现有下降趋势。</p>
+</li>
+<li><p>源站是否有新内容发布？<br>答：CDN节点访问新内容，导致CDN节点回源较多，命中率会表现有下降趋势。</p>
+</li>
+<li><p>源站是否出现过异常导致5XX和4XX增加，由于5XX和4XX不缓存，会表现命中率下降。</p>
+</li>
+<li><p>源站的访问url的header参数，或者在CDN控制管理后台的缓存配置规则是否改变过？<br>答：缓存时长的调整，有可能会带来命中率的变化。</p>
+</li>
+<li><p>如果判断url是否命中CDN缓存？<br>查看响应头信息中的<code>X-Cache</code>字段。</p>
+</li>
+<li><p>显示<code>MISS</code>，说明没有命中CDN缓存，是回源的。</p>
+</li>
+<li><p>显示<code>HIT</code>，是命中了CDN缓存。</p>
+</li>
+</ol>
+<p>除了<code>X-Cache</code>还有如下几个参数与CDN有关：<br><code>X-Swift-SaveTime</code>：内容开始在CDN上缓存的时间。由于系统时间是GMT时间，所以需要折算成北京时间。<br><code>X-Swift-CacheTime</code>：CDN的默认缓存时间，以秒为单位。<br><code>Age</code>：该内容在CDN上已经缓存了的时间。</p>
+<ol start="14">
+<li>AJAX从b.com请求另一个域a.com的地址会有跨域的问题，如何配置？<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">		listen       <span class="number">80</span>;</span><br><span class="line">		server_name  b.com;</span><br><span class="line">		location /&#123;</span><br><span class="line">			add_header <span class="string">&#x27;Access-Control-Allow-Origin&#x27;</span> <span class="string">&#x27;http://a.com&#x27;</span>;</span><br><span class="line">			add_header <span class="string">&#x27;Access-Control-Allow-Credentials&#x27;</span> <span class="string">&#x27;true&#x27;</span>;</span><br><span class="line">			add_header <span class="string">&#x27;Access-Control-Allow-Methods&#x27;</span> <span class="string">&#x27;GET&#x27;</span>;</span><br><span class="line">		&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<p>第一条add_header：授权从a.com的请求<br>第二条add_header：当该标志为真时，响应于该请求是否可以被暴露<br>第三条add_header：指定请求的方法，可以是GET，POST，PUT，DELETE，HEAD<br>如果想允许来自任何域的请求，可以这样：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">	    listen <span class="number">80</span>;</span><br><span class="line">	    server_name b.com;</span><br><span class="line">	    location /&#123;</span><br><span class="line">		    Access-Control-Allow-Origin: *</span><br><span class="line">	    &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<ol start="15">
+<li><p>如果想配置2-3个域设置为信任，其他的域名被排除，应该如何配置？</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">	    listen <span class="number">80</span>;</span><br><span class="line">	    server_name b.com;</span><br><span class="line">	    location /&#123;</span><br><span class="line">                <span class="keyword">if</span> ( $http_referer ~* (a.com|b.com|c.com)  ) &#123; </span><br><span class="line">		        Access-Control-Allow-Origin: *</span><br><span class="line">                &#125;</span><br><span class="line">	    &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>将不带www的访问强制加上www怎么做？</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">       <span class="comment"># 下面这句就是当识别到 HOST 不是带 www 的全部都 302 带上 www</span></span><br><span class="line"><span class="keyword">if</span> ( $host != <span class="string">&#x27;www.your-domain.com&#x27;</span> ) &#123;</span><br><span class="line">	rewrite ^(.*)$ https://www.your-domain.com$<span class="number">1</span> permanent;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>一个日志文件a.log有1000万行,结构如下：<br>a1,190,c1<br>a2,301,c2<br>a3,90,c3<br>a4,190,c4<br>a5,170,c5<br>…<br>使用Linux命令查找并输出第二例字段最大的三个值？</p>
+</li>
+</ol>
+<p>答案：<code>cat a.log | awk -F&#39;,&#39; &#39;{print $2}&#39; | sort -k1nr | head -n 3</code></p>
+<ol start="18">
+<li>在mysql InnoDB引擎中，一个update事务：<code>update users set status = &#39;delete&#39; where id = 100; </code>正在执行，在commit之前；另一个查询请求<code>select * from users where id = 100;</code>会被阻塞住么？如果不会，会查到什么数据?<br>答：不阻塞，其可以查询出100（因为读的时候不涉及锁，且事务未提交，所以可以查询出）</li>
+</ol>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a target="_blank" rel="noopener" href="https://my.oschina.net/mrpei123/blog/1794001">https://my.oschina.net/mrpei123/blog/1794001</a><br><a target="_blank" rel="noopener" href="http://note.qidong.name/2017/09/nginx-https-hsts/">http://note.qidong.name/2017/09/nginx-https-hsts/</a><br><a target="_blank" rel="noopener" href="https://www.ssllabs.com/ssltest/index.html%EF%BC%88%E6%B5%8B%E8%AF%95ssl%E5%AE%89%E5%85%A8%E7%9A%84%E7%BD%91%E7%AB%99%EF%BC%89">https://www.ssllabs.com/ssltest/index.html（测试ssl安全的网站）</a></p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/nginx/" rel="tag"># nginx</a>
+              <a href="/tags/%E9%9D%A2%E8%AF%95%E7%AC%94%E8%AF%95/" rel="tag"># 面试笔试</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/02/15/%E4%BD%BF%E7%94%A8Logstash%E7%9A%84%E6%AD%A3%E5%88%99%E5%8C%B9%E9%85%8D%E6%97%A5%E5%BF%97%E6%A0%BC%E5%BC%8F/" rel="prev" title="使用Logstash的正则匹配日志格式">
+      <i class="fa fa-chevron-left"></i> 使用Logstash的正则匹配日志格式
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/02/28/%E8%AE%A9Nginx%E9%89%B4%E6%9D%83%E5%8A%9F%E8%83%BD%E4%BF%9D%E6%8A%A4Kibana%E7%BD%91%E9%A1%B5/" rel="next" title="让Nginx鉴权功能保护Kibana网页">
+      让Nginx鉴权功能保护Kibana网页 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%95%E9%A2%98%E5%86%85%E5%AE%B9"><span class="nav-number">1.</span> <span class="nav-text">试题内容</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">2.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

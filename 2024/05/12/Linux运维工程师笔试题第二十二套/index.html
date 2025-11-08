@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="在Java中，未使用BufferedInputStream读取文件导致调用方sys过高，本质是频繁的系统调用引起的性能瓶颈">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux运维工程师笔试题第二十二套">
+<meta property="og:url" content="http://example.com/2024/05/12/Linux%E8%BF%90%E7%BB%B4%E5%B7%A5%E7%A8%8B%E5%B8%88%E7%AC%94%E8%AF%95%E9%A2%98%E7%AC%AC%E4%BA%8C%E5%8D%81%E4%BA%8C%E5%A5%97/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="在Java中，未使用BufferedInputStream读取文件导致调用方sys过高，本质是频繁的系统调用引起的性能瓶颈">
+<meta property="og:locale">
+<meta property="article:published_time" content="2024-05-12T06:22:09.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:47:01.416Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="python">
+<meta property="article:tag" content="开发">
+<meta property="article:tag" content="面试">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2024/05/12/Linux%E8%BF%90%E7%BB%B4%E5%B7%A5%E7%A8%8B%E5%B8%88%E7%AC%94%E8%AF%95%E9%A2%98%E7%AC%AC%E4%BA%8C%E5%8D%81%E4%BA%8C%E5%A5%97/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>Linux运维工程师笔试题第二十二套 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/05/12/Linux%E8%BF%90%E7%BB%B4%E5%B7%A5%E7%A8%8B%E5%B8%88%E7%AC%94%E8%AF%95%E9%A2%98%E7%AC%AC%E4%BA%8C%E5%8D%81%E4%BA%8C%E5%A5%97/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Linux运维工程师笔试题第二十二套
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-05-12 14:22:09" itemprop="dateCreated datePublished" datetime="2024-05-12T14:22:09+08:00">2024-05-12</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:47:01" itemprop="dateModified" datetime="2025-11-08T08:47:01+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%A4%A7%E7%89%9B%E4%B9%8B%E8%B7%AF/" itemprop="url" rel="index"><span itemprop="name">大牛之路</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>4.4k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>16 mins.</span>
+            </span>
+            <div class="post-description">在Java中，未使用BufferedInputStream读取文件导致调用方sys过高，本质是频繁的系统调用引起的性能瓶颈</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <ol>
+<li>篮子里有100个苹果，将这些苹果进行编号，从0开始到99。现在将这些苹果分成4份，第一份20个，第二份30个，第三份38个，最后一份12个，要求是苹果的编号不能连续。</li>
+</ol>
+<p>【思路】通过构造性方法分配苹果，确保每份内部无连续编号：<br>第一份（20 个苹果）：选取前 20 个奇数（1, 3, 5, …, 39）。奇数之间相差 2，无连续编号。<br>第二份（30 个苹果）：选取剩余的奇数（41, 43, …, 99）。	同样无连续编号。<br>第三份（38 个苹果）：选取前 38 个偶数（0, 2, 4, …, 74）。这些苹果之间相差 2，无连续编号。<br>第四份（12 个苹果）：选取后 12 个偶数（76, 78, …, 98）。同样无连续编号。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 生成各分组的苹果编号</span></span><br><span class="line">group1 = <span class="built_in">list</span>(<span class="built_in">range</span>(<span class="number">1</span>, <span class="number">40</span>, <span class="number">2</span>))       <span class="comment"># 第一份：20 个奇数（1, 3, ..., 39）</span></span><br><span class="line">group2 = <span class="built_in">list</span>(<span class="built_in">range</span>(<span class="number">41</span>, <span class="number">100</span>, <span class="number">2</span>))      <span class="comment"># 第二份：30 个奇数（41, 43, ..., 99）</span></span><br><span class="line">group3 = <span class="built_in">list</span>(<span class="built_in">range</span>(<span class="number">0</span>, <span class="number">75</span>, <span class="number">2</span>))        <span class="comment"># 第三份：38 个偶数（0, 2, ..., 74）</span></span><br><span class="line">group4 = <span class="built_in">list</span>(<span class="built_in">range</span>(<span class="number">76</span>, <span class="number">99</span>, <span class="number">2</span>))       <span class="comment"># 第四份：12 个偶数（76, 78, ..., 98）</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 验证各分组数量是否正确</span></span><br><span class="line"><span class="keyword">assert</span> <span class="built_in">len</span>(group1) == <span class="number">20</span>, <span class="string">&quot;第一份数量错误&quot;</span></span><br><span class="line"><span class="keyword">assert</span> <span class="built_in">len</span>(group2) == <span class="number">30</span>, <span class="string">&quot;第二份数量错误&quot;</span></span><br><span class="line"><span class="keyword">assert</span> <span class="built_in">len</span>(group3) == <span class="number">38</span>, <span class="string">&quot;第三份数量错误&quot;</span></span><br><span class="line"><span class="keyword">assert</span> <span class="built_in">len</span>(group4) == <span class="number">12</span>, <span class="string">&quot;第四份数量错误&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 验证各分组内部无连续编号</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">has_consecutive</span>(<span class="params">numbers</span>):</span><br><span class="line">    sorted_numbers = <span class="built_in">sorted</span>(numbers)</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">1</span>, <span class="built_in">len</span>(sorted_numbers)):</span><br><span class="line">        <span class="keyword">if</span> sorted_numbers[i] - sorted_numbers[i-<span class="number">1</span>] == <span class="number">1</span>:</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> group <span class="keyword">in</span> [group1, group2, group3, group4]:</span><br><span class="line">    <span class="keyword">assert</span> <span class="keyword">not</span> has_consecutive(group), <span class="string">&quot;存在连续编号&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 验证所有苹果编号被唯一分配</span></span><br><span class="line">all_apples = <span class="built_in">set</span>(<span class="built_in">range</span>(<span class="number">100</span>))</span><br><span class="line">assigned = <span class="built_in">set</span>(group1 + group2 + group3 + group4)</span><br><span class="line"><span class="keyword">assert</span> all_apples == assigned, <span class="string">&quot;苹果编号未全部分配或重复&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 输出结果</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;分组结果：&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot;第一份: <span class="subst">&#123;group1&#125;</span>&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot;第二份: <span class="subst">&#123;group2&#125;</span>&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot;第三份: <span class="subst">&#123;group3&#125;</span>&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot;第四份: <span class="subst">&#123;group4&#125;</span>&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+
+<ol start="2">
+<li>编写一个函数，在字符串数组中查找最长的公共前缀字符串。 如果没有公共前缀，则返回空字符串” “。<br>输入：strs &#x3D; [“present”,”promotion”,”protect”]<br>输出：”pr”<br>输入：strs &#x3D; [“al”,”trace”,”mtr”]<br>输出：” “</li>
+</ol>
+<p>【思路】<br>先确定拿到的strs里最少的单词的长度，然后就拿第一个单词的第一个字母开始对比，如果跟第二个单词的第一个字母相同，再比较第三个单词的第一个字母，如果三个都相同，则比较第二个字母。一直到不相同结束。</p>
+<p>【代码】</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">longest_common_prefix</span>(<span class="params">strs</span>):</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> strs:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;&quot;</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 找到最短的字符串长度</span></span><br><span class="line">    min_length = <span class="built_in">min</span>(<span class="built_in">len</span>(s) <span class="keyword">for</span> s <span class="keyword">in</span> strs)</span><br><span class="line">    </span><br><span class="line">    prefix = <span class="string">&quot;&quot;</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(min_length):</span><br><span class="line">        char = strs[<span class="number">0</span>][i]</span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">all</span>(s[i] == char <span class="keyword">for</span> s <span class="keyword">in</span> strs):  <span class="comment"># 判断是否所有字符串的当前位置字符相同，这里如果都相同，就是返回都是Ture,外面再套了一层all</span></span><br><span class="line">            prefix += char</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> prefix</span><br><span class="line"></span><br><span class="line"><span class="comment"># 测试示例</span></span><br><span class="line">strs1 = [<span class="string">&quot;present&quot;</span>, <span class="string">&quot;promotion&quot;</span>, <span class="string">&quot;protect&quot;</span>]</span><br><span class="line"><span class="built_in">print</span>(longest_common_prefix(strs1))  <span class="comment"># 输出: &quot;pr&quot;</span></span><br><span class="line"></span><br><span class="line">strs2 = [<span class="string">&quot;al&quot;</span>, <span class="string">&quot;trace&quot;</span>, <span class="string">&quot;mtr&quot;</span>]</span><br><span class="line"><span class="built_in">print</span>(longest_common_prefix(strs2))  <span class="comment"># 输出: &quot;&quot;</span></span><br><span class="line"></span><br><span class="line">strs3 = []</span><br><span class="line"><span class="built_in">print</span>(longest_common_prefix(strs3))  <span class="comment"># 输出: &quot;&quot;</span></span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>给定一个整数x，如果x是回文整数，则返回true。 当一个整数向后读取与向前读取相同时，它就是一个回文。例如，121是回文，而123不是。</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">is_palindrome</span>(<span class="params">x</span>):</span><br><span class="line">    <span class="comment"># 将整数转换为字符串</span></span><br><span class="line">    str_x = <span class="built_in">str</span>(x)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 比较原字符串和反转后的字符串是否相同</span></span><br><span class="line">    <span class="keyword">return</span> str_x == str_x[::-<span class="number">1</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment"># 测试示例</span></span><br><span class="line"><span class="built_in">print</span>(is_palindrome(<span class="number">121</span>))  <span class="comment"># 输出: True</span></span><br><span class="line"><span class="built_in">print</span>(is_palindrome(-<span class="number">121</span>))  <span class="comment"># 输出: False</span></span><br><span class="line"><span class="built_in">print</span>(is_palindrome(<span class="number">123</span>))  <span class="comment"># 输出: False</span></span><br><span class="line"><span class="built_in">print</span>(is_palindrome(<span class="number">1221</span>))  <span class="comment"># 输出: True</span></span><br></pre></td></tr></table></figure>
+
+<ol start="4">
+<li>在一个整型数组中, 找到两个index，其对应的两个数相加为给出的目标数字。 你可以假设每个输入都有且仅有一个解。给定一个整数数组nums和一个整数目标值target，返回两个数字的索引，使它们相加到目标值。<br>您可以假设每个输入都只有一个答案，但是不能两次使用同一元素。可以按任何顺序返回答案。<br>示范<br>输入：nums &#x3D; [3,2,4], target &#x3D; 6<br>输出：[1,2]<br>输入：nums &#x3D; [1,2,9], target &#x3D; 10<br>输出：[0,2]</li>
+</ol>
+<p>【思路】先拿到nums里每一个元素的index和对应的值，然后用目标数target逐一减去每一个元素，看剩下的值是否在，因为是要求返回两个数字的索引，所以存在就拿到另一个值的index，如果不存在就返回空就得了。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">two_sum</span>(<span class="params">nums, target</span>):</span><br><span class="line">    num_dict = &#123;&#125;  <span class="comment"># 创建一个字典</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> index, num <span class="keyword">in</span> <span class="built_in">enumerate</span>(nums):  <span class="comment"># 逐一获得目标数组的值num和索引i</span></span><br><span class="line">        complement = target - num    <span class="comment"># 然后就是目标值-目标数组的值num，看剩余的的值是否在</span></span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> complement <span class="keyword">in</span> num_dict:</span><br><span class="line">            <span class="keyword">return</span> [num_dict[complement], index]</span><br><span class="line">        </span><br><span class="line">        num_dict[num] = index</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 题目假设一定有解，所以这里不会到达</span></span><br><span class="line">    <span class="keyword">return</span> []</span><br><span class="line"></span><br><span class="line"><span class="comment"># 示例</span></span><br><span class="line">nums = [<span class="number">2</span>, <span class="number">7</span>, <span class="number">11</span>, <span class="number">15</span>]</span><br><span class="line">target = <span class="number">26</span></span><br><span class="line"><span class="built_in">print</span>(two_sum(nums, target))  <span class="comment"># 输出: [2, 3]</span></span><br></pre></td></tr></table></figure>
+
+
+<ol start="5">
+<li><p><code>select * from A where exists (select * from B where A.id=B.id); </code>和 <code>select * from A where A.id in (select id from B);</code>如果A表有100条数据，B表有10000条，请问哪个sql语句执行效率高？<br>【答案】EXISTS 可以利用索引快速查找并提前终止，减少不必要的扫描。IN 需要生成并存储较大的结果集，可能导致内存开销和性能下降。所以，EXISTS 语句的执行效率更高。</p>
+</li>
+<li><p>简述CGROUP如何限制进程cpu使用<br>【答案】首先需要在系统中创建一个CGroup，并为其配置相应的资源限制。这通常涉及到创建目录结构和设置文件。例如，在 <code>/sys/fs/cgroup/cpu/</code> 下创建一个名为 <code>my_cgroup</code> 的CGroup：<code>mkdir /sys/fs/cgroup/cpu/my_cgroup</code></p>
+</li>
+</ol>
+<p>然后，设置CPU份额。CGroup提供了两种方式来限制CPU使用：CPU份额（CPU shares）和CPU配额（CPU quotas）。CPU份额决定了各个任务之间的相对优先级。例如，如果两个任务A和B的CPU份额分别是1024和512，那么任务A将获得大约两倍于任务B的CPU时间。</p>
+<p>设置CPU份额：<code>echo 1024 &gt; /sys/fs/cgroup/cpu/my_cgroup/cpu.shares</code></p>
+<p>CPU配额允许你精确地限制任务在一定时间内能够使用的CPU时间。例如，你可以设置一个任务在一个周期内最多只能使用50%的CPU时间。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">echo <span class="number">50000</span> &gt; /sys/fs/cgroup/cpu/my_cgroup/cpu.cfs_quota_us</span><br><span class="line">echo <span class="number">100000</span> &gt; /sys/fs/cgroup/cpu/my_cgroup/cpu.cfs_period_us</span><br></pre></td></tr></table></figure>
+
+<p>这里，<code>cpu.cfs_quota_us</code> 表示在一个周期内允许的最大CPU时间（单位是微秒），而 <code>cpu.cfs_period_us</code> 表示周期的长度（单位也是微秒）。上面的例子表示在一个周期（100000微秒，即0.1秒）内，最多使用50000微秒（即0.05秒）的CPU时间。</p>
+<p>最后，将特定的进程添加到CGroup中，以便它们受到资源限制的影响。例如，将PID为1234的进程添加到 <code>my_cgroup</code> 中：<code>echo 1234 &gt; /sys/fs/cgroup/cpu/my_cgroup/tasks</code></p>
+<p>现在可以通过读取相关文件来监控CGroup的状态和统计信息。<code>cat /sys/fs/cgroup/cpu/my_cgroup/cpuacct.usage</code></p>
+<ol start="7">
+<li>http 301 500和502 含义<br>【答案】</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">301</span> Moved Permanently（永久重定向），此时客户端会缓存新 URL。而<span class="number">302</span>（临时重定向），客户端不会缓存新 URL。</span><br><span class="line"><span class="number">500</span> Internal Server Error（服务器内部错误），直接去后端服务器上看问题吧，通常由代码缺陷、配置错误或依赖服务故障引起。</span><br><span class="line"><span class="number">502</span> Bad Gateway（错误网关）,即作为网关或代理的服务器（如 Nginx、反向代理）从上游服务器（后端服务）收到无效响应。有可能是反向代理的nginx挂了，或者是后端服务超时了。</span><br><span class="line"><span class="number">503</span> service unavialable:服务器尚未处于可以接受请求的状态。通常造成这种情况的原因是由于服务器停机维护或者已超载。</span><br><span class="line"><span class="number">504</span> Gateway timeout：正常情况下，是由于被请求服务器发送超时引起。</span><br><span class="line"><span class="number">505</span> http协议不支持。</span><br></pre></td></tr></table></figure>
+
+<ol start="8">
+<li>如何限制单个容器的最大磁盘占用？<br>【答案】</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">docker create \</span><br><span class="line">  --name my_container \</span><br><span class="line">  --storage-opt size=10G \</span><br><span class="line">  your_image</span><br></pre></td></tr></table></figure>
+
+<ol start="9">
+<li><p>A和B两台服务器，如何让A可以访问B的ssh，B不能访问A的ssh服务<br>【答案】这里主要是“B不能访问A的ssh服务”，iptables配置如下：</p>
+ <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 假设 A 的 IP 是 192.168.1.100，</span></span><br><span class="line"><span class="comment"># 需要在B侧配置</span></span><br><span class="line">sudo iptables -A INPUT -p tcp --dport <span class="number">22</span> -s <span class="number">192.168</span><span class="number">.1</span><span class="number">.100</span> -j DROP</span><br><span class="line">解释：</span><br><span class="line">	-A INPUT：添加到输入链。</span><br><span class="line">	-p tcp --dport <span class="number">22</span>：针对 SSH 的 TCP <span class="number">22</span> 端口。</span><br><span class="line">	-s <span class="number">192.168</span><span class="number">.1</span><span class="number">.100</span>：指定源 IP 为 A 的地址。</span><br><span class="line">	-j DROP：丢弃该流量（即拒绝连接）。</span><br><span class="line"></span><br><span class="line">sudo service iptables save <span class="comment">#保存</span></span><br></pre></td></tr></table></figure>
+<p>如果需要 完全禁止 B 访问 A 的所有服务，而不仅仅是 SSH，则在A侧配置：<code>sudo iptables -A INPUT -s B的IP地址 -j DROP </code></p>
+</li>
+<li><p>谈谈DNS 两种方式<br>【答案】</p>
+</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">递归 DNS（Recursive DNS）</span><br><span class="line">递归 DNS 服务器负责为客户端解析域名，递归查询整个 DNS 层级（根服务器 → 顶级域服务器 → 权威服务器），直到获取最终的 IP 地址。</span><br><span class="line">特点：客户端视角：客户端只需向递归 DNS 发起请求，无需关心 DNS 查询过程。缓存优化：递归 DNS 通常会缓存结果，减少重复查询。</span><br><span class="line">权威 DNS（Authoritative DNS）</span><br><span class="line">权威 DNS 服务器负责管理特定域名的解析数据（如 example.com 的 A 记录、CNAME 记录等），直接返回域名对应的 IP 地址。</span><br><span class="line">特点：层级关系：每个域名需配置一个或多个权威服务器（主服务器 + 从服务器）。数据源：解析数据存储在区域文件（Zone File）中。</span><br></pre></td></tr></table></figure>
+
+<ol start="11">
+<li>谈谈bind高可用机制<br>【答案】</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">主从服务器（Primary/Secondary）：通过主服务器（Primary）和从服务器（Secondary）的协作，确保在主服务器故障时，从服务器仍能提供解析服务。</span><br><span class="line">负载均衡 + VIP（Virtual IP）：通过虚拟 IP（VIP）和负载均衡器（如 HAProxy）将流量分发到多个 BIND 实例，实现无缝故障转移。</span><br><span class="line">DNSSEC + 区域签名：通过 DNSSEC（DNS Security Extensions）对区域数据进行签名，确保数据完整性和防篡改。</span><br><span class="line">自动故障切换（Keepalived + VRRP）：使用 Keepalived 实现主备服务器的自动切换，当主服务器宕机时，VIP 自动转移到备用服务器。</span><br></pre></td></tr></table></figure>
+
+<ol start="12">
+<li>mysql主从同步的全同步复制和半同步复制是啥？<br>【答案】</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mysql默认的复制方式是异步的，主库把日志发送给从库后不关心从库是否已经处理，这样会产生一个问题就是假设主库挂了，从库处理失败了，这时候从库升为主库后，日志就丢失了。由此产生两个概念。</span><br><span class="line">全同步复制：主库写入binlog后强制同步日志到从库，所有的从库都执行完成后才返回给客户端，但是很显然这个方式的话性能会受到严重影响。</span><br><span class="line">半同步复制：和全同步不同的是，半同步复制的逻辑是这样，从库写入日志成功后返回ACK确认给主库，主库收到至少一个从库的确认就认为写操作完成。</span><br></pre></td></tr></table></figure>
+
+<ol start="13">
+<li>free -m 这个命令的输出是啥意思？<br>【答案】</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">total：总内存大小（单位：MB）。used + free + buff/cache ≈ total，这是正常现象。</span><br><span class="line">used：已使用的内存大小（包括缓存和缓冲区）。used 为 <span class="number">0</span> 时，表示物理内存足够，无需使用交换分区。used 明显大于 <span class="number">0</span>，说明物理内存不足，系统开始使用磁盘作为虚拟内存（性能可能下降）。</span><br><span class="line">free：完全空闲的内存大小（未被使用）。</span><br><span class="line">shared：共享内存大小（通常由多个进程共享的内存区域）。</span><br><span class="line">buff/cache：内核缓存和缓冲区占用的内存大小（这部分可以被快速释放以供应用程序使用）。</span><br><span class="line">available：可用内存大小（预估当前系统可分配的内存，比 free + buff/cache 更合理）。如果 available 接近 <span class="number">0</span>，可能需要优化内存使用或增加内存。</span><br><span class="line">Mem：物理内存（RAM）的统计信息。</span><br><span class="line">Swap：交换分区（Swap）的统计信息。</span><br><span class="line"></span><br><span class="line">结合 watch 命令实时监控内存：watch -n <span class="number">1</span> free -m </span><br></pre></td></tr></table></figure>
+
+<ol start="14">
+<li>tair的读写RT都有升高，跟有热点 key是什么关系？</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">（<span class="number">1</span>）单节点负载过载</span><br><span class="line">现象：热点 Key 通常集中在 单个缓存节点（Tair 的数据分片机制下，Key 分布不均可能导致热点集中）。</span><br><span class="line">结果：a.该节点的 CPU、内存、网络带宽被耗尽。  </span><br><span class="line">     b.请求排队等待，导致 RT 明显上升，甚至触发超时或熔断。</span><br><span class="line">（<span class="number">2</span>）线程阻塞与锁竞争</span><br><span class="line">现象：对热点 Key 的并发读写操作可能引发 锁竞争（如原子操作 INCR、分布式锁）。</span><br><span class="line">结果：</span><br><span class="line">    a.大量线程等待锁释放，导致 请求堆积。</span><br><span class="line">例如：秒杀场景中对库存的频繁减扣。</span><br><span class="line">（<span class="number">3</span>）网络拥塞</span><br><span class="line">现象：大量请求集中访问热点 Key，导致节点与客户端之间的网络链路饱和。</span><br><span class="line">结果：a.网络延迟增加，RT 上升。</span><br><span class="line">    b.可能波及同节点的其他非热点 Key 请求（“木桶效应”）。</span><br><span class="line">（<span class="number">4</span>）缓存穿透或击穿</span><br><span class="line">现象：</span><br><span class="line">    a.缓存穿透：非法 Key 的高频查询（如攻击性扫描）。</span><br><span class="line">    b.缓存击穿：热点 Key 过期后，大量请求直接穿透到后端数据库。</span><br><span class="line">结果：后端数据库压力激增，导致整体 RT 雪崩式升高。</span><br></pre></td></tr></table></figure>
+
+<ol start="15">
+<li>什么场景下的GC耗时很长可以通过增加容器数来有效解决？<br>GC（垃圾回收）耗时长通常由以下原因导致：<br>堆内存过大：Full GC 扫描的堆内存越大，耗时越长。<br>高并发负载：单容器处理大量请求，导致对象分配速度快，GC 频率升高。</li>
+</ol>
+<p>增加容器数 的本质是 水平扩展，通过分散负载和减少单容器内存压力，间接降低 GC 耗时。</p>
+<ol start="16">
+<li>无序正整数数字中找出所有元素拼接后的最小值，比如 [1,3,2],得到 123。<br>【思路】这个题不能简单的用sort从小到大排序然后组合起来就交卷，因为有一种情况，假设给的列表是[1,30,2,15]，直接sort后的得到的答案是121530,但是实际最小的值应该是115230，核心原因就是2虽然小于15，但是放在数字里作为百位数或者千位数这个逻辑就不对了。<br>但是sort还是要sort的，毕竟它是唯一一个python具备排序的功能。核心点是sort是可以带入key的，比如sort(key&#x3D;len)，这个的效果就是按照各个元素的字符串长度来排序了，不要简单的以为sort只能排数字大小。</li>
+</ol>
+<p>但是这个key怎么来？这里还有一个问题，就是如何判断我们上面说的“2和15谁前谁后”了，这里用字符串的比较功能，因为”2”+”15” &#x3D; “215”, 而 “15”+”2” &#x3D; “152”,通过字符串的比较，返回1 -1 和0这三种情况，然后用这三种情况作为key就行了。</p>
+<p>这题比较难的地方就是用到了<code>cmp_to_key</code>这个东西，估计在笔试的时候用python的同学很难想到它。我当时面字节数据中台的时候就让写这道题，我就没写出来，很囧。这道题是明显的java更好写（Comparator是自带的模块），但是python反而不好写的典型。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> functools <span class="keyword">import</span> cmp_to_key</span><br><span class="line"><span class="keyword">from</span> typing <span class="keyword">import</span> <span class="type">List</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">minNumber</span>(<span class="params">self, nums: <span class="type">List</span>[<span class="built_in">int</span>]</span>) -&gt; <span class="built_in">str</span>:</span><br><span class="line">        <span class="comment"># 将所有数字转换为字符串</span></span><br><span class="line">        nums_str = <span class="built_in">list</span>(<span class="built_in">map</span>(<span class="built_in">str</span>, nums))  <span class="comment"># 这里用到了map函数的一个特性，就是map的用法是（函数，目标），达到每个目标都这个函数的影响，而str本身也是一个函数</span></span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 自定义比较函数</span></span><br><span class="line">        <span class="keyword">def</span> <span class="title function_">compare</span>(<span class="params">a: <span class="built_in">str</span>, b: <span class="built_in">str</span></span>) -&gt; <span class="built_in">int</span>:</span><br><span class="line">            <span class="keyword">if</span> a + b &lt; b + a:</span><br><span class="line">                <span class="keyword">return</span> -<span class="number">1</span>  <span class="comment"># a 应排在 b 前面</span></span><br><span class="line">            <span class="keyword">elif</span> a + b &gt; b + a:</span><br><span class="line">                <span class="keyword">return</span> <span class="number">1</span>   <span class="comment"># a 应排在 b 后面</span></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 按自定义规则排序</span></span><br><span class="line">        nums_str.sort(key=cmp_to_key(compare))</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 处理全零的情况</span></span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">all</span>(s == <span class="string">&#x27;0&#x27;</span> <span class="keyword">for</span> s <span class="keyword">in</span> nums_str):</span><br><span class="line">            <span class="keyword">return</span> <span class="string">&#x27;0&#x27;</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">return</span> <span class="string">&#x27;&#x27;</span>.join(nums_str)</span><br><span class="line"></span><br><span class="line"> <span class="comment"># 示例 1</span></span><br><span class="line"><span class="built_in">print</span>(Solution().minNumber([<span class="number">1</span>, <span class="number">3</span>, <span class="number">2</span>]))  <span class="comment"># 输出: &quot;123&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 示例 2</span></span><br><span class="line"><span class="built_in">print</span>(Solution().minNumber([<span class="number">3</span>, <span class="number">30</span>, <span class="number">34</span>, <span class="number">5</span>, <span class="number">9</span>]))  <span class="comment"># 输出: &quot;3033459&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 示例 3</span></span><br><span class="line"><span class="built_in">print</span>(Solution().minNumber([<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>]))  <span class="comment"># 输出: &quot;0&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 示例 4</span></span><br><span class="line"><span class="built_in">print</span>(Solution().minNumber([<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>]))  <span class="comment"># 输出: &quot;012&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 这里估计有人会懵逼，明明compare里要求参数是a和b，但是实际只传入了一个list，没有a b，这个是怎么成功的？因为排序算法（如 list.sort() 或 sorted()）会自动调用比较函数，无需手动传递参数。也就是说compare(a, b) 并不是直接调用的，而是通过cmp_to_key和Python的排序算法隐式调用的:</span></span><br><span class="line"><span class="comment">#   a.排序算法会自动遍历所有元素对，并为每一对调用比较函数。</span></span><br><span class="line"><span class="comment">#   b.a 和 b 是排序算法动态传入的，你只需要定义比较逻辑即可。</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 我后来遛弯的时候想了一下另一个方法：可以先取到整个list的数字位数，比如[1,3,2,15],那么就是5位数，然后通过ljust(5,0)这个方法对每一个元素补0到5位数，那么1就是10000，2就是20000，15就是15000，3就是30000，然后对他们进行sort排序，得到了[10000，15000，20000，30000]，然后逐一用rstrip剔除掉多余的0，得到[1,15,2,3]，那么就是最小的拼接和：11523。</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 但是后来问了ai，发现这个方法有一个漏洞，就是当出现[1,100]的时候，因为1000=1000，那么可能会得到1100是最小和，其实应该是1001才对，所以还是字符串比较法是完美的。</span></span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/python/" rel="tag"># python</a>
+              <a href="/tags/%E9%9D%A2%E8%AF%95/" rel="tag"># 面试</a>
+              <a href="/tags/%E5%BC%80%E5%8F%91/" rel="tag"># 开发</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/04/22/%E5%B7%B4%E8%90%A8%E8%B5%9B%E5%AD%A3%E6%9C%AB%E6%80%BB%E7%BB%93/" rel="prev" title="巴萨的23～24赛季末总结">
+      <i class="fa fa-chevron-left"></i> 巴萨的23～24赛季末总结
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/05/27/Linux%E8%BF%90%E7%BB%B4%E5%B7%A5%E7%A8%8B%E5%B8%88%E7%AC%94%E8%AF%95%E9%A2%98%E7%AC%AC%E4%BA%8C%E5%8D%81%E4%B8%89%E5%A5%97/" rel="next" title="Linux运维工程师笔试题第二十三套">
+      Linux运维工程师笔试题第二十三套 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

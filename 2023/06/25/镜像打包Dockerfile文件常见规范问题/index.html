@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="启动优化考察每一个SRE对docker理解的基本功">
+<meta property="og:type" content="article">
+<meta property="og:title" content="镜像打包Dockerfile文件常见规范问题">
+<meta property="og:url" content="http://example.com/2023/06/25/%E9%95%9C%E5%83%8F%E6%89%93%E5%8C%85Dockerfile%E6%96%87%E4%BB%B6%E5%B8%B8%E8%A7%81%E8%A7%84%E8%8C%83%E9%97%AE%E9%A2%98/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="启动优化考察每一个SRE对docker理解的基本功">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/dockerfile1.png">
+<meta property="og:image" content="http://example.com/images/dockerfile2.png">
+<meta property="og:image" content="http://example.com/images/dockerfile3.png">
+<meta property="og:image" content="http://example.com/images/dockerfile4.png">
+<meta property="og:image" content="http://example.com/images/dockerfile5.png">
+<meta property="og:image" content="http://example.com/images/dockerfile6.png">
+<meta property="article:published_time" content="2023-06-25T09:22:56.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:48:26.125Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="docker">
+<meta property="article:tag" content="优化">
+<meta property="article:tag" content="镜像">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/dockerfile1.png">
+
+<link rel="canonical" href="http://example.com/2023/06/25/%E9%95%9C%E5%83%8F%E6%89%93%E5%8C%85Dockerfile%E6%96%87%E4%BB%B6%E5%B8%B8%E8%A7%81%E8%A7%84%E8%8C%83%E9%97%AE%E9%A2%98/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>镜像打包Dockerfile文件常见规范问题 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/06/25/%E9%95%9C%E5%83%8F%E6%89%93%E5%8C%85Dockerfile%E6%96%87%E4%BB%B6%E5%B8%B8%E8%A7%81%E8%A7%84%E8%8C%83%E9%97%AE%E9%A2%98/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          镜像打包Dockerfile文件常见规范问题
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-06-25 17:22:56" itemprop="dateCreated datePublished" datetime="2023-06-25T17:22:56+08:00">2023-06-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:48:26" itemprop="dateModified" datetime="2025-11-08T08:48:26+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>1.6k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>6 mins.</span>
+            </span>
+            <div class="post-description">启动优化考察每一个SRE对docker理解的基本功</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>修改dockerfile主要影响镜像的打包方式，一般并不会影响应用的实际运行（调整后例如使用mini镜像导致组件依赖缺失等环境问题除外，这部分可以通过添加组件依赖解决）。</p>
+<p>本文的目的就是展示在工作中遇到的dockerfile经常出现的一些不规范的地方以及具体的可优化点。</p>
+<p>优化调整不规范dockerfile文件的主要好处：<br>       a. 减少应用构建时的镜像打包耗时（减少镜像的更新层数）<br>       b. 缩小应用镜像的包大小，提升应用部署时的镜像拉取速度（减少镜像层数以及清理无用的安装包缓存）</p>
+<h2 id="分类问题总结"><a href="#分类问题总结" class="headerlink" title="分类问题总结"></a>分类问题总结</h2><h3 id="RUN-yum指令后应以yum-clean-all收尾"><a href="#RUN-yum指令后应以yum-clean-all收尾" class="headerlink" title="RUN yum指令后应以yum clean all收尾"></a>RUN yum指令后应以yum clean all收尾</h3><p>【原因】一些应用需要通过yum指令安装依赖的组件，在使用yum指令之后没有在最后使用<code>yum clean all</code>进行安装包缓存的清理，这会使最终的镜像包包含无用的安装包文件增加了镜像包的大小</p>
+<p>【解决方案】在所有yum指令的最后增加一条<code>yum clean all</code></p>
+<p>【收益】根据实际安装包的大小获得相应的容量缩减收益</p>
+<p>例如：<br><img src="/images/dockerfile1.png" alt="paradin" title="平常时候不增加惯了"><br>调整后：<br><img src="/images/dockerfile2.png" alt="paradin" title="增加clean all，清理安装包缓存"></p>
+<h3 id="RUN-yum或RUN-rpm指令应在COPY指令之前"><a href="#RUN-yum或RUN-rpm指令应在COPY指令之前" class="headerlink" title="RUN yum或RUN rpm指令应在COPY指令之前"></a>RUN yum或RUN rpm指令应在COPY指令之前</h3><p>【原因】目前大部分应用镜像出现该规范问题主要是在copy应用主包之后，使用RUN指令进行应用包的解包操作，以及部分应用将新增的组件安装等指令直接在copy应用主包之后添加</p>
+<p>【解决方案】对于新增的组件安装等指令迁移至前面统一的RUN指令里，通过&amp;&amp;实现同类型或类似变化频率的指令在同一个RUN层。对于对应用包解包操作需要根据应用自身需求确定是否可以移除（可以检查应用启动文件是否存在检查应用包并解包的脚本，如果存在则可以放心的在dockerfile移除主包解压指令，同时当前各应用的主包压缩模式小文件存在情况很少，所以对应用的首次启动耗时不会带来影响。从目前收集的几个应用看均可移除该指令）。</p>
+<p>【收益】a. 减少镜像分层，获得分层聚合带来的容量缩减收益<br>     b. 应用解压后占用的容量缩减收益<br>     c. 降低镜像构建耗时，特别当使用yum指令用于安装依赖组件时，可以得到较高的耗时优化收益</p>
+<h3 id="不应该超过3条连续RUN命令-Dockerfile指令不应超过20条"><a href="#不应该超过3条连续RUN命令-Dockerfile指令不应超过20条" class="headerlink" title="不应该超过3条连续RUN命令&#x2F;Dockerfile指令不应超过20条"></a>不应该超过3条连续RUN命令&#x2F;Dockerfile指令不应超过20条</h3><p>【原因】一些应用为了添加应用的依赖组件或环境配置，并没有把相同类型或变化频率的指令集中在一个RUN层，而是为每一个sh指令配置RUN指令。一条RUN指令会对应一个镜像分层，过多的RUN指令会导致最终的镜像容量变大。</p>
+<p>【解决方案】以动静分离原则，采用不变更指令、偶尔变更指令、频繁变更指令设计尽量将少RUN指令，根据依赖关系和变化频率将各sh指令分配至对应的RUN层，以&amp;&amp;分割符实现批量指令配置</p>
+<p>【收益】降低镜像层变更同步的影响，提升镜像构建的push同步速度，同时因镜像层数减少带来部分容量缩减的收益</p>
+<h3 id="base镜像体积不应超过2G，能用最小的基础镜像就用最小的，这个不多说了"><a href="#base镜像体积不应超过2G，能用最小的基础镜像就用最小的，这个不多说了" class="headerlink" title="base镜像体积不应超过2G，能用最小的基础镜像就用最小的，这个不多说了"></a>base镜像体积不应超过2G，能用最小的基础镜像就用最小的，这个不多说了</h3><h3 id="CMD-ENTRYPOINT-EXPOSE-LABEL指令位置应在COPY-RUN之前"><a href="#CMD-ENTRYPOINT-EXPOSE-LABEL指令位置应在COPY-RUN之前" class="headerlink" title="CMD&#x2F;ENTRYPOINT&#x2F;EXPOSE&#x2F;LABEL指令位置应在COPY&#x2F;RUN之前"></a>CMD&#x2F;ENTRYPOINT&#x2F;EXPOSE&#x2F;LABEL指令位置应在COPY&#x2F;RUN之前</h3><p>【原因】一般ENTRYPOINT基本上是固定不变的，所以放在COPY&#x2F;RUN之前可以减少因COPY&#x2F;RUN层变动导致分层缓存失效而被动重新构建分层<br>【解决方案】将ENTRYPOINT指令放在所有的COPY&#x2F;RUN之前即可<br>【收益】目前ENTRYPOINT指令用于指定应用启动目录，因此实际对镜像影响很小，所以调整后对当前镜像大小和构建时长没有什么影响，仅用于满足集团dockerfile的执行规范</p>
+<h3 id="存在部分重复的配置指令"><a href="#存在部分重复的配置指令" class="headerlink" title="存在部分重复的配置指令"></a>存在部分重复的配置指令</h3><p>【解决方案】部分dockerfile配置存在重复指令的情况，特别是ENV配置，需要将ENV配置集中在一条ENV指令中减少镜像层数，同时去除不必要的重复配置<br>【收益】减少镜像层数，获得镜像层数减少带来小量的缩减的收益<br><img src="/images/dockerfile3.png" alt="paradin" title="上面一个path，下面又对path进行配置，重复了"></p>
+<p><img src="/images/dockerfile4.png" alt="paradin" title="调整后删除多余的java环境配置，将ali_start_timeout指令集中到同一个ENV指令中"></p>
+<h3 id="构建时发生变化的层不应该超过3层"><a href="#构建时发生变化的层不应该超过3层" class="headerlink" title="构建时发生变化的层不应该超过3层"></a>构建时发生变化的层不应该超过3层</h3><p>【原因】一般采用动静分离原则进行指令分层优化后，大部分情况下构建变化不会超过3层。出现这个可能原因有如下两个：<br>   1、Dockerfile指令进行了较大的调整后首次进行编译，导致之前的分层缓存失效需要对变化的层重新构建<br>   2、Dockerfile指令未按动静分离原则进行分层，将需要经常变化的分层内容对应的指令写在了前面，导致后面的分层被动进行重新构建（docker构建逻辑：当前分层如果需要重新构建，则后续的分层不论是否变化都需要强制重新构建）<br>【解决方案】<br>     1、对于第一种情况，只要再重新构建一次即可消除该问题，即在每次对dockerfile做较大指令调整后可连续进行2次编译来查看是否存在该问题<br>     2、对于第二种情况，检查Dockerfile指令是否存在每次编译都需要变化的内容写在了前面，分析确认各个指令对应的内容的变化频率，采用不变化、偶尔变化、频繁变化从上至下的方式整理编写到Dockerfile，典型是主应用包拷贝指令，因为应用包每次构建一定会发生变化，所以在拷贝主应用包指令后面的其他指令一定会被强制重新构建。<br>【收益】减少镜像变化层数，降低镜像构建耗时<br>例如：<br><img src="/images/dockerfile5.png" alt="paradin" title="这里把经常变化的一个又一个文件的copy后，最后才拷贝一个不怎么会变化的setenv.sh文件"></p>
+<p><img src="/images/dockerfile6.png" alt="paradin" title="将内容不会变化的setenv.sh文件的拷贝和权限设置指令迁移至主应用文件拷贝指令之前，同时将多个相同的主包文件拷贝指令合并成一个Copy指令，去除多余的变化层"></p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/docker/" rel="tag"># docker</a>
+              <a href="/tags/%E9%95%9C%E5%83%8F/" rel="tag"># 镜像</a>
+              <a href="/tags/%E4%BC%98%E5%8C%96/" rel="tag"># 优化</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/06/18/%E6%85%A2sql%E4%BC%98%E5%8C%96%E6%96%B9%E6%B3%95/" rel="prev" title="mysql稳定性相关的几个小tips">
+      <i class="fa fa-chevron-left"></i> mysql稳定性相关的几个小tips
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/07/21/%E4%B8%BA%E5%95%A5%E6%88%91%E4%BB%AC%E5%96%9C%E6%AC%A2%E6%B1%9F%E6%B9%96%E7%89%87/" rel="next" title="从《荒野大镖客2》看黑社会片和江湖片">
+      从《荒野大镖客2》看黑社会片和江湖片 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E7%B1%BB%E9%97%AE%E9%A2%98%E6%80%BB%E7%BB%93"><span class="nav-number">1.</span> <span class="nav-text">分类问题总结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#RUN-yum%E6%8C%87%E4%BB%A4%E5%90%8E%E5%BA%94%E4%BB%A5yum-clean-all%E6%94%B6%E5%B0%BE"><span class="nav-number">1.1.</span> <span class="nav-text">RUN yum指令后应以yum clean all收尾</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RUN-yum%E6%88%96RUN-rpm%E6%8C%87%E4%BB%A4%E5%BA%94%E5%9C%A8COPY%E6%8C%87%E4%BB%A4%E4%B9%8B%E5%89%8D"><span class="nav-number">1.2.</span> <span class="nav-text">RUN yum或RUN rpm指令应在COPY指令之前</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8D%E5%BA%94%E8%AF%A5%E8%B6%85%E8%BF%873%E6%9D%A1%E8%BF%9E%E7%BB%ADRUN%E5%91%BD%E4%BB%A4-Dockerfile%E6%8C%87%E4%BB%A4%E4%B8%8D%E5%BA%94%E8%B6%85%E8%BF%8720%E6%9D%A1"><span class="nav-number">1.3.</span> <span class="nav-text">不应该超过3条连续RUN命令&#x2F;Dockerfile指令不应超过20条</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#base%E9%95%9C%E5%83%8F%E4%BD%93%E7%A7%AF%E4%B8%8D%E5%BA%94%E8%B6%85%E8%BF%872G%EF%BC%8C%E8%83%BD%E7%94%A8%E6%9C%80%E5%B0%8F%E7%9A%84%E5%9F%BA%E7%A1%80%E9%95%9C%E5%83%8F%E5%B0%B1%E7%94%A8%E6%9C%80%E5%B0%8F%E7%9A%84%EF%BC%8C%E8%BF%99%E4%B8%AA%E4%B8%8D%E5%A4%9A%E8%AF%B4%E4%BA%86"><span class="nav-number">1.4.</span> <span class="nav-text">base镜像体积不应超过2G，能用最小的基础镜像就用最小的，这个不多说了</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CMD-ENTRYPOINT-EXPOSE-LABEL%E6%8C%87%E4%BB%A4%E4%BD%8D%E7%BD%AE%E5%BA%94%E5%9C%A8COPY-RUN%E4%B9%8B%E5%89%8D"><span class="nav-number">1.5.</span> <span class="nav-text">CMD&#x2F;ENTRYPOINT&#x2F;EXPOSE&#x2F;LABEL指令位置应在COPY&#x2F;RUN之前</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%98%E5%9C%A8%E9%83%A8%E5%88%86%E9%87%8D%E5%A4%8D%E7%9A%84%E9%85%8D%E7%BD%AE%E6%8C%87%E4%BB%A4"><span class="nav-number">1.6.</span> <span class="nav-text">存在部分重复的配置指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%84%E5%BB%BA%E6%97%B6%E5%8F%91%E7%94%9F%E5%8F%98%E5%8C%96%E7%9A%84%E5%B1%82%E4%B8%8D%E5%BA%94%E8%AF%A5%E8%B6%85%E8%BF%873%E5%B1%82"><span class="nav-number">1.7.</span> <span class="nav-text">构建时发生变化的层不应该超过3层</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

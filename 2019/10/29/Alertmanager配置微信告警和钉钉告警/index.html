@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="这几天又是云迁移又是GDPR，累的吐血">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Alertmanager配置微信告警和钉钉告警">
+<meta property="og:url" content="http://example.com/2019/10/29/Alertmanager%E9%85%8D%E7%BD%AE%E5%BE%AE%E4%BF%A1%E5%91%8A%E8%AD%A6%E5%92%8C%E9%92%89%E9%92%89%E5%91%8A%E8%AD%A6/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="这几天又是云迁移又是GDPR，累的吐血">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/prometheus16.png">
+<meta property="og:image" content="http://example.com/images/prometheus17.png">
+<meta property="og:image" content="http://example.com/images/prometheus18.png">
+<meta property="og:image" content="http://example.com/images/prometheus21.png">
+<meta property="og:image" content="http://example.com/images/prometheus22.png">
+<meta property="article:published_time" content="2019-10-29T06:50:12.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:46:41.641Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="Prometheus">
+<meta property="article:tag" content="监控">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/prometheus16.png">
+
+<link rel="canonical" href="http://example.com/2019/10/29/Alertmanager%E9%85%8D%E7%BD%AE%E5%BE%AE%E4%BF%A1%E5%91%8A%E8%AD%A6%E5%92%8C%E9%92%89%E9%92%89%E5%91%8A%E8%AD%A6/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>Alertmanager配置微信告警和钉钉告警 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/10/29/Alertmanager%E9%85%8D%E7%BD%AE%E5%BE%AE%E4%BF%A1%E5%91%8A%E8%AD%A6%E5%92%8C%E9%92%89%E9%92%89%E5%91%8A%E8%AD%A6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Alertmanager配置微信告警和钉钉告警
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-10-29 14:50:12" itemprop="dateCreated datePublished" datetime="2019-10-29T14:50:12+08:00">2019-10-29</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:46:41" itemprop="dateModified" datetime="2025-11-08T08:46:41+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>717</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>3 mins.</span>
+            </span>
+            <div class="post-description">这几天又是云迁移又是GDPR，累的吐血</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="配置微信告警"><a href="#配置微信告警" class="headerlink" title="配置微信告警"></a>配置微信告警</h2><p>首先先去搞一个微信企业号，创建一个新的应用：<br><img src="/images/prometheus16.png" alt="akb48"></p>
+<p>创建微信企业号的过程可以见<a target="_blank" rel="noopener" href="https://rorschachchan.github.io/2018/01/10/Zabbix3-0%E6%90%AD%E9%85%8D%E5%BE%AE%E4%BF%A1%E4%BC%81%E4%B8%9A%E5%8F%B7%E6%8A%A5%E8%AD%A6/">https://rorschachchan.github.io/2018/01/10/Zabbix3-0%E6%90%AD%E9%85%8D%E5%BE%AE%E4%BF%A1%E4%BC%81%E4%B8%9A%E5%8F%B7%E6%8A%A5%E8%AD%A6/</a> 这篇文章。</p>
+<p>来到prometheus服务器里，编辑<code>alertmanager.yml</code>如下：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">global</span>:</span><br><span class="line">  resolve_timeout: 5m</span><br><span class="line">  smtp_smarthost: <span class="string">&#x27;smtp.163.com:465&#x27;</span></span><br><span class="line">  smtp_from: <span class="string">&#x27;chenx1242@163.com&#x27;</span></span><br><span class="line">  smtp_auth_username: <span class="string">&#x27;chenx1242@163.com&#x27;</span></span><br><span class="line">  smtp_auth_password: <span class="string">&#x27;邮箱密码&#x27;</span></span><br><span class="line">  smtp_require_tls: false</span><br><span class="line">  wechat_api_url: http://qyapi.weixin.qq.com/cgi-<span class="built_in">bin</span>/		<span class="comment">#这里是wechat对外接口</span></span><br><span class="line"></span><br><span class="line">templates:</span><br><span class="line">  - <span class="string">&#x27;./template/*.tmpl&#x27;</span>		<span class="comment"># 模板的地址</span></span><br><span class="line"></span><br><span class="line">route:</span><br><span class="line">  group_by: [<span class="string">&#x27;chentest&#x27;</span>]</span><br><span class="line">  group_wait: 10s</span><br><span class="line">  group_interval: 30s</span><br><span class="line">  repeat_interval: 30m</span><br><span class="line">  receiver: <span class="string">&#x27;GOOGLE-email&#x27;</span></span><br><span class="line">  routes:	<span class="comment"># 这里做了一个路由</span></span><br><span class="line">  - receiver: <span class="string">&#x27;wechat&#x27;</span></span><br><span class="line">    group_wait: 30s	<span class="comment"># 这个路由会覆盖上面的值</span></span><br><span class="line"></span><br><span class="line">receivers:</span><br><span class="line">- name: <span class="string">&#x27;GOOGLE-email&#x27;</span></span><br><span class="line">  email_configs:</span><br><span class="line">  - send_resolved: true</span><br><span class="line">    to: <span class="string">&#x27;chenshuo955@gmail.com&#x27;</span></span><br><span class="line">    html: <span class="string">&#x27;&#123;&#123; template &quot;email.html&quot; . &#125;&#125;&#x27;</span></span><br><span class="line">    headers: &#123; Subject: <span class="string">&quot;[WARN]Prometheus告警邮件&quot;</span> &#125;</span><br><span class="line"></span><br><span class="line">- name: <span class="string">&#x27;wechat&#x27;</span></span><br><span class="line">  wechat_configs:</span><br><span class="line">  - corp_id: <span class="string">&#x27;XXXX&#x27;</span>		<span class="comment"># 企业信息(&quot;我的企业&quot;---&gt;&quot;CorpID&quot;[在底部])</span></span><br><span class="line">    to_user: <span class="string">&#x27;@all&#x27;</span>		<span class="comment"># 所有人就是@all，或者是指定人</span></span><br><span class="line">    agent_id: <span class="string">&#x27;1000003&#x27;</span> 	<span class="comment"># 企业微信(&quot;企业应用&quot;--&gt;&quot;自定应用&quot;[Prometheus]--&gt; &quot;AgentId&quot;)</span></span><br><span class="line">    api_secret: <span class="string">&#x27;E8DR55yEDwp0E3d0mpjsdWdt0pFNF9i7kQPzFfsQVbI&#x27;</span>	<span class="comment"># 企业微信(&quot;企业应用&quot;--&gt;&quot;自定应用&quot;[Prometheus]--&gt; &quot;Secret&quot;) </span></span><br><span class="line">    send_resolved: true		<span class="comment">#问题解决了要发信息</span></span><br><span class="line">    message: <span class="string">&#x27;&#123;&#123; template &quot;wechat.html&quot; . &#125;&#125;&#x27;</span>		<span class="comment"># 指定模板</span></span><br><span class="line"></span><br><span class="line">inhibit_rules:</span><br><span class="line">  - source_match:</span><br><span class="line">      severity: <span class="string">&#x27;critical&#x27;</span></span><br><span class="line">    target_match:</span><br><span class="line">      severity: <span class="string">&#x27;warning&#x27;</span></span><br><span class="line">    equal: [<span class="string">&#x27;alertname&#x27;</span>, <span class="string">&#x27;dev&#x27;</span>, <span class="string">&#x27;instance&#x27;</span>]</span><br></pre></td></tr></table></figure></p>
+<p>然后来到当前目录的<code>/template/</code>里创建<code>wechat.tmpl</code>，如下：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123; define <span class="string">&quot;wechat.html&quot;</span> &#125;&#125;</span><br><span class="line">    &#123;&#123; <span class="built_in">range</span> .Alerts &#125;&#125;</span><br><span class="line">    ========start==========</span><br><span class="line">    告警程序: prometheus_alert</span><br><span class="line">    告警级别: &#123;&#123; .Labels.severity &#125;&#125;</span><br><span class="line">    告警类型: &#123;&#123; .Labels.alertname &#125;&#125;</span><br><span class="line">    故障主机: &#123;&#123; .Labels.instance &#125;&#125;</span><br><span class="line">    告警主题: &#123;&#123; .Annotations.summary &#125;&#125;</span><br><span class="line">    告警详情: &#123;&#123; .Annotations.description &#125;&#125;</span><br><span class="line">    触发时间: &#123;&#123; .StartsAt.Format <span class="string">&quot;2019-01-01 01:01:01&quot;</span> &#125;&#125;</span><br><span class="line">    ========end==========</span><br><span class="line">    &#123;&#123; end &#125;&#125;</span><br><span class="line">&#123;&#123; end &#125;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>启动alertmanager，不就就可以在微信上看到信息了：<br><img src="/images/prometheus17.png" alt="akb48"></p>
+<h2 id="配置钉钉告警"><a href="#配置钉钉告警" class="headerlink" title="配置钉钉告警"></a>配置钉钉告警</h2><p>首先先创建钉钉机器人并且获取对应的token:<br><img src="/images/prometheus18.png" alt="akb48"></p>
+<p>然后检查一下自己的golang版本，网络上流行的timonwong的webhook是不能用于1.13版本的，所以要安装1.11版本的golang。安装方法golang 1.11方法如下：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">wget https://studygolang.com/dl/golang/go1<span class="number">.11</span>.linux-amd64.tar.gz</span><br><span class="line">tar zxvf go1<span class="number">.11</span>.linux-amd64.tar.gz -C /usr/local</span><br></pre></td></tr></table></figure></p>
+<p>修改<code>/etc/profile</code>,在文件末尾添加如下内容:<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#go setting</span></span><br><span class="line">export GOROOT=/usr/local/go</span><br><span class="line">export GOPATH=/usr/local/gopath</span><br><span class="line">export PATH=$PATH:$GOROOT/<span class="built_in">bin</span></span><br></pre></td></tr></table></figure></p>
+<p>执行<code>source /etc/profile</code>配置文件的环境变量立刻生效，此时在<code>/usr/local/go/src</code>路径下：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">mkdir -pv github.com/timonwong</span><br><span class="line">cd github.com/timonwong</span><br><span class="line">git clone https://github.com/timonwong/prometheus-webhook-dingtalk.git</span><br><span class="line">cd  prometheus-webhook-dingtalk/</span><br><span class="line">make</span><br></pre></td></tr></table></figure></p>
+<p>然后执行效果如下，同时<code>/usr/local/go/src/github.com/timonwong/prometheus-webhook-dingtalk</code>路径下多了一个<code>prometheus-webhook-dingtalk</code>：<br><img src="/images/prometheus21.png" alt="akb48"></p>
+<p>然后在后台执行这个<code>prometheus-webhook-dingtalk</code>：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nohup ./prometheus-webhook-dingtalk --ding.profile=<span class="string">&quot;chen_dingding=https://oapi.dingtalk.com/robot/send?access_token=XXXXX&quot;</span>   <span class="number">2</span>&gt;&amp;<span class="number">1</span> <span class="number">1</span>&gt;dingding.log &amp;		<span class="comment">#创建一个频道chen_dingding</span></span><br></pre></td></tr></table></figure></p>
+<p>然后在<code>alertmanager.yaml</code>增加钉钉报警相关的信息：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">- receiver: <span class="string">&#x27;dingding&#x27;</span></span><br><span class="line">  group_wait: 30s</span><br><span class="line">  <span class="keyword">match</span>:</span><br><span class="line">    go: gothreads</span><br><span class="line"></span><br><span class="line">- name: <span class="string">&#x27;dingding&#x27;</span></span><br><span class="line">  webhook_configs:</span><br><span class="line">  - send_resolved: true</span><br><span class="line">    url: http://localhost:<span class="number">8060</span>/dingtalk/chens_dingding/send		<span class="comment">#这里频道要一致</span></span><br></pre></td></tr></table></figure></p>
+<p>然后重启Alarmmanager即可，一会就能收到报警：<br><img src="/images/prometheus22.png" alt="akb48"></p>
+<p>至于这个钉钉与alertmanager的webhook勾连的细节，可以去看<a target="_blank" rel="noopener" href="http://ylzheng.com/2018/03/01/alertmanager-webhook-dingtalk/">http://ylzheng.com/2018/03/01/alertmanager-webhook-dingtalk/</a> 。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/xzkzzz/p/10211394.html">https://www.cnblogs.com/xzkzzz/p/10211394.html</a><br><a target="_blank" rel="noopener" href="https://github.com/prometheus/alertmanager/issues/1385">https://github.com/prometheus/alertmanager/issues/1385</a><br><a target="_blank" rel="noopener" href="https://blog.rj-bai.com/post/158.html">https://blog.rj-bai.com/post/158.html</a></p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%9B%91%E6%8E%A7/" rel="tag"># 监控</a>
+              <a href="/tags/Prometheus/" rel="tag"># Prometheus</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/10/12/Prometheus%E5%A2%9E%E5%8A%A0%E5%91%8A%E8%AD%A6%E5%92%8C%E8%87%AA%E5%AE%9A%E4%B9%89%E7%9B%91%E6%8E%A7%E9%A1%B9/" rel="prev" title="Prometheus配置Alertmanager并实现邮箱告警">
+      <i class="fa fa-chevron-left"></i> Prometheus配置Alertmanager并实现邮箱告警
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/11/07/AWS%E9%85%8D%E7%BD%AE%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/" rel="next" title="AWS数据迁移到阿里云的一些坑">
+      AWS数据迁移到阿里云的一些坑 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E5%BE%AE%E4%BF%A1%E5%91%8A%E8%AD%A6"><span class="nav-number">1.</span> <span class="nav-text">配置微信告警</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E9%92%89%E9%92%89%E5%91%8A%E8%AD%A6"><span class="nav-number">2.</span> <span class="nav-text">配置钉钉告警</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">3.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="使用jumpserver连接服务器的时候出现Error reading SSH protocol banner错误的话，可能是系统用户没有推送的原因">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用Python GUI去将本地文件上传阿里云OSS">
+<meta property="og:url" content="http://example.com/2019/05/13/%E4%BD%BF%E7%94%A8Python-GUI%E5%8E%BB%E5%B0%86%E6%9C%AC%E5%9C%B0%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E9%98%BF%E9%87%8C%E4%BA%91OSS/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="使用jumpserver连接服务器的时候出现Error reading SSH protocol banner错误的话，可能是系统用户没有推送的原因">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/tkinter3.png">
+<meta property="article:published_time" content="2019-05-13T11:51:31.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:47:35.701Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="gui">
+<meta property="article:tag" content="python3">
+<meta property="article:tag" content="阿里云OSS">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/tkinter3.png">
+
+<link rel="canonical" href="http://example.com/2019/05/13/%E4%BD%BF%E7%94%A8Python-GUI%E5%8E%BB%E5%B0%86%E6%9C%AC%E5%9C%B0%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E9%98%BF%E9%87%8C%E4%BA%91OSS/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>使用Python GUI去将本地文件上传阿里云OSS | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/05/13/%E4%BD%BF%E7%94%A8Python-GUI%E5%8E%BB%E5%B0%86%E6%9C%AC%E5%9C%B0%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E9%98%BF%E9%87%8C%E4%BA%91OSS/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          使用Python GUI去将本地文件上传阿里云OSS
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-05-13 19:51:31" itemprop="dateCreated datePublished" datetime="2019-05-13T19:51:31+08:00">2019-05-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:47:35" itemprop="dateModified" datetime="2025-11-08T08:47:35+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>742</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>3 mins.</span>
+            </span>
+            <div class="post-description">使用jumpserver连接服务器的时候出现Error reading SSH protocol banner错误的话，可能是系统用户没有推送的原因</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>前端同事会甩过来一个zip包，然后我们需要将其解压，然后上传到阿里云OSS里对应的目录，为了提高效率，就用python 3写了一个GUI，如图：<br><img src="/images/tkinter3.png" alt="akb48" title="选择对应的zip包，然后选择目录"></p>
+<p>具体代码如下：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python </span></span><br><span class="line"><span class="comment"># -*- coding:utf-8 -*-</span></span><br><span class="line"><span class="comment"># 作者：ChrisChan</span></span><br><span class="line"><span class="comment"># 用途：使用GUI上传阿里云OSS</span></span><br><span class="line"><span class="keyword">import</span> tkinter <span class="keyword">as</span> tk</span><br><span class="line"><span class="keyword">import</span> tkinter.ttk <span class="keyword">as</span> ttk</span><br><span class="line"><span class="keyword">from</span> tkinter <span class="keyword">import</span> messagebox  <span class="comment"># 弹窗</span></span><br><span class="line"><span class="comment"># from tkinter import filedialog  # 选择单独文件</span></span><br><span class="line"><span class="keyword">from</span> tkinter.filedialog <span class="keyword">import</span> askdirectory <span class="comment"># 选择文件夹</span></span><br><span class="line"><span class="keyword">import</span> oss2,os,sys,zipfile,time  <span class="comment">#引入zipfile解压</span></span><br><span class="line"></span><br><span class="line">window = tk.Tk()</span><br><span class="line">window.title(<span class="string">&quot;将桌面文件上传到阿里云国内线上OSS&quot;</span>)   <span class="comment"># 窗体的标题</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">confirm</span>():</span><br><span class="line">    result = messagebox.askokcancel(<span class="string">&quot;请确认&quot;</span>, <span class="string">&#x27;&#x27;&#x27;本地文件是：%s,对应OSS路径是：%s&#x27;&#x27;&#x27;</span> % (filename,region1.get())) <span class="comment"># 前面是弹窗主题，后面是弹窗内容</span></span><br><span class="line">    Des_path = region1.get()</span><br><span class="line">    fileroot = filename.split(<span class="string">&#x27;.zip&#x27;</span>)[<span class="number">0</span>]    <span class="comment">#获取文件路径，不含.zip后缀</span></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;上传zip包路径是:%s&quot;</span> % fileroot)  <span class="comment"># 获取要上传的文件路径</span></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;要解压的zip包名是:%s&quot;</span> % filename)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;目标路径是:%s&quot;</span> % Des_path)   <span class="comment"># 获取目的完整路径</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> result <span class="keyword">is</span> <span class="literal">True</span>:</span><br><span class="line">        ak = <span class="string">&quot;账号ak&quot;</span></span><br><span class="line">        sk = <span class="string">&quot;账号sk&quot;</span>   <span class="comment"># 秘钥</span></span><br><span class="line">        auth = oss2.Auth(ak, sk)   <span class="comment"># 鉴权</span></span><br><span class="line">        ossBucket = oss2.Bucket(auth, <span class="string">&#x27;http://oss-cn-hangzhou.aliyuncs.com&#x27;</span>,Des_path)   <span class="comment"># 定义ossBucket</span></span><br><span class="line">        date = time.strftime(<span class="string">&quot;%Y-%m-%d&quot;</span>, time.localtime())  <span class="comment">#获取今天日期</span></span><br><span class="line">        <span class="comment">#解压缩zip包</span></span><br><span class="line">        zFile = zipfile.ZipFile(filename, <span class="string">&quot;r&quot;</span>)</span><br><span class="line">        <span class="keyword">for</span> fileM <span class="keyword">in</span> zFile.namelist():</span><br><span class="line">            zFile.extract(fileM, <span class="string">&quot;D:\OSSback&quot;</span>)</span><br><span class="line">        zFile.close()</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 文件夹上传</span></span><br><span class="line">        <span class="keyword">def</span> <span class="title function_">uploadFile</span>(<span class="params">file</span>):</span><br><span class="line">            remoteName = file.replace(fileroot,<span class="string">&#x27;&#x27;</span>).replace(<span class="string">&#x27;\\&#x27;</span>,<span class="string">&#x27;/&#x27;</span>)[<span class="number">1</span>:]     <span class="comment"># 将“/”去掉</span></span><br><span class="line">            <span class="built_in">print</span>(<span class="string">&#x27;uploading...&#x27;</span>, file, <span class="string">&#x27;remoteName:&#x27;</span>, remoteName)</span><br><span class="line">            result = ossBucket.put_object_from_file(remoteName, file)</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">&#x27;http status: &#123;0&#125;&#x27;</span>.<span class="built_in">format</span>(result.status))</span><br><span class="line"></span><br><span class="line">        <span class="keyword">def</span> <span class="title function_">list</span>(<span class="params"><span class="built_in">dir</span></span>):</span><br><span class="line">            fs = os.listdir(<span class="built_in">dir</span>)</span><br><span class="line">            <span class="keyword">for</span> f <span class="keyword">in</span> fs:</span><br><span class="line">                file = <span class="built_in">dir</span>+<span class="string">&quot;\\&quot;</span>+f</span><br><span class="line">                <span class="keyword">if</span> os.path.isdir(file):</span><br><span class="line">                    <span class="built_in">list</span>(file)</span><br><span class="line">                <span class="keyword">else</span>:</span><br><span class="line">                    uploadFile(file)</span><br><span class="line">        <span class="built_in">list</span>(fileroot)   <span class="comment"># 开始上传</span></span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;目标文件夹里所有文件上传完毕！&quot;</span>)</span><br><span class="line"></span><br><span class="line">        <span class="comment">#zip包改名</span></span><br><span class="line">        os.rename(filename,filename + date) <span class="comment">#按日期重命名</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">chooseZip</span>():</span><br><span class="line">    <span class="keyword">global</span> filename</span><br><span class="line">    filename = tk.filedialog.askopenfilename()    <span class="comment"># 选择单独的文件</span></span><br><span class="line">    <span class="keyword">if</span> filename != <span class="string">&#x27;&#x27;</span>:</span><br><span class="line">        lb.config(text=<span class="string">&quot;您选择的文件是：&quot;</span> + filename)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        lb.config(text=<span class="string">&quot;您没有选择任何文件&quot;</span>)</span><br><span class="line"></span><br><span class="line">lb = tk.Label(window, text=<span class="string">&#x27;&#x27;</span>)</span><br><span class="line">lb.grid(row=<span class="number">0</span>, column=<span class="number">1</span>, sticky=tk.W, padx=<span class="number">10</span>, pady=<span class="number">5</span>)</span><br><span class="line">btn = tk.Button(window, text=<span class="string">&quot;选择要上传的文件&quot;</span>, command=chooseZip)</span><br><span class="line">btn.grid(row=<span class="number">0</span>, column=<span class="number">0</span>, sticky=tk.E, padx=<span class="number">10</span>, pady=<span class="number">5</span>)</span><br><span class="line"></span><br><span class="line">lb2 = tk.Label(window, text=<span class="string">&#x27;请选择上传地址&#x27;</span>)</span><br><span class="line">lb2.grid(row=<span class="number">2</span>, column=<span class="number">0</span>, sticky=tk.W, padx=<span class="number">10</span>, pady=<span class="number">5</span>)</span><br><span class="line">number = tk.StringVar()</span><br><span class="line">region1 = ttk.Combobox(window,width=<span class="number">35</span>,textvariable=number,state=<span class="string">&#x27;readonly&#x27;</span>)    <span class="comment">#下拉列表设置成为只读模式</span></span><br><span class="line">region1[<span class="string">&#x27;values&#x27;</span>] = (<span class="string">&#x27;resource-public/lccms&#x27;</span>,<span class="string">&#x27;resource-public/phoneAlarm&#x27;</span>,<span class="string">&#x27;resource-public/lcview&#x27;</span>,<span class="string">&#x27;resource-public/webFront/annualReport&#x27;</span>,<span class="string">&#x27;resource-public/webFront/cancellation&#x27;</span>,<span class="string">&#x27;resource-public/webFront/deviceShare&#x27;</span>,<span class="string">&#x27;resource-public/webFront/discoverNews&#x27;</span>,<span class="string">&#x27;resource-public/webFront/timeAlbum&#x27;</span>,<span class="string">&#x27;resource-public/chenchenchen&#x27;</span>)   <span class="comment">#下拉列表里面具体的元素</span></span><br><span class="line">region1.grid(row=<span class="number">2</span>,column=<span class="number">1</span>)</span><br><span class="line">region1.current(<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">tk.Button(window, text=<span class="string">&#x27;上传&#x27;</span>, width=<span class="number">10</span>, command=confirm).grid(row=<span class="number">3</span>, column=<span class="number">0</span>, sticky=tk.W, padx=<span class="number">10</span>, pady=<span class="number">5</span>)</span><br><span class="line">tk.Button(window, text=<span class="string">&#x27;退出&#x27;</span>, width=<span class="number">10</span>, command=window.quit).grid(row=<span class="number">3</span>, column=<span class="number">1</span>, sticky=tk.E, padx=<span class="number">10</span>, pady=<span class="number">5</span>)</span><br><span class="line"></span><br><span class="line">tk.mainloop()</span><br></pre></td></tr></table></figure></p>
+<p>整个过程还是出现一个gui界面，然后传入zip包，然后将其在源目录下解压缩，并且上传到选择的OSS路径里，上传成功后将原zip改名已做备份。</p>
+<p>最后吐槽一下，阿里云OSS的SDK里是没有文件改名的功能，只能复制一份然后靠上传新的顶替掉原来老的内容，这样很不友善…所以我才选择将zip包保留在本地。</p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/python3/" rel="tag"># python3</a>
+              <a href="/tags/%E9%98%BF%E9%87%8C%E4%BA%91OSS/" rel="tag"># 阿里云OSS</a>
+              <a href="/tags/gui/" rel="tag"># gui</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/05/07/%E4%BD%BF%E7%94%A8python-GUI%E5%8E%BB%E5%88%9B%E5%BB%BA%E9%98%BF%E9%87%8C%E4%BA%91%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" rel="prev" title="使用Python GUI去创建阿里云负载均衡">
+      <i class="fa fa-chevron-left"></i> 使用Python GUI去创建阿里云负载均衡
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/05/14/%E9%85%8D%E7%BD%AEintellij-IDEA%E8%AE%A9%E8%BF%90%E7%BB%B4%E5%BC%80%E5%8F%91%E6%9B%B4%E9%AB%98%E6%95%88%E7%8E%87/" rel="next" title="配置Intellij IDEA进行高效率运维开发">
+      配置Intellij IDEA进行高效率运维开发 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

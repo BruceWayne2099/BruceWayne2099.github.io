@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="如果遇到文件模式是dos的话，执行set ff&#x3D;unix即可。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Ansible-Playbook判断进程是否存在">
+<meta property="og:url" content="http://example.com/2019/06/27/Ansible-Playbook%E5%88%A4%E6%96%AD%E8%BF%9B%E7%A8%8B%E6%98%AF%E5%90%A6%E5%AD%98%E5%9C%A8/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="如果遇到文件模式是dos的话，执行set ff&#x3D;unix即可。">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/DH12-1.gif">
+<meta property="article:published_time" content="2019-06-27T13:57:14.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:46:41.948Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="ansible">
+<meta property="article:tag" content="批量部署">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/DH12-1.gif">
+
+<link rel="canonical" href="http://example.com/2019/06/27/Ansible-Playbook%E5%88%A4%E6%96%AD%E8%BF%9B%E7%A8%8B%E6%98%AF%E5%90%A6%E5%AD%98%E5%9C%A8/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>Ansible-Playbook判断进程是否存在 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/06/27/Ansible-Playbook%E5%88%A4%E6%96%AD%E8%BF%9B%E7%A8%8B%E6%98%AF%E5%90%A6%E5%AD%98%E5%9C%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Ansible-Playbook判断进程是否存在
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-06-27 21:57:14" itemprop="dateCreated datePublished" datetime="2019-06-27T21:57:14+08:00">2019-06-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:46:41" itemprop="dateModified" datetime="2025-11-08T08:46:41+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>892</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>3 mins.</span>
+            </span>
+            <div class="post-description">如果遇到文件模式是dos的话，执行set ff=unix即可。</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h2><p>部署有一个需求，要将所有的模块服务器里添加一个叫agentmizar的日志采集模块。但是有一些服务器提前有部署过，那么判断一下如果服务器里有此进程就跳过，如果没有此进程就传包并修改配置文件然后启动。</p>
+<p>与playbook搭配的yaml内容如下：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">- hosts: <span class="built_in">all</span>		<span class="comment">#默认执行hosts里的所有IP</span></span><br><span class="line">  remote_user: root</span><br><span class="line">  any_errors_fatal: no</span><br><span class="line">  gather_facts: no		<span class="comment">#不采集对方机器的数据，提高执行速度</span></span><br><span class="line">  serial:</span><br><span class="line">  - <span class="number">5</span>		<span class="comment">#5台机器一组</span></span><br><span class="line">  tasks:</span><br><span class="line">  - name: judge agent process <span class="keyword">is</span> exits</span><br><span class="line">    shell: ps -aux | grep agent</span><br><span class="line">    ignore_errors: <span class="literal">True</span>		<span class="comment">#如果命令执行不成功，即 echo $?不为0，则在其语句后面的ansible语句不会被执行，导致整个程序中止。</span></span><br><span class="line">    register: result</span><br><span class="line"></span><br><span class="line">  - name: agent <span class="keyword">is</span> running</span><br><span class="line">    shell: echo <span class="string">&quot;agent is running&quot;</span></span><br><span class="line">    when: result.stdout.find(<span class="string">&#x27;agent.conf&#x27;</span>) != -<span class="number">1</span></span><br><span class="line"></span><br><span class="line">  - name: agent <span class="built_in">dir</span> <span class="keyword">is</span> exits</span><br><span class="line">    shell: ls /opt/agentmizar</span><br><span class="line">	ignore_errors: <span class="literal">True</span></span><br><span class="line"> 		register: dirresult</span><br><span class="line"></span><br><span class="line">  - name: copy packages</span><br><span class="line">    copy:</span><br><span class="line">      src: /tmp/agentmizar.<span class="built_in">zip</span></span><br><span class="line">      dest: /opt</span><br><span class="line">      owner: root</span><br><span class="line">    when: dirresult <span class="keyword">is</span> failed		<span class="comment">#如果文件夹存在就是dirresult is succeeded</span></span><br><span class="line"> </span><br><span class="line">  - name: unzip agentmizar</span><br><span class="line">    unarchive:				<span class="comment">#如果你并不喜欢用unzip的话，那么可以shell:unzip -o 对应.zip的方式来达到不用输入y的效果，但是更推荐用unarchive</span></span><br><span class="line">      <span class="comment">#extra_opts: -j		#将zip里的所有递归文件都放到本目录</span></span><br><span class="line">      src: /opt/agentmizar.<span class="built_in">zip</span></span><br><span class="line">      dest: /opt  </span><br><span class="line">      remote_src: yes </span><br><span class="line">    when: result.stdout.find(<span class="string">&#x27;agent.conf&#x27;</span>) == -<span class="number">1</span></span><br><span class="line"></span><br><span class="line">  - name: backup old <span class="keyword">and</span> unpack new package</span><br><span class="line">    shell: cp -rf /opt/build/* /opt/	<span class="comment">#由于zip包也解压缩出来是一个build文件夹，需要再扒一层</span></span><br><span class="line">    when: result.stdout.find(<span class="string">&#x27;agent.conf&#x27;</span>) == -<span class="number">1</span></span><br><span class="line"></span><br><span class="line">  - name: update agent.conf</span><br><span class="line">    lineinfile:</span><br><span class="line">      dest: /opt/agentmizar/agent.conf</span><br><span class="line">      regexp: <span class="string">&quot;kafka = 192.168.0.1:9092,192.168.0.2:9092,192.168.0.3:9092&quot;</span>		<span class="comment">#修改配置文件</span></span><br><span class="line">      line: <span class="string">&quot;kafka = 172.0.10.1:9092&quot;</span></span><br><span class="line">    when: result.stdout.find(<span class="string">&#x27;agent.conf&#x27;</span>) == -<span class="number">1</span></span><br><span class="line"></span><br><span class="line">  - name: start agentmizar</span><br><span class="line">    shell: cd /opt/agentmizar/ &amp;&amp; /<span class="built_in">bin</span>/bash /opt/agentmizar/start_agent.sh</span><br><span class="line">    when: result.stdout.find(<span class="string">&#x27;agent.conf&#x27;</span>) == -<span class="number">1</span></span><br></pre></td></tr></table></figure></p>
+<p>这个yaml，我执行<code>ps -aux | grep agent</code>，并将结果存储到<code>result</code>这个<code>register</code>里。然后从<code>register</code>里去find关键字<code>agent.conf</code>，如果不存在就返回-1，那么可以判断当前机器里没有agentmizar进程。</p>
+<p>如果说进程是一个守护进程，那么在判断进程（比如是systemctl status apache2）是否存在可以这么写：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">- name: Check <span class="keyword">if</span> Apache <span class="keyword">is</span> running</span><br><span class="line">  command: systemctl status apache2</span><br><span class="line">  ignore_errors: yes</span><br><span class="line">  changed_when: false</span><br><span class="line">  register: service_apache_status</span><br><span class="line"></span><br><span class="line">- name: Report status of Apache</span><br><span class="line">  fail:</span><br><span class="line">    msg: |</span><br><span class="line">      Service apache2 <span class="keyword">is</span> <span class="keyword">not</span> running.</span><br><span class="line">      Output of `systemctl status apache2`:</span><br><span class="line">      &#123;&#123; service_apache_status.stdout &#125;&#125;</span><br><span class="line">      &#123;&#123; service_apache_status.stderr &#125;&#125;</span><br><span class="line">  when: service_apache_status | failed</span><br></pre></td></tr></table></figure></p>
+<p>注意！如果when条件判断句中有变量的话要将用（）来括变量，如下：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">when: ansible_default_ipv4.address == &#123;&#123; ETCD_NODE03 &#125;&#125;		<span class="comment">#错误写法</span></span><br><span class="line">when: ansible_default_ipv4.address == (ETCD_NODE03)			<span class="comment">#正确写法</span></span><br></pre></td></tr></table></figure></p>
+<p>再注意！<code>register</code>变量的命名不能用-（中横线），比如<code>dev-sda6_result</code>，则会被解析成<code>sda6_result</code>，dev会被丢掉！</p>
+<h2 id="yum一次性安装多个模块的问题"><a href="#yum一次性安装多个模块的问题" class="headerlink" title="yum一次性安装多个模块的问题"></a>yum一次性安装多个模块的问题</h2><p>新版本的ansible-playbook已经不支持在yum安装多个模块里使用的方式了，也就是说<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">tasks</span><br><span class="line">- name: 安装最新版本的命令</span><br><span class="line">yum: name=&#123;&#123; item &#125;&#125; state=latest</span><br><span class="line">with_items:</span><br><span class="line">   - unzip</span><br><span class="line">   - psmisc</span><br><span class="line">   - java-<span class="number">1.8</span><span class="number">.0</span>-openjdk*</span><br></pre></td></tr></table></figure></p>
+<p>这么写在老版本还OK，但是在2.8以后，还这么写就会有错误：<code>[DEPRECATION WARNING]: Invoking &quot;yum&quot; only once while using a loop via squash_actions is deprecated. Instead of using a loop to supply multiple items and specifying name: &quot;&#123;&#123; item &#125;&#125;&quot;, please  use name: [&#39;unzip&#39;, &#39;psmisc&#39;, &#39;java-1.8.0-openjdk*&#39;] and remove the loop. This feature will be removed in version 2.11. Deprecation warnings can be disabled by setting deprecation_warnings=False in ansible.cfg</code>.要改成如下：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">tasks:           </span><br><span class="line">- name: 安装最新版本的命令</span><br><span class="line">yum:           </span><br><span class="line">  state: latest</span><br><span class="line">  name:        </span><br><span class="line">    - unzip </span><br><span class="line">    - psmisc</span><br><span class="line">    - java-<span class="number">1.8</span><span class="number">.0</span>-openjdk*</span><br></pre></td></tr></table></figure></p>
+<h2 id="如何在task之间传递变量"><a href="#如何在task之间传递变量" class="headerlink" title="如何在task之间传递变量"></a>如何在task之间传递变量</h2><p>某个变量想从一个task给另一个，可以按照如下的方式写：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">---</span><br><span class="line">- hosts: <span class="built_in">all</span></span><br><span class="line">  gather_facts: no</span><br><span class="line">  tasks:</span><br><span class="line">    - name: register <span class="built_in">vars</span></span><br><span class="line">      shell: hostname</span><br><span class="line">      register: info</span><br><span class="line"></span><br><span class="line">    - name: display <span class="built_in">vars</span></span><br><span class="line">      debug: msg=<span class="string">&quot;&#123;&#123;info.stdout&#125;&#125;&quot;</span></span><br></pre></td></tr></table></figure><br>第一个shell执行完后，使用register获取数据到info里，info是一个key value字典，debug输出info.stdout的具体内容。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a target="_blank" rel="noopener" href="https://www.ibm.com/developerworks/cn/linux/1608_lih_ansible/index.html">https://www.ibm.com/developerworks/cn/linux/1608_lih_ansible/index.html</a><br><a target="_blank" rel="noopener" href="https://blog.51cto.com/liuzhengwei521/1962382">https://blog.51cto.com/liuzhengwei521/1962382</a>	（条件判断）<br><img src="/images/DH12-1.gif" alt="akb48" title="2009年东部半决赛魔术VS骑士"></p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/ansible/" rel="tag"># ansible</a>
+              <a href="/tags/%E6%89%B9%E9%87%8F%E9%83%A8%E7%BD%B2/" rel="tag"># 批量部署</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/06/25/Python%E7%AB%AF%E5%8F%A3%E6%8E%A2%E6%B5%8B%E8%84%9A%E6%9C%AC/" rel="prev" title="Python端口探测脚本">
+      <i class="fa fa-chevron-left"></i> Python端口探测脚本
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/06/28/Proxysql%E6%B7%BB%E5%8A%A0%E5%90%8E%E7%AB%AFSSL%E5%8A%A0%E5%AF%86/" rel="next" title="Proxysql添加后端SSL加密">
+      Proxysql添加后端SSL加密 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AD%A3%E6%96%87"><span class="nav-number">1.</span> <span class="nav-text">正文</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#yum%E4%B8%80%E6%AC%A1%E6%80%A7%E5%AE%89%E8%A3%85%E5%A4%9A%E4%B8%AA%E6%A8%A1%E5%9D%97%E7%9A%84%E9%97%AE%E9%A2%98"><span class="nav-number">2.</span> <span class="nav-text">yum一次性安装多个模块的问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E5%9C%A8task%E4%B9%8B%E9%97%B4%E4%BC%A0%E9%80%92%E5%8F%98%E9%87%8F"><span class="nav-number">3.</span> <span class="nav-text">如何在task之间传递变量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">4.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

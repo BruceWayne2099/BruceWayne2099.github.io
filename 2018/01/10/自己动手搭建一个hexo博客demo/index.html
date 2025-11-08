@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="记录自己搭窝的过程，方便以后搭更多的窝...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="自己动手搭建一个hexo博客demo">
+<meta property="og:url" content="http://example.com/2018/01/10/%E8%87%AA%E5%B7%B1%E5%8A%A8%E6%89%8B%E6%90%AD%E5%BB%BA%E4%B8%80%E4%B8%AAhexo%E5%8D%9A%E5%AE%A2demo/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="记录自己搭窝的过程，方便以后搭更多的窝...">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/zhucegithub.png">
+<meta property="og:image" content="http://example.com/images/config1.png">
+<meta property="og:image" content="http://example.com/images/nodeV.png">
+<meta property="og:image" content="http://example.com/images/installhexo1.png">
+<meta property="og:image" content="http://example.com/images/installhexo2.png">
+<meta property="og:image" content="http://example.com/images/githubak.png">
+<meta property="og:image" content="http://example.com/images/miyao.png">
+<meta property="og:image" content="http://example.com/images/addak.png">
+<meta property="og:image" content="http://example.com/images/hexo1.png">
+<meta property="og:image" content="http://example.com/images/installnext.png">
+<meta property="og:image" content="http://example.com/images/next1.png">
+<meta property="og:image" content="http://example.com/images/repository.png">
+<meta property="og:image" content="http://example.com/images/hexod.png">
+<meta property="og:image" content="http://example.com/images/hexod2.png">
+<meta property="og:image" content="http://example.com/images/newnext.png">
+<meta property="article:published_time" content="2018-01-10T02:54:51.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:48:12.622Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="github">
+<meta property="article:tag" content="hexo">
+<meta property="article:tag" content="博客搭建">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/zhucegithub.png">
+
+<link rel="canonical" href="http://example.com/2018/01/10/%E8%87%AA%E5%B7%B1%E5%8A%A8%E6%89%8B%E6%90%AD%E5%BB%BA%E4%B8%80%E4%B8%AAhexo%E5%8D%9A%E5%AE%A2demo/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>自己动手搭建一个hexo博客demo | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2018/01/10/%E8%87%AA%E5%B7%B1%E5%8A%A8%E6%89%8B%E6%90%AD%E5%BB%BA%E4%B8%80%E4%B8%AAhexo%E5%8D%9A%E5%AE%A2demo/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          自己动手搭建一个hexo博客demo
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-01-10 10:54:51" itemprop="dateCreated datePublished" datetime="2018-01-10T10:54:51+08:00">2018-01-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:48:12" itemprop="dateModified" datetime="2025-11-08T08:48:12+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/" itemprop="url" rel="index"><span itemprop="name">博客搭建</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>1.7k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>6 mins.</span>
+            </span>
+            <div class="post-description">记录自己搭窝的过程，方便以后搭更多的窝...</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>曾几何时，自己动手做一个博客的想法愈加强烈，想在里面放一些更多除了技术之外的东西，比如烹饪的美食，比如PVP的视频，比如拍摄的照片，比如篮球足球的评论。在这种需求下，我从众多博客框架里面选择了hexo，原因就是“很多人都推荐hexo”….（囧）于是乎我在windows里搞一个，由于我在公司的网络是可以跨越长城的，所以搞github有一点天然的优势。而且github的博客不用花钱搞域名，他直接免费提供…</p>
+<p><strong>在搞github的时候墙裂推荐各位去用命令行，有linux的基本基础就可以很熟练的使用命令行搞github， 它的客户端真的不如命令行好用。</strong></p>
+<h2 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h2><p>先去注册一个github，然后去<a target="_blank" rel="noopener" href="https://git-scm.com/">https://git-scm.com</a> 上下载一个最新的git windows的客户端，我下载的是2.15.1版本，如图：<br><img src="/images/zhucegithub.png" alt="抱光妹" title="windows下载github"></p>
+<p>下载完毕之后，就把这个exe文件安装，然后在“开始”里找到git再打开“Git Bash”，我的github账号是<code>RorschachChan</code>，电子邮件也已经配置过，所以现在就在这个bash窗口里写入如下语句：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git config --<span class="variable language_">global</span> user.<span class="property">name</span> <span class="string">&quot;RorschachChan&quot;</span></span><br><span class="line">git config --<span class="variable language_">global</span> user.<span class="property">email</span> <span class="string">&quot;chenx1242@163.com&quot;</span></span><br></pre></td></tr></table></figure></p>
+<p><img src="/images/config1.png" alt="抱光妹" title="确定用户名和邮箱"><br>上面<code>git config --global</code>参数，表示你这台机器上所有的Git仓库都会使用这个配置。</p>
+<p>再去<code>https://nodejs.org/en/download/</code>上根据自己windows的情况，下载最新的<code>nodejs</code>，下载完了之后就一路next，然后需要退出重进一下<code>git bash</code>，在bash的命令行里输入<code>node -v</code>，看到版本号就是OK，同时输入node，<code>$</code>会变成<code>&gt;</code>，然后输入.exit就可以退出返回到bash。<br><img src="/images/nodeV.png" alt="抱光妹" title="查看node版本"></p>
+<p>然后就是安装hexo，hexo的安装比较简单，就是在git bash里输入<code>npm install -g hexo-cli </code>和<code>npm install -g hexo</code>，然后需要等待一会，如果出现了<code>npm ERR!</code>不要怕，重新输入一次应该就会好了，安装完毕之后，输入<code>hexo -v</code>查看hexo的版本，如图：<br><img src="/images/installhexo1.png" alt="抱光妹" title="安装hexo-cli"><br><img src="/images/installhexo2.png" alt="抱光妹" title="安装hexo"></p>
+<p>然后建立一个github ssh密钥，在git bash里输入<code>ssh-keygen -t rsa -C &quot;你的邮箱&quot;</code>，然后告诉密钥生成的路径（下图黄框）以及会让你输入对应的口诀（红色箭头），这个口诀很重要，要妥善保存，如图：<br><img src="/images/githubak.png" alt="抱光妹" title="配置密钥"></p>
+<p>这个密码会在你提交项目（<code>hexo d</code>）时使用，如果为空的话提交项目时则不用输入。这个设置是防止别人往你的项目里提交内容。这时候去<code>C:\Users\33664\.ssh</code>的路径里就会看到一对钥匙，<strong>id_rsa是私钥，不能泄露出去，id_rsa.pub是公钥，可以放心地告诉任何人。</strong><br><img src="/images/miyao.png" alt="抱光妹" title="密钥在这里"></p>
+<p>来到github的个人配置里，选择<code>SSH and GPG keys</code>，然后输入title和id_rsa.pub的内容，点击<code>add ssh key</code>。如图：<br><img src="/images/addak.png" alt="抱光妹" title="在github添加ak"><br>准备工作的最后一步，就是建立一个文件夹，我的文件夹建立在E盘下，名字就叫hexo。</p>
+<h2 id="开始搭建博客"><a href="#开始搭建博客" class="headerlink" title="开始搭建博客"></a>开始搭建博客</h2><p>首先在git bash里进入&#x2F;e&#x2F;hexo，然后输入<code>hexo init</code>，这个命令是初始化命令，再输入<code>hexo -g</code>来生成静态文件，执行之后，hexo就会在public文件夹生成相关html文件，这些文件将来都是要提交到github上你的用户名.github.io的仓库上去的。然后可以输入<code>hexo s</code>来本地启动hexo，这个时候跑到浏览器里输入<code>localhost:4000</code>就会看到hexo博客最初的一个样子，如图：<br><img src="/images/hexo1.png" alt="抱光妹" title="最初是状态的hexo"></p>
+<p>这个默认的主题比较难看，我们去<code>https://github.com/iissnan/hexo-theme-next</code>下载最近一个比较火爆的主题next,并且把这个下载到hexo文件夹里的themes&#x2F;next里，语句是：<code>git clone https://github.com/iissnan/hexo-theme-next.git themes/next</code><br><img src="/images/installnext.png" alt="抱光妹" title="安装next主题"></p>
+<p>然后打开hexo文件夹里的<code>_config.xml</code>，把原有的theme注释，换成新的next，注意，中间是有空格的！<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#<span class="attr">theme</span>: landscape</span><br><span class="line"><span class="attr">theme</span>: next</span><br></pre></td></tr></table></figure></p>
+<p>然后<code>hexo clean</code>和<code>hexo g</code>清除 Hexo 的缓存和重新生成静态文件，再次<code>hexo s</code>启动进程，来到浏览看一下发现博客的样子就变成下面的样子了：<br><img src="/images/next1.png" alt="抱光妹" title="展示next主题"></p>
+<p>这个看上去就简单大方很多了吧。</p>
+<h2 id="把博客上传到github"><a href="#把博客上传到github" class="headerlink" title="把博客上传到github"></a>把博客上传到github</h2><p>现在有人问了，这个博客看上去好像很美，但是有两个致命的缺陷：第一，内容都是在我的windows里，如果我这个电脑坏了&#x2F;出差&#x2F;换新硬盘，那么如何保证我以前文件？第二，我启动进程需要执行 <code>hexo -s</code>，如果我电脑关机了，岂不是博客无法打开？</p>
+<p>需要解决就要把磁盘上的内容传递到github库里了，同时github是常开进程的，这样既可以更新我们的内容又不会关闭博客进程，除非github这个网站黄了。</p>
+<p>先去github网站去建立一个库（repository），这里我直接选择了公共读，如图：<br><img src="/images/repository.png" alt="抱光妹" title="建立一个新库"></p>
+<p>然后在hexo文件夹里面，修改一下_config.xml的几个地方：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"># <span class="title class_">Site</span></span><br><span class="line"><span class="attr">title</span>: 石锤淡啤酒    #这个是网站在标签页的标题</span><br><span class="line"><span class="attr">subtitle</span>: 生活就是等待戈多    #这个是副标题</span><br><span class="line"><span class="attr">description</span>: 这里记录的不只有代码，还有生活和思想！    #这里也可以写网站的关键词，也可以矫情的写点别的</span><br><span class="line"><span class="attr">author</span>: <span class="title class_">Chris</span> <span class="title class_">Chan</span>    #这个作者会在网页最下面显示</span><br><span class="line"><span class="attr">language</span>: zh-<span class="title class_">Hans</span>    #这里表示简体中文</span><br><span class="line"><span class="attr">timezone</span>:</span><br><span class="line"></span><br><span class="line"># <span class="title class_">Deployment</span></span><br><span class="line">## <span class="title class_">Docs</span>: <span class="attr">https</span>:<span class="comment">//hexo.io/docs/deployment.html</span></span><br><span class="line"><span class="attr">deploy</span>:</span><br><span class="line"> 		<span class="attr">type</span>: git</span><br><span class="line"> 		<span class="attr">repository</span>: git@github.<span class="property">com</span>:<span class="title class_">RorschachChan</span>/<span class="title class_">RorschachChan</span>.<span class="property">github</span>.<span class="property">io</span>.<span class="property">git</span>    #这里写的就是刚刚申请的库名</span><br><span class="line"> 		<span class="attr">branch</span>: master</span><br></pre></td></tr></table></figure><br>建立完库以及修改保存了_config.xml之后，我们执行一句<code>hexo d</code>部署命令，在执行的时候需要输入当时你建立id_rsa时候的口诀，刚刚申请的那个口诀不会这么快就忘了吧。<br><img src="/images/hexod.png" alt="抱光妹" title="部署博客"></p>
+<p>返回到github的网站就看到hexo里所有的内容都上传到了github网站里了，如图:<br><img src="/images/hexod2.png" alt="抱光妹" title="上传成功"></p>
+<p>在浏览器里输入“https:&#x2F;&#x2F;你的用户名.github.io”，就看到了博客界面：<br><img src="/images/newnext.png" alt="抱光妹" title="更改了主题和作者的界面"></p>
+<p>同理，如果你的github用户名是test，建立的是<code>test.github.io</code>的仓库（必须是你的用户名，其它名称无效），将来你的网站访问地址就是<code>http://test.github.io</code>了，每一个github账户最多只能创建一个这样可以直接使用域名访问的仓库。</p>
+<p>至此，建立一个博客demo就到此结束了！</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a target="_blank" rel="noopener" href="https://baoyuzhang.github.io/2017/04/28/%E3%80%90Hexo%E6%90%AD%E5%BB%BA%E7%8B%AC%E7%AB%8B%E5%8D%9A%E5%AE%A2%E5%85%A8%E7%BA%AA%E5%BD%95%E3%80%91%EF%BC%88%E4%B8%80%EF%BC%89%E4%BD%BF%E7%94%A8Git%E5%92%8CGithub/">https://baoyuzhang.github.io/2017/04/28/【Hexo搭建独立博客全纪录】（一）使用Git和Github/</a><br><a target="_blank" rel="noopener" href="https://github.com/iissnan/hexo-theme-next">https://github.com/iissnan/hexo-theme-next</a><br><a target="_blank" rel="noopener" href="http://opiece.me/2015/04/09/hexo-guide/">http://opiece.me/2015/04/09/hexo-guide/</a><br><a target="_blank" rel="noopener" href="http://shenzekun.cn/hexo%E7%9A%84next%E4%B8%BB%E9%A2%98%E4%B8%AA%E6%80%A7%E5%8C%96%E9%85%8D%E7%BD%AE%E6%95%99%E7%A8%8B.html">http://shenzekun.cn/hexo的next主题个性化配置教程.html</a> 强烈推荐这篇文章，可以让你把next主题的博客做的更加漂亮！ </p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/github/" rel="tag"># github</a>
+              <a href="/tags/hexo/" rel="tag"># hexo</a>
+              <a href="/tags/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/" rel="tag"># 博客搭建</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/01/09/Query-String%E8%B7%9Farg%E7%9A%84%E5%BC%82%E5%90%8C/" rel="prev" title="Query String跟Arg的差异">
+      <i class="fa fa-chevron-left"></i> Query String跟Arg的差异
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/01/10/Zabbix3-0%E6%90%AD%E9%85%8D%E5%BE%AE%E4%BF%A1%E4%BC%81%E4%B8%9A%E5%8F%B7%E6%8A%A5%E8%AD%A6/" rel="next" title="Zabbix3.0搭配微信企业号报警">
+      Zabbix3.0搭配微信企业号报警 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C"><span class="nav-number">1.</span> <span class="nav-text">准备工作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%80%E5%A7%8B%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2"><span class="nav-number">2.</span> <span class="nav-text">开始搭建博客</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8A%8A%E5%8D%9A%E5%AE%A2%E4%B8%8A%E4%BC%A0%E5%88%B0github"><span class="nav-number">3.</span> <span class="nav-text">把博客上传到github</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">4.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

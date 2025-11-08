@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="如果想要固定容器IP，可以先&quot;docker network create --subnet&#x3D;IP段&#x2F;16 网段名称&quot;，然后docker run的时候加上&quot;--net 网段名称 --ip 具体IP&quot;即可">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python3监控https证书过期时间">
+<meta property="og:url" content="http://example.com/2019/07/17/python3%E7%9B%91%E6%8E%A7https%E8%AF%81%E4%B9%A6%E8%BF%87%E6%9C%9F%E6%97%B6%E9%97%B4/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="如果想要固定容器IP，可以先&quot;docker network create --subnet&#x3D;IP段&#x2F;16 网段名称&quot;，然后docker run的时候加上&quot;--net 网段名称 --ip 具体IP&quot;即可">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/pyredis3.png">
+<meta property="article:published_time" content="2019-07-17T11:43:40.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:47:21.535Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="https证书">
+<meta property="article:tag" content="python3">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/pyredis3.png">
+
+<link rel="canonical" href="http://example.com/2019/07/17/python3%E7%9B%91%E6%8E%A7https%E8%AF%81%E4%B9%A6%E8%BF%87%E6%9C%9F%E6%97%B6%E9%97%B4/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>python3监控https证书过期时间 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/07/17/python3%E7%9B%91%E6%8E%A7https%E8%AF%81%E4%B9%A6%E8%BF%87%E6%9C%9F%E6%97%B6%E9%97%B4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          python3监控https证书过期时间
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-07-17 19:43:40" itemprop="dateCreated datePublished" datetime="2019-07-17T19:43:40+08:00">2019-07-17</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:47:21" itemprop="dateModified" datetime="2025-11-08T08:47:21+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>944</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>3 mins.</span>
+            </span>
+            <div class="post-description">如果想要固定容器IP，可以先"docker network create --subnet=IP段/16 网段名称"，然后docker run的时候加上"--net 网段名称 --ip 具体IP"即可</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>上周日，我们的一个https证书到期了，结果运维没有事前检查到，导致服务中断，于是赶紧亡羊补牢一个python3的脚本：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># !/usr/bin/env python </span></span><br><span class="line"><span class="comment"># -*- coding:utf-8 -*-</span></span><br><span class="line"><span class="comment"># 作者：ChrisChan</span></span><br><span class="line"><span class="comment"># 用途：获取https证书的过期时间，需要先执行pip3 install pyopenssl</span></span><br><span class="line"><span class="keyword">from</span> urllib3.contrib <span class="keyword">import</span> pyopenssl <span class="keyword">as</span> reqs</span><br><span class="line"><span class="keyword">from</span> datetime <span class="keyword">import</span> datetime</span><br><span class="line"></span><br><span class="line"><span class="comment"># 公网验证</span></span><br><span class="line">cert = reqs.OpenSSL.crypto.load_certificate(reqs.OpenSSL.crypto.FILETYPE_PEM, reqs.ssl.get_server_certificate((<span class="string">&#x27;cn.imoulife.com&#x27;</span>, <span class="number">443</span>)))</span><br><span class="line"></span><br><span class="line">notafter = datetime.strptime(cert.get_notAfter().decode()[<span class="number">0</span>:-<span class="number">1</span>], <span class="string">&#x27;%Y%m%d%H%M%S&#x27;</span>)	<span class="comment">#获取到的时间戳格式是ans.1的，需要转换</span></span><br><span class="line">remain_days = notafter - datetime.now()	<span class="comment"># 用证书到期时间减去当前时间</span></span><br><span class="line"><span class="built_in">print</span>(remain_days.days)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 离线验证</span></span><br><span class="line"><span class="keyword">from</span> OpenSSL <span class="keyword">import</span> crypto</span><br><span class="line"></span><br><span class="line">cert_file = <span class="string">&#x27;F:\\crt文件的路径\\mycert.crt&#x27;</span></span><br><span class="line">cert2 = crypto.load_certificate(crypto.FILETYPE_PEM, <span class="built_in">open</span>(cert_file).read())</span><br><span class="line">cert2.get_version()</span><br><span class="line">subject = cert2.get_subject()</span><br><span class="line">subject.get_components()</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;域名是：&quot;</span>,subject.CN)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;终止的时间戳是：&quot;</span>,cert2.get_notAfter())</span><br></pre></td></tr></table></figure></p>
+<p>pyopenssl可以给与我们的https信息非常的丰富，除了到期时间之外，还有如下几个常用项：</p>
+<ol>
+<li>get_subject()：返回证书域名</li>
+<li>get_version()：返回证书版本</li>
+<li>get_issuer()：证书颁发机构</li>
+</ol>
+<p>更多信息可以去看 <a target="_blank" rel="noopener" href="https://www.pyopenssl.org/en/stable/index.html">https://www.pyopenssl.org/en/stable/index.html</a> 官网介绍。</p>
+<p>进一步加工后的脚本是:<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># !/usr/bin/env python </span></span><br><span class="line"><span class="comment"># -*- coding:utf-8 -*-</span></span><br><span class="line"><span class="keyword">import</span> argparse</span><br><span class="line"><span class="keyword">from</span> urllib3.contrib <span class="keyword">import</span> pyopenssl <span class="keyword">as</span> reqs</span><br><span class="line"><span class="keyword">from</span> datetime <span class="keyword">import</span> datetime</span><br><span class="line"></span><br><span class="line"><span class="comment"># 命令行参数</span></span><br><span class="line">parser = argparse.ArgumentParser(description=<span class="string">&#x27;本脚本获取https证书到期时间&#x27;</span>)</span><br><span class="line">parser.add_argument(<span class="string">&#x27;-w&#x27;</span>, <span class="string">&#x27;--www&#x27;</span>, metavar=<span class="string">&#x27;https网站,如cn.imoulife.com&#x27;</span>, required=<span class="literal">True</span>, dest=<span class="string">&#x27;sites&#x27;</span>,  nargs=<span class="string">&#x27;+&#x27;</span>, <span class="built_in">help</span>=<span class="string">&#x27;请一定要输入监控的https网站&#x27;</span>)  <span class="comment"># required表示此字段一定需要,nargs=’+’ 表&gt;示至少一个参数</span></span><br><span class="line">args = parser.parse_args()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 公网验证</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">get_notafter</span>(<span class="params">www</span>):</span><br><span class="line">    cert = reqs.OpenSSL.crypto.load_certificate(reqs.OpenSSL.crypto.FILETYPE_PEM, reqs.ssl.get_server_certificate((www, <span class="number">443</span>)))</span><br><span class="line"></span><br><span class="line">    notafter = datetime.strptime(cert.get_notAfter().decode()[<span class="number">0</span>:-<span class="number">1</span>], <span class="string">&#x27;%Y%m%d%H%M%S&#x27;</span>)</span><br><span class="line">    remain_days = notafter - datetime.now()         <span class="comment"># 用证书到期时间减去当前时间</span></span><br><span class="line">    <span class="built_in">print</span>(www,<span class="string">&quot;证书到期天数是：&quot;</span>,remain_days.days)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 输出结果</span></span><br><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    <span class="keyword">for</span> site <span class="keyword">in</span> args.sites:</span><br><span class="line">        get_notafter(site)</span><br><span class="line"><span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;出现错误，请检查域名是否正确或者可达性！&quot;</span>)</span><br></pre></td></tr></table></figure></p>
+<p>执行效果如下：<br><img src="/images/pyredis3.png" alt="抱光妹"></p>
+<h2 id="shell脚本"><a href="#shell脚本" class="headerlink" title="shell脚本"></a>shell脚本</h2><p><a target="_blank" rel="noopener" href="http://noops.me/?p=945">http://noops.me/?p=945</a> 这个小米的运维网站分享一个非常不错的shell脚本来监控证书，脚本如下：<br>	<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash">! /bin/sh</span></span><br><span class="line"> </span><br><span class="line">host=$1</span><br><span class="line">port=$2</span><br><span class="line">end_date=`openssl s_client -host $host -port $port -showcerts &lt;/dev/null 2&gt;/dev/null |</span><br><span class="line">          sed -n &#x27;/BEGIN CERTIFICATE/,/END CERT/p&#x27; |</span><br><span class="line">      openssl x509 -text 2&gt;/dev/null |</span><br><span class="line">      sed -n &#x27;s/ *Not After : *//p&#x27;`</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">openssl 检验和验证SSL证书。</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">&lt;/dev/null 定向标准输入，防止交互式程序Hang。从/dev/null 读时，直接读出0 。</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">sed -n 和p 一起使用，仅显示匹配到的部分。 //,// 区间匹配。</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">openssl x509 -text 解码证书信息，包含证书的有效期。</span></span><br><span class="line"> </span><br><span class="line">if [ -n &quot;$end_date&quot; ]</span><br><span class="line">then</span><br><span class="line">    end_date_seconds=`date &#x27;+%s&#x27; --date &quot;$end_date&quot;`</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="built_in">date</span>指令format字符串时间。</span></span><br><span class="line">    now_seconds=`date &#x27;+%s&#x27;`</span><br><span class="line">    echo &quot;($end_date_seconds-$now_seconds)/24/3600&quot; | bc</span><br><span class="line">fi</span><br></pre></td></tr></table></figure></p>
+<p>上面那个有两个小地方可以改进下：<code>echo “HOST: test.com /r/n GET / HTTP/1.1″|openssl s_client -connect test.com:443</code> 这样可以增加速度，因为<code>openssl s_client</code>只负责链接，后面是请求内容如果不输入的话就是等待超时，时间会很长。而且增加一个参数<code>-servername</code>可一直开启<code>TLS SNI support</code>，可以检测一个ip多个证书的情况。</p>
+<h2 id="其他监控证书的网站"><a href="#其他监控证书的网站" class="headerlink" title="其他监控证书的网站"></a>其他监控证书的网站</h2><p>如果不想用脚本监控可以用第三方网站监控，下面这三个网站方法都一样：就是填入自己的邮箱注册账户，然后在页面输入自己要监控的域名，然后会给你一个剩余时间，如果快到期了就会给你发邮件通知，这三个网站分别是：</p>
+<ol>
+<li>letsmonitor.org      	每小时检测一次，但是发送告警邮件只有一次</li>
+<li>certificatemonitor.org   非常简单，只能443端口，一共会发9次邮件通知</li>
+<li><a target="_blank" rel="noopener" href="https://keychest.net/">https://keychest.net/</a>    它支持api，邮件每周一次发送，比较好</li>
+</ol>
+<p>详情可见<a target="_blank" rel="noopener" href="https://www.sooele.com/2784.html">https://www.sooele.com/2784.html</a> 。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a target="_blank" rel="noopener" href="https://flyhigher.top/develop/755.html">https://flyhigher.top/develop/755.html</a><br><a target="_blank" rel="noopener" href="https://blog.skk.moe/post/checkssl-status/">https://blog.skk.moe/post/checkssl-status/</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/tzdjzs/article/details/28124609">https://blog.csdn.net/tzdjzs/article/details/28124609</a><br><a target="_blank" rel="noopener" href="https://www.conum.cn/program/python/241.html">https://www.conum.cn/program/python/241.html</a> （pyopenssl的介绍）<br><a target="_blank" rel="noopener" href="https://python3-cookbook.readthedocs.io/zh_CN/latest/c13/p03_parsing_command_line_options.html">https://python3-cookbook.readthedocs.io/zh_CN/latest/c13/p03_parsing_command_line_options.html</a> (python命令行参数)</p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/python3/" rel="tag"># python3</a>
+              <a href="/tags/https%E8%AF%81%E4%B9%A6/" rel="tag"># https证书</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/07/15/%E4%BD%BF%E7%94%A8Debian9%E9%83%A8%E7%BD%B2Harbor%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/" rel="prev" title="使用centos7部署Harbor私有仓库">
+      <i class="fa fa-chevron-left"></i> 使用centos7部署Harbor私有仓库
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/07/23/%E5%9C%A8Docker%E9%87%8C%E4%BD%BF%E7%94%A8runit%E7%9B%91%E6%8E%A7%E6%9C%8D%E5%8A%A1%E7%8A%B6%E6%80%81/" rel="next" title="在Docker里使用s6-svscan做进程守护">
+      在Docker里使用s6-svscan做进程守护 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#shell%E8%84%9A%E6%9C%AC"><span class="nav-number">1.</span> <span class="nav-text">shell脚本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E7%9B%91%E6%8E%A7%E8%AF%81%E4%B9%A6%E7%9A%84%E7%BD%91%E7%AB%99"><span class="nav-number">2.</span> <span class="nav-text">其他监控证书的网站</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">3.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

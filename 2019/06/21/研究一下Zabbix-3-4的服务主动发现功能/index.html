@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="AWS的工单反馈与阿里云真是天差地别">
+<meta property="og:type" content="article">
+<meta property="og:title" content="研究一下Zabbix 3.4的服务主动发现功能">
+<meta property="og:url" content="http://example.com/2019/06/21/%E7%A0%94%E7%A9%B6%E4%B8%80%E4%B8%8BZabbix-3-4%E7%9A%84%E6%9C%8D%E5%8A%A1%E4%B8%BB%E5%8A%A8%E5%8F%91%E7%8E%B0%E5%8A%9F%E8%83%BD/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="AWS的工单反馈与阿里云真是天差地别">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/LLD7.png">
+<meta property="og:image" content="http://example.com/images/LLD8.png">
+<meta property="og:image" content="http://example.com/images/LLD1.png">
+<meta property="og:image" content="http://example.com/images/LLD2.png">
+<meta property="og:image" content="http://example.com/images/LLD3.png">
+<meta property="og:image" content="http://example.com/images/LLD4.png">
+<meta property="og:image" content="http://example.com/images/LLD5.png">
+<meta property="og:image" content="http://example.com/images/LLD6.png">
+<meta property="og:image" content="http://example.com/images/LLD9.png">
+<meta property="og:image" content="http://example.com/images/LLD10.png">
+<meta property="og:image" content="http://example.com/images/LLD11.png">
+<meta property="article:published_time" content="2019-06-21T09:24:11.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:48:09.360Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="zabbix">
+<meta property="article:tag" content="监控">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/LLD7.png">
+
+<link rel="canonical" href="http://example.com/2019/06/21/%E7%A0%94%E7%A9%B6%E4%B8%80%E4%B8%8BZabbix-3-4%E7%9A%84%E6%9C%8D%E5%8A%A1%E4%B8%BB%E5%8A%A8%E5%8F%91%E7%8E%B0%E5%8A%9F%E8%83%BD/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>研究一下Zabbix 3.4的服务主动发现功能 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/06/21/%E7%A0%94%E7%A9%B6%E4%B8%80%E4%B8%8BZabbix-3-4%E7%9A%84%E6%9C%8D%E5%8A%A1%E4%B8%BB%E5%8A%A8%E5%8F%91%E7%8E%B0%E5%8A%9F%E8%83%BD/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          研究一下Zabbix 3.4的服务主动发现功能
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-06-21 17:24:11" itemprop="dateCreated datePublished" datetime="2019-06-21T17:24:11+08:00">2019-06-21</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:48:09" itemprop="dateModified" datetime="2025-11-08T08:48:09+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>880</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>3 mins.</span>
+            </span>
+            <div class="post-description">AWS的工单反馈与阿里云真是天差地别</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>我所在组一直以来对不同服务的监控方针是：针对不同的服务（比如nginx,tomcat,mysql等等）创建不同的template，然后将这个template应用于对应的服务器上，在每一个template里添加具体的item和trigger。今天尝试一下全新的自动发现<code>Low-level discovery</code>（LLD）。</p>
+<p>LLD对返回的内容有一个json格式，这个json格式必须要被<code>zabbix-server</code>识别。所以我们需要准备一个脚本，脚本的结果就是生成这个json。本文<code>zabbix-server</code>和<code>zabbix-agent</code>的版本都是<code>3.4.15</code>。</p>
+<h2 id="服务器内部操作"><a href="#服务器内部操作" class="headerlink" title="服务器内部操作"></a>服务器内部操作</h2><p>首先在被监控服务器里，创建一个脚本<code>/etc/zabbix/script/discovery_services.sh</code>，内容如下：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/bin/bash</span></span><br><span class="line">proarray=($(find /var/run/ -name <span class="string">&quot;*.pid&quot;</span>|egrep -v <span class="string">&#x27;(rpc|php_daemon|haldaemon|irqbalance|console-kit-daemon)&#x27;</span> |awk -<span class="string">F&#x27;/&#x27;</span> <span class="string">&#x27;&#123;print $NF&#125;&#x27;</span>|awk -<span class="string">F&#x27;.&#x27;</span> <span class="string">&#x27;&#123;print $1&#125;&#x27;</span>))    <span class="comment"># 排除不监控的服务</span></span><br><span class="line"></span><br><span class="line">length=$&#123;<span class="comment">#proarray[@]&#125;		#$&#123;#var&#125;是用来取长度</span></span><br><span class="line">printf <span class="string">&quot;&#123;\n&quot;</span></span><br><span class="line">printf  <span class="string">&#x27;\t&#x27;</span><span class="string">&quot;\&quot;data\&quot;:[&quot;</span></span><br><span class="line">printf <span class="string">&quot;\t&quot;</span></span><br><span class="line">printf <span class="string">&#x27;\n\t\t&#123;&#x27;</span></span><br><span class="line">printf <span class="string">&quot;\&quot;&#123;#PRO_NAME&#125;\&quot;:\&quot;iptables\&quot;&#125;&quot;</span>       <span class="comment">#必须要添加的iptables</span></span><br><span class="line">printf  <span class="string">&quot;,&quot;</span></span><br><span class="line"><span class="keyword">for</span> ((i=<span class="number">0</span>;i&lt;$length;i++))</span><br><span class="line">do</span><br><span class="line">        printf <span class="string">&#x27;\n\t\t&#123;&#x27;</span></span><br><span class="line">        printf <span class="string">&quot;\&quot;&#123;#PRO_NAME&#125;\&quot;:\&quot;$&#123;proarray[$i]&#125;\&quot;&#125;&quot;</span>	<span class="comment">#for循环取每一项</span></span><br><span class="line">        <span class="keyword">if</span> [ $i -lt $[$length-<span class="number">1</span>] ];then</span><br><span class="line">                printf <span class="string">&#x27;,&#x27;</span></span><br><span class="line">        fi</span><br><span class="line">done</span><br><span class="line">printf  <span class="string">&quot;\n\t]\n&quot;</span></span><br><span class="line">printf <span class="string">&quot;&#125;\n&quot;</span></span><br></pre></td></tr></table></figure></p>
+<p>这里我们设定将所有的进程文件的pid统一放到&#x2F;var&#x2F;run下，这样能取到所有进程的文件。脚本里的<code>{PRO_NAME}</code>这个就是自动发现规则中的宏变量，另外这个脚本返回的是符合<code>zabbix-server</code>的json格式。如图：<br><img src="/images/LLD7.png" alt="akb48"></p>
+<p>同时在加上一个判断进程是否运行的脚本<code>/etc/zabbix/script/program_status.sh</code>，内容如下：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/bin/bash</span></span><br><span class="line">procjetName=<span class="string">&quot;$&#123;1:-NULL&#125;&quot;</span></span><br><span class="line">LOCK_PATH=<span class="string">&quot;/var/lock/subsys&quot;</span>     </span><br><span class="line">RUN_PATH=<span class="string">&quot;/var/run&quot;</span></span><br><span class="line">ret_ok=<span class="number">1</span></span><br><span class="line">ret_critical=<span class="number">3</span></span><br><span class="line">ret_unknown=<span class="number">4</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>  [[ $&#123;procjetName&#125; == <span class="string">&quot;NULL&quot;</span> ]] ; then</span><br><span class="line">        echo $&#123;ret_unknown&#125;</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> [ -f <span class="string">&quot;$&#123;LOCK_PATH&#125;/$&#123;procjetName&#125;&quot;</span> ] || [ -f <span class="string">&quot;$&#123;RUN_PATH&#125;/$&#123;procjetName&#125;.pid&quot;</span> ]  || [ -f <span class="string">&quot;$&#123;RUN_PATH&#125;/$&#123;procjetName&#125;/$&#123;procjetName&#125;.pid&quot;</span> ] ; then</span><br><span class="line">        echo $&#123;ret_ok&#125;</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">        echo $&#123;ret_critical&#125;</span><br><span class="line">fi</span><br></pre></td></tr></table></figure></p>
+<p>这个脚本的结果就是：服务若存在就返回1，否则返回3。如图：<br><img src="/images/LLD8.png" alt="akb48"></p>
+<p>然后在<code>zabbix_agentd.conf</code>里添加两个<code>items</code>，如下：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">UserParameter=services.scan,/<span class="built_in">bin</span>/bash /etc/zabbix/script/discovery_services.sh</span><br><span class="line">UserParameter=services.status[*],/<span class="built_in">bin</span>/bash /etc/zabbix/script/program_status.sh $<span class="number">1</span></span><br></pre></td></tr></table></figure></p>
+<p>服务端操作到此结束。</p>
+<h2 id="WEB端操作"><a href="#WEB端操作" class="headerlink" title="WEB端操作"></a>WEB端操作</h2><p>添加自动发现规则与添加item很相似，先<code>configuation</code>—<code>templates</code>—<code>create template</code>:<br><img src="/images/LLD1.png" alt="akb48"></p>
+<p><img src="/images/LLD2.png" alt="akb48"></p>
+<p>在新生成的“服务进程自动发现”的template里添加<code>Discovery rules</code>，设定Key是<code>Services.scan</code>如下：<br><img src="/images/LLD3.png" alt="akb48"></p>
+<p>上面那个<code>Services.scan</code>到时候要写到<code>zabbix-agent.conf</code>里的，切记保持一模一样。然后在点击Filters标签页，如下：<br><img src="/images/LLD4.png" alt="akb48"></p>
+<p>此处的<code>{PRO_NAME}</code>就是我们的脚本返回的变量，保存之。然后创建一个<code>item prototypes</code>，如图：<br><img src="/images/LLD5.png" alt="akb48"></p>
+<p>此处需要注意的<code>$1</code>和<code>键值</code>是我们之前定义的，也即是服务名，保存之。</p>
+<p>然后创建一个<code>trigger prototype</code>，如图：<br><img src="/images/LLD6.png" alt="akb48"></p>
+<p>图中的解释器是：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(&#123;auto Service discovery:services.status[&#123;<span class="comment">#PRO_NAME&#125;].last()&#125;&lt;&gt;1) and (&#123;auto Service discovery:services.status[&#123;#PRO_NAME&#125;].last(,1h)&#125;=1)</span></span><br></pre></td></tr></table></figure></p>
+<p>这句话的意思是“最后状态不是1同时一小时前的状态是1”的服务出现了问题会发生报警，这主要是因为当启动一些临时进程，比如yum，当yum完毕了之后，进程就不存在了，那么如果只是通过判断进程数的话，就会报<code>yum is down</code>。</p>
+<p>至此web端配置结束。</p>
+<h2 id="错误解决"><a href="#错误解决" class="headerlink" title="错误解决"></a>错误解决</h2><p>如果web界面出现了<code>Value should be a JSON object.</code>的错误，如图：<br><img src="/images/LLD9.png" alt="akb48"></p>
+<p>跑到zabbix-server去zabbix-get一下发现有错误：<br><img src="/images/LLD10.png" alt="akb48"></p>
+<p>将mdadm这个文件夹改成755即可。回到web页面查看一下<code>latest data</code>:<br><img src="/images/LLD11.png" alt="akb48"></p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a target="_blank" rel="noopener" href="https://www.zabbix.com/documentation/3.4/zh/manual/discovery/low_level_discovery">https://www.zabbix.com/documentation/3.4/zh/manual/discovery/low_level_discovery</a><br><a target="_blank" rel="noopener" href="https://www.xiaomastack.com/2015/07/04/zabbix-auto-tcp-port/">https://www.xiaomastack.com/2015/07/04/zabbix-auto-tcp-port/</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/fengbohello/p/5954895.html">https://www.cnblogs.com/fengbohello/p/5954895.html</a> （Linux Shell 截取字符串）<br><a target="_blank" rel="noopener" href="http://caosiyang.github.io/2017/03/06/zabbix-get-value-error/">http://caosiyang.github.io/2017/03/06/zabbix-get-value-error/</a></p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%9B%91%E6%8E%A7/" rel="tag"># 监控</a>
+              <a href="/tags/zabbix/" rel="tag"># zabbix</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/06/20/%E7%BD%91%E6%98%93%E9%9B%B7%E7%81%AB%E8%BF%90%E7%BB%B4%E9%9D%A2%E8%AF%95%E8%AE%B0%E5%BD%95/" rel="prev" title="网易雷火运维面试全纪录">
+      <i class="fa fa-chevron-left"></i> 网易雷火运维面试全纪录
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/06/24/%E4%BD%BF%E7%94%A8Alpine%E5%BD%93%E5%9F%BA%E7%A1%80%E9%95%9C%E5%83%8F%E7%9A%84%E5%9D%91/" rel="next" title="使用Alpine当基础镜像的坑">
+      使用Alpine当基础镜像的坑 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%86%85%E9%83%A8%E6%93%8D%E4%BD%9C"><span class="nav-number">1.</span> <span class="nav-text">服务器内部操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#WEB%E7%AB%AF%E6%93%8D%E4%BD%9C"><span class="nav-number">2.</span> <span class="nav-text">WEB端操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%94%99%E8%AF%AF%E8%A7%A3%E5%86%B3"><span class="nav-number">3.</span> <span class="nav-text">错误解决</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">4.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

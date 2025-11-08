@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="从搭建ELK开始日志分析之路">
+<meta property="og:type" content="article">
+<meta property="og:title" content="记录日志系统ELKB 5.6.4的搭建过程">
+<meta property="og:url" content="http://example.com/2018/01/16/%E8%AE%B0%E5%BD%95%E6%97%A5%E5%BF%97%E7%B3%BB%E7%BB%9FELKB-5-6-4%E7%9A%84%E6%90%AD%E5%BB%BA%E8%BF%87%E7%A8%8B/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="从搭建ELK开始日志分析之路">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/elk1.png">
+<meta property="og:image" content="http://example.com/images/elk2.png">
+<meta property="og:image" content="http://example.com/images/elk3.png">
+<meta property="og:image" content="http://example.com/images/elk4.png">
+<meta property="og:image" content="http://example.com/images/elk5.png">
+<meta property="og:image" content="http://example.com/images/elk6.png">
+<meta property="og:image" content="http://example.com/images/elk7.png">
+<meta property="og:image" content="http://example.com/images/elk8.png">
+<meta property="og:image" content="http://example.com/images/elk10.png">
+<meta property="og:image" content="http://example.com/images/elk9.png">
+<meta property="og:image" content="http://example.com/images/elk11.png">
+<meta property="og:image" content="http://example.com/images/elk12.png">
+<meta property="og:image" content="http://example.com/images/elk13.png">
+<meta property="og:image" content="http://example.com/images/elk14.png">
+<meta property="og:image" content="http://example.com/images/elk15.png">
+<meta property="og:image" content="http://example.com/images/elk16.png">
+<meta property="og:image" content="http://example.com/images/elk17.png">
+<meta property="og:image" content="http://example.com/images/elk18.png">
+<meta property="article:published_time" content="2018-01-15T23:59:43.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:48:20.141Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="ELK">
+<meta property="article:tag" content="大数据分析">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/elk1.png">
+
+<link rel="canonical" href="http://example.com/2018/01/16/%E8%AE%B0%E5%BD%95%E6%97%A5%E5%BF%97%E7%B3%BB%E7%BB%9FELKB-5-6-4%E7%9A%84%E6%90%AD%E5%BB%BA%E8%BF%87%E7%A8%8B/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>记录日志系统ELKB 5.6.4的搭建过程 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2018/01/16/%E8%AE%B0%E5%BD%95%E6%97%A5%E5%BF%97%E7%B3%BB%E7%BB%9FELKB-5-6-4%E7%9A%84%E6%90%AD%E5%BB%BA%E8%BF%87%E7%A8%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          记录日志系统ELKB 5.6.4的搭建过程
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-01-16 07:59:43" itemprop="dateCreated datePublished" datetime="2018-01-16T07:59:43+08:00">2018-01-16</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:48:20" itemprop="dateModified" datetime="2025-11-08T08:48:20+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>2.6k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>9 mins.</span>
+            </span>
+            <div class="post-description">从搭建ELK开始日志分析之路</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>ELK是最近比较流行的免费的日志系统解决方案，注意，ELK不是一个软件名，而是一个解决方案的缩写，即<code>Elasticsearch+Logstash+Kibana（ELK Stack）</code>。这哥几个都是java系的产品，但是众所周知，java的东西很吃内存和CPU，Logstash在当作为收集日志的Agent时，就显得太过臃肿了。听说直播平台“斗鱼”团队很为logstash占用资源的情况很而苦恼，后来为了解决这个问题，他们自己写了一个agent。不过后来官方在logstash-forwarder的基础上推出了beat系列，里面包括四个兄弟，分别是：Packetbeat（搜集网络流量数据）；Topbeat（搜集系统、进程和文件系统级别的 CPU 和内存使用情况等数据）；Filebeat（搜集文件数据）；Winlogbeat（搜集 Windows 事件日志数据）。而Filebeat也就这样加入了“日志收集分析”的团队里，所以虽然大家还是习惯性的叫ELK，其实准确的说法已经是ELKB了。</p>
+<p>ELKB这几个哥们的分工如下：</p>
+<ol>
+<li>Elasticsearch：分布式搜索和分析引擎，具有高可伸缩、高可靠和易管理等特点。基于 Apache Lucene 构建，能对大容量的数据进行接近实时的存储、搜索和分析操作。通常被用作某些应用的基础搜索引擎，使其具有复杂的搜索功能；</li>
+<li>Logstash：数据收集额外处理和数据引擎。它支持动态的从各种数据源搜集数据，并对数据进行过滤、分析、丰富、统一格式等操作，然后存储到用户指定的位置；</li>
+<li>Kibana：数据分析和可视化平台。通常与 Elasticsearch 配合使用，对其中数据进行搜索、分析和以统计图表的方式展示；</li>
+<li>Filebeat：ELK 协议栈的新成员，在需要采集日志数据的 server 上安装 Filebeat，并指定日志目录或日志文件后，Filebeat 就能读取数据，迅速发送到 Logstash 进行解析，亦或直接发送到 Elasticsearch 进行集中式存储和分析。</li>
+</ol>
+<h2 id="设计架构"><a href="#设计架构" class="headerlink" title="设计架构"></a>设计架构</h2><p><img src="/images/elk1.png" alt="办公室"></p>
+<p>本文的设计结构就是这样，其中红色的redis&#x2F;RebbitMQ部分可以省略（我这个例子里暂省略），让日志直接传递到logstash，如果日志量较大，最好还是添加上redis，同时再横向扩容Elasticsearch，搞成一个集群。</p>
+<p>对于这几个模块服务器多说几句：<br>1）Logstash要选择计算能力强的，CPU和内存比较丰满的；<br>2）Elasticsearch要选择磁盘容量大的，同时CPU和内存也比较丰满的；</p>
+<h2 id="实验软件版本"><a href="#实验软件版本" class="headerlink" title="实验软件版本"></a>实验软件版本</h2><p>Elasticsearch 5.6.4<br>Logstash 5.6.4<br>Kibana 5.6.4<br>Filebeat 5.6.4<br>Java 1.8+，安装方法：<code>http://blog.51cto.com/chenx1242/2043924</code><br>由于ELKB这几个东西都是墙外的，墙内的下载可能会比较费劲。所以我稍后会把所有ELKB的5.6.4程序都放在51CTO的存储空间里，需要的朋友可以去下载，还是那话，虽然ELK升级频率很快，但是5.6.4已经足够稳定了。</p>
+<h2 id="实验服务器情况"><a href="#实验服务器情况" class="headerlink" title="实验服务器情况"></a>实验服务器情况</h2><p><img src="/images/elk2.png" alt="办公室"></p>
+<h2 id="安装Elasticsearch-5-6-4"><a href="#安装Elasticsearch-5-6-4" class="headerlink" title="安装Elasticsearch 5.6.4"></a>安装Elasticsearch 5.6.4</h2><p>以下所有操作都是root下进行的:<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">curl -L -O <span class="attr">https</span>:<span class="comment">//artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.6.4.rpm</span></span><br><span class="line">rpm -ivh elasticsearch-<span class="number">5.6</span><span class="number">.4</span>.<span class="property">rpm</span></span><br></pre></td></tr></table></figure></p>
+<p>然后编辑<code>/etc/elasticsearch/elasticsearch.yml</code>，不然的话logstash无法与之相连：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cluster.<span class="property">name</span>: my-application  #如果是集群的es就把这个打开，<span class="title class_">Elasticsearch</span> 启动时会根据配置文件中设置的集群名字（cluster.<span class="property">name</span>）自动查找并加入集群，端口是<span class="number">9300</span></span><br><span class="line">network.<span class="property">host</span>: <span class="number">0.0</span><span class="number">.0</span><span class="number">.0</span>    #取消注释，并且改成<span class="number">0.0</span><span class="number">.0</span><span class="number">.0</span></span><br><span class="line">http.<span class="property">port</span>: <span class="number">9200</span>    #取消注释</span><br></pre></td></tr></table></figure></p>
+<p>保存之后，启动并且添加开机启动：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">systemctl start elasticsearch     </span><br><span class="line">systemctl enable elasticsearch</span><br></pre></td></tr></table></figure></p>
+<p>使用<code>curl localhost:9200</code>能看到这样的情景就证明已经成功启动了：<br><img src="/images/elk3.png" alt="办公室"></p>
+<h2 id="安装kibana-5-6-4"><a href="#安装kibana-5-6-4" class="headerlink" title="安装kibana 5.6.4"></a>安装kibana 5.6.4</h2><p>以下所有操作都是root下进行的:<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">curl -L -O <span class="attr">https</span>:<span class="comment">//artifacts.elastic.co/downloads/kibana/kibana-5.6.4-linux-x86_64.tar.gz</span></span><br><span class="line">tar xzvf kibana-<span class="number">5.6</span><span class="number">.4</span>-linux-x86_64.<span class="property">tar</span>.<span class="property">gz</span></span><br><span class="line">cd kibana-<span class="number">5.6</span><span class="number">.4</span>-linux-x86_64/</span><br><span class="line">vim config/kibana.<span class="property">yml</span></span><br></pre></td></tr></table></figure></p>
+<p>把kibana.yml里的<code>server.host: localhost</code>改成<code>server.host: 0.0.0.0</code>，然后保存退出，在kibana的bin文件夹里执行<code>./kibana</code>即可。如果要后台启动就是<code>nohup /kibana安装路径/bin/kibana &amp;</code>。</p>
+<p>启动之后，如图：<br><img src="/images/elk4.png" alt="办公室"></p>
+<h2 id="安装Logstash-5-6-4"><a href="#安装Logstash-5-6-4" class="headerlink" title="安装Logstash 5.6.4"></a>安装Logstash 5.6.4</h2><p>以下所有操作都是root下进行的:<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">curl -L -O <span class="attr">https</span>:<span class="comment">//artifacts.elastic.co/downloads/logstash/logstash-5.6.4.rpm </span></span><br><span class="line">rpm -ivh logstash-<span class="number">5.6</span><span class="number">.4</span>.<span class="property">rpm</span></span><br></pre></td></tr></table></figure></p>
+<p>如果安装的时候爆错：<code>/usr/share/logstash/vendor/jruby/bin/jruby: line 388: /usr/bin/java: No such file or directory</code>。那么就先<code>which java</code>查看一下java的文件，然后做一个软连接过去，然后重装logstash即可，如图：<br><img src="/images/elk5.png" alt="办公室"></p>
+<p><img src="/images/elk6.png" alt="办公室"></p>
+<p>用户可以使用TLS双向认证加密Filebeat和Logstash的连接，保证Filebeat只向可信的Logstash发送加密的数据（如果你的logstash和filebeat是内网通信，而且你认可当前内网的安全度，这一步可以省略）。同样的，Logstash也只接收可信的Filebeat发送的数据。这个功能默认是关闭的，要开启的话需要先<code>vim /etc/pki/tls/openssl.cnf</code>，如图：<br><img src="/images/elk7.png" alt="办公室"></p>
+<p>找到<code>[ v3_ca ]</code>的字段，在底下添加<code>subjectAltName = IP:logstash的内网IP</code>字段，保存退出来到&#x2F;etc&#x2F;pki&#x2F;tls&#x2F;，执行下面命令：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">openssl req -x509 -days <span class="number">365</span> -batch -nodes -newkey <span class="attr">rsa</span>:<span class="number">2048</span> -keyout private/logstash-forwarder.<span class="property">key</span> -out certs/logstash-forwarder.<span class="property">crt</span></span><br></pre></td></tr></table></figure></p>
+<p>来生成一个期限为365天的IP SAN证书对，如果想生成一个十年的证书，就把365改成3650即可，如图：</p>
+<p>安装完毕之后，<code>vim /etc/logstash/logstash.yml</code>，编辑成如下的样子：<br><img src="/images/elk8.png" alt="办公室"></p>
+<p>然后在<code>/etc/logstash/</code>下手动建立一个目录conf.d，在conf.d里新建一个<code>logstash.conf</code>的文件，如下：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">$ cat /usr/local/logstash/config/conf.<span class="property">d</span>/logstash.<span class="property">conf</span></span><br><span class="line">#在输入部分，配置<span class="title class_">Logstash</span>通信端口以及添加<span class="variable constant_">SSL</span>证书，从而进行安全通信。</span><br><span class="line">input &#123;</span><br><span class="line"> beats &#123;</span><br><span class="line">   <span class="function"><span class="params">port</span> =&gt;</span> <span class="number">5044</span></span><br><span class="line">   ssl =&gt; <span class="literal">true</span></span><br><span class="line">   ssl_certificate =&gt; <span class="string">&quot;/etc/pki/tls/certs/logstash-forwarder.crt&quot;</span></span><br><span class="line">   ssl_key =&gt; <span class="string">&quot;/etc/pki/tls/private/logstash-forwarder.key&quot;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">#在过滤器部分，我们将使用<span class="title class_">Grok</span>来解析这些日志，然后将其发送到<span class="title class_">Elasticsearch</span>。以下grok过滤器将查找“syslog”标记的日志，并尝试解析它们，以生成结构化索引。</span><br><span class="line">filter &#123;</span><br><span class="line"> 	<span class="keyword">if</span> [type] == <span class="string">&quot;syslog&quot;</span> &#123;</span><br><span class="line">    grok &#123;</span><br><span class="line">      <span class="function"><span class="params">match</span> =&gt;</span> &#123; <span class="string">&quot;message&quot;</span> =&gt; <span class="string">&quot;%&#123;SYSLOGTIMESTAMP:syslog_timestamp&#125; %&#123;SYSLOGHOST:syslog_hostname&#125; %&#123;DATA:syslog_program&#125;(?:\[%&#123;POSINT:syslog_pid&#125;\])?: %&#123;GREEDYDATA:syslog_message&#125;&quot;</span> &#125;</span><br><span class="line">      add_field =&gt; [ <span class="string">&quot;received_at&quot;</span>, <span class="string">&quot;%&#123;@timestamp&#125;&quot;</span> ]</span><br><span class="line">      add_field =&gt; [ <span class="string">&quot;received_from&quot;</span>, <span class="string">&quot;%&#123;host&#125;&quot;</span> ]</span><br><span class="line">    &#125;</span><br><span class="line">    syslog_pri &#123; &#125;</span><br><span class="line">    date &#123;</span><br><span class="line">      <span class="function"><span class="params">match</span> =&gt;</span> [ <span class="string">&quot;syslog_timestamp&quot;</span>, <span class="string">&quot;MMM  d HH:mm:ss&quot;</span>, <span class="string">&quot;MMM dd HH:mm:ss&quot;</span> ]</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line">#输出部分，我们将定义要存储的日志位置</span><br><span class="line">output &#123;</span><br><span class="line">	elasticsearch &#123;</span><br><span class="line"> 	<span class="function"><span class="params">hosts</span> =&gt;</span> [ <span class="string">&quot;10.162.80.192:9200&quot;</span> ]                #这个地址是elasticsearch的内网地址</span><br><span class="line">	index =&gt; <span class="string">&quot;filebeat-%&#123;+YYYY.MM.dd&#125;&quot;</span>			#设定这个是索引</span><br><span class="line">   	#index =&gt; <span class="string">&quot;auclogstash-%&#123;+YYYY.MM.dd&#125;&quot;</span>    	#这行是后来作实验的，可以忽视            </span><br><span class="line">	user =&gt; elastic                    #这个是为了将来装x-pack准备的</span><br><span class="line">	password =&gt; changeme                #同上</span><br><span class="line">   	   &#125;</span><br><span class="line">stdout &#123;</span><br><span class="line">   	<span class="function"><span class="params">codec</span> =&gt;</span> rubydebug</span><br><span class="line">   	   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>然后就是启动并且添加开机自启动:<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">systemctl start logstash        </span><br><span class="line">systemctl enable logstash</span><br></pre></td></tr></table></figure></p>
+<h2 id="安装filebeat"><a href="#安装filebeat" class="headerlink" title="安装filebeat"></a>安装filebeat</h2><p>以下所有操作都是root下进行的,在模块服务器上安装filebeat的方法如下:<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">curl -L -O <span class="attr">https</span>:<span class="comment">//artifacts.elastic.co/downloads/beats/filebeat/filebeat-5.6.4-x86_64.rpm </span></span><br><span class="line">rpm -ivh filebeat-<span class="number">5.6</span><span class="number">.4</span>-x86_64.<span class="property">rpm</span></span><br></pre></td></tr></table></figure></p>
+<p>之前在logstash上生成了一个IP SAN证书，现在需要把这个证书传递给filebeat的机器里，使用scp语句如下：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scp -pr root@<span class="number">10.162</span><span class="number">.80</span><span class="number">.171</span>:<span class="regexp">/etc/</span>pki/tls/certs/logstash-forwarder.<span class="property">crt</span> /etc/ssl/certs/        #<span class="number">10.162</span><span class="number">.80</span><span class="number">.171</span>就是logstash的内网<span class="variable constant_">IP</span></span><br></pre></td></tr></table></figure></p>
+<p>输入logstash的密码，并且密钥文件复制完毕之后，需要修改filebeat.yml，于是#vim &#x2F;etc&#x2F;filebeat&#x2F;filebeat.yml：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">[root@func-auc-<span class="number">001</span> log]# grep -iv <span class="string">&#x27;#&#x27;</span> /etc/filebeat/filebeat.<span class="property">yml</span> | grep -iv <span class="string">&#x27;^$&#x27;</span></span><br><span class="line">filebeat.<span class="property">prospectors</span>:</span><br><span class="line">- <span class="attr">input_type</span>: log</span><br><span class="line">  <span class="attr">paths</span>:</span><br><span class="line">    -  <span class="regexp">/mnt/</span>hswx/auc/logs<span class="comment">/*.log        #这个是那个auc模块的路径</span></span><br><span class="line"><span class="comment">    -    /第二个日志路径/*.log                   #如果有第二个文件路径的话</span></span><br><span class="line"><span class="comment">  tail_files: true                                 #从文件末尾开始读取</span></span><br><span class="line"><span class="comment">  document_type: &quot;newnginx-api&quot;                    #logstash那里已经设定了index，如果要使用了document_type，那么在logstash的index就要这么写：&quot;%&#123;type&#125;-%&#123;+YYYY.MM.dd&#125;&quot;</span></span><br><span class="line"><span class="comment">  # 以下是规避数据热点的优化参数：</span></span><br><span class="line"><span class="comment">    spool_size: 1024         # 积累1024条消息才上报</span></span><br><span class="line"><span class="comment">    idle_timeout: &quot;5s&quot;        # 空闲5s上报</span></span><br><span class="line"><span class="comment">   </span></span><br><span class="line"><span class="comment">output.logstash:</span></span><br><span class="line"><span class="comment">  hosts: [&quot;10.162.80.171:5044&quot;]            #这个地方要写logstash的内网地址</span></span><br><span class="line"><span class="comment">  ssl.certificate_authorities: [&quot;/etc/ssl/certs/logstash-forwarder.crt&quot;]    #这里就是刚刚复制的那个密钥文件路径</span></span><br><span class="line"><span class="comment">  #注意上面是ssl而不是tls，1.0版本才是tls，如果这个写错了，启动的时候会出现“read: connection reset by peer”的错误</span></span><br></pre></td></tr></table></figure></p>
+<p>注意！Filebeat的配置文件采用YAML格式，这意味着缩进非常重要！请务必使用与这些说明相同数量的空格。</p>
+<p>保存之后，使用<code>/etc/init.d/filebeat start</code>启动filebeat，如图：<br><img src="/images/elk10.png" alt="办公室"></p>
+<h2 id="故障解决"><a href="#故障解决" class="headerlink" title="故障解决"></a>故障解决</h2><p>ELK几个部件现在都已经启动了，并且互相telnet端口都是通的，在elasticsearch的服务器上使用<code>curl -XGET &#39;http://elasticsearch内网IP:9200/filebeat-*/_search?pretty&#39;</code>却出现这样的情况：<br><img src="/images/elk9.png" alt="办公室"></p>
+<p>而使用<code>tailf /var/log/filebeat/filebeat</code>去查看filebeat的日志是这样的：<br><img src="/images/elk11.png" alt="办公室"></p>
+<p>再看看logstash-plain.log，里面的情况是这样的：<br><img src="/images/elk12.png" alt="办公室"></p>
+<p>从此可见，filebeat与logstash的联系是error状态，那么停止filebeat的进程，改用<code>/etc/init.d/filebeat start -c /etc/filebeat/filebeat.yml</code>，重新在elasticsearch的服务器上使用<code>curl -XGET &#39;http://elasticsearch内网IP:9200/filebeat-*/_search?pretty&#39;</code>发现已经成功读到了我们之前配置的目录“&#x2F;mng&#x2F;hswx&#x2F;auc&#x2F;log”，如图：<br><img src="/images/elk13.png" alt="办公室"></p>
+<h2 id="配置kibana"><a href="#配置kibana" class="headerlink" title="配置kibana"></a>配置kibana</h2><p>在浏览器输入<code>kibana服务器外网IP：5601</code>打开kibana的web界面，把<code>idenx pattern</code>的地方改成<code>filebeat-*</code>(同之前配置的index索引一致)，然后点击<code>create</code>，如图：<br><img src="/images/elk14.png" alt="办公室"></p>
+<p>然后就得到了细节的web界面，如图：<br><img src="/images/elk15.png" alt="办公室"></p>
+<p>点击左侧框的<code>Discover</code>，就会看到梦寐以求的日志web界面，如图：<br><img src="/images/elk16.png" alt="办公室"></p>
+<p>看一下红色框的内容里面有时间，有host主机，有source来源，还有具体的日志信息，我们再去func-auc-001这个日志源主机上查询一下日志：<br><img src="/images/elk17.png" alt="办公室"></p>
+<p>两个日志是一样的，可见实现了预期的日志展示的目标！</p>
+<p>最后一步，就是把kibana与nginx联系起来（也可以把kibana做阿里云负载均衡的后端服务器），这样通过nginx&#x2F;负载均衡来访问kibana的界面，对kibana来说更安全。配置端口监听如图，再把kibana服务器挂在负载均衡后面即可。<br><img src="/images/elk18.png" alt="办公室"></p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a target="_blank" rel="noopener" href="https://www.ibm.com/developerworks/cn/opensource/os-cn-elk-filebeat/index.html">https://www.ibm.com/developerworks/cn/opensource/os-cn-elk-filebeat/index.html</a><br><a target="_blank" rel="noopener" href="https://www.ibm.com/developerworks/cn/opensource/os-cn-elk/">https://www.ibm.com/developerworks/cn/opensource/os-cn-elk/</a><br><a target="_blank" rel="noopener" href="http://www.jinsk.vip/2017/05/24/elksetup/">http://www.jinsk.vip/2017/05/24/elksetup/</a><br><a target="_blank" rel="noopener" href="https://renwole.com/archives/661">https://renwole.com/archives/661</a><br><a target="_blank" rel="noopener" href="https://www.zybuluo.com/dume2007/note/665868">https://www.zybuluo.com/dume2007/note/665868</a><br><a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/beats/libbeat/5.6/getting-started.html">https://www.elastic.co/guide/en/beats/libbeat/5.6/getting-started.html</a><br><a target="_blank" rel="noopener" href="https://discuss.elastic.co/search?q=ERR%20Failed%20to%20publish%20events%20caused%20by:%20read%20tcp">https://discuss.elastic.co/search?q=ERR%20Failed%20to%20publish%20events%20caused%20by%3A%20read%20tcp</a><br><a target="_blank" rel="noopener" href="http://jaminzhang.github.io/elk/ELK-config-and-use-Filebeat/">http://jaminzhang.github.io/elk/ELK-config-and-use-Filebeat/</a> （这个博主很好，但是就是博客无法留言，这点比较坑）</p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90/" rel="tag"># 大数据分析</a>
+              <a href="/tags/ELK/" rel="tag"># ELK</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/01/16/%E4%BB%8E%E2%80%9CNo-space-left-on-device%E2%80%9D%E5%88%B0%E5%88%A0%E9%99%A4%E6%B5%B7%E9%87%8F%E6%96%87%E4%BB%B6/" rel="prev" title="从“No space left on device”到删除海量文件">
+      <i class="fa fa-chevron-left"></i> 从“No space left on device”到删除海量文件
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/01/16/Docker%E5%87%BA%E7%8E%B0%E5%AE%A2%E6%88%B7%E7%AB%AF%E4%B8%8E%E6%9C%8D%E5%8A%A1%E7%AB%AF%E6%9C%89%E5%B7%AE%E7%9A%84%E9%94%99%E8%AF%AF/" rel="next" title="Docker出现客户端与服务端有差的错误...">
+      Docker出现客户端与服务端有差的错误... <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BE%E8%AE%A1%E6%9E%B6%E6%9E%84"><span class="nav-number">2.</span> <span class="nav-text">设计架构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E8%BD%AF%E4%BB%B6%E7%89%88%E6%9C%AC"><span class="nav-number">3.</span> <span class="nav-text">实验软件版本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%83%85%E5%86%B5"><span class="nav-number">4.</span> <span class="nav-text">实验服务器情况</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85Elasticsearch-5-6-4"><span class="nav-number">5.</span> <span class="nav-text">安装Elasticsearch 5.6.4</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85kibana-5-6-4"><span class="nav-number">6.</span> <span class="nav-text">安装kibana 5.6.4</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85Logstash-5-6-4"><span class="nav-number">7.</span> <span class="nav-text">安装Logstash 5.6.4</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85filebeat"><span class="nav-number">8.</span> <span class="nav-text">安装filebeat</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%85%E9%9A%9C%E8%A7%A3%E5%86%B3"><span class="nav-number">9.</span> <span class="nav-text">故障解决</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%85%8D%E7%BD%AEkibana"><span class="nav-number">10.</span> <span class="nav-text">配置kibana</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">11.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

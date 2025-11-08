@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="翻墙这个技术纯属是自己人祸害自己人搞出来的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="日版switch搭配小火箭实现游戏加速下载">
+<meta property="og:url" content="http://example.com/2021/02/22/%E6%97%A5%E7%89%88switch%E6%90%AD%E9%85%8D%E5%B0%8F%E7%81%AB%E7%AE%AD%E5%8A%A0%E9%80%9F%E4%B8%8B%E8%BD%BD/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="翻墙这个技术纯属是自己人祸害自己人搞出来的">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/switch%E5%8A%A0%E9%80%9F.jpg">
+<meta property="og:image" content="http://example.com/images/switch%E5%8A%A0%E9%80%9F1.png">
+<meta property="og:image" content="http://example.com/images/switch%E5%8A%A0%E9%80%9F2.jpg">
+<meta property="og:image" content="http://example.com/images/switch%E5%8A%A0%E9%80%9F3.jpg">
+<meta property="og:image" content="http://example.com/images/switch%E5%8A%A0%E9%80%9F4.png">
+<meta property="og:image" content="http://example.com/images/switch%E5%8A%A0%E9%80%9F5.jpg">
+<meta property="og:image" content="http://example.com/images/switch%E5%8A%A0%E9%80%9F6.jpg">
+<meta property="og:image" content="http://example.com/images/switch%E5%8A%A0%E9%80%9F7.jpg">
+<meta property="og:image" content="http://example.com/images/switch%E5%8A%A0%E9%80%9F8.jpg">
+<meta property="og:image" content="http://example.com/images/switch%E5%8A%A0%E9%80%9F10.jpg">
+<meta property="og:image" content="http://example.com/images/switch%E5%8A%A0%E9%80%9F9.jpg">
+<meta property="og:image" content="http://example.com/images/%E4%B9%94%E6%B2%BB%E8%A3%85%E9%80%BC%E4%B8%89%E5%88%86%E7%90%83.gif">
+<meta property="article:published_time" content="2021-02-22T02:24:23.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:48:05.074Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="shadowrocket">
+<meta property="article:tag" content="switch">
+<meta property="article:tag" content="翻墙">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/switch%E5%8A%A0%E9%80%9F.jpg">
+
+<link rel="canonical" href="http://example.com/2021/02/22/%E6%97%A5%E7%89%88switch%E6%90%AD%E9%85%8D%E5%B0%8F%E7%81%AB%E7%AE%AD%E5%8A%A0%E9%80%9F%E4%B8%8B%E8%BD%BD/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>日版switch搭配小火箭实现游戏加速下载 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/02/22/%E6%97%A5%E7%89%88switch%E6%90%AD%E9%85%8D%E5%B0%8F%E7%81%AB%E7%AE%AD%E5%8A%A0%E9%80%9F%E4%B8%8B%E8%BD%BD/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          日版switch搭配小火箭实现游戏加速下载
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-02-22 10:24:23" itemprop="dateCreated datePublished" datetime="2021-02-22T10:24:23+08:00">2021-02-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:48:05" itemprop="dateModified" datetime="2025-11-08T08:48:05+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%9D%A0%E4%B9%B1%E8%8A%B1%E5%A4%A9/" itemprop="url" rel="index"><span itemprop="name">坠乱花天</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>1.4k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>5 mins.</span>
+            </span>
+            <div class="post-description">翻墙这个技术纯属是自己人祸害自己人搞出来的</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="背景交代"><a href="#背景交代" class="headerlink" title="背景交代"></a>背景交代</h2><p>春节期间俺响应“就地过年”的政策，就在公司内部平台上买了一个日版续航的switch（主要是为了跟媳妇玩游戏），如图：<br><img src="/images/switch%E5%8A%A0%E9%80%9F.jpg"></p>
+<p>拿到货之后，效仿网上的攻略，注册了美区、日区、港区的账号，一一对应关联了switch的用户，然后趁着打折买了几个游戏。这里插播一句，paypal这个模式在大陆用户的心智还没有完全打开，在港区是可以使用支付宝付款的，这个对不熟悉paypal的用户来说无疑是更友好的，但是就是要注意心仪的游戏在港区什么时候会优惠，这样更划算，毕竟好玩的switch游戏都不算便宜…</p>
+<p>先下载一个游戏试试手吧，在MAC上先到任天堂港区网站登录注册好的港区账号（各区的账号不通），然后 <a target="_blank" rel="noopener" href="https://store.nintendo.com.hk/70010000009642">https://store.nintendo.com.hk/70010000009642</a> 买了游戏<code>Splatoon™ 2</code>在支付宝页面付了钱，等了大约5分钟，拿到了下载代码，如图：<br><img src="/images/switch%E5%8A%A0%E9%80%9F1.png" title="299港币兑换人民币是250块"></p>
+<p>在switch里使用港区账号登录eshop，输入刚得到的游戏下载代码就可以下载对应的游戏了，但是发现下载速度奇慢，6.1G的内容下载需要40多个小时。</p>
+<p>为啥这么慢？这就是要感谢国家政策了。一个游戏下载就要两天，换谁都受不了。遇到这种恶心问题我们得解决它，这里就需要一个ios shadowrocket程序(下文简称小火箭，其实其他同类型的APP也能实现代理加速游戏下载的功能)，还有一个梯子服务器。如何搭建梯子服务器可以去看<a target="_blank" rel="noopener" href="https://github.com/233boy/v2ray/wiki/V2Ray%E4%B8%80%E9%94%AE%E5%AE%89%E8%A3%85%E8%84%9A%E6%9C%AC">https://github.com/233boy/v2ray/wiki/V2Ray%E4%B8%80%E9%94%AE%E5%AE%89%E8%A3%85%E8%84%9A%E6%9C%AC</a> 这篇文章。<br><img src="/images/switch%E5%8A%A0%E9%80%9F2.jpg" title="我这个小火箭是2.1.21版本，略老，但是大概意思是一样的"></p>
+<h2 id="实战配置"><a href="#实战配置" class="headerlink" title="实战配置"></a>实战配置</h2><p>先确认你的梯子服务器是ok的，小火箭的开关是打开的，手机端可以正常翱翔。在switch的home页面里，<code>配置</code>–&gt;<code>互联网配置</code>–&gt;<code>WiFi</code>，这里需要手机端跟switch链接上同一个wifi。如图：<br><img src="/images/switch%E5%8A%A0%E9%80%9F3.jpg" title="这里是配置，点进去左侧菜单有互联网配置"></p>
+<p>然后我们需要给switch配置一个静态IP，因为我这个版本的小火箭是需要添加IP白名单来鉴权的。配置静态IP的方法很简单，直接写死一个当前网段的IP即可，我这里写的是<code>192.168.1.7</code>。如果你家里的路由器是tplink，那么就在电脑浏览器的地址栏输入<code>192.168.1.1</code>以及对应的账号密码登录tplink的客户端，找到LAN口设置，把IP地址填写到switch配置wifi的网关里，把掩码也写到掩码的位置上。如图：<br><img src="/images/switch%E5%8A%A0%E9%80%9F4.png" title="网关就是你的wifi路由器当前的IP地址"></p>
+<p>DNS服务器也是需要从tplink的web端里获取，一模一样的填写到对应的switch栏里：<br><img src="/images/switch%E5%8A%A0%E9%80%9F5.jpg" title="这几个必须填写，不然无法保存"></p>
+<p>此时先连接一下这个wifi，看看switch是否可以正常连接，正常连接了才可以往下一步走，不然就要排查当前存在的问题!</p>
+<p>然后在小火箭手机客户端，点击下面的<code>设置</code>，在tunnel里点击<code>代理</code>，<code>代理</code>页面里地址<code>127.0.0.1</code>不要动，端口可以自己改，建议大于8000，我这里改成了<code>8520</code>。如图：<br><img src="/images/switch%E5%8A%A0%E9%80%9F6.jpg"></p>
+<p>然后点击<code>代理共享</code>，打开<code>启用共享</code>，记住你的地址，它是以<code>IP:端口</code>的形式出现的，然后在下面<code>允许的IP地址</code>里填写刚刚你手动写死的switch静态地址<code>192.168.1.7</code>，如图:<br><img src="/images/switch%E5%8A%A0%E9%80%9F7.jpg" title="这个192.168.1.106就是手机作为代理的IP，用于被switch识别"></p>
+<p>返回到switch，还是在WiFi配置页面，<code>代理服务器</code>设置成启用，然后IP就是写上面红色盖住的IP，端口就是小火箭里的那个8520，自动验证选择<code>不启用</code>，如图：<br><img src="/images/switch%E5%8A%A0%E9%80%9F8.jpg"></p>
+<p>确认其他的东西都是原状，比如<code>MTU</code>什么的都不要更改。此时保存，再次尝试一下是否可以通过wifi连接到互联网，如果可以，那就大功告成了！</p>
+<p>此时你返回到switch的home页面，再次尝试下载游戏，就会看到耗时会明显降低，如图：<br><img src="/images/switch%E5%8A%A0%E9%80%9F10.jpg" title="效果还是不错的"></p>
+<p>具体的下载速度在switch看不出来，但是可以通过小火箭的工作台来看，我这个服务器是曼谷的服务器（只是旗帜默认是美国），跟香港有一定的地理距离，速度基本维持在200K~700K幅度摇摆，6.1G的需要大约3个小时就可以下载完了。如图：<br><img src="/images/switch%E5%8A%A0%E9%80%9F9.jpg" title="400多K能解渴了"></p>
+<p>这里要注意，一定要让switch跟手机端保持在同一个WiFi下，不然链接就会断开，下载也就中断了。</p>
+<p>最后还要补充两句：</p>
+<ol>
+<li>这个方法只能对下载加速有效，对跨大洲联网游戏卡顿没有任何帮助，因为代理是http模式的，不是udp模式的；</li>
+<li>海外版的switch应该无法识别家里路由器的5G信号，这是因为各国WiFi频道不一致导致的，如果非要让switch识别到5G信号，那就要在路由器上把工作地区调整为“美国&#x2F;日本”，这样switch就可以识别到了；</li>
+<li>如果游戏一直处于“已暂停”的状态，先去查看网络是否正常工作，如果网络是好的，那么查看是不是你游玩了联网的游戏没有退出，switch默认如果有联网游戏的话，为了保证联网效果，后台下载是关闭的，即使短暂退出返回home页面也是不下载的，所以要彻底关闭其他游戏才能恢复下载；</li>
+</ol>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a target="_blank" rel="noopener" href="https://sspai.com/post/58543">https://sspai.com/post/58543</a><br><a target="_blank" rel="noopener" href="https://zankyo.cc/2845/">https://zankyo.cc/2845/</a><br><a target="_blank" rel="noopener" href="https://www.nintendoswitch.com.cn/support/faq/410.html">https://www.nintendoswitch.com.cn/support/faq/410.html</a><br><a target="_blank" rel="noopener" href="https://freewechat.com/a/MzI2NjY1MTMyMA==/2247484618/1">https://freewechat.com/a/MzI2NjY1MTMyMA==/2247484618/1</a><br><img src="/images/%E4%B9%94%E6%B2%BB%E8%A3%85%E9%80%BC%E4%B8%89%E5%88%86%E7%90%83.gif" title="当年乔治哥的装逼三分球"></p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%BF%BB%E5%A2%99/" rel="tag"># 翻墙</a>
+              <a href="/tags/switch/" rel="tag"># switch</a>
+              <a href="/tags/shadowrocket/" rel="tag"># shadowrocket</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/02/20/Mysql%E9%87%8C%E4%BD%BF%E7%94%A8OUTER-JOIN%E6%8A%A5%E9%94%99/" rel="prev" title="Mysql里使用OUTER JOIN报错">
+      <i class="fa fa-chevron-left"></i> Mysql里使用OUTER JOIN报错
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/03/02/%E4%BD%BF%E7%94%A8seleium+python3%E6%A8%A1%E6%8B%9F%E7%99%BB%E9%99%86%E9%89%B4%E6%9D%83%E7%BD%91%E9%A1%B5/" rel="next" title="使用seleium+python模拟登陆鉴权网页">
+      使用seleium+python模拟登陆鉴权网页 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%83%8C%E6%99%AF%E4%BA%A4%E4%BB%A3"><span class="nav-number">1.</span> <span class="nav-text">背景交代</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E6%88%98%E9%85%8D%E7%BD%AE"><span class="nav-number">2.</span> <span class="nav-text">实战配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">3.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

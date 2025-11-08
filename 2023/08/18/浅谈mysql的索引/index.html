@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="索引是一个好东西，那么啥情况会导致索引失效？">
+<meta property="og:type" content="article">
+<meta property="og:title" content="浅谈mysql的索引">
+<meta property="og:url" content="http://example.com/2023/08/18/%E6%B5%85%E8%B0%88mysql%E7%9A%84%E7%B4%A2%E5%BC%95/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="索引是一个好东西，那么啥情况会导致索引失效？">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/%E7%B4%A2%E5%BC%95.png">
+<meta property="og:image" content="http://example.com/images/%E7%B4%A2%E5%BC%951.png">
+<meta property="og:image" content="http://example.com/images/%E7%B4%A2%E5%BC%953.png">
+<meta property="og:image" content="http://example.com/images/%E7%B4%A2%E5%BC%952.png">
+<meta property="article:published_time" content="2023-08-18T15:03:28.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:48:06.842Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="mysql">
+<meta property="article:tag" content="数据库">
+<meta property="article:tag" content="稳定性">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/%E7%B4%A2%E5%BC%95.png">
+
+<link rel="canonical" href="http://example.com/2023/08/18/%E6%B5%85%E8%B0%88mysql%E7%9A%84%E7%B4%A2%E5%BC%95/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>浅谈mysql的索引 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/08/18/%E6%B5%85%E8%B0%88mysql%E7%9A%84%E7%B4%A2%E5%BC%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          浅谈mysql的索引
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-08-18 23:03:28" itemprop="dateCreated datePublished" datetime="2023-08-18T23:03:28+08:00">2023-08-18</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:48:06" itemprop="dateModified" datetime="2025-11-08T08:48:06+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>3.3k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>12 mins.</span>
+            </span>
+            <div class="post-description">索引是一个好东西，那么啥情况会导致索引失效？</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="哪些情况不走索引"><a href="#哪些情况不走索引" class="headerlink" title="哪些情况不走索引"></a>哪些情况不走索引</h2><ol>
+<li>隐式转化，说白了就是两边的参数的格式不一致，详情可见<a target="_blank" rel="noopener" href="https://dev.mysql.com/doc/refman/5.7/en/type-conversion.html%EF%BC%9A">https://dev.mysql.com/doc/refman/5.7/en/type-conversion.html：</a>  <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1. 表字段类型和传参类型不一致，导致MySQL进行了类型转换。比如传入了`数值型`的值，而表结构中这个字段是`字符串`的。MySQL在处理这个类型不一致的时候，会进行隐式转化，转换成浮点型的类型，导致MySQL无法使用索引。</span><br><span class="line">2. JOIN 的时候，两张表JOIN的字段对应字符集不一致，也会导致隐式转化。</span><br><span class="line">3. 当where查询操作符左边为数值类型时发生了隐式转换，那么对效率影响不大，但还是不推荐这么做。当where查询操作符左边为字符类型时发生了隐式转换，那么会导致索引失效，造成全表扫描效率极低。</span><br></pre></td></tr></table></figure></li>
+<li>函数运算：在字段上进行函数运算。如 <code>where a+1 = 1 ;</code>  <code>where DATE_FORMAT(c,&#39;%Y&#39;) = &#39;2024&#39;</code> <code>where upper(lastname)=&#39;smith&#39;</code>这样的。</li>
+<li>like百分号前缀匹配: <code>where c1 like &#39;%xxxx&#39;;</code></li>
+<li>非值查询：  <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1. where a not in (1,2,3)</span><br><span class="line">2. where a != 1</span><br></pre></td></tr></table></figure></li>
+<li>当cpu、内存、磁盘容量很高的时候，可能也会导致优化器没有充足资源去评估可能的执行计划，从而选错索引，所以数据库的系统水位和系统配置还是要保持健康。(我曾经见过一次客户端链接风暴，2分钟内创建了3万个链接，每个链接是256k内存，一下子就吃掉了7.5G内存，导致实例出现oom)</li>
+<li>应尽量避免在 where 子句中使用 or 来连接条件，否则将导致引擎放弃使用索引而进行全表扫描，如<code>select id from t where num=10 or num=20;</code>可以这样查询：<code>select id from t where num=10 union all select id from t where num=20;</code>。</li>
+</ol>
+<h2 id="如何使用explain"><a href="#如何使用explain" class="headerlink" title="如何使用explain"></a>如何使用explain</h2><p>当我们分析为啥一个sql这么慢，我们肯定要用到<code>explain</code>命令，我们需要重点关注：</p>
+<ol>
+<li>id列：当 id 相同时，执行顺序由上向下；当 id 不同时，id 值越大，优先级越高，越先执行。</li>
+<li>type列：如果出现<code>ALL</code> <code>INDEX</code> 需要重点关注，表示的是该表在执行计划中是全表扫描或者全索引扫描，性能分别是倒数第一和倒数第二。</li>
+<li>rows列：表示的是通过索引过滤后有多少记录。一般来说，执行计划中这个列如果出现比较大的，就需要注意。如果出现扫描行数大于1000，但是只返回2条，那说明索引、SQL等存在优化的空间。</li>
+<li>extra列：如果出现了<code>Using filesort</code>或者<code>Using temporary</code>，说明MySQL没有办法利用索引本身的有序性进行排序。此时，需要关注前面的rows是否有超过2000行以上。如果超过，排序成本会变高。</li>
+<li>filtered列：表示的是返回行数和通过索引扫描的行数比值，最大值100，表示不需要回表过滤。filter 越小，说明索引优化的空间越大。</li>
+</ol>
+<p>举个例子：<br><img src="/images/%E7%B4%A2%E5%BC%95.png" alt="paradin" title="重点看上面说的那几列"></p>
+<h2 id="优化法则"><a href="#优化法则" class="headerlink" title="优化法则"></a>优化法则</h2><ol>
+<li>单表查询，返回的数据行数，小于整个表的30%，建议在这个字段上加上索引（非绝对）。</li>
+<li>返回行数 &#x2F; 扫描行数  &lt; 1&#x2F;50，需要确认选择性好的字段是否都在索引里面。</li>
+<li>SQL查询要遵守MySQL最左匹配原则，尽量将选择性好的字段放在索引的前面。</li>
+<li>当过滤成本和排序成本两者不可兼得时，可以考虑牺牲成本较小的操作，来成全成本较大部分。</li>
+<li>等值查询的字段尽量放在组合索引的左侧，范围查询的字段放在组合索引的右侧。</li>
+<li>提高SQL filter。1：避免回表查询；2：降低无效索引扫描</li>
+</ol>
+<h2 id="基础知识，留给你面试装逼用"><a href="#基础知识，留给你面试装逼用" class="headerlink" title="基础知识，留给你面试装逼用"></a>基础知识，留给你面试装逼用</h2><ol>
+<li>MySQL 索引是<code>B+Tree</code>数，是有序树。</li>
+<li>MySQL组合索引<code>idx_ab(a, b,)</code>中，是先根据a排序。a相同的情况下，再根据b排序。</li>
+<li>MySQL索引使用遵循最左匹配原则，针对a,b字段组合索引，需要先判断where条件里面有无a字段，如果没有，大概率是没办法走a,b 的组合索引的；如果有的话，再去判断b 字段是否在where条件里面</li>
+</ol>
+<p>使用索引的关注点：1. 过滤能否走索引，2. 排序能否走索引。</p>
+<p>索引字段选择性：</p>
+<ol>
+<li>字段选择性代表这个字段在这个表里面的唯一性程度，例如我们需要查找某个员工的具体信息，已知道的条件是 where 部门&#x3D;’数据库产品事业部’ and 名字&#x3D;’张三’ and 性别&#x3D;’男’，那按照我们对数据分布的理解，“名字”是三个条件中选择率最高的列，如果创建单列索引，“名字”列上建索引是最好的选择。</li>
+<li>字段选择性 &#x3D;  COUNT(DISTINCT col) &#x2F; COUNT(*) ，字段选择性越趋向于1，选择性越好。要提高定位效率，就要在选择率高的列上创建索引。</li>
+<li>字段选择性越好，该字段上的查询越适合建立索引。</li>
+</ol>
+<h2 id="常见优化经典案例"><a href="#常见优化经典案例" class="headerlink" title="常见优化经典案例"></a>常见优化经典案例</h2><ol>
+<li>缺失索引<br>sql:<code>select c1,c2 from t where c3=10086;</code><br>表结构：</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE `t` (</span><br><span class="line">  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT &#x27;主键&#x27;,</span><br><span class="line">  `c1` bigint(20) DEFAULT &#x27;0&#x27;,</span><br><span class="line">  `c2` bigint(20) DEFAULT &#x27;0&#x27;,</span><br><span class="line">  `c3` bigint(20) DEFAULT &#x27;0&#x27;,</span><br><span class="line">  PRIMARY KEY (`id`)</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>查询扫描了100万行，返回了1行。原因是由于c3上面没有索引，导致SQL执行了全表扫描。explain一下的结果是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">+----+-------------+--------+------------+------+---------------+------+---------+------+---------+----------+-------------+</span><br><span class="line">| id | select_type | table  | partitions | type | possible_keys | key  | key_len | ref  | rows    | filtered | Extra       |</span><br><span class="line">+----+-------------+--------+------------+------+---------------+------+---------+------+---------+----------+-------------+</span><br><span class="line">|  1 | SIMPLE      |    t   | NULL       | ALL  | NULL          | NULL | NULL    | NULL | 1000000 |    10.00 | Using where |</span><br><span class="line">+----+-------------+--------+------------+------+---------------+------+---------+------+---------+----------+-------------+</span><br></pre></td></tr></table></figure>
+
+<p>因此可以在字段c3 上面添加一个普通索引。如果c3 是唯一，可以添加唯一索引。<code>alter table t add index idx_c3(c3);</code></p>
+<ol start="2">
+<li>索引优化1<br>sql:<code>explain  SELECT * FROM slow_log_history where sql_id=&#39;88891227eb51726145bf033966bc4574&#39; and &#39;slow_date&#39; =&#39;2024-07-15&#39;;</code></li>
+</ol>
+<p>表结构：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE `slow_log_history` (</span><br><span class="line">  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT &#x27;主键&#x27;,</span><br><span class="line">  ...</span><br><span class="line">  `sql_id` varchar(100) DEFAULT NULL COMMENT &#x27;库名&#x27;,</span><br><span class="line"> ...</span><br><span class="line">  `slow_date` date DEFAULT &#x27;1970-01-01&#x27;,</span><br><span class="line">  PRIMARY KEY (`id`),</span><br><span class="line">  KEY `idx_sql_id` (`sql_id`),</span><br><span class="line">) ENGINE=InnoDB AUTO_INCREMENT=2124700 DEFAULT CHARSET=utf8</span><br><span class="line">;</span><br></pre></td></tr></table></figure>
+
+<p>查询扫描了133行，返回了1行。其中filter 只有3.07，说明很多数据都需要回表判断。explain一下的结果是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; explain  SELECT * FROM slow_log_history where sql_id=&#x27;88891227eb51726145bf033966bc4574&#x27; and &#x27;slow_date&#x27; =&#x27;2024-07-15&#x27;;</span><br><span class="line">+----+-------------+------------------+------------+------+----------------------------------------+------------+---------+-------+------+----------+-------------+</span><br><span class="line">| id | select_type | table            | partitions | type | possible_keys                          | key        | key_len | ref   | rows | filtered | Extra       |</span><br><span class="line">+----+-------------+------------------+------------+------+----------------------------------------+------------+---------+-------+------+----------+-------------+</span><br><span class="line">|  1 | SIMPLE      | slow_log_history | NULL       | ref  | uniq_ins_id,idx_sql_id,idx_date_ins_db | idx_sql_id | 303     | const |  133 |     3.07 | Using where |</span><br><span class="line">+----+-------------+------------------+------------+------+----------------------------------------+------------+---------+-------+------+----------+-------------+</span><br><span class="line">1 row in set, 1 warning (0.00 sec)</span><br></pre></td></tr></table></figure>
+
+<p>因此可以将<code>idx_sql_id</code> (<code>sql_id</code>) 改成 <code>idx_sql_id_date</code> (<code>sql_id</code>, slow_date)</p>
+<ol start="3">
+<li>索引优化2<br>表结构：</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE `slow_log_history` (</span><br><span class="line">  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT &#x27;主键&#x27;,</span><br><span class="line">  ...</span><br><span class="line">  `sql_id` varchar(100) DEFAULT NULL COMMENT &#x27;库名&#x27;,</span><br><span class="line"> ...</span><br><span class="line">  `slow_date` date DEFAULT &#x27;1970-01-01&#x27;,</span><br><span class="line">  PRIMARY KEY (`id`),</span><br><span class="line">  KEY `idx_date_sql_id` (`slow_date`, `sql_id`),</span><br><span class="line">) ENGINE=InnoDB AUTO_INCREMENT=2124700 DEFAULT CHARSET=utf8</span><br><span class="line">;</span><br></pre></td></tr></table></figure>
+<p>在该查询中，需要获取2024-07-10 之后特定sql_id 的所有记录。<br>由于我们的索引是(<code>slow_date</code>, <code>sql_id</code>) 的组合，我们的查询完全命中索引，可以直接在索引里面定位到第一条满足的记录，然后开始向右遍历。但是遍历的过程中，2024-07-10 这一天是有很多记录的，会导致不是我们需要的sql_id数据也被我们扫描到了。</p>
+<p>同样的，2024-07-10 的记录遍历完后，开始遍历2024-07-11号的，一直到遍历到该索引的最右边。<br>相当于扫描的数据总量为  <code>slow_date</code> &#x3D;’2024-07-10’ and sql_id&gt;&#x3D;’xxx’   加上  <code>slow_date</code> &gt; ‘2024-07-10’</p>
+<p><img src="/images/%E7%B4%A2%E5%BC%951.png" alt="paradin" title="说白了，就是以第一个作为主索引后面会带来很多无效查询"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; explain  SELECT * FROM slow_log_history force index(idx_date_sql_id)  where sql_id=&#x27;88891227eb51726145bf033966bc4574&#x27; and `slow_date` &gt;=&#x27;2024-07-10&#x27;;</span><br><span class="line">+----+-------------+------------------+------------+-------+-----------------+-----------------+---------+------+--------+----------+-----------------------+</span><br><span class="line">| id | select_type | table            | partitions | type  | possible_keys   | key             | key_len | ref  | rows   | filtered | Extra                 |</span><br><span class="line">+----+-------------+------------------+------------+-------+-----------------+-----------------+---------+------+--------+----------+-----------------------+</span><br><span class="line">|  1 | SIMPLE      | slow_log_history | NULL       | range | idx_date_sql_id | idx_date_sql_id | 307     | NULL | 381138 |    10.00 | Using index condition |</span><br><span class="line">+----+-------------+------------------+------------+-------+-----------------+-----------------+---------+------+--------+----------+-----------------------+</span><br><span class="line">1 row in set, 1 warning (0.00 sec)</span><br></pre></td></tr></table></figure>
+<p><img src="/images/%E7%B4%A2%E5%BC%953.png" alt="paradin" title="扫描细节"></p>
+<p>其实一个sql_id，一天就一条记录，SQL整体返回行数就只有5条左右。按照刚刚的理论，我们希望位于利用索引去查询，是能够定位到最小的一个范围，避免无效扫描。那我们的索引可以调整下顺序，改成   KEY <code>idx_sql_id_date</code> (<code>sql_id</code>,<code>slow_date</code>)这样我们的索引中，同样的sql_id的情况下，不同的<code>slow_date</code>是相邻是顺序排列的。</p>
+<p><img src="/images/%E7%B4%A2%E5%BC%952.png" alt="paradin" title="这么一调整就紧凑多了"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; explain  SELECT * FROM slow_log_history force index(idx_sql_id_date)  where sql_id=&#x27;88891227eb51726145bf033966bc4574&#x27; and `slow_date` &gt;=&#x27;2024-07-10&#x27;;</span><br><span class="line">+----+-------------+------------------+------------+-------+-----------------+-----------------+---------+------+------+----------+-----------------------+</span><br><span class="line">| id | select_type | table            | partitions | type  | possible_keys   | key             | key_len | ref  | rows | filtered | Extra                 |</span><br><span class="line">+----+-------------+------------------+------------+-------+-----------------+-----------------+---------+------+------+----------+-----------------------+</span><br><span class="line">|  1 | SIMPLE      | slow_log_history | NULL       | range | idx_sql_id_date | idx_sql_id_date | 307     | NULL |    7 |   100.00 | Using index condition |</span><br><span class="line">+----+-------------+------------------+------------+-------+-----------------+-----------------+---------+------+------+----------+-----------------------+</span><br><span class="line">1 row in set, 1 warning (0.00 sec)</span><br></pre></td></tr></table></figure>
+
+<p>新的索引，只需要扫描7行，效率大大提升，高下立判。</p>
+<ol start="4">
+<li>排序优化<br>sql是这样的:select c4, c5 from t where c1&#x3D;x and c2 in (x, y) order by c3 limit 100;</li>
+</ol>
+<p>假设1<br>c1 条件过滤后，有102万条记录。c1,c2 条件过滤后，有100万条记录。<br>如果我们建的索引是(c1,c2,c3)。由于c2是多个值，那么c3在索引里面是一个无序的状态，无法使用索引排序，在执行计划里面就会出现filesort。100万条记录进行filesort会比较慢。<br>优化方式：<br><code>调整索引 idx_c1_c3_c2(c1,c3,c2)</code><br>由于c3 前面的c1字段是等值查询，那么c3 在索引里面就是一个有序的状态。而c2 在二级索引，可以利用MySQL的ICP 特性完成过滤，去除了filesort成本。</p>
+<p>注：<br>    a. filesort表示MySQL无法使用索引的有序性完成排序，需要进行额外排序。可能采用堆排，归并排序等方式。<br>    b. ICP 是MySQL的一个特性，未使用该特性的时候，某些过滤条件就算在索引里面，MySQL也无法使用索引过滤，被迫需要回表过滤。启用ICP特性后，Server层可以将该过滤条件传递到引擎，让引擎完成过滤，降低回表次数。（该特性会让rows_examined 指标失真）</p>
+<p>假设2<br>c1 条件过滤后，有102万条记录。c1,c2 条件过滤后，有100条记录。<br>c1, c2  条件通过索引过滤后，剩余的数据只有100条记录，排序成本已经非常低。<br>优化方式：<br><code>调整索引 idx_c1_c2(c1,c2)</code></p>
+<p>注：本例的Case，需要综合评估排序成本以及索引成本，将大头的成本用索引解决。如果两种成本差不多，需要考虑应用侧拆成多个等值查询，应用侧做合并。</p>
+<ol start="5">
+<li>索引覆盖<br>部分查询，像做计数，高频查询字段和条件，可以放在索引里面，避免回表的损耗。<br>Case1：<br><code>select count(*) from t where c1=x and c2=y;</code><br>如果count 没办法避免，则可以将<code>c1,c2</code>都加到索引里面，使用索引覆盖，提高count效率<br>解决方案就是：添加索引idx_c1_c2(c1,c2)</li>
+</ol>
+<p>Case2:<br><code>select c3 from t where c1 = x and c2 = y;</code><br>假设该查询是一个特别高频的，假设达到了1W+的QPS，可以考虑将c3 字段添加到索引里面，避免回表<br>解决方案就是：添加索引idx_c1_c2_c3(c1,c2,c3)</p>
+<h2 id="当你新增一个索引的代价"><a href="#当你新增一个索引的代价" class="headerlink" title="当你新增一个索引的代价"></a>当你新增一个索引的代价</h2><p>当数据库管理系统向表中添加一行时，它必须在每一个索引上都添加相应的行。在当前的硬件条件下，在一个索引上添加一行，插入操作所花费的时间就是增加10ms，因为必须从磁盘上读取一个叶子页。</p>
+<p>当一个事务向一张有10个索引的表里插入1行数据时，索引的维护就会使响应时间增加10*10ms&#x3D;100ms，这可能是可接受的。然而，如果一个事务向一张有10个索引的表里插入20行数据的话，索引的维护就会需要181次随机读，即耗费1.8s。这个估算基于的前提假设是，新的索引行会把表上其中一个索引（一直增大的键值上的索引）添加到同一个叶子页上，而会把其余9个索引添加到20个不同的叶子页上。从响应时间的角度来看，在一个有10个索引的大表上进行大的事务操作（每个事务中有许多插入或删除操作）可能是无法忍受的。</p>
+<h2 id="练道题吧"><a href="#练道题吧" class="headerlink" title="练道题吧"></a>练道题吧</h2><p>有如下这个表：<br>  <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE `tuser` (</span><br><span class="line">`<span class="built_in">id</span>` <span class="built_in">int</span>(<span class="number">11</span>) NOT NULL,</span><br><span class="line">`id_card` varchar(<span class="number">32</span>) DEFAULT NULL,</span><br><span class="line">`name` varchar(<span class="number">32</span>) DEFAULT NULL,</span><br><span class="line">`age` <span class="built_in">int</span>(<span class="number">11</span>) DEFAULT NULL,</span><br><span class="line">`ismale` tinyint(<span class="number">1</span>) DEFAULT NULL,</span><br><span class="line">PRIMARY KEY (`<span class="built_in">id</span>`),</span><br><span class="line">index `id_card` (`id_card`),</span><br><span class="line">index `name_age` (`name`,`age`)</span><br><span class="line">) ENGINE=InnoDB</span><br></pre></td></tr></table></figure><br>数据：<br>1,1,张三,26<br>2,2,李四,26<br>3,3,张六,26<br>4,5,王五,25</p>
+<p>问题下面语句会走索引吗？走哪个索引，为什么？<br>  <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">select * <span class="keyword">from</span> tuser where name like ‘张%’;</span><br><span class="line">select * <span class="keyword">from</span> tuser where age = <span class="number">25</span>;</span><br></pre></td></tr></table></figure></p>
+<p>答案：<br>1、like会走<code>name_age</code>索引，因为name 是组合索引 <code>name_age</code> 的第一个字段，<code>LIKE &#39;张%&#39; </code>是对 name 的前缀匹配，符合最左前缀原则,因此 MySQL 会使用该索引进行过滤。由于查询需要返回所有字段（*），MySQL 在找到匹配的 name 后，会通过主键 id 回表获取完整数据。<br>2、<code>age</code>不走索引，因为age 是组合索引<code>name_age</code>的第二个字段，但查询条件中没有包含 name，直接跳过第一个字段 name，违反了最左前缀原则。MySQL 只能通过全表扫描来查找符合条件的记录。</p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/mysql/" rel="tag"># mysql</a>
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag"># 数据库</a>
+              <a href="/tags/%E7%A8%B3%E5%AE%9A%E6%80%A7/" rel="tag"># 稳定性</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/07/21/%E4%B8%BA%E5%95%A5%E6%88%91%E4%BB%AC%E5%96%9C%E6%AC%A2%E6%B1%9F%E6%B9%96%E7%89%87/" rel="prev" title="从《荒野大镖客2》看黑社会片和江湖片">
+      <i class="fa fa-chevron-left"></i> 从《荒野大镖客2》看黑社会片和江湖片
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/09/04/%E4%B8%AD%E5%9B%BD%E7%94%B7%E7%AF%AE%E4%B9%8B%E8%B4%A5/" rel="next" title="中国男篮的垮台">
+      中国男篮的垮台 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%93%AA%E4%BA%9B%E6%83%85%E5%86%B5%E4%B8%8D%E8%B5%B0%E7%B4%A2%E5%BC%95"><span class="nav-number">1.</span> <span class="nav-text">哪些情况不走索引</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8explain"><span class="nav-number">2.</span> <span class="nav-text">如何使用explain</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BC%98%E5%8C%96%E6%B3%95%E5%88%99"><span class="nav-number">3.</span> <span class="nav-text">优化法则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%EF%BC%8C%E7%95%99%E7%BB%99%E4%BD%A0%E9%9D%A2%E8%AF%95%E8%A3%85%E9%80%BC%E7%94%A8"><span class="nav-number">4.</span> <span class="nav-text">基础知识，留给你面试装逼用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E4%BC%98%E5%8C%96%E7%BB%8F%E5%85%B8%E6%A1%88%E4%BE%8B"><span class="nav-number">5.</span> <span class="nav-text">常见优化经典案例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BD%93%E4%BD%A0%E6%96%B0%E5%A2%9E%E4%B8%80%E4%B8%AA%E7%B4%A2%E5%BC%95%E7%9A%84%E4%BB%A3%E4%BB%B7"><span class="nav-number">6.</span> <span class="nav-text">当你新增一个索引的代价</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%83%E9%81%93%E9%A2%98%E5%90%A7"><span class="nav-number">7.</span> <span class="nav-text">练道题吧</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="rotate是“轮转、交替、转动、试转动”的意思">
+<meta property="og:type" content="article">
+<meta property="og:title" content="日志文件管理者：Logrotate">
+<meta property="og:url" content="http://example.com/2018/02/12/%E6%97%A5%E5%BF%97%E6%96%87%E4%BB%B6%E7%AE%A1%E7%90%86%E8%80%85%EF%BC%9ALogrotate/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="rotate是“轮转、交替、转动、试转动”的意思">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/logrotate1.png">
+<meta property="og:image" content="http://example.com/images/logrotate2.png">
+<meta property="og:image" content="http://example.com/images/logrotate3.png">
+<meta property="og:image" content="http://example.com/images/logrotate4.png">
+<meta property="og:image" content="http://example.com/images/logrotate5.png">
+<meta property="article:published_time" content="2018-02-12T11:57:18.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:48:04.836Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="linux">
+<meta property="article:tag" content="运维技术">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/logrotate1.png">
+
+<link rel="canonical" href="http://example.com/2018/02/12/%E6%97%A5%E5%BF%97%E6%96%87%E4%BB%B6%E7%AE%A1%E7%90%86%E8%80%85%EF%BC%9ALogrotate/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>日志文件管理者：Logrotate | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2018/02/12/%E6%97%A5%E5%BF%97%E6%96%87%E4%BB%B6%E7%AE%A1%E7%90%86%E8%80%85%EF%BC%9ALogrotate/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          日志文件管理者：Logrotate
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-02-12 19:57:18" itemprop="dateCreated datePublished" datetime="2018-02-12T19:57:18+08:00">2018-02-12</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:48:04" itemprop="dateModified" datetime="2025-11-08T08:48:04+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>998</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>4 mins.</span>
+            </span>
+            <div class="post-description">rotate是“轮转、交替、转动、试转动”的意思</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>服务器在服务运行的时候，难免会生成大量日志，一般来说遇到日志过多的情况，就会写一个看门狗：监控磁盘容量的大小，如果磁盘剩余空间小于某个值，就去日志文件夹里把一个月或者几个月之前的废弃日志删除掉以达到释放磁盘空间的目的。</p>
+<p>但是往往有的时候过期的日志很重要，或者即使是一周的时间内，也会生成容量非常可观的日志，那么就需要使用logrotate命令来管理这些日志，这个命令是linux自带的。</p>
+<p>logrotate这个命令的用法请看：<code>https://linux.cn/article-8227-1-rel.html</code>和<code>https://linux.cn/article-4126-1.html</code> 。</p>
+<h2 id="实验开始"><a href="#实验开始" class="headerlink" title="实验开始"></a>实验开始</h2><p>首先，假设服务器里某个日志文件夹里的日志<code>auc.log.10</code>是这样的：<br><img src="/images/logrotate1.png" alt="paradin"></p>
+<p>然后在logrotate的配置文件是这么写的：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">/mnt/hswx/auc/logs/auc.<span class="property">log</span><span class="number">.10</span> &#123;             这里是目标日志的绝对路径</span><br><span class="line">       daily        每天执行一次</span><br><span class="line">       minsize 200M    文件容量大于200M开始处理，如果到了时间但是没有大于200M，不会处理</span><br><span class="line">       compress          压缩</span><br><span class="line">       dateext          文件会以日期为后缀</span><br><span class="line">       create <span class="number">777</span> root root    新建的那个日志文件属性是<span class="number">777</span></span><br><span class="line">       rotate <span class="number">2</span>         保留最多<span class="number">2</span>个文件</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>然后执行<code>logrotate -vf /etc/logrotate.conf</code>，看到的效果是：<br><img src="/images/logrotate2.png" alt="paradin"></p>
+<p>命令执行后，服务器create了新的<code>auc.log.10</code>，而且属性变成了777，同时把原有的部分压缩成gz的格式。</p>
+<p>上面那个测试的对象是已经过期的日志，现在我们要压缩当前的日志，目的是<code>在压缩了auc.log并且重命名之后，可以生成新的auc.log，同时这个新的auc.log会被写入</code>。</p>
+<p>现在我们尝试一下，把原来的配置文件改成这样：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">/mnt/hswx/auc/logs/auc.<span class="property">log</span> &#123;</span><br><span class="line">       weekly</span><br><span class="line">       minsize 200M</span><br><span class="line">       compress</span><br><span class="line">       rotate <span class="number">2</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>但是执行之后，我们发现变成了这样：<br><img src="/images/logrotate3.png" alt="paradin"></p>
+<p>原来的<code>auc.log</code>不见了，而出现的<code>auc.log.1</code>里面的内容是原来<code>auc.log</code>的内容，可见原有的<code>auc.log</code>已经被顶掉了。这是因为我们上面的配置文件里面没有加上<code>dateext</code>，所以默认会以<code>.1、.2、.3</code>为后缀。</p>
+<p>问题是我们没有生成<code>auc.log</code>，那么这段时间的日志就会找不到<code>auc.log</code>而凭空消失。可见这个方法没有达到我们的目的，需要改进。</p>
+<h2 id="改进之后"><a href="#改进之后" class="headerlink" title="改进之后"></a>改进之后</h2><p>我们这个内部模块auc只有重新启动这个进程才会生成<code>auc.log</code>，既然要解决这样的问题，我们很自然的就想到<code>kill -HUP</code>这种平滑启动的方式，但是要注意！<code>kill -HUP</code>对deamon会进行重新读取配置启动，但是对于普通的进程只会把其杀死！而这个auc就是一个普通的java程序，没有配套的守护进程。所以只能使用一般的重启方式来达到生成<code>auc.log</code>这个目的。</p>
+<p>首先我们把原来的配置文件改成这样：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">/mnt/hswx/auc/logs/auc.<span class="property">log</span> &#123;</span><br><span class="line">       weekly    #每周执行</span><br><span class="line">       dateext    #以日期作为后缀</span><br><span class="line">       minsize 200M    #到达了200M自动执行，不然即使到了一周的时间也不执行</span><br><span class="line">       compress    #压缩</span><br><span class="line">       rotate <span class="number">2</span>    #最多保留两个文件</span><br><span class="line">       sharedsripts    </span><br><span class="line">       postrotate    #在执行完日志压缩之后就执行如下动作</span><br><span class="line">               /bin/bash /root/restart.<span class="property">sh</span>    #动作就是执行这个绝对路径的脚本</span><br><span class="line">       endscript    #收工</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>而这个<code>restart.sh</code>的内容很简单:<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">#!<span class="regexp">/bin/</span>bash</span><br><span class="line">cd /mnt &amp;&amp; ./stopAUC.<span class="property">sh</span>    #停止auc进程</span><br><span class="line">cd /mnt &amp;&amp; ./startAUC.<span class="property">sh</span>    #启动auc进程</span><br><span class="line">echo <span class="variable constant_">HAHAHAHA</span>！！！    #表示已经<span class="variable constant_">OK</span>了，让我们发出杠铃一般的笑声</span><br></pre></td></tr></table></figure></p>
+<p>现在我们重新跑一下logrotate，<code>logrotate -vf /etc/logrotate.conf</code>。看一下效果：<br><img src="/images/logrotate4.png" alt="paradin"></p>
+<p>可以看到先把日志改名压缩，完事后也执行了<code>restart.sh</code>这个脚本，再日志里一看，<code>auc.log</code>也顺利生成了！<br><img src="/images/logrotate5.png" alt="paradin"></p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a target="_blank" rel="noopener" href="http://www.pythondev.org/post/8.html">http://www.pythondev.org/post/8.html</a><br><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/87e2fd01393c?utm_campaign=maleskine&utm_content=note&utm_medium=seo_notes&utm_source=recommendation">https://www.jianshu.com/p/87e2fd01393c?utm_campaign=maleskine&amp;utm_content=note&amp;utm_medium=seo_notes&amp;utm_source=recommendation</a><br><a target="_blank" rel="noopener" href="https://segmentfault.com/q/1010000000120419">https://segmentfault.com/q/1010000000120419</a></p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/linux/" rel="tag"># linux</a>
+              <a href="/tags/%E8%BF%90%E7%BB%B4%E6%8A%80%E6%9C%AF/" rel="tag"># 运维技术</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/02/11/%E4%B8%80%E4%B8%AA%E6%9A%97%E8%97%8F%E6%9D%80%E6%9C%BA%E7%9A%84%E8%84%9A%E6%9C%AC/" rel="prev" title="一个暗藏杀机的脚本">
+      <i class="fa fa-chevron-left"></i> 一个暗藏杀机的脚本
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/02/12/%E5%85%B3%E4%BA%8Elogrotate%E7%9A%84%E9%A2%9D%E5%A4%96%E8%A1%A5%E5%85%85/" rel="next" title="关于logrotate的额外补充">
+      关于logrotate的额外补充 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E5%BC%80%E5%A7%8B"><span class="nav-number">2.</span> <span class="nav-text">实验开始</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%94%B9%E8%BF%9B%E4%B9%8B%E5%90%8E"><span class="nav-number">3.</span> <span class="nav-text">改进之后</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">4.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

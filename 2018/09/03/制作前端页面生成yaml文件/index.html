@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="唉，我觉得我的django能力还需要更进步！">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Django制作前端页面生成yaml文件">
+<meta property="og:url" content="http://example.com/2018/09/03/%E5%88%B6%E4%BD%9C%E5%89%8D%E7%AB%AF%E9%A1%B5%E9%9D%A2%E7%94%9F%E6%88%90yaml%E6%96%87%E4%BB%B6/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="唉，我觉得我的django能力还需要更进步！">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/django7.png">
+<meta property="og:image" content="http://example.com/images/django6.png">
+<meta property="og:image" content="http://example.com/images/django8.gif">
+<meta property="article:published_time" content="2018-09-03T03:06:42.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:47:49.141Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="django">
+<meta property="article:tag" content="python">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/django7.png">
+
+<link rel="canonical" href="http://example.com/2018/09/03/%E5%88%B6%E4%BD%9C%E5%89%8D%E7%AB%AF%E9%A1%B5%E9%9D%A2%E7%94%9F%E6%88%90yaml%E6%96%87%E4%BB%B6/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>Django制作前端页面生成yaml文件 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2018/09/03/%E5%88%B6%E4%BD%9C%E5%89%8D%E7%AB%AF%E9%A1%B5%E9%9D%A2%E7%94%9F%E6%88%90yaml%E6%96%87%E4%BB%B6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Django制作前端页面生成yaml文件
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-09-03 11:06:42" itemprop="dateCreated datePublished" datetime="2018-09-03T11:06:42+08:00">2018-09-03</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:47:49" itemprop="dateModified" datetime="2025-11-08T08:47:49+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>972</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>4 mins.</span>
+            </span>
+            <div class="post-description">唉，我觉得我的django能力还需要更进步！</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="整体流程与环境说明"><a href="#整体流程与环境说明" class="headerlink" title="整体流程与环境说明"></a>整体流程与环境说明</h2><p>整体流程如下图，请感受灵魂画师的功力：<br><img src="/images/django7.png" alt="paradin"></p>
+<p>Django:<code>2.1.1</code>，阿里云服务器<br>Python:<code>3.6.4</code>，安装方法见：<a target="_blank" rel="noopener" href="https://rorschachchan.github.io/2018/07/31/%E8%8E%B7%E5%8F%96%E7%BD%91%E7%AB%99title%E7%9A%84%E8%84%9A%E6%9C%AC/">https://rorschachchan.github.io/2018/07/31/获取网站title的脚本/</a></p>
+<h2 id="Django启动"><a href="#Django启动" class="headerlink" title="Django启动"></a>Django启动</h2><p>由于是python3，所以直接<code>pip install django</code>就安装最新的Django版本。<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">django-admin startproject <span class="title class_">Kubernetes</span>		#如果提示django-admin命令不存在可以做一个软连接到/usr/local/bin/目录下</span><br><span class="line">cd <span class="title class_">Kubernetes</span></span><br><span class="line">python manage.<span class="property">py</span> startapp createyaml 	#创建<span class="variable constant_">APP</span></span><br><span class="line">python manage.<span class="property">py</span> migrate</span><br><span class="line">python manage.<span class="property">py</span> createsuperuser</span><br></pre></td></tr></table></figure></p>
+<p>app创建完毕之后，在<code>Kubernetes/settings.py</code>的<code>INSTALLED_APPS</code>字段添加<code>createyaml</code>，此时就创建好了项目和app。<code>python manage.py runserver 0.0.0.0:8000</code>启动django，然后浏览器地址栏输入<code>外网IP：8000</code>，就会看到django正常启动了，如图：<br><img src="/images/django6.png" alt="paradin"></p>
+<h2 id="Django准备"><a href="#Django准备" class="headerlink" title="Django准备"></a>Django准备</h2><p>首先我们先准备一个脚本<code>111.sh</code>，这个脚本很简单，就是接收到前端传入的数值然后加工成一个yaml文件，如下：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">#!<span class="regexp">/bin/</span>bash</span><br><span class="line">#用来生成对应的yaml文件</span><br><span class="line">cat &lt;&lt; <span class="variable constant_">EOF</span></span><br><span class="line">=============================</span><br><span class="line">===   <span class="variable constant_">HERE</span> <span class="variable constant_">IS</span> <span class="variable constant_">YOUR</span> <span class="variable constant_">YAML</span>   ===</span><br><span class="line">=============================</span><br><span class="line"><span class="variable constant_">EOF</span></span><br><span class="line"></span><br><span class="line">echo <span class="attr">apiVersion</span>: v1</span><br><span class="line">echo <span class="attr">kind</span>: $1</span><br><span class="line">echo <span class="attr">metadata</span>:</span><br><span class="line">echo <span class="attr">name</span>: $2</span><br><span class="line">echo <span class="attr">labels</span>:</span><br><span class="line">echo <span class="attr">app</span>: web</span><br><span class="line">echo <span class="attr">spec</span>:</span><br><span class="line">echo <span class="attr">containers</span>:</span><br><span class="line">echo -- <span class="attr">name</span>: front-end</span><br><span class="line">echo <span class="attr">image</span>: $5</span><br><span class="line">echo <span class="attr">ports</span>:</span><br><span class="line">echo -- <span class="attr">containerPort</span>: $3</span><br><span class="line">echo -- <span class="attr">name</span>: rss-reader</span><br><span class="line">echo <span class="attr">image</span>: nickchase/rss-php-<span class="attr">nginx</span>:v1</span><br><span class="line">echo <span class="attr">ports</span>:</span><br><span class="line">echo - <span class="attr">containerPort</span>: $4</span><br></pre></td></tr></table></figure></p>
+<p>可以看出上面这个生成yaml脚本太粗糙了，很多地方还有待改进，但是这仅仅是一个小例子而已。再去<code>/django/Kubernetes/createyaml/templates</code>里准备一个比较简单的前端页面脚本，内容如下：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">&lt;!<span class="variable constant_">DOCTYPE</span> html&gt;</span><br><span class="line">&lt;html lang=&quot;en&quot;&gt;</span><br><span class="line">        &lt;head&gt;</span><br><span class="line">                &lt;meta charset=&quot;UTF-8&quot;&gt;</span><br><span class="line">                &lt;title&gt;创建yaml文件&lt;/title&gt;</span><br><span class="line">        &lt;/head&gt;</span><br><span class="line">        &lt;body&gt;</span><br><span class="line">                &lt;h1&gt;创建YAML文件用于K8s部署&lt;/h1&gt;</span><br><span class="line">                &lt;h2&gt;请根据实际情况填写以下内容&lt;/h2&gt;</span><br><span class="line">                &lt;form method=&quot;post&quot; action=&quot;/create_yaml/&quot;&gt;</span><br><span class="line">                        &lt;input type=&quot;text&quot; name=&quot;kind&quot; placeholder=&quot;类型&quot;&gt;&lt;br&gt;</span><br><span class="line">                        &lt;input type=&quot;text&quot; name=&quot;name&quot; placeholder=&quot;名称&quot;&gt;&lt;br&gt;</span><br><span class="line">                        &lt;input type=&quot;text&quot; name=&quot;containerPort1&quot; placeholder=&quot;容器端口1&quot;&gt;&lt;br&gt;</span><br><span class="line">                        &lt;input type=&quot;text&quot; name=&quot;containerPort2&quot; placeholder=&quot;容器端口2&quot;&gt;&lt;br&gt;</span><br><span class="line">                        &lt;input type=&quot;text&quot; name=&quot;mirror&quot; placeholder=&quot;镜像&quot;&gt;&lt;br&gt;</span><br><span class="line">                        &#123;&#123; error &#125;&#125;&lt;br&gt;</span><br><span class="line">                        &lt;button id=&quot;btn&quot; type=&quot;submit&quot;&gt;生成yaml&lt;/button&gt;</span><br><span class="line">                        &#123;% csrf_token %&#125;	</span><br><span class="line">			&lt;!-- 标签添加CSRF令牌，这是因为django针对CSRF(跨站请求伪造)有保护措施，没有这句话就是403 --!&gt; </span><br><span class="line">                &lt;/form&gt;</span><br><span class="line">        &lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure></p>
+<p>有了页面，还需要一个域名指向这个页面，修改一下<code>/django/Kubernetes/Kubernetes/urls.py</code>，改成如下：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.<span class="property">contrib</span> <span class="keyword">import</span> admin</span><br><span class="line"><span class="keyword">from</span> django.<span class="property">urls</span> <span class="keyword">import</span> path</span><br><span class="line"><span class="keyword">from</span> createyaml <span class="keyword">import</span> views		#将createyaml这个app的views引进</span><br><span class="line"></span><br><span class="line">urlpatterns = [</span><br><span class="line">    <span class="title function_">path</span>(<span class="string">&#x27;admin/&#x27;</span>, admin.<span class="property">site</span>.<span class="property">urls</span>),</span><br><span class="line">    <span class="title function_">path</span>(r<span class="string">&#x27;create_yaml/&#x27;</span>, views.<span class="property">create_yaml</span>),	#新版的这里不再是url了，把这个url指向views.<span class="property">py</span>里的create_yaml函数</span><br><span class="line">]</span><br></pre></td></tr></table></figure></p>
+<p>再继续，写一下<code>views.py</code>里的<code>create_yaml</code>函数：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> subprocess		#引入这个库</span><br><span class="line"></span><br><span class="line">#创建yaml</span><br><span class="line">def <span class="title function_">create_yaml</span>(request):</span><br><span class="line">    <span class="keyword">if</span> request.<span class="property">method</span> == <span class="string">&#x27;POST&#x27;</span>:</span><br><span class="line">        kind = request.<span class="property">POST</span>.<span class="title function_">get</span>(<span class="string">&#x27;kind&#x27;</span>, <span class="string">&#x27;&#x27;</span>)		#后面的<span class="string">&#x27;&#x27;</span>是默认值的意思</span><br><span class="line">        name = request.<span class="property">POST</span>.<span class="title function_">get</span>(<span class="string">&#x27;name&#x27;</span>, <span class="string">&#x27;&#x27;</span>)</span><br><span class="line">        containerPort1 = request.<span class="property">POST</span>.<span class="title function_">get</span>(<span class="string">&#x27;containerPort1&#x27;</span>, <span class="string">&#x27;&#x27;</span>)</span><br><span class="line">        containerPort2 = request.<span class="property">POST</span>.<span class="title function_">get</span>(<span class="string">&#x27;containerPort2&#x27;</span>, <span class="string">&#x27;&#x27;</span>)</span><br><span class="line">        mirror = request.<span class="property">POST</span>.<span class="title function_">get</span>(<span class="string">&#x27;mirror&#x27;</span>, <span class="string">&#x27;&#x27;</span>)	</span><br><span class="line">        result = subprocess.<span class="title class_">Popen</span>(args=[<span class="string">&#x27;bash&#x27;</span>,<span class="string">&#x27;/docker/111.sh&#x27;</span>,name,mirror,containerPort1,containerPort2],stdout = subprocess.<span class="property">PIPE</span>,shell = <span class="title class_">False</span>).<span class="property">stdout</span>.<span class="title function_">read</span>()	#在这里通过subprocess去启动<span class="number">111.</span>sh这个脚本</span><br><span class="line">        <span class="keyword">return</span> <span class="title class_">HttpResponse</span>(result,content_type=<span class="string">&quot;text/plain&quot;</span>)</span><br><span class="line">    <span class="attr">else</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="title function_">render</span>(request,<span class="string">&#x27;createyaml.html&#x27;</span>)</span><br></pre></td></tr></table></figure></p>
+<p>以上函数多说几句：</p>
+<ol>
+<li>首先判断请求的方法是否是<code>POST</code>，不是的话返回该页面;</li>
+<li><code>request.POST.get</code>方法获取前端传入的名称或者端口等值，此处的<code>kind</code>、<code>name</code>、<code>mirror</code>和<code>containerPort</code>就是html文件里form表单部分那两个<code>input</code>标签的<code>name</code>属性；</li>
+<li>获取到了变量，然后就让<code>subprocess</code>来调用111.sh来用这些变量去运行脚本，执行的结果就是<code>result</code>，然后<code>return</code>这个<code>result</code>结果；</li>
+<li>使用subprocess最好不打开<code>shell = True</code>，因为这样的话，要是不小心<code>rm -rf /</code>，你就gg了，但是如果<code>shell = False</code>的话，就会把刚才的命令看成<code>rm</code>和<code>-rf /</code>两部分，也就是不能成功，这样也免去了别人恶意注入的危险；</li>
+</ol>
+<h2 id="实际操作效果"><a href="#实际操作效果" class="headerlink" title="实际操作效果"></a>实际操作效果</h2><p><img src="/images/django8.gif" alt="akb48" title="本gif是用LICEcap录制的"></p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/xiaoyaozizai017/article/details/72794469">https://blog.csdn.net/xiaoyaozizai017/article/details/72794469</a><br><a target="_blank" rel="noopener" href="http://lipeilipei.top/2018/02/07/python+django%E5%AE%9E%E7%8E%B0%E7%99%BB%E9%99%86%E5%8A%9F%E8%83%BD%EF%BC%88%E4%B8%8B%E7%AF%87%EF%BC%89/">http://lipeilipei.top/2018/02/07/python+django%E5%AE%9E%E7%8E%B0%E7%99%BB%E9%99%86%E5%8A%9F%E8%83%BD%EF%BC%88%E4%B8%8B%E7%AF%87%EF%BC%89/</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/bjbz_cxy/article/details/79358718">https://blog.csdn.net/bjbz_cxy/article/details/79358718</a>	(如果不想用django就可以看看这个cgi方法)<br><a target="_blank" rel="noopener" href="http://blog.51cto.com/laomomo/2163399">http://blog.51cto.com/laomomo/2163399</a></p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/django/" rel="tag"># django</a>
+              <a href="/tags/python/" rel="tag"># python</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/08/30/Jenkins%E8%87%AA%E5%8A%A8%E6%9E%84%E5%BB%BA%E9%95%9C%E5%83%8F%E5%B9%B6%E4%B8%94%E5%8F%91%E9%80%81%E9%92%89%E9%92%89%E9%80%9A%E7%9F%A5/" rel="prev" title="Jenkins自动构建镜像并且发送钉钉通知">
+      <i class="fa fa-chevron-left"></i> Jenkins自动构建镜像并且发送钉钉通知
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/09/06/%E4%B8%80%E7%89%87%E6%97%A7%E6%96%87-%E5%BD%93%E4%BB%8A%E4%B8%AD%E5%9B%BD%E4%BC%9A%E4%B8%8D%E4%BC%9A%E5%8F%91%E7%94%9F%E9%9D%A9%E5%91%BD/" rel="next" title="一篇旧文----《当今中国会不会发生革命》">
+      一篇旧文----《当今中国会不会发生革命》 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B4%E4%BD%93%E6%B5%81%E7%A8%8B%E4%B8%8E%E7%8E%AF%E5%A2%83%E8%AF%B4%E6%98%8E"><span class="nav-number">1.</span> <span class="nav-text">整体流程与环境说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Django%E5%90%AF%E5%8A%A8"><span class="nav-number">2.</span> <span class="nav-text">Django启动</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Django%E5%87%86%E5%A4%87"><span class="nav-number">3.</span> <span class="nav-text">Django准备</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E9%99%85%E6%93%8D%E4%BD%9C%E6%95%88%E6%9E%9C"><span class="nav-number">4.</span> <span class="nav-text">实际操作效果</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">5.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

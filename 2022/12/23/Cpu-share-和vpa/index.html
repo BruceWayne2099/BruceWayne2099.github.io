@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="降本增效、聚沙成塔">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Cpu share和vpa">
+<meta property="og:url" content="http://example.com/2022/12/23/Cpu-share-%E5%92%8Cvpa/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="降本增效、聚沙成塔">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/cpushare.webp">
+<meta property="og:image" content="http://example.com/images/cpushare2.png">
+<meta property="og:image" content="http://example.com/images/cpushare-1.png">
+<meta property="article:published_time" content="2022-12-23T06:05:27.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:46:46.002Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="cpu">
+<meta property="article:tag" content="linux">
+<meta property="article:tag" content="计算机基础">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/cpushare.webp">
+
+<link rel="canonical" href="http://example.com/2022/12/23/Cpu-share-%E5%92%8Cvpa/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>Cpu share和vpa | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/12/23/Cpu-share-%E5%92%8Cvpa/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Cpu share和vpa
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2022-12-23 14:05:27" itemprop="dateCreated datePublished" datetime="2022-12-23T14:05:27+08:00">2022-12-23</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:46:46" itemprop="dateModified" datetime="2025-11-08T08:46:46+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>1.6k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>6 mins.</span>
+            </span>
+            <div class="post-description">降本增效、聚沙成塔</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="什么是-CPU-Share"><a href="#什么是-CPU-Share" class="headerlink" title="什么是 CPU Share?"></a>什么是 CPU Share?</h2><p>CPU Share 是容器调度时进行 CPU 资源分配的一种方式，相对于集团之前使用的 CPU Set 而言。CPU Set 模式下会为一个 4C 的容器分配固定的“独占的” 4 个 CPU 核，容器中所有进程&#x2F;任务只能跑在这 4 个核上（因此算力上限就这 4 核），同时其它容器中的进程&#x2F;任务不能使用这 4 个核。</p>
+<p>而 CPU Share 模式下一台 96 核的宿主机上一个 4C 容器绑定的 CPU 核数可能在 4 ~ 96 之间，取决这台宿主机上的资源分配情况及其它容器是否 CPU Share。目前一台宿主机上的所有 Share 容器都绑定相同的一批 CPU 核，容器中的进程&#x2F;任务可以跑在所有这些核上，每个容器可使用的 CPU 资源通过与容器规格相对应的权重来分配。<br><img src="/images/cpushare.webp" alt="paradin"></p>
+<h2 id="为什么要做-CPU-Share"><a href="#为什么要做-CPU-Share" class="headerlink" title="为什么要做 CPU Share"></a>为什么要做 CPU Share</h2><p>优势：</p>
+<ol>
+<li>CPU 资源的分配可以更加精细化，原来 Set 模式下 CPU 资源的最小分配粒度是 1 核，而 Share 模式下可以做到 1&#x2F;1000 核；</li>
+<li>宿主机上所有 Share 容器共享 CPU 核，每个容器不用的 CPU 资源可以被其它容器&#x2F;任务使用，有利于资源利用率提升；</li>
+<li>可以更好的满足业务实时资源弹性需求，并且可能允许容器在短时间内使用超过容器规格的 CPU 资源来应对瞬间突发峰值；</li>
+</ol>
+<p>需要注意：</p>
+<ol>
+<li>因为 CPU Share 的资源共享特性，当宿主机整机 CPU 压力比较高时，请求达到时可能需要内核调度时间，可能对长尾延迟有影响。</li>
+<li>CPU Share是不会导致ip发生变化的。</li>
+</ol>
+<p>由于 CPU Share 在资源利用率和弹性资源调度上的优势，后续在非重点应用上大规模推进应用 Share 化应该是业界主流趋势。除极个别延迟特别敏感业务（Latency sensitive critical）外，绝大多数的在线延迟敏感通用业务（Latency sensitive general）都将切换为 Share 模式。</p>
+<p>最后简单总结：<br><img src="/images/cpushare2.png" alt="paradin" title="简单总结"></p>
+<p>上图说cpuset也存在两种详细的绑核模式，分为<code>Spread</code>和<code>SameCoreFirst</code>。差异主要如下（举例4core Pod）：<br>● Spread：优先绑定每个core的1个HT，最多可以用到4个core的cpu算力，算力上限高，但确定性较差（对端HT会争抢），且存在L1&#x2F;L2层面的cache污染<br>● SameCoreFirst：优先占用每个core的两个HT，最多用满2个core的4个HT算力，算力上限低，但确定性高。</p>
+<h2 id="如何查看应用的进程-线程数"><a href="#如何查看应用的进程-线程数" class="headerlink" title="如何查看应用的进程&#x2F;线程数"></a>如何查看应用的进程&#x2F;线程数</h2><p>绝大多数在线应用的启动脚本中通过读取容器内可见的 CPU 核数( grep -c ‘cpu[0-9][0-9]*’ &#x2F;proc&#x2F;stat )来设置应用进程&#x2F;线程数等，尤其是 Java 应用的 ParallelGCThreads 参数设置。由于 Share 容器绑定的 CPU 核可能远大于容器规格，因此需要读取容器内的 SIGMA_MAX_PROCESSORS_LIMIT 来作为相关设置的依据。</p>
+<h2 id="什么是-VPA"><a href="#什么是-VPA" class="headerlink" title="什么是 VPA"></a>什么是 VPA</h2><p>VPA(Vertical Pod Autoscaler，垂直弹性伸缩) 相对于 HPA(Horizontal Pod Autoscaler，水平弹性伸缩) 而言，HPA 通过增减应用的运行容器实例来提升资源利用率&#x2F;应对峰值，而 VPA 则是通过增减单个容器实例所分得的资源(CPU&#x2F;MEM)多少来提升资源利用率&#x2F;应对峰值。由于 CPU Share 具备的共享和弹性特性，VPA 在 CPU Share 模式下更易实施且更安全。</p>
+<p>VPA 根据应用资源画像调整容器 CPU 规格，同时保持 CPU 最大可用上限不变来弹性使用资源，容器将根据调整后规格进行计费，从而节省业务资源成本（后续随着应用水位的变化，也会自动往上调节，以寻找到最适合应用的资源配置）。当前阶段由于可用资源上限不变，并且平台设置了安全水位策略，风险较低，如有异常可在平台上执行一键回滚。</p>
+<h2 id="为什么要做-VPA"><a href="#为什么要做-VPA" class="headerlink" title="为什么要做 VPA"></a>为什么要做 VPA</h2><p>HPA 扩缩容器的方式链路较长，涉及应用启停、中间件等运维配置的变动等，对线上的影响比较大，但是在资源节省上也更彻底。另外，由于业务容灾部署的需要，应用保有最小容器数量有一定限制，可能远超应用真实的资源需求。</p>
+<p>VPA可以对应用容器进行原地秒级资源伸缩，链路短，风险更低，业务基本无感，从而更好的做到资源利用率的提升。CPU Share 容器资源分配由 request 和 limit 两个值决定，request 是强保障的资源，limit 是最大可用到的资源上限，默认情况下 容器规格 &#x3D;&#x3D; request &#x3D;&#x3D; limit，VPA 通过资源画像得到应用推荐的 request 值，同时保持 limit 不变，因此 CPU Share 模式的 VPA 风险较低。</p>
+<p>不过这里要注意！应用升配（比如 2c-&gt;3c）在当前宿主机剩余资源不足时会发生驱逐，驱逐会导致更换宿主机，进而更换ip和重启应用。</p>
+<h2 id="注意这里的坑"><a href="#注意这里的坑" class="headerlink" title="注意这里的坑"></a>注意这里的坑</h2><p>最近大促压测的时候，发现有一个应用同一个单元但是不同的机房cpu相差10%左右：<br><img src="/images/cpushare-1.png" alt="paradin" title="开始以为是有离线任务，但是后来发现离线任务压测时候已经压制掉了"></p>
+<p>同样的应用肯定代码都是一样的，后来发现低cpu的是cpuset资源分配机制，而高cpu的是cpushare资源分配机制。后来查了一下原因：</p>
+<ol>
+<li>amd8代机(256core)&#x2F;intel机器8代机有两个numa，cpushare会导致跨numa，这样会导致较高的延迟和较低的带宽利用率，性能变差。</li>
+<li>NUMA架构下，CPU近端节点和远端节点之间的访存延时存在较大差异（idle延时110+ns vs 80+ns），因此在对cpuset pod调度时，会优先分配同一个socket&#x2F;die上的cpu给pod，配合单机default的numa policy，所以会尽量做到同一个pod的cpu和内存在同一个numa节点上，容器性能会比较稳定。</li>
+<li>amdl3 cache是Die共用，跨Die会导致性能变差。针对cpushare的pod，当前x86场景未做特殊处理，倚天场景会把单机划分成两个cpuSharePool（倚天跨Die的性能比较差）。</li>
+</ol>
+<p>所以如果是核心应用的话，还是建议尽量用cpuset来保障稳定性。</p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/linux/" rel="tag"># linux</a>
+              <a href="/tags/cpu/" rel="tag"># cpu</a>
+              <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/" rel="tag"># 计算机基础</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/12/12/%E9%98%BF%E6%A0%B9%E5%BB%B7%E5%85%8B%E7%BD%97%E5%9C%B0%E4%BA%9A%E5%89%8D%E7%9E%BB%E5%92%8CC%E7%BD%97%E6%80%8E%E4%B9%88%E5%8A%9E/" rel="prev" title="世界杯半决赛前瞻和C罗怎么办">
+      <i class="fa fa-chevron-left"></i> 世界杯半决赛前瞻和C罗怎么办
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/01/09/EXCEL%E5%A4%8D%E5%88%B6%E7%B2%98%E8%B4%B4%E5%8E%BB%E6%8E%89%E7%A7%91%E5%AD%A6%E8%AE%B0%E6%95%B0%E6%B3%95/" rel="next" title="EXCEL如何去掉科学记数法">
+      EXCEL如何去掉科学记数法 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF-CPU-Share"><span class="nav-number">1.</span> <span class="nav-text">什么是 CPU Share?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%81%9A-CPU-Share"><span class="nav-number">2.</span> <span class="nav-text">为什么要做 CPU Share</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E6%9F%A5%E7%9C%8B%E5%BA%94%E7%94%A8%E7%9A%84%E8%BF%9B%E7%A8%8B-%E7%BA%BF%E7%A8%8B%E6%95%B0"><span class="nav-number">3.</span> <span class="nav-text">如何查看应用的进程&#x2F;线程数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF-VPA"><span class="nav-number">4.</span> <span class="nav-text">什么是 VPA</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%81%9A-VPA"><span class="nav-number">5.</span> <span class="nav-text">为什么要做 VPA</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%E8%BF%99%E9%87%8C%E7%9A%84%E5%9D%91"><span class="nav-number">6.</span> <span class="nav-text">注意这里的坑</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

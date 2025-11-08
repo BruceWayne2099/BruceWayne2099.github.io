@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="把数据存到redis里，任我蹂躏...">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用python调用redis的基本操作">
+<meta property="og:url" content="http://example.com/2018/03/26/%E4%BD%BF%E7%94%A8python%E8%B0%83%E7%94%A8redis%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="把数据存到redis里，任我蹂躏...">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/redis1.png">
+<meta property="article:published_time" content="2018-03-26T10:52:37.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:47:41.380Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="python">
+<meta property="article:tag" content="redis">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/redis1.png">
+
+<link rel="canonical" href="http://example.com/2018/03/26/%E4%BD%BF%E7%94%A8python%E8%B0%83%E7%94%A8redis%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>使用python调用redis的基本操作 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2018/03/26/%E4%BD%BF%E7%94%A8python%E8%B0%83%E7%94%A8redis%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          使用python调用redis的基本操作
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-03-26 18:52:37" itemprop="dateCreated datePublished" datetime="2018-03-26T18:52:37+08:00">2018-03-26</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:47:41" itemprop="dateModified" datetime="2025-11-08T08:47:41+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>1.3k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>5 mins.</span>
+            </span>
+            <div class="post-description">把数据存到redis里，任我蹂躏...</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>最近有一个需求，里面涉及到把<code>python</code>获取到的数值存储到<code>redis</code>里，于是就简单研究一下<code>python</code>调用<code>redis</code>的方法。</p>
+<p><code>python</code>要调用redis的时候，需要先安装redis模块，有两个方法。第一个方法就是<code>pip install redis</code>，第二个方法就是<code>easy_install redis</code>，模块装完之后，就可以创建redis连接了。</p>
+<p><code>redis-py</code>提供两个类<code>Redis</code>和<code>StrictRedis</code>来实现Redis的命令，<code>StrictRedis</code>用于实现大部分官方的命令，并使用官方的语法和命令（比如，<code>SET</code>命令对应与<code>StrictRedis.set</code>方法）。 <code>Redis</code>是<code>StrictRedis</code>的子类，用于向后兼容旧版本的<code>redis-py</code>。 <font color=red>官方推荐使用<code>StrictRedis</code>方法，所以我这里只说<code>StrictRedis</code></font>。</p>
+<h2 id="如何连接"><a href="#如何连接" class="headerlink" title="如何连接"></a>如何连接</h2><p>连接的代码如下：<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; <span class="keyword">import</span> redis</span><br><span class="line"></span><br><span class="line">#这里是redis的基本情况</span><br><span class="line">&gt;&gt;&gt; host = <span class="string">&#x27;这里填写redis的host地址&#x27;</span></span><br><span class="line">&gt;&gt;&gt; port = <span class="number">6379</span>        #根据实际情况更改端口</span><br><span class="line">&gt;&gt;&gt; password = <span class="string">&#x27;redis对应的密码&#x27;</span></span><br><span class="line"></span><br><span class="line">#使用<span class="title class_">StrictRedis</span>去连接到目标redis</span><br><span class="line">&gt;&gt;&gt; r = redis.<span class="title class_">StrictRedis</span>(host=host, port=<span class="number">6379</span>, password=password, db=<span class="number">0</span>) #db为选定的数据库，db=<span class="number">0</span>代表选择了<span class="number">0</span>号数据库。redis默认有<span class="number">16</span>个数据库，在conf里面可以配置。如果没有指定的数据库，可以不写。</span><br><span class="line">&gt;&gt;&gt; r.<span class="title function_">set</span>(<span class="string">&#x27;age&#x27;</span>, <span class="string">&#x27;88&#x27;</span>)</span><br><span class="line">&gt;&gt;&gt; r.<span class="title function_">get</span>(<span class="string">&#x27;age&#x27;</span>)</span><br><span class="line"><span class="string">&#x27;88&#x27;</span></span><br></pre></td></tr></table></figure></p>
+<p>关系型数据库都有一个<code>连接池</code>的概念：对于大量redis连接来说，如果使用直接连接redis的方式的话，将会造成大量的TCP的重复连接，所以，就引入<code>连接池</code>来解决这个问题。在使用连接池连接上redis之后，可以从该连接池里面生成连接，调用完成之后，该链接将会返还给连接池，供其他连接请求调用，这样将减少大量redis连接的执行时间，那么使用<code>StrictRedis</code>的连接池的实现方式如下：<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pool = redis.<span class="title class_">ConnectionPool</span>(host=host, port=<span class="number">6379</span>, password=password)</span><br><span class="line">r = redis.<span class="title class_">StrictRedis</span>(connection_pool=pool</span><br></pre></td></tr></table></figure></p>
+<p>或者使用<code>pipeline</code>（管道），通过<code>缓冲多条命令，然后一次性执行</code>的方法减少<code>服务器-客户端</code>之间TCP数据库包，从而提高效率，方法如下：<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">接上文</span><br><span class="line">pipe = r.<span class="title function_">pipeline</span>()</span><br><span class="line">#插入数据</span><br><span class="line">&gt;&gt;&gt; pipe.<span class="title function_">hset</span>(<span class="string">&quot;hash_key&quot;</span>,<span class="string">&quot;leizhu900516&quot;</span>,<span class="number">8</span>)</span><br><span class="line"><span class="title class_">Pipeline</span>&lt;<span class="title class_">ConnectionPool</span>&lt;<span class="title class_">Connection</span>&lt;host=<span class="number">192.168</span><span class="number">.8</span><span class="number">.176</span>,port=<span class="number">6379</span>,db=<span class="number">0</span>&gt;&gt;&gt;</span><br><span class="line">&gt;&gt;&gt; pipe.<span class="title function_">hset</span>(<span class="string">&quot;hash_key&quot;</span>,<span class="string">&quot;chenhuachao&quot;</span>,<span class="number">9</span>)</span><br><span class="line"><span class="title class_">Pipeline</span>&lt;<span class="title class_">ConnectionPool</span>&lt;<span class="title class_">Connection</span>&lt;host=<span class="number">192.168</span><span class="number">.8</span><span class="number">.176</span>,port=<span class="number">6379</span>,db=<span class="number">0</span>&gt;&gt;&gt;</span><br><span class="line">&gt;&gt;&gt; pipe.<span class="title function_">hset</span>(<span class="string">&quot;hash_key&quot;</span>,<span class="string">&quot;wanger&quot;</span>,<span class="number">10</span>)</span><br><span class="line"><span class="title class_">Pipeline</span>&lt;<span class="title class_">ConnectionPool</span>&lt;<span class="title class_">Connection</span>&lt;host=<span class="number">192.168</span><span class="number">.8</span><span class="number">.176</span>,port=<span class="number">6379</span>,db=<span class="number">0</span>&gt;&gt;&gt;</span><br><span class="line">&gt;&gt;&gt; pipe.<span class="title function_">execute</span>()</span><br><span class="line">[1L, 1L, 1L]</span><br></pre></td></tr></table></figure><br><img src="/images/redis1.png" alt="paradin" title="查看插入的结果"></p>
+<p>批量读取数据的方法如下:<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; pipe.<span class="title function_">hget</span>(<span class="string">&quot;hash_key&quot;</span>,<span class="string">&quot;leizhu900516&quot;</span>)</span><br><span class="line"><span class="title class_">Pipeline</span>&lt;<span class="title class_">ConnectionPool</span>&lt;<span class="title class_">Connection</span>&lt;host=<span class="number">192.168</span><span class="number">.8</span><span class="number">.176</span>,port=<span class="number">6379</span>,db=<span class="number">0</span>&gt;&gt;&gt;</span><br><span class="line">&gt;&gt;&gt; pipe.<span class="title function_">hget</span>(<span class="string">&quot;hash_key&quot;</span>,<span class="string">&quot;chenhuachao&quot;</span>)</span><br><span class="line"><span class="title class_">Pipeline</span>&lt;<span class="title class_">ConnectionPool</span>&lt;<span class="title class_">Connection</span>&lt;host=<span class="number">192.168</span><span class="number">.8</span><span class="number">.176</span>,port=<span class="number">6379</span>,db=<span class="number">0</span>&gt;&gt;&gt;</span><br><span class="line">&gt;&gt;&gt; pipe.<span class="title function_">hget</span>(<span class="string">&quot;hash_key&quot;</span>,<span class="string">&quot;wanger&quot;</span>)</span><br><span class="line"><span class="title class_">Pipeline</span>&lt;<span class="title class_">ConnectionPool</span>&lt;<span class="title class_">Connection</span>&lt;host=<span class="number">192.168</span><span class="number">.8</span><span class="number">.176</span>,port=<span class="number">6379</span>,db=<span class="number">0</span>&gt;&gt;&gt;</span><br><span class="line">&gt;&gt;&gt; result = pipe.<span class="title function_">execute</span>()</span><br><span class="line">&gt;&gt;&gt; print result</span><br><span class="line">[<span class="string">&#x27;8&#x27;</span>, <span class="string">&#x27;9&#x27;</span>, <span class="string">&#x27;10&#x27;</span>]   #有序的列表</span><br></pre></td></tr></table></figure></p>
+<p><code>pipeline</code>的命令可以写在一起，如<code>p.set(&#39;hello&#39;,&#39;redis&#39;).sadd(&#39;faz&#39;,&#39;baz&#39;).incr(&#39;num&#39;).execute()</code>，其实它的意思等同于是：<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; p.<span class="title function_">set</span>(<span class="string">&#x27;hello&#x27;</span>,<span class="string">&#x27;redis&#x27;</span>)</span><br><span class="line">&gt;&gt;&gt; p.<span class="title function_">sadd</span>(<span class="string">&#x27;faz&#x27;</span>,<span class="string">&#x27;baz&#x27;</span>)</span><br><span class="line">&gt;&gt;&gt; p.<span class="title function_">incr</span>(<span class="string">&#x27;num&#x27;</span>)</span><br><span class="line">&gt;&gt;&gt; p.<span class="title function_">execute</span>()</span><br><span class="line">[<span class="title class_">True</span>, <span class="number">1</span>, <span class="number">1</span>]</span><br></pre></td></tr></table></figure></p>
+<p>利用<code>pipeline</code>取值3500条数据，大约需要900ms，如果配合线程or协程来使用，每秒返回1W数据是没有问题的，基本能满足大部分业务。</p>
+<h2 id="如何存储"><a href="#如何存储" class="headerlink" title="如何存储"></a>如何存储</h2><p>上面已经举了一个<code>age：88</code>的例子，可见创建一个<code>string</code>类型的key并放入value是使用<code>set</code>方法，比如再多存几个名字：<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; r.<span class="title function_">set</span>(<span class="string">&#x27;name&#x27;</span>, <span class="string">&#x27;lilei&#x27;</span>)</span><br><span class="line"><span class="title class_">True</span></span><br><span class="line">&gt;&gt;&gt; r.<span class="title function_">get</span>(<span class="string">&#x27;name&#x27;</span>)</span><br><span class="line"><span class="string">&#x27;lilei&#x27;</span></span><br><span class="line">&gt;&gt;&gt; r.<span class="title function_">set</span>(<span class="string">&#x27;name2&#x27;</span>, <span class="string">&#x27;zhaowei&#x27;</span>)</span><br><span class="line"><span class="title class_">True</span></span><br><span class="line">&gt;&gt;&gt; r.<span class="title function_">set</span>(<span class="string">&#x27;name3&#x27;</span>, <span class="string">&#x27;james&#x27;</span>)</span><br><span class="line"><span class="title class_">True</span></span><br><span class="line">&gt;&gt;&gt; r.<span class="title function_">set</span>(<span class="string">&#x27;name4&#x27;</span>, <span class="string">&#x27;yaoming&#x27;</span>)</span><br><span class="line"><span class="title class_">True</span></span><br><span class="line">#列出以name开头的所有key</span><br><span class="line">&gt;&gt;&gt; print r.<span class="title function_">keys</span>(<span class="string">&quot;name*&quot;</span>)</span><br><span class="line">[<span class="string">&#x27;name3&#x27;</span>, <span class="string">&#x27;name4&#x27;</span>, <span class="string">&#x27;name2&#x27;</span>, <span class="string">&#x27;name&#x27;</span>]</span><br><span class="line">#列出所有key</span><br><span class="line">&gt;&gt;&gt; print r.<span class="title function_">keys</span>()</span><br><span class="line">&gt;&gt;&gt; r.<span class="title function_">dbsize</span>()         #当前数据库包含多少条数据       </span><br><span class="line">4L</span><br><span class="line">&gt;&gt;&gt; r.<span class="title function_">delete</span>(<span class="string">&#x27;name&#x27;</span>)</span><br><span class="line"><span class="number">1</span></span><br><span class="line">&gt;&gt;&gt; r.<span class="title function_">save</span>()               #执行“检查点”操作，将数据写回磁盘。保存时阻塞</span><br><span class="line"><span class="title class_">True</span></span><br><span class="line">&gt;&gt;&gt; r.<span class="title function_">get</span>(<span class="string">&#x27;name&#x27;</span>)</span><br><span class="line">&gt;&gt;&gt; r.<span class="title function_">flushdb</span>()        #清空r中的所有数据</span><br><span class="line"><span class="title class_">True</span></span><br></pre></td></tr></table></figure></p>
+<p>还有其他类型的存储方法，简单举例子如下：<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">#创建一个hash</span><br><span class="line">r.<span class="title function_">hset</span>(<span class="string">&#x27;abc:def&#x27;</span>, <span class="string">&#x27;name&#x27;</span>, <span class="string">&quot;abcde&quot;</span>)</span><br><span class="line">#获取一个hash的所有值</span><br><span class="line">print r.<span class="title function_">hgetall</span>(<span class="string">&#x27;abc:def&#x27;</span>)</span><br><span class="line">#获取一个hash的所有key    </span><br><span class="line">print r.<span class="title function_">hkeys</span>(<span class="string">&#x27;abc:def&#x27;</span>) </span><br><span class="line">#创建list</span><br><span class="line">r.<span class="title function_">sadd</span>(<span class="string">&#x27;abcd:ef&#x27;</span>,<span class="string">&#x27;nihao&#x27;</span>)</span><br><span class="line">r.<span class="title function_">sadd</span>(<span class="string">&#x27;abcd:ef&#x27;</span>,<span class="string">&#x27;hello&#x27;</span>)</span><br><span class="line">r.<span class="title function_">sadd</span>(<span class="string">&#x27;xxxx&#x27;</span>,<span class="string">&#x27;nihao&#x27;</span>)</span><br><span class="line">r.<span class="title function_">sadd</span>(<span class="string">&#x27;xxxx&#x27;</span>,<span class="string">&#x27;good&#x27;</span>)</span><br><span class="line">#打印出该key中的值 list</span><br><span class="line">print r.<span class="title function_">smembers</span>(<span class="string">&#x27;abcd:ef&#x27;</span>)</span><br><span class="line">#查询两个list中相同的值</span><br><span class="line">print r.<span class="title function_">sinter</span>(<span class="string">&#x27;abcd:ef&#x27;</span>, <span class="string">&#x27;xxxx&#x27;</span>)</span><br><span class="line">#给两个list取并集</span><br><span class="line">print r.<span class="title function_">sunion</span>(<span class="string">&#x27;abcd:ef&#x27;</span>, <span class="string">&#x27;xxxx&#x27;</span>)</span><br></pre></td></tr></table></figure></p>
+<p><code>setnx</code>是<code>SET if Not eXists</code>的缩写，也就是只有不存在的时候才设置，可以利用它来实现锁的效果。python要使用它也是<code>r.setnx(key,value)</code>，当发现没有这个key的时候，就会插入这个新的key以及对应的value，如果发现有了个这个key了，那这条就等于没加。</p>
+<h2 id="如何删除"><a href="#如何删除" class="headerlink" title="如何删除"></a>如何删除</h2><p><code>py-redis</code>中有个<code>delete</code>接口，既可以删除单个key，也可以全删除key，如果要删除几个key，用法是:<code>r.delete(&#39;age&#39;)</code>、<code>r.delete(&#39;sex&#39;, &#39;age&#39;)</code>，如果要全删除，那就是<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">keys = r.<span class="title function_">keys</span>()</span><br><span class="line">r.<span class="title function_">delete</span>(*keys)</span><br></pre></td></tr></table></figure></p>
+<p>执行之后的效果等于<code>flushall</code>。</p>
+<p>redis里默认情况下是不支持通配符的，那么要批量删除key怎么做呢？答案就是搭配<code>xargs</code>，比如要删除掉所有<code>2018-03-</code>开头的key：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis-cli -hredis地址 -a密码 keys <span class="string">&quot;2018-03-*&quot;</span>|xargs redis-cli -hredis地址 -a密码 del</span><br></pre></td></tr></table></figure></p>
+<h2 id="python将两个list元素一一对应转换为dict"><a href="#python将两个list元素一一对应转换为dict" class="headerlink" title="python将两个list元素一一对应转换为dict"></a>python将两个list元素一一对应转换为dict</h2><p>使用python的<code>zip</code>函数和强大的集合操作可以方便的将两个list元素一一对应转换为dict，如下示例代码：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">names = [<span class="string">&#x27;n1&#x27;</span>,<span class="string">&#x27;n2&#x27;</span>,<span class="string">&#x27;n3&#x27;</span>]</span><br><span class="line">values = [<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>]	</span><br><span class="line">nvs = <span class="title function_">zip</span>(names,values)</span><br><span class="line">nvDict = <span class="title function_">dict</span>( (name,value) <span class="keyword">for</span> name,value <span class="keyword">in</span> nvs)</span><br></pre></td></tr></table></figure></p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a target="_blank" rel="noopener" href="https://github.com/andymccurdy/redis-py">https://github.com/andymccurdy/redis-py</a><br><a target="_blank" rel="noopener" href="http://xiaorui.cc/2014/11/10/%E4%BD%BF%E7%94%A8redis-py%E7%9A%84%E4%B8%A4%E4%B8%AA%E7%B1%BBredis%E5%92%8Cstrictredis%E6%97%B6%E9%81%87%E5%88%B0%E7%9A%84%E5%9D%91/">http://xiaorui.cc/2014/11/10/%E4%BD%BF%E7%94%A8redis-py%E7%9A%84%E4%B8%A4%E4%B8%AA%E7%B1%BBredis%E5%92%8Cstrictredis%E6%97%B6%E9%81%87%E5%88%B0%E7%9A%84%E5%9D%91/</a><br><a target="_blank" rel="noopener" href="http://debugo.com/python-redis/">http://debugo.com/python-redis/</a></p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/redis/" rel="tag"># redis</a>
+              <a href="/tags/python/" rel="tag"># python</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/03/22/%E4%BD%BF%E7%94%A8python%E8%B0%83%E7%94%A8echart%E7%94%BB%E5%9B%BE/" rel="prev" title="使用python调用echart画图">
+      <i class="fa fa-chevron-left"></i> 使用python调用echart画图
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/03/26/%E8%AE%B0%E5%BD%95%E4%B8%80%E6%AC%A1nginx%E5%87%BA%E7%8E%B0%E4%BA%86502%E7%9A%84%E9%97%AE%E9%A2%98/" rel="next" title="记录一次nginx出现了502的问题">
+      记录一次nginx出现了502的问题 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E8%BF%9E%E6%8E%A5"><span class="nav-number">2.</span> <span class="nav-text">如何连接</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E5%AD%98%E5%82%A8"><span class="nav-number">3.</span> <span class="nav-text">如何存储</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E5%88%A0%E9%99%A4"><span class="nav-number">4.</span> <span class="nav-text">如何删除</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#python%E5%B0%86%E4%B8%A4%E4%B8%AAlist%E5%85%83%E7%B4%A0%E4%B8%80%E4%B8%80%E5%AF%B9%E5%BA%94%E8%BD%AC%E6%8D%A2%E4%B8%BAdict"><span class="nav-number">5.</span> <span class="nav-text">python将两个list元素一一对应转换为dict</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">6.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

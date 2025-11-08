@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="整个搭建完毕之后，redis可能key是0，这是正常现象，因为日志量少，直接就消费掉了。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="将redis加入到elk日志系统里">
+<meta property="og:url" content="http://example.com/2018/02/09/%E5%B0%86redis%E5%8A%A0%E5%85%A5%E5%88%B0elk%E6%97%A5%E5%BF%97%E7%B3%BB%E7%BB%9F%E9%87%8C/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="整个搭建完毕之后，redis可能key是0，这是正常现象，因为日志量少，直接就消费掉了。">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/elkredis1.png">
+<meta property="og:image" content="http://example.com/images/elkredis2.png">
+<meta property="og:image" content="http://example.com/images/elkredis3.png">
+<meta property="og:image" content="http://example.com/images/elkredis4.png">
+<meta property="og:image" content="http://example.com/images/elkredis5.png">
+<meta property="og:image" content="http://example.com/images/elkredis6.png">
+<meta property="og:image" content="http://example.com/images/elkredis7.png">
+<meta property="og:image" content="http://example.com/images/elkredis8.png">
+<meta property="og:image" content="http://example.com/images/elkredis9.png">
+<meta property="article:published_time" content="2018-02-09T09:14:18.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:47:59.994Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="elk">
+<meta property="article:tag" content="redis">
+<meta property="article:tag" content="大数据分析">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/elkredis1.png">
+
+<link rel="canonical" href="http://example.com/2018/02/09/%E5%B0%86redis%E5%8A%A0%E5%85%A5%E5%88%B0elk%E6%97%A5%E5%BF%97%E7%B3%BB%E7%BB%9F%E9%87%8C/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>将redis加入到elk日志系统里 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2018/02/09/%E5%B0%86redis%E5%8A%A0%E5%85%A5%E5%88%B0elk%E6%97%A5%E5%BF%97%E7%B3%BB%E7%BB%9F%E9%87%8C/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          将redis加入到elk日志系统里
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-02-09 17:14:18" itemprop="dateCreated datePublished" datetime="2018-02-09T17:14:18+08:00">2018-02-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:47:59" itemprop="dateModified" datetime="2025-11-08T08:47:59+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>1.3k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>5 mins.</span>
+            </span>
+            <div class="post-description">整个搭建完毕之后，redis可能key是0，这是正常现象，因为日志量少，直接就消费掉了。</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>之前在<code>https://rorschachchan.github.io/2018/01/16/记录日志系统ELKB-5-6-4的搭建过程/</code>里面，我画的那个架构图里说了整个架构可以加入redis，但是在文章里我没有写到redis怎么加进去。为了让整个系统更好的分层，是非常建议引入Redis的，毕竟Redis服务器是logstash官方推荐的broker选择。Redis作为一个缓存，能够帮助我们在主节点上屏蔽掉多个从节点之间不同日志文件的差异，负责管理日志端（从节点）的人可以专注于向 Redis 里生产数据，而负责数据分析聚合端的人则可以专注于从Redis内消费数据。所以这一次实验要把redis加进去，同时也要部署一个nginx，让elk再去采集nginx的日志。</p>
+<p>整个架构图图下：<br><img src="/images/elkredis1.png" alt="paradin"></p>
+<h2 id="部署redis"><a href="#部署redis" class="headerlink" title="部署redis"></a>部署redis</h2><p>安装redis的方法请去看<code>http://blog.51cto.com/chenx1242/1793895</code>，我这里使用的redis版本是<code>4.0.6</code>，在执行<code>make test</code>的时候可能会有如下的错误：<br><img src="/images/elkredis2.png" alt="paradin"></p>
+<p>那就安装新一点的<code>tcl</code>吧，方法如下：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">wget <span class="attr">http</span>:<span class="comment">//downloads.sourceforge.net/tcl/tcl8.6.1-src.tar.gz</span></span><br><span class="line">tar xzvf tcl8<span class="number">.6</span><span class="number">.1</span>-src.<span class="property">tar</span>.<span class="property">gz</span>  -C /usr/local/</span><br><span class="line">cd  /usr/local/tcl8<span class="number">.6</span><span class="number">.1</span>/unix/</span><br><span class="line">./configure</span><br><span class="line">make &amp;&amp; make install</span><br></pre></td></tr></table></figure></p>
+<p>然后重新去<code>make test</code>就会看到成功的字样，如图：<br><img src="/images/elkredis3.png" alt="paradin"></p>
+<p>现在redis的漏洞比较多，大多数就是因为密码太简单导致的，所以把redis密码改一下，在<code>redis.conf</code>里，改成如下的样子：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">bind 内网<span class="variable constant_">IP</span>地址 <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span>              ###仅允许内网和本机访问</span><br><span class="line">protected-mode yes                   ###保护模式开启</span><br><span class="line">port <span class="number">6379</span>                          ###端口默认为<span class="number">6379</span>，按需修改</span><br><span class="line">daemonize yes                        ###守护模式开启</span><br><span class="line">pidfile /usr/local/redis/redis.<span class="property">pid</span>               ###指定pid文件路径和文件名</span><br><span class="line">logfile <span class="string">&quot;/usr/local/redis/redis.log&quot;</span>             ###指定日志文件路径和文件名</span><br><span class="line">dbfilename redis.<span class="property">rdb</span>                     ###指定数据文件<span class="variable constant_">RDB</span>文件名</span><br><span class="line">dir /usr/local/redis/                    ###指定数据文件<span class="variable constant_">RDB</span>文件的存放路径</span><br><span class="line">requirepass 『<span class="variable constant_">YOURPASSWORD</span>』              ###设置访问密码，提升密码强度</span><br></pre></td></tr></table></figure></p>
+<p>保存之后启动redis即可。</p>
+<p>如果redis是主从配置，若master配置了密码则slave也要配置相应的密码参数否则无法进行正常复制的。需要在slave的<code>redis.conf</code>里找到<code>#masterauth  mstpassword</code>，去掉注释，也改成跟master一样的密码，重启一下即可。 </p>
+<p>nginx的安装这里就不写了，直接看<code>http://www.runoob.com/linux/nginx-install-setup.html</code>这个就行了。</p>
+<h2 id="安装x-pack"><a href="#安装x-pack" class="headerlink" title="安装x-pack"></a>安装x-pack</h2><p>x-pack是elk官方提供的认证授权插件，安装方法很简单，分别找到下面三个文件，然后后面加上<code>install x-pack</code>即可：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">./elasticsearch-plugin install x-pack --batch </span><br><span class="line">./logstash-plugin install x-pack </span><br><span class="line">./kibana-plugin install x-pack</span><br></pre></td></tr></table></figure></p>
+<p>如果要查看已经安装的插件，那就是：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@chen-elk-<span class="number">001</span> bin]# ./elasticsearch-plugin list</span><br><span class="line">x-pack</span><br><span class="line">[root@chen-elk-<span class="number">001</span> bin]# ./kibana-plugin list</span><br><span class="line">x-pack@<span class="number">5.6</span><span class="number">.4</span></span><br></pre></td></tr></table></figure></p>
+<p>如果kibana-plugin要卸载x-pack，那就是：<code>./kibana-plugin remove x-pack</code>。</p>
+<p>重启服务即可登录，默认的登录用户名: <code>elastic</code>，密码:<code>changeme</code>。<br><img src="/images/elkredis4.png" alt="paradin"><br><img src="/images/elkredis5.png" alt="paradin"></p>
+<p>这里注意一下，<code>./logstash-plugin install x-pack</code>的时候可能是出现ruby源的错误，如图：<br><img src="/images/elkredis6.png" alt="paradin"></p>
+<p>这是因为中国特色社会主义的网络限制访问<code>https://rubygems.org</code>，一般来说，可以把它更改成阿里的ruby源<code>https://ruby.taobao.org/</code>，不过如果你的服务器无法跨越长城的话，那么更改也是不好使的，所以在这一步，我选择离线安装x-pack。也就是先把<code>https://artifacts.elastic.co/downloads/packs/x-pack/x-pack-5.6.4.zip</code>这个文件下载到本地上传到服务器的root文件夹里，然后安装：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@chen-logstash-<span class="number">001</span> bin]# ./logstash-plugin install <span class="attr">file</span>:<span class="comment">///root/x-pack-5.6.4.zip</span></span><br><span class="line"><span class="title class_">Installing</span> <span class="attr">file</span>: <span class="regexp">/root/</span>x-pack-<span class="number">5.6</span><span class="number">.4</span>.<span class="property">zip</span></span><br><span class="line"><span class="title class_">Install</span> successful</span><br></pre></td></tr></table></figure></p>
+<h2 id="配置filebeat"><a href="#配置filebeat" class="headerlink" title="配置filebeat"></a>配置filebeat</h2><p>由于这个nginx我们需要先让filebeat把<code>nginx.log</code>和<code>error.log</code>先推到redis存储，然后再由redis推到logstash。配置<code>filebeat.yml</code>的具体信息如下:<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[root@iZbp10hw6wezxmrvrcjyhlZ filebeat]# grep -iv <span class="string">&#x27;#&#x27;</span> /etc/filebeat/filebeat.<span class="property">yml</span> | grep -iv <span class="string">&#x27;^$&#x27;</span></span><br><span class="line">filebeat.<span class="property">prospectors</span>:</span><br><span class="line">- <span class="attr">input_type</span>: log</span><br><span class="line">  <span class="attr">paths</span>:</span><br><span class="line">    - <span class="regexp">/usr/</span>local/nginx/logs<span class="comment">/*.log    #这里是nginx的日志文件夹</span></span><br><span class="line"><span class="comment">     </span></span><br><span class="line"><span class="comment">output.redis:                #以下这部分都是新加的</span></span><br><span class="line"><span class="comment">  enabled: true</span></span><br><span class="line"><span class="comment">  hosts: [&quot;127.0.0.1:6379&quot;]</span></span><br><span class="line"><span class="comment">  key: logindexer_list            #与redis配置文件里的key遥相呼应</span></span><br><span class="line"><span class="comment">  password: 『YOURPASSWORD』    #跟上面的密码遥相呼应</span></span><br></pre></td></tr></table></figure></p>
+<p>配置完毕之后，启动filebeat，命令语句：<code>/etc/init.d/filebeat start -c /etc/filebeat/filebeat.yml</code>。</p>
+<h2 id="配置logstash"><a href="#配置logstash" class="headerlink" title="配置logstash"></a>配置logstash</h2><p>由于这台logstash已经开启了一个logstash进程，那么再收集nginx的日志需要新开一个logstash进程，也需要新写一个conf文件，假设新的conf文件是<code>nginx-logstash.conf</code>，它的写法如下：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">input &#123;</span><br><span class="line">    redis &#123;</span><br><span class="line">        <span class="function"><span class="params">host</span> =&gt;</span> <span class="string">&quot;10.168.173.181&quot;</span></span><br><span class="line">        type =&gt; <span class="string">&quot;redis-input&quot;</span></span><br><span class="line">        data_type =&gt; <span class="string">&quot;list&quot;</span></span><br><span class="line">        key =&gt; <span class="string">&quot;logindexer_list&quot;</span></span><br><span class="line">        port =&gt; <span class="number">6379</span></span><br><span class="line">        password =&gt; <span class="string">&quot;ChenRedi$&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># filter configration here</span><br><span class="line">output &#123;</span><br><span class="line">     elasticsearch &#123;</span><br><span class="line">        <span class="function"><span class="params">hosts</span> =&gt;</span> [ <span class="string">&quot;10.162.80.192:9200&quot;</span> ]</span><br><span class="line">        user =&gt; elastic</span><br><span class="line">        password =&gt; changeme</span><br><span class="line">        index =&gt; <span class="string">&quot;nginxlogstash-%&#123;+YYYY.MM.dd&#125;&quot;</span>        #这个是新的索引</span><br><span class="line">    &#125;</span><br><span class="line">stdout &#123;</span><br><span class="line">    <span class="function"><span class="params">codec</span> =&gt;</span> rubydebug</span><br><span class="line">       &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>现在logstash不支持多个实例共享一个<code>path.data</code>，所以要在在启动不同实例的时候，命令行里增加<code>--path.data PATH</code>，为不同实例指定不同的路径。启动logstash之后，看到显示如下：<br><img src="/images/elkredis7.png" alt="paradin"></p>
+<p>再到nginx的日志看一下，因为logstash里没有做日志的切割，所以是整个一个类似字符串的形式发送了过来：<br><img src="/images/elkredis8.png" alt="paradin"></p>
+<p>果然有这样的日志，可见logstash与nginx的redis已经正确连接。在elasticsearch里，使用<code>curl -u 账号密码 &#39;localhost:9200/_cat/indices?v&#39;</code>查询索引的时候，就会看到那个<code>nginxlogstash</code>，如图：<br><img src="/images/elkredis9.png" alt="paradin"></p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a target="_blank" rel="noopener" href="https://doc.yonyoucloud.com/doc/logstash-best-practice-cn/input/redis.html">https://doc.yonyoucloud.com/doc/logstash-best-practice-cn/input/redis.html</a></p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/redis/" rel="tag"># redis</a>
+              <a href="/tags/elk/" rel="tag"># elk</a>
+              <a href="/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90/" rel="tag"># 大数据分析</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/02/09/Mysql-Atlas%E4%BB%8E%E5%BA%93%E5%A7%8B%E7%BB%88%E6%B2%A1%E6%9C%89%E5%BB%BA%E7%AB%8B%E8%BF%9E%E6%8E%A5%E6%80%8E%E4%B9%88%E5%8A%9E/" rel="prev" title="Mysql-Atlas从库始终没有建立连接怎么办">
+      <i class="fa fa-chevron-left"></i> Mysql-Atlas从库始终没有建立连接怎么办
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/02/11/http%E8%BF%94%E5%9B%9E%E7%A0%81%E6%98%AF000/" rel="next" title="http返回码是000...">
+      http返回码是000... <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%83%A8%E7%BD%B2redis"><span class="nav-number">1.</span> <span class="nav-text">部署redis</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85x-pack"><span class="nav-number">2.</span> <span class="nav-text">安装x-pack</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%85%8D%E7%BD%AEfilebeat"><span class="nav-number">3.</span> <span class="nav-text">配置filebeat</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%85%8D%E7%BD%AElogstash"><span class="nav-number">4.</span> <span class="nav-text">配置logstash</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">5.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

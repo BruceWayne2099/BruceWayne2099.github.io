@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="将监控进行到无死角">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一个监控挂载盘的python脚本">
+<meta property="og:url" content="http://example.com/2018/02/27/%E4%B8%80%E4%B8%AA%E7%9B%91%E6%8E%A7%E6%8C%82%E8%BD%BD%E7%9B%98%E7%9A%84python%E8%84%9A%E6%9C%AC/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="将监控进行到无死角">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/gaojingmail1.png">
+<meta property="og:image" content="http://example.com/images/gaojingmail2.png">
+<meta property="article:published_time" content="2018-02-27T15:08:09.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:47:24.851Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="python">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/gaojingmail1.png">
+
+<link rel="canonical" href="http://example.com/2018/02/27/%E4%B8%80%E4%B8%AA%E7%9B%91%E6%8E%A7%E6%8C%82%E8%BD%BD%E7%9B%98%E7%9A%84python%E8%84%9A%E6%9C%AC/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>一个监控挂载盘的python脚本 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2018/02/27/%E4%B8%80%E4%B8%AA%E7%9B%91%E6%8E%A7%E6%8C%82%E8%BD%BD%E7%9B%98%E7%9A%84python%E8%84%9A%E6%9C%AC/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          一个监控挂载盘的python脚本
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-02-27 23:08:09" itemprop="dateCreated datePublished" datetime="2018-02-27T23:08:09+08:00">2018-02-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:47:24" itemprop="dateModified" datetime="2025-11-08T08:47:24+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>1.1k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>4 mins.</span>
+            </span>
+            <div class="post-description">将监控进行到无死角</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>公司产品线有一个公用的挂载盘，主要是用来方便各位开发人员去放置他们自己的一些工作材料，比如异常的日志或者<code>tcpdump</code>的抓包等等杂七杂八的东西，但是这个挂载盘由于使用人众多，容量自然要有监控，于是就有了写这个脚本的动机。</p>
+<p>在这里我写了两个脚本，上面这个是用来监控磁盘容量，然后通过<code>df -h</code>的排序生成前十名占容量最大的文件夹，把这个文件夹的名字和对应的大小重定向到一个叫<code>alarm.txt</code>这个文件里，这个文件就是邮件正文。然后在确定他们的主人，统一加上公司邮箱后缀来得到他们主人的邮箱地址，最后对应他们各自的邮箱地址用下面那个脚本来发送文件夹容量过高的邮件。</p>
+<h2 id="监控挂载盘的脚本"><a href="#监控挂载盘的脚本" class="headerlink" title="监控挂载盘的脚本"></a>监控挂载盘的脚本</h2><pre><code><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">#!<span class="regexp">/usr/</span>bin/env python</span><br><span class="line"># coding=utf-<span class="number">8</span></span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> <span class="title class_">AutoMail</span></span><br><span class="line"><span class="keyword">import</span> commands</span><br><span class="line"></span><br><span class="line">#设定变量判断是否挂载和挂载盘的容量</span><br><span class="line">mount = commands.<span class="title function_">getoutput</span>(<span class="string">&quot;mount | grep &#x27;:.*nfs&#x27;|wc -l&quot;</span>)</span><br><span class="line">size = commands.<span class="title function_">getoutput</span>(<span class="string">&quot;df -h | grep share | awk &#x27;&#123;print $5&#125;&#x27; | cut -d &#x27;%&#x27; -f 1&quot;</span>)</span><br><span class="line"> </span><br><span class="line">##建立发邮件的文本文件</span><br><span class="line">def <span class="title class_">Createalarm</span>():</span><br><span class="line">    <span class="keyword">if</span> os.<span class="property">path</span>.<span class="title function_">exists</span>(<span class="string">&#x27;/root/chenscript/alarm.txt&#x27;</span>) == <span class="title class_">True</span>:	</span><br><span class="line">        os.<span class="title function_">system</span>(<span class="string">&quot;python /root/chenscript/weixin_sharealarm.py&quot;</span>)</span><br><span class="line">        <span class="title function_">print</span> (<span class="string">&quot;微信告警已经发送！&quot;</span>)</span><br><span class="line">        os.<span class="title function_">system</span>(<span class="string">&quot;cd /root/chenscript; echo &#x27;share盘容量大于80%，现在将调出容量排名前十位的文件夹名字及对应的容量，请各位处理一下不需要的文件！&#x27; &gt;/root/chenscript/alarm.txt&quot;</span>)</span><br><span class="line">       	os.<span class="title function_">system</span>(<span class="string">&quot;cd /挂载盘名称 ;du -s * --exclude=&#x27;不想要计算在内的文件夹&#x27; --exclude=&#x27;不想要计算在内的文件夹&#x27; --exclude=&#x27;不想要计算在内的文件夹&#x27;|sort -nr |head &gt;&gt;/root/chenscript/alarm.txt&quot;</span>)</span><br><span class="line">        os.<span class="title function_">system</span>(<span class="string">&quot;echo &#x27;\n&#x27; &gt;&gt; /root/chenscript/alarm.txt&quot;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> os.<span class="property">path</span>.<span class="title function_">exists</span>(<span class="string">&#x27;/root/chenscript/alarm.txt&#x27;</span>) == <span class="title class_">False</span>:</span><br><span class="line">        os.<span class="title function_">system</span>(<span class="string">&quot;cd /root/chenscript;touch alarm.txt&quot;</span>)</span><br><span class="line"></span><br><span class="line">def <span class="title class_">Sendmail</span>():</span><br><span class="line">        fp = <span class="title function_">open</span>(<span class="string">&#x27;/root/chenscript/alarm.txt&#x27;</span>, <span class="string">&#x27;r&#x27;</span>)</span><br><span class="line">        content = fp.<span class="title function_">read</span>()</span><br><span class="line">        <span class="title class_">AutoMail</span>.<span class="title function_">send_mail</span>(<span class="string">&#x27;share挂载盘容量大于80%！收到邮件的各位请整理自己对应的文件夹！&#x27;</span>, content)</span><br><span class="line"> </span><br><span class="line">#将邮件的文件刷新</span><br><span class="line">def <span class="title class_">Dellist</span>():</span><br><span class="line">        os.<span class="title function_">system</span>(<span class="string">&quot;cd /root/chenscript/;rm -f alarm.txt;touch alarm.txt&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> mount == <span class="string">&#x27;1&#x27;</span> and size &gt;= <span class="string">&#x27;80&#x27;</span>:</span><br><span class="line">        <span class="title function_">print</span> (<span class="string">&quot;挂载盘存在！&quot;</span>)</span><br><span class="line">        <span class="title function_">print</span> (<span class="string">&quot;share盘容量大于80%...&quot;</span>)</span><br><span class="line">        <span class="title class_">Createlist</span>()</span><br><span class="line">        <span class="title class_">Sendmail</span>()</span><br><span class="line">        <span class="title class_">Dellist</span>()</span><br><span class="line">elif mount == <span class="string">&#x27;1&#x27;</span> and size &lt; <span class="string">&#x27;80&#x27;</span>:</span><br><span class="line">        <span class="title function_">print</span> (<span class="string">&quot;挂载盘存在！&quot;</span>)</span><br><span class="line">        <span class="title function_">print</span> (<span class="string">&quot;share盘容量正常...&quot;</span>)</span><br><span class="line"><span class="attr">else</span>:</span><br><span class="line">       	<span class="title function_">print</span> (<span class="string">&quot;挂载盘不存在，现在重新挂载...&quot;</span>)</span><br><span class="line">       	os.<span class="title function_">system</span>(<span class="string">&quot;mount -t nfs -o acl,rw,intr,soft,nolock,rsize=8192,wsize=8192 10.160.43.172:/share /share &quot;</span>)</span><br></pre></td></tr></table></figure>
+</code></pre>
+<h2 id="发送告警邮件脚本"><a href="#发送告警邮件脚本" class="headerlink" title="发送告警邮件脚本"></a>发送告警邮件脚本</h2><pre><code><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">#!<span class="regexp">/usr/</span>bin/env python</span><br><span class="line">#coding=utf-<span class="number">8</span></span><br><span class="line">#这个脚本的用途是用来发送邮件</span><br><span class="line"><span class="keyword">import</span> smtplib</span><br><span class="line"><span class="keyword">from</span> email.<span class="property">mime</span>.<span class="property">multipart</span> <span class="keyword">import</span> <span class="title class_">MIMEMultipart</span></span><br><span class="line"><span class="keyword">from</span> email.<span class="property">mime</span>.<span class="property">text</span> <span class="keyword">import</span> <span class="title class_">MIMEText</span></span><br><span class="line"><span class="keyword">from</span> email.<span class="property">mime</span>.<span class="property">application</span> <span class="keyword">import</span> <span class="title class_">MIMEApplication</span></span><br><span class="line"></span><br><span class="line">mailto_list=[]    #这里为空list，会从list.<span class="property">txt</span>里一行一行的当做元素添加进来</span><br><span class="line"></span><br><span class="line">#生成list.<span class="property">txt</span></span><br><span class="line"><span class="keyword">if</span> os.<span class="property">path</span>.<span class="title function_">exists</span>(<span class="string">&#x27;/root/chenscript/list.txt&#x27;</span>) == <span class="title class_">True</span>:</span><br><span class="line">        os.<span class="title function_">system</span>(<span class="string">&quot;cd /挂载盘名称;du -s * --exclude=&#x27;不想要计算在内的文件夹&#x27; --exclude=&#x27;不想要计算在内的文件夹&#x27; --exclude=&#x27;不想要计算在内的文件夹&#x27;|sort -nr |head|awk \&#x27;&#123;print $2\&quot;@dahuatech.com\&quot;&#125;\&#x27;  &gt;&gt;/root/chenscript/list.txt&quot;</span>)</span><br><span class="line"><span class="keyword">if</span> os.<span class="property">path</span>.<span class="title function_">exists</span>(<span class="string">&#x27;/root/chenscript/list.txt&#x27;</span>) == <span class="title class_">False</span>:</span><br><span class="line">        os.<span class="title function_">system</span>(<span class="string">&quot;cd /root/chenscript/;rm -f list.txt;echo &#x27;本人的邮箱地址&#x27;&gt;list.txt&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> <span class="title function_">open</span>(<span class="string">&#x27;/root/chenscript/list.txt&#x27;</span>,<span class="string">&#x27;r&#x27;</span>) <span class="keyword">as</span> <span class="attr">f</span>:</span><br><span class="line">    f=f.<span class="title function_">readlines</span>()</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="attr">f</span>:</span><br><span class="line">        i=i.<span class="title function_">strip</span>(<span class="string">&#x27;\n&#x27;</span>)</span><br><span class="line">        mailto_list.<span class="title function_">append</span>(i)</span><br><span class="line">mail_host=<span class="string">&quot;这里填写邮箱主机&quot;</span></span><br><span class="line">mail_user=<span class="string">&quot;这里填写发送人的邮箱地址&quot;</span></span><br><span class="line">mail_pass=<span class="string">&quot;发送人的邮箱密码&quot;</span></span><br><span class="line">mail_postfix=<span class="string">&quot;dahuatech.com&quot;</span></span><br><span class="line">mail_sender=<span class="string">&quot;与mail_host内容相同&quot;</span></span><br><span class="line">def <span class="title function_">send_mail</span>(sub, content):</span><br><span class="line">    me=mail_sender	</span><br><span class="line">    msg = <span class="title class_">MIMEMultipart</span>()</span><br><span class="line">    msg[<span class="string">&#x27;Subject&#x27;</span>] = sub</span><br><span class="line">    msg[<span class="string">&#x27;From&#x27;</span>] = me</span><br><span class="line">    msg[<span class="string">&#x27;To&#x27;</span>] = <span class="string">&quot;;&quot;</span>.<span class="title function_">join</span>(mailto_list)</span><br><span class="line">    content1 = <span class="title class_">MIMEText</span>(<span class="title function_">str</span>(content), <span class="string">&#x27;plain&#x27;</span>, <span class="string">&#x27;utf-8&#x27;</span>)</span><br><span class="line">    msg.<span class="title function_">attach</span>(content1)</span><br><span class="line">    <span class="attr">try</span>:</span><br><span class="line">        s = smtplib.<span class="title function_">SMTP</span>()</span><br><span class="line">        s.<span class="title function_">connect</span>(mail_host)</span><br><span class="line">        s.<span class="title function_">login</span>(mail_user,mail_pass)</span><br><span class="line">        s.<span class="title function_">sendmail</span>(me, mailto_list, msg.<span class="title function_">as_string</span>())</span><br><span class="line">        <span class="title function_">print</span>(<span class="string">&#x27;发送成功！\n&#x27;</span>)</span><br><span class="line">        s.<span class="title function_">close</span>()</span><br><span class="line">    except <span class="title class_">Exception</span> <span class="keyword">as</span> <span class="attr">e</span>: <span class="title function_">print</span>(<span class="title function_">str</span>(e))</span><br><span class="line"></span><br><span class="line">os.<span class="title function_">system</span>(<span class="string">&quot;cd /root/chenscript/;rm -f list.txt;echo &#x27;我本人的邮件地址&#x27;&gt;list.txt&quot;</span>)</span><br></pre></td></tr></table></figure>
+</code></pre>
+<p>执行的效果如下：<br><img src="/images/gaojingmail1.png" alt="paradin"></p>
+<h2 id="隐藏的知识点"><a href="#隐藏的知识点" class="headerlink" title="隐藏的知识点"></a>隐藏的知识点</h2><p>1）<code>du -s</code>是按照字节来统计，<code>--exclude=&#39;yunwei&#39;</code>是在排序的时候忽略掉<code>yunwei</code>这个文件夹，容后再用<code>sort -nr|head</code>是得到从大到小前10名，如果得到后10名就是<code>sort -nr|tail</code>；<br>2）如果使用的是<code>import commands</code>，那么<code>commands.getoutpu</code>t得到的是字符串！<br>3）用<code>mount | grep &#39;:.*nfs&#39;</code>来判断挂载盘是否存在是一个很简单的方式，如果挂了多个，就用<code>ip in</code>的方式来进一步判断；<br>4）python要一行一行的读取文件，就<code>readline</code>；<br>5）python按行读取文件，去掉换行符<code>\n</code>的方法：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> line <span class="keyword">in</span> file.<span class="title function_">readlines</span>():</span><br><span class="line">    line=line.<span class="title function_">strip</span>(<span class="string">&#x27;\n&#x27;</span>)</span><br></pre></td></tr></table></figure><br>6）<code>import Automail</code>的时候，就已经把<code>Automail.py</code>这个脚本固定住了，这时候<code>mailto_list</code>已经不能变化了，所以要把添加<code>list.txt</code>放到这个脚本里。<br><img src="/images/gaojingmail2.png" alt="paradin"></p>
+<p>发了邮件，连吼带骂一顿，终于把share盘容量下降到了69这样一个美妙的数字…</p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/python/" rel="tag"># python</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/02/27/%E4%BD%BF%E7%94%A8matplotlib%E7%94%BB%E5%9B%BE%E7%9A%84%E4%B8%80%E4%B8%AA%E8%84%9A%E6%9C%AC/" rel="prev" title="使用matplotlib画图的一个脚本">
+      <i class="fa fa-chevron-left"></i> 使用matplotlib画图的一个脚本
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/02/28/%E8%B0%83%E7%94%A8%E9%98%BF%E9%87%8C%E4%BA%91api%E8%8E%B7%E5%8F%96%E9%98%BF%E9%87%8C%E4%BA%91%E6%95%B0%E6%8D%AE%E5%90%8C%E6%AD%A5%E6%9C%8D%E5%8A%A1%EF%BC%88DTS%EF%BC%89%E5%B9%B6%E4%B8%94%E4%BD%9C%E5%9B%BE%E5%8F%91%E9%80%81%E9%82%AE%E4%BB%B6%E7%9A%84%E6%95%B4%E4%B8%AA%E6%B5%81%E7%A8%8B/" rel="next" title="调用阿里云api获取阿里云数据同步服务（DTS）并且作图发送邮件的整个流程">
+      调用阿里云api获取阿里云数据同步服务（DTS）并且作图发送邮件的整个流程 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%91%E6%8E%A7%E6%8C%82%E8%BD%BD%E7%9B%98%E7%9A%84%E8%84%9A%E6%9C%AC"><span class="nav-number">2.</span> <span class="nav-text">监控挂载盘的脚本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%91%E9%80%81%E5%91%8A%E8%AD%A6%E9%82%AE%E4%BB%B6%E8%84%9A%E6%9C%AC"><span class="nav-number">3.</span> <span class="nav-text">发送告警邮件脚本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9A%90%E8%97%8F%E7%9A%84%E7%9F%A5%E8%AF%86%E7%82%B9"><span class="nav-number">4.</span> <span class="nav-text">隐藏的知识点</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

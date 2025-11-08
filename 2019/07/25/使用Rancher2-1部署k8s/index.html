@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="批量删除exited状态的容器是：docker rm $(sudo docker ps -qf status&#x3D;exited)">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用Rancher2.1部署k8s集群">
+<meta property="og:url" content="http://example.com/2019/07/25/%E4%BD%BF%E7%94%A8Rancher2-1%E9%83%A8%E7%BD%B2k8s/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="批量删除exited状态的容器是：docker rm $(sudo docker ps -qf status&#x3D;exited)">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/rancher5.png">
+<meta property="og:image" content="http://example.com/images/rancher6.png">
+<meta property="og:image" content="http://example.com/images/rancher1.png">
+<meta property="og:image" content="http://example.com/images/rancher7.png">
+<meta property="og:image" content="http://example.com/images/rancher8.png">
+<meta property="og:image" content="http://example.com/images/rancher9.png">
+<meta property="og:image" content="http://example.com/images/rancher10.png">
+<meta property="og:image" content="http://example.com/images/rancher30.png">
+<meta property="article:published_time" content="2019-07-25T03:03:04.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:47:35.987Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="k8s">
+<meta property="article:tag" content="rancher">
+<meta property="article:tag" content="云原生">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/rancher5.png">
+
+<link rel="canonical" href="http://example.com/2019/07/25/%E4%BD%BF%E7%94%A8Rancher2-1%E9%83%A8%E7%BD%B2k8s/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>使用Rancher2.1部署k8s集群 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/07/25/%E4%BD%BF%E7%94%A8Rancher2-1%E9%83%A8%E7%BD%B2k8s/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          使用Rancher2.1部署k8s集群
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-07-25 11:03:04" itemprop="dateCreated datePublished" datetime="2019-07-25T11:03:04+08:00">2019-07-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:47:35" itemprop="dateModified" datetime="2025-11-08T08:47:35+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>1.5k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>5 mins.</span>
+            </span>
+            <div class="post-description">批量删除exited状态的容器是：docker rm $(sudo docker ps -qf status=exited)</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="rancher是个啥？"><a href="#rancher是个啥？" class="headerlink" title="rancher是个啥？"></a>rancher是个啥？</h2><p>Rancher是一个开源的企业级全栈化容器部署及管理平台。简单的说，就是一个可以让你通过web界面管理docker容器的平台。定位上和K8s比较接近，都是通过web界面赋予完全的docker服务编排功能。而且它自带账户权限。相比K8s没有账号管理rancher自带账号权限体系。账号可以独立创建，也可以很方便地接入ldap等账号体系，对于公司使用是一大利器。</p>
+<p>还有一个最牛逼的就是它有一个应用商店，并且可以做到配置自用的应用商店，部署服务，很快就能搞定！</p>
+<p>所以说在k8s势不可挡的今天，学习一下rancher还是很有必要的。哪怕你领导担心它搞不定线上业务，拿来给测试环境部署也好啊！具体rancher的优点和不足可以去看 <a target="_blank" rel="noopener" href="https://blog.csdn.net/CSDN_duomaomao/article/details/78029800">https://blog.csdn.net/CSDN_duomaomao/article/details/78029800</a> 。</p>
+<h2 id="安装rancher以及创建k8s集群"><a href="#安装rancher以及创建k8s集群" class="headerlink" title="安装rancher以及创建k8s集群"></a>安装rancher以及创建k8s集群</h2><p>安装rancher的方法非常简单：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">docker run -d --restart=unless-stopped \</span><br><span class="line">   --name rancher-managment \</span><br><span class="line">      -p <span class="number">8080</span>:<span class="number">80</span> -p <span class="number">8443</span>:<span class="number">443</span> \</span><br><span class="line">      -v /rancher/data:/var/lib/rancher \</span><br><span class="line">      rancher/rancher:latest</span><br></pre></td></tr></table></figure></p>
+<p>参数<code>--restart=unless-stopped</code>的意思是<code>在容器退出时总是重启容器，但是不考虑在Docker守护进程启动时就已经停止了的容器</code>。</p>
+<p>然后确认一下防火墙是否对外开放了8443和8080端口，打开浏览器输入<code>IP:8443</code>就会看到rancher的样子，自带中文版，就问你感动不感动？<br><img src="/images/rancher5.png" alt="抱光妹"></p>
+<p>然后准备三台服务器，资料如下：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">名称：k8s-001	IP：<span class="string">&quot;172.20.52.12&quot;</span>	角色：etcd+control+worker</span><br><span class="line">名称：k8s-002	IP：<span class="string">&quot;172.20.52.11&quot;</span>	角色：worker</span><br><span class="line">名称：k8s-003	IP：<span class="string">&quot;172.20.52.10&quot;</span>	角色：worker</span><br></pre></td></tr></table></figure></p>
+<p>以上服务器系统均为centos7，而且与rancher网络的8443和8080端口互通。为了路径相同，个人建议在rancher买一个大一点的高效云盘，然后让这三个worker都挂载这个云盘，这样的话启动容器的时候，数据都持久化保存在云盘里。</p>
+<p>回到rancher页面，点击<code>添加集群</code>，选择<code>CUSTOM</code>，然后给集群起个名儿，如果有其他的rancher成员可以管理或者访问这个集群就编辑一下成员角色，默认情况下是安装<code>k8s-1.11</code>版本。然后点击<code>下一步</code>：<br><img src="/images/rancher6.png" alt="抱光妹"></p>
+<p>下一步很重要了，先在第一台172.20.52.12上勾选所有的角色以及输入对应IP，然后会web页面下面生成一个命令，将这个命令在172.20.52.12上执行一下，瞬间它就会尝试去注册到rancher：<br><img src="/images/rancher1.png" alt="抱光妹"></p>
+<p>如果注册不成功，web提示<code>[etcd]Pulling image [rancher/coreos-etcd:v3.12.18] on host XXX</code>的话，那么还要去该服务器上手动<code>docker pull rancher/coreos-etcd:v3.12.18</code>一下，不久之后就会看到主机被成功注册到rancher上：<br><img src="/images/rancher7.png" alt="抱光妹"></p>
+<p>点击<code>主机</code>，能看到一点CPU和内存的细节：<br><img src="/images/rancher8.png" alt="抱光妹"></p>
+<h2 id="安装kuberctl"><a href="#安装kuberctl" class="headerlink" title="安装kuberctl"></a>安装kuberctl</h2><p>使用rancher部署的k8s集群是没有自带kuberctl命令的，只能通过rancher页面的执行<code>kubectl命令行</code>来操作，若需要worker里使用kubectl，那就得手动安装，过程如下：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/<span class="built_in">bin</span>/linux/amd64/kubectl		<span class="comment">#国内可以正常打开，表怕</span></span><br><span class="line">chmod +x kubectl</span><br><span class="line">sudo mv ./kubectl /usr/local/<span class="built_in">bin</span>/kubectl</span><br><span class="line">echo <span class="string">&quot;source &lt;(kubectl completion bash)&quot;</span> &gt;&gt; ~/.bash_profile  <span class="comment"># 增加自动补全功能  </span></span><br><span class="line">kubectl version</span><br></pre></td></tr></table></figure></p>
+<p>此时得到的结果应该是：<br><img src="/images/rancher9.png" alt="抱光妹"></p>
+<p>如果执行的结果是：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">/usr/local/<span class="built_in">bin</span>/kubectl: line <span class="number">1</span>: syntax error near unexpected token `&lt;<span class="string">&#x27;</span></span><br><span class="line"><span class="string">/usr/local/bin/kubectl: line 1: `&lt;?xml version=&#x27;</span><span class="number">1.0</span><span class="string">&#x27; encoding=&#x27;</span>UTF-<span class="number">8</span><span class="string">&#x27;?&gt;&lt;Error&gt;&lt;Code&gt;NoSuchKey&lt;/Code&gt;&lt;Message&gt;The specified key does not exist.&lt;/Message&gt;&lt;Details&gt;No such object: kubernetes-release/release//bin/linux/amd64/kubectl&lt;/Details&gt;&lt;/Error&gt;&#x27;</span></span><br></pre></td></tr></table></figure></p>
+<p>那么很有可能是你的kubectl没有下载完全，这个文件应该是41M左右的，大于小于都不对！</p>
+<p>返回到rancher的集群页面，点击<code>kubeconfig文件</code>，将里面的内容复制到<code>~/.kube/config</code>里（没有就创建一个），保存退出之后，重开一个终端就能正常使用了，如图：<br><img src="/images/rancher10.png" alt="抱光妹"></p>
+<h2 id="清理节点"><a href="#清理节点" class="headerlink" title="清理节点"></a>清理节点</h2><p>当你不想要一个node的时候，一定要清理干净，不然在新加node的时候就会出现：<code>[etcd] Etcd Cluster is not healthy</code>的错误。清理节点的方法语句如下：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 停止服务</span></span><br><span class="line">systemctl  disable kubelet.service</span><br><span class="line">systemctl  disable kube-scheduler.service</span><br><span class="line">systemctl  disable kube-proxy.service</span><br><span class="line">systemctl  disable kube-controller-manager.service</span><br><span class="line">systemctl  disable kube-apiserver.service</span><br><span class="line">	</span><br><span class="line">systemctl  stop kubelet.service</span><br><span class="line">systemctl  stop kube-scheduler.service</span><br><span class="line">systemctl  stop kube-proxy.service</span><br><span class="line">systemctl  stop kube-controller-manager.service</span><br><span class="line">systemctl  stop kube-apiserver.service</span><br><span class="line">	</span><br><span class="line"><span class="comment"># 删除所有容器</span></span><br><span class="line">docker rm -f $(docker ps -qa)</span><br><span class="line">	</span><br><span class="line"><span class="comment"># 删除所有容器卷</span></span><br><span class="line">docker volume rm $(docker volume ls -q)</span><br><span class="line">	</span><br><span class="line"><span class="comment"># 卸载mount目录</span></span><br><span class="line"><span class="keyword">for</span> mount <span class="keyword">in</span> $(mount | grep tmpfs | grep <span class="string">&#x27;/var/lib/kubelet&#x27;</span> | awk <span class="string">&#x27;&#123; print $3 &#125;&#x27;</span>) /var/lib/kubelet /var/lib/rancher; do umount $mount; done</span><br><span class="line"></span><br><span class="line"><span class="comment"># 备份目录</span></span><br><span class="line">mv /etc/kubernetes /etc/kubernetes-bak-$(date +<span class="string">&quot;%Y%m%d%H%M&quot;</span>)</span><br><span class="line">mv /var/lib/etcd /var/lib/etcd-bak-$(date +<span class="string">&quot;%Y%m%d%H%M&quot;</span>)</span><br><span class="line">mv /var/lib/rancher /var/lib/rancher-bak-$(date +<span class="string">&quot;%Y%m%d%H%M&quot;</span>)</span><br></pre></td></tr></table></figure></p>
+<p>node上的重要数据，已经要备份好！</p>
+<h2 id="其他问题"><a href="#其他问题" class="headerlink" title="其他问题"></a>其他问题</h2><p>如果node是集群，那么把web的语句复制到node的命令行执行后却迟迟不见注册成功，那么可以点击高级选项，然后输入内网IP和名称，如图：<br><img src="/images/rancher30.png" alt="抱光妹"></p>
+<p>如果在node上执行<code>kubectl version</code>的时候报错：<code>Unable to connect to the server: x509: certificate signed by unknown authority</code>，原因可以看<a target="_blank" rel="noopener" href="https://www.cnrancher.com/docs/rancher/v2.x/cn/configuration/admin-settings/custom-ca-root-certificate/">https://www.cnrancher.com/docs/rancher/v2.x/cn/configuration/admin-settings/custom-ca-root-certificate/</a> 。不过不知道是我姿势不对还是怎么的，我按照官方文档操作没有成功，这样可以在rancher的执行语句里添加<code>--no-cacerts</code>，如下：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">docker run -d --restart=unless-stopped \</span><br><span class="line">  --name rancher-managment \</span><br><span class="line">  -p <span class="number">8080</span>:<span class="number">80</span> -p <span class="number">8443</span>:<span class="number">443</span> \</span><br><span class="line">  -v /rancher/data:/var/lib/rancher/ \</span><br><span class="line">  rancher/rancher:latest   --no-cacerts </span><br></pre></td></tr></table></figure></p>
+<p>这样就可以解决了。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/horizonli/p/10572834.html">https://www.cnblogs.com/horizonli/p/10572834.html</a><br><a target="_blank" rel="noopener" href="https://systemoutprint.github.io/kubernetes/2018/07/19/kubernetes%E9%9B%86%E7%BE%A4%E7%97%9B%E8%8B%A6%E6%90%AD%E5%BB%BA%E8%BF%87%E7%A8%8B/">https://systemoutprint.github.io/kubernetes/2018/07/19/kubernetes%E9%9B%86%E7%BE%A4%E7%97%9B%E8%8B%A6%E6%90%AD%E5%BB%BA%E8%BF%87%E7%A8%8B/</a></p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/k8s/" rel="tag"># k8s</a>
+              <a href="/tags/%E4%BA%91%E5%8E%9F%E7%94%9F/" rel="tag"># 云原生</a>
+              <a href="/tags/rancher/" rel="tag"># rancher</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/07/23/%E5%9C%A8Docker%E9%87%8C%E4%BD%BF%E7%94%A8runit%E7%9B%91%E6%8E%A7%E6%9C%8D%E5%8A%A1%E7%8A%B6%E6%80%81/" rel="prev" title="在Docker里使用s6-svscan做进程守护">
+      <i class="fa fa-chevron-left"></i> 在Docker里使用s6-svscan做进程守护
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/07/25/%E4%BD%BF%E7%94%A8Rancher%E6%90%AD%E9%85%8DHarbor%E9%83%A8%E7%BD%B2Kafka/" rel="next" title="使用Rancher搭配Harbor部署Kafka集群">
+      使用Rancher搭配Harbor部署Kafka集群 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#rancher%E6%98%AF%E4%B8%AA%E5%95%A5%EF%BC%9F"><span class="nav-number">1.</span> <span class="nav-text">rancher是个啥？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85rancher%E4%BB%A5%E5%8F%8A%E5%88%9B%E5%BB%BAk8s%E9%9B%86%E7%BE%A4"><span class="nav-number">2.</span> <span class="nav-text">安装rancher以及创建k8s集群</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85kuberctl"><span class="nav-number">3.</span> <span class="nav-text">安装kuberctl</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B8%85%E7%90%86%E8%8A%82%E7%82%B9"><span class="nav-number">4.</span> <span class="nav-text">清理节点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E9%97%AE%E9%A2%98"><span class="nav-number">5.</span> <span class="nav-text">其他问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">6.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

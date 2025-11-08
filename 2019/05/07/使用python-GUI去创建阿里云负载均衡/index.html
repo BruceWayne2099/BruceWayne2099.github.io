@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="如果发现activemq curl自己的8161端口timeout的情况，多半是activemq死了，重启可破之">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用Python GUI去创建阿里云负载均衡">
+<meta property="og:url" content="http://example.com/2019/05/07/%E4%BD%BF%E7%94%A8python-GUI%E5%8E%BB%E5%88%9B%E5%BB%BA%E9%98%BF%E9%87%8C%E4%BA%91%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="如果发现activemq curl自己的8161端口timeout的情况，多半是activemq死了，重启可破之">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/tkinter1.png">
+<meta property="og:image" content="http://example.com/images/tkinter2.png">
+<meta property="article:published_time" content="2019-05-07T06:17:04.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:47:40.592Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="python3">
+<meta property="article:tag" content="tkinter">
+<meta property="article:tag" content="阿里云">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/tkinter1.png">
+
+<link rel="canonical" href="http://example.com/2019/05/07/%E4%BD%BF%E7%94%A8python-GUI%E5%8E%BB%E5%88%9B%E5%BB%BA%E9%98%BF%E9%87%8C%E4%BA%91%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>使用Python GUI去创建阿里云负载均衡 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/05/07/%E4%BD%BF%E7%94%A8python-GUI%E5%8E%BB%E5%88%9B%E5%BB%BA%E9%98%BF%E9%87%8C%E4%BA%91%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          使用Python GUI去创建阿里云负载均衡
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-05-07 14:17:04" itemprop="dateCreated datePublished" datetime="2019-05-07T14:17:04+08:00">2019-05-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:47:40" itemprop="dateModified" datetime="2025-11-08T08:47:40+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>1.3k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>5 mins.</span>
+            </span>
+            <div class="post-description">如果发现activemq curl自己的8161端口timeout的情况，多半是activemq死了，重启可破之</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>最近闲来无事研究了一下python3的gui，就用最基础的tkinter去做了一个购买阿里云负载均衡的脚本，先看一下效果：<br><img src="/images/tkinter1.png" alt="akb48" title="在对应的栏目里输入相应的值"></p>
+<p>点击“确认”按钮之后，就会出现这样一个谈话框：<br><img src="/images/tkinter2.png" alt="akb48"></p>
+<p>确认参数完毕之后，若点击取消则返回上一层页面修改，如果点击确认则进行购买。</p>
+<p>这个脚本需要的基础知识可以去看一下莫烦大大的tkinter教学系列，地址是<a target="_blank" rel="noopener" href="https://morvanzhou.github.io/tutorials/python-basic/tkinter/">https://morvanzhou.github.io/tutorials/python-basic/tkinter/</a> ，B站有全部的视频，不到10分钟一节课，还是很棒的。</p>
+<h2 id="脚本正文"><a href="#脚本正文" class="headerlink" title="脚本正文"></a>脚本正文</h2><p>脚本内容如下：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python </span></span><br><span class="line"><span class="comment"># -*- coding:utf-8 -*-</span></span><br><span class="line"><span class="comment">#作者：ChrisChan</span></span><br><span class="line"><span class="comment">#用途：py3脚本，使用GUI购买阿里云SLB脚本</span></span><br><span class="line"><span class="keyword">import</span> tkinter <span class="keyword">as</span> tk</span><br><span class="line"><span class="keyword">import</span> tkinter.ttk <span class="keyword">as</span> ttk	<span class="comment">#下拉式菜单</span></span><br><span class="line"><span class="keyword">from</span> tkinter <span class="keyword">import</span> messagebox  <span class="comment">#弹窗</span></span><br><span class="line"><span class="keyword">from</span> aliyunsdkcore.client <span class="keyword">import</span> AcsClient</span><br><span class="line"><span class="keyword">from</span> aliyunsdkcore.acs_exception.exceptions <span class="keyword">import</span> ClientException</span><br><span class="line"><span class="keyword">from</span> aliyunsdkcore.acs_exception.exceptions <span class="keyword">import</span> ServerException</span><br><span class="line"><span class="keyword">from</span> aliyunsdkslb.request.v20140515.CreateLoadBalancerRequest <span class="keyword">import</span> CreateLoadBalancerRequest</span><br><span class="line"></span><br><span class="line"><span class="comment">#秘钥集合</span></span><br><span class="line">aksk_A = [<span class="string">&quot;第一个账号的ak&quot;</span>,<span class="string">&quot;第一个账号的sk&quot;</span>]</span><br><span class="line">aksk_B = [<span class="string">&quot;第2个账号的ak&quot;</span>,<span class="string">&quot;第2个账号的sk&quot;</span>]</span><br><span class="line">aksk_C = [<span class="string">&quot;第3个账号的ak&quot;</span>,<span class="string">&quot;第3个账号的sk&quot;</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment">#创建一个类可以建立负载均衡</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">CreateSlb</span>(<span class="title class_ inherited__">object</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self,ak,sk,domain</span>):</span><br><span class="line">        <span class="variable language_">self</span>.ak = ak</span><br><span class="line">        <span class="variable language_">self</span>.sk = sk</span><br><span class="line">        <span class="variable language_">self</span>.domain = domain</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">create</span>(<span class="params">self,name,nettype</span>):</span><br><span class="line">        client = AcsClient(<span class="variable language_">self</span>.ak,<span class="variable language_">self</span>.sk,<span class="variable language_">self</span>.domain)</span><br><span class="line">        request = CreateLoadBalancerRequest()</span><br><span class="line">        request.set_accept_format(<span class="string">&#x27;json&#x27;</span>)</span><br><span class="line">        request.set_LoadBalancerSpec(<span class="string">&quot;slb.s1.small&quot;</span>)	<span class="comment">#这里是负载均衡的规格，</span></span><br><span class="line">        request.set_LoadBalancerName(name)</span><br><span class="line">        request.set_AddressType(nettype)</span><br><span class="line">        response = client.do_action_with_exception(request)</span><br><span class="line">        <span class="built_in">print</span>(<span class="built_in">str</span>(response, encoding=<span class="string">&#x27;utf-8&#x27;</span>))</span><br><span class="line"></span><br><span class="line">window = tk.Tk()	<span class="comment">#建立一个窗体</span></span><br><span class="line">window.title(<span class="string">&quot;购买阿里云负载均衡&quot;</span>)   <span class="comment">#窗体的标题</span></span><br><span class="line"></span><br><span class="line">Label1 = tk.Label(window, text=<span class="string">&#x27;请输入负载均衡名称:&#x27;</span>).grid(row=<span class="number">0</span>, column=<span class="number">0</span>)</span><br><span class="line">v1 = tk.StringVar()</span><br><span class="line">e1 = tk.Entry(window, textvariable=v1)</span><br><span class="line">e1.grid(row=<span class="number">0</span>,column=<span class="number">1</span>,padx=<span class="number">10</span>,pady=<span class="number">5</span>)  <span class="comment"># 设置输入框显示的位置，以及长和宽属性</span></span><br><span class="line"></span><br><span class="line">l = tk.Label(window,bg=<span class="string">&quot;yellow&quot;</span>,width=<span class="number">20</span>,text=<span class="string">&quot;默认值是1&quot;</span>)</span><br><span class="line">l.grid(row=<span class="number">1</span>,column=<span class="number">1</span>,padx=<span class="number">10</span>,pady=<span class="number">5</span>)</span><br><span class="line"></span><br><span class="line">parameter1 = tk.StringVar()</span><br><span class="line">l1 = tk.Label(window,bg=<span class="string">&#x27;pink&#x27;</span>,width=<span class="number">20</span>,height=<span class="number">5</span>,text=<span class="string">&quot;请选择对应的阿里云账号&quot;</span>)</span><br><span class="line">l1.grid(row=<span class="number">2</span>,column=<span class="number">1</span>,rowspan=<span class="number">3</span>,padx=<span class="number">10</span>,pady=<span class="number">5</span>)</span><br><span class="line"></span><br><span class="line">parameter2 = tk.StringVar()</span><br><span class="line">l2 = tk.Label(window,bg=<span class="string">&#x27;yellow&#x27;</span>,width=<span class="number">20</span>,text=<span class="string">&quot;请选择实例所在的地域&quot;</span>)</span><br><span class="line">l2.grid(row=<span class="number">5</span>,column=<span class="number">1</span>,padx=<span class="number">10</span>,pady=<span class="number">5</span>)</span><br><span class="line"></span><br><span class="line">parameter3 = tk.StringVar()</span><br><span class="line">l3 = tk.Label(window,bg=<span class="string">&#x27;green&#x27;</span>,width=<span class="number">20</span>,height=<span class="number">3</span>,text=<span class="string">&quot;请选择网络类型&quot;</span>)</span><br><span class="line">l3.grid(row=<span class="number">10</span>,column=<span class="number">1</span>,rowspan=<span class="number">2</span>,padx=<span class="number">10</span>,pady=<span class="number">5</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">clickMe</span>():</span><br><span class="line">    result = messagebox.askokcancel(<span class="string">&quot;请确认&quot;</span>, <span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">    负载均衡名称是：%s,对应账号是：%s,所在区域是：%s,网络类型是：%s</span></span><br><span class="line"><span class="string">    &#x27;&#x27;&#x27;</span> % (v1.get(),parameter1.get(),region1.get(),parameter3.get())) <span class="comment">#前面是弹窗主题，后面是弹窗内容</span></span><br><span class="line">    name = v1.get()</span><br><span class="line">    nettype = parameter3.get()</span><br><span class="line">    domain = region1.get()</span><br><span class="line">    account = parameter1.get()</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;负载均衡名称是：%s&quot;</span> % name)  <span class="comment"># 获取用户输入的信息</span></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;所在区域是：%s&quot;</span> % domain)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;对应账号是：%s&quot;</span> % account)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;网络类型是：%s&quot;</span> % nettype)</span><br><span class="line">    <span class="keyword">if</span> result <span class="keyword">is</span> <span class="literal">True</span>:</span><br><span class="line">        <span class="keyword">if</span> account == <span class="string">&quot;A&quot;</span>:</span><br><span class="line">            ak = aksk_A[<span class="number">0</span>]</span><br><span class="line">            sk = aksk_A[<span class="number">1</span>]</span><br><span class="line">            getSLB = CreateSlb(ak,sk,domain)    <span class="comment">#将类实例化</span></span><br><span class="line">            getSLB.create(name,nettype)	<span class="comment">#执行购买函数</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">elif</span> account == <span class="string">&quot;B&quot;</span>:</span><br><span class="line">            ak = aksk_B[<span class="number">0</span>]</span><br><span class="line">            sk = aksk_B[<span class="number">1</span>]</span><br><span class="line">            getSLB = CreateSlb(ak, sk, domain)  <span class="comment"># 将类实例化</span></span><br><span class="line">            getSLB.create(name,nettype)	<span class="comment">#执行购买函数</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            ak = aksk_C[<span class="number">0</span>]</span><br><span class="line">            sk = aksk_C[<span class="number">1</span>]</span><br><span class="line">            getSLB = CreateSlb(ak, sk, domain)  <span class="comment"># 将类实例化</span></span><br><span class="line">            getSLB.create(name,nettype)	<span class="comment">#执行购买函数</span></span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;购买完毕！&quot;</span>)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">print_selection</span>(<span class="params">v</span>):</span><br><span class="line">    l.config(text=<span class="string">&quot;当前选择的值是：&quot;</span> + v)   <span class="comment">#V就是传入值也是获取的长度</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">get_env</span>():</span><br><span class="line">    l1.config(text=<span class="string">&quot;你选择了&quot;</span>+parameter1.get())  <span class="comment">#使用config功能去改变原有l的参数,把text变成了提取var1里的值</span></span><br><span class="line">    <span class="comment">#print(parameter1.get())</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">get_region</span>():</span><br><span class="line">    l2.config(text=<span class="string">&quot;你选择了&quot;</span>+region1.get())</span><br><span class="line">    <span class="comment">#print(parameter2.get())</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">get_network</span>():</span><br><span class="line">    l3.config(text=<span class="string">&quot;你选择了&quot;</span>+parameter3.get())</span><br><span class="line">    <span class="comment">#print(parameter3.get())</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#选择环境</span></span><br><span class="line">env1 = tk.Radiobutton(window,text=<span class="string">&quot;第一个账号&quot;</span>,variable=parameter1,value=<span class="string">&#x27;A&#x27;</span>,command=get_env)</span><br><span class="line">env2 = tk.Radiobutton(window,text=<span class="string">&quot;第2个账号&quot;</span>,variable=parameter1,value=<span class="string">&#x27;B&#x27;</span>,command=get_env)</span><br><span class="line">env3 = tk.Radiobutton(window,text=<span class="string">&quot;第3个账号&quot;</span>,variable=parameter1,value=<span class="string">&#x27;C&#x27;</span>,command=get_env)</span><br><span class="line">env1.grid(row=<span class="number">2</span>, column=<span class="number">0</span>, padx=<span class="number">10</span>, pady=<span class="number">5</span>)</span><br><span class="line">env2.grid(row=<span class="number">3</span>, column=<span class="number">0</span>, padx=<span class="number">10</span>, pady=<span class="number">5</span>)</span><br><span class="line">env3.grid(row=<span class="number">4</span>, column=<span class="number">0</span>, padx=<span class="number">10</span>, pady=<span class="number">5</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">#选择地域，使用下拉列表</span></span><br><span class="line">number = tk.StringVar()</span><br><span class="line">region1 = ttk.Combobox(window,width=<span class="number">12</span>,textvariable=number,state=<span class="string">&#x27;readonly&#x27;</span>)    <span class="comment">#加入readonly，使下拉列表设置成为只读模式</span></span><br><span class="line">region1[<span class="string">&#x27;values&#x27;</span>] = (<span class="string">&quot;cn-hangzhou&quot;</span>,<span class="string">&quot;cn-shenzhen&quot;</span>,<span class="string">&quot;eu-central-1&quot;</span>,<span class="string">&quot;ap-southeast-1&quot;</span>,<span class="string">&quot;cn-hongkong&quot;</span>)   <span class="comment">#下拉列表里面具体的元素</span></span><br><span class="line">region1.grid(row=<span class="number">5</span>,column=<span class="number">0</span>)</span><br><span class="line">region1.current(<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">#选择内/外网</span></span><br><span class="line">network1 = tk.Radiobutton(window,text=<span class="string">&quot;内网&quot;</span>,variable=parameter3,value=<span class="string">&#x27;intranet&#x27;</span>,command=get_network)</span><br><span class="line">network2 = tk.Radiobutton(window,text=<span class="string">&quot;外网&quot;</span>,variable=parameter3,value=<span class="string">&#x27;internet&#x27;</span>,command=get_network)</span><br><span class="line">network1.grid(row=<span class="number">10</span>, column=<span class="number">0</span>, padx=<span class="number">10</span>, pady=<span class="number">5</span>)</span><br><span class="line">network2.grid(row=<span class="number">11</span>, column=<span class="number">0</span>, padx=<span class="number">10</span>, pady=<span class="number">5</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">#尺度区间</span></span><br><span class="line">s = tk.Scale(window,label=<span class="string">&quot;想要多少台?&quot;</span>,from_=<span class="number">1</span>,to=<span class="number">20</span>,orient=tk.HORIZONTAL,resolution=<span class="number">1</span>,command=print_selection)   </span><br><span class="line"><span class="comment">#HORIZONTAL横向,length的单位是像素,resolution单位是取小数还是取整</span></span><br><span class="line">s.grid(row=<span class="number">1</span>, column=<span class="number">0</span>, padx=<span class="number">10</span>, pady=<span class="number">5</span>) </span><br><span class="line"></span><br><span class="line"><span class="comment">#提交按钮</span></span><br><span class="line">action = tk.Button(window, text=<span class="string">&#x27;确认提交&#x27;</span>,width=<span class="number">10</span>,command=clickMe)</span><br><span class="line">action.grid(row=<span class="number">12</span>, column=<span class="number">0</span>, sticky=tk.W, padx=<span class="number">10</span>, pady=<span class="number">5</span>)</span><br><span class="line">tk.Button(window, text=<span class="string">&#x27;退出程序&#x27;</span>,width=<span class="number">10</span>,command=window.quit).grid(row=<span class="number">12</span>, column=<span class="number">1</span>, sticky=tk.E, padx=<span class="number">10</span>, pady=<span class="number">5</span>)</span><br><span class="line"></span><br><span class="line">tk.mainloop()</span><br></pre></td></tr></table></figure></p>
+<p>基本脚本的注释就已经讲明白了整个脚本执行的过程，简单说来就是界面输入对应的选项，再把这些选项传入到阿里云的api里达到购买负载均衡的目的。这里要注意一下，<code>thinker</code>布局只能从<code>pack</code>,<code>grid</code>,<code>place</code>里选择一种。</p>
+<p>脚本就到此结束，后期再给这个脚本添加到对应的端口监听功能就完美了！</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a target="_blank" rel="noopener" href="https://www.mierhuo.com/code/106">https://www.mierhuo.com/code/106</a><br><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/5dfeb29aed7b">https://www.jianshu.com/p/5dfeb29aed7b</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/ruo-li-suo-yi/p/7425307.html">https://www.cnblogs.com/ruo-li-suo-yi/p/7425307.html</a></p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E9%98%BF%E9%87%8C%E4%BA%91/" rel="tag"># 阿里云</a>
+              <a href="/tags/python3/" rel="tag"># python3</a>
+              <a href="/tags/tkinter/" rel="tag"># tkinter</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/04/29/%E8%A7%A3%E5%86%B3%E5%BE%AE%E4%BF%A1%E4%B8%8D%E6%94%AF%E6%8C%81%E9%98%BF%E9%87%8C%E4%BA%91OSS%E5%9F%9F%E5%90%8D%E7%9A%84%E9%97%AE%E9%A2%98/" rel="prev" title="解决微信不支持阿里云OSS域名的问题">
+      <i class="fa fa-chevron-left"></i> 解决微信不支持阿里云OSS域名的问题
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/05/13/%E4%BD%BF%E7%94%A8Python-GUI%E5%8E%BB%E5%B0%86%E6%9C%AC%E5%9C%B0%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E9%98%BF%E9%87%8C%E4%BA%91OSS/" rel="next" title="使用Python GUI去将本地文件上传阿里云OSS">
+      使用Python GUI去将本地文件上传阿里云OSS <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%84%9A%E6%9C%AC%E6%AD%A3%E6%96%87"><span class="nav-number">2.</span> <span class="nav-text">脚本正文</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">3.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

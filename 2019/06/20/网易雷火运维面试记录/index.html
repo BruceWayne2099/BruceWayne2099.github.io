@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="这个世界总会有一些莫名其妙的拒绝">
+<meta property="og:type" content="article">
+<meta property="og:title" content="网易雷火运维面试全纪录">
+<meta property="og:url" content="http://example.com/2019/06/20/%E7%BD%91%E6%98%93%E9%9B%B7%E7%81%AB%E8%BF%90%E7%BB%B4%E9%9D%A2%E8%AF%95%E8%AE%B0%E5%BD%95/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="这个世界总会有一些莫名其妙的拒绝">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/%E4%B8%80%E6%8B%B3%E6%AD%A6%E6%9C%AF.jpg">
+<meta property="article:published_time" content="2019-06-20T06:12:57.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:48:11.623Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="大牛之路">
+<meta property="article:tag" content="面试">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/%E4%B8%80%E6%8B%B3%E6%AD%A6%E6%9C%AF.jpg">
+
+<link rel="canonical" href="http://example.com/2019/06/20/%E7%BD%91%E6%98%93%E9%9B%B7%E7%81%AB%E8%BF%90%E7%BB%B4%E9%9D%A2%E8%AF%95%E8%AE%B0%E5%BD%95/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>网易雷火运维面试全纪录 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2019/06/20/%E7%BD%91%E6%98%93%E9%9B%B7%E7%81%AB%E8%BF%90%E7%BB%B4%E9%9D%A2%E8%AF%95%E8%AE%B0%E5%BD%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          网易雷火运维面试全纪录
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-06-20 14:12:57" itemprop="dateCreated datePublished" datetime="2019-06-20T14:12:57+08:00">2019-06-20</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:48:11" itemprop="dateModified" datetime="2025-11-08T08:48:11+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>1.2k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>5 mins.</span>
+            </span>
+            <div class="post-description">这个世界总会有一些莫名其妙的拒绝</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="电话一面"><a href="#电话一面" class="headerlink" title="电话一面"></a>电话一面</h2><ol>
+<li><p>都搞过什么linux的发行版，区别是啥？</p>
+</li>
+<li><p>为什么云服务器普遍不装swap？</p>
+ <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">小内存主机由于内存不足导致持续swapping后会严重影响存储设备的IO性能。其实如果需要使用swap的话，主机性能也已经是烂的一塌糊涂，根本不能满足使用了，建议增加内存为上。 </span><br></pre></td></tr></table></figure>
+</li>
+<li><p>localhost与127.0.0.1的区别</p>
+ <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">localhost（local）是不经网卡传输！这点很重要，它不受网络防火墙和网卡相关的的限制。<span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span>是通过网卡传输，依赖网卡，并受到网络防火墙和网卡相关的限制。</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>iptables的四表五链是啥？</p>
+</li>
+<li><p>出现延迟都有原因？</p>
+</li>
+<li><p>如何把数据库恢复到指定时刻？</p>
+</li>
+<li><p>你从业以来参与的比较大的故障是什么？怎么解决的？</p>
+</li>
+<li><p>如果要大量insert数据到数据库，有什么优化的方法？</p>
+ <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1</span>)一条SQL语句插入多条数据:比如一次insert插入多个values，INSERT INTO `insert_table` (`datetime`, `uid`, `content`, `<span class="built_in">type</span>`) VALUES (<span class="string">&#x27;0&#x27;</span>, <span class="string">&#x27;userid_0&#x27;</span>, <span class="string">&#x27;content_0&#x27;</span>, <span class="number">0</span>), (<span class="string">&#x27;1&#x27;</span>, <span class="string">&#x27;userid_1&#x27;</span>, <span class="string">&#x27;content_1&#x27;</span>, <span class="number">1</span>);</span><br><span class="line">这样的好处是减少binlog和innodb的日质量，降低了日志刷盘的频率提高效率，同时减少了网络传输的IO，这个优化效果特别明显；</span><br><span class="line"><span class="number">2</span>）把多一个insert写成一个事务，进行一个insert操作时，MySQL内部会建立一个事务，在事务内才进行真正插入处理操作。通过使用事务可以减少创建事务的消耗，所有插入都在执行后才进行提交操作；</span><br><span class="line"><span class="number">3</span>）数据按照主键有序插入，因为数据库插入时，需要维护索引数据，无序的记录会增大维护索引的成本，不过这个方法提高的并不明显；</span><br><span class="line"><span class="number">4</span>）以上方法综合使用；</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="电话二面"><a href="#电话二面" class="headerlink" title="电话二面"></a>电话二面</h2><ol>
+<li><p>介绍一下你自己</p>
+</li>
+<li><p>使用docker遇到了什么坑？</p>
+</li>
+<li><p>docker的网络模式有哪些？为什么不能选hosts？</p>
+</li>
+<li><p>服务器调整进程优先级的命令是啥？</p>
+ <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">一般来说微服务（即一个云服务器只跑一个进程）的场景来说，这个问题很少遇到，但是实际很多公司是一个服务器（比如<span class="number">80</span>核160G）跑多个进程，那么对后台的程序有优先级限制就要使用`nice`命令。</span><br><span class="line">Linux系统中，进程有-<span class="number">19</span>到<span class="number">19</span>这<span class="number">39</span>个优先级。-<span class="number">19</span>最优先，<span class="number">19</span>最不优先。进程的默认优先级为<span class="number">0</span>。如果希望将进程调整为最优先，则将进程的nice值设置为-<span class="number">19</span>；如果希望进程最不优先，占用最少的系统CPU时间，则将其设置为<span class="number">19</span>。</span><br><span class="line"></span><br><span class="line">修改已经存在的进程的优先级</span><br><span class="line">将PID为<span class="number">1799</span>的进程优先级设置为最低（<span class="number">19</span>）：renice <span class="number">19</span> <span class="number">1799</span></span><br><span class="line">将PID为<span class="number">1799</span>的进程优先级设置为最高（-<span class="number">19</span>）：renice -<span class="number">19</span> <span class="number">1799</span></span><br><span class="line"></span><br><span class="line">新建进程并设置优先级</span><br><span class="line">nice -<span class="number">19</span> tar zcf pack.tar.gz documents		<span class="comment">#这里-19并不是最高优先级，而是最低优先级，要设定最高优先级是--19</span></span><br></pre></td></tr></table></figure></li>
+<li><p>python的&#x3D;&#x3D;和is有什么不同？</p>
+ <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">is</span>比较的是<span class="built_in">id</span>是不是一样，==比较的是值是不是一样。</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>如何删除某文件下所有名称带有空格的文件？</p>
+ <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">可以通过转义符，或者获取文件的inode，根据inode删除对应的文件:find -inum 编号 -delete</span><br><span class="line">比如想rm文件名为“my file”的文件可以用rm my\ file</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>ansibleplaybook的回滚方法？</p>
+</li>
+<li><p>如果nginx的server设置了add header，同时子location也设置了add header，那么会有什么现象？</p>
+</li>
+<li><p>如何判断查询是否用到了索引？</p>
+ <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">使用explain，如果<span class="built_in">type</span>类型是<span class="built_in">all</span>就是没有用到索引，如果是其他具体类型就是用到了索引。</span><br><span class="line">索引依次从好到差：system，const，eq_ref，ref，fulltext，ref_or_null，unique_subquery，index_subquery，<span class="built_in">range</span>，index_merge，index，ALL，除了<span class="built_in">all</span>之外，其他的<span class="built_in">type</span>都可以使用到索引，除了index_merge之外，其他的<span class="built_in">type</span>只可以用到一个索引。</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="现场技术一面"><a href="#现场技术一面" class="headerlink" title="现场技术一面"></a>现场技术一面</h2><ol>
+<li><p>写一下Python序列循环移位的方法，原来是[1,2,3,4,5,6]，变成[3,4,5,6,1,2]，任意语言都可以。</p>
+ <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">使用切片，简单易理解，速度最快，可同时实现循环左移（k&gt;<span class="number">0</span>）和右移（k&lt;<span class="number">0</span>）。</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">demo</span>(<span class="params">lst, k</span>):</span><br><span class="line">    <span class="keyword">return</span> lst[k:] + lst[:k]</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>你们平时备份mysql使用什么方法？为什么用这个开源软件？</p>
+</li>
+<li><p>服务器你们是如何初始化的？</p>
+</li>
+<li><p>简单的介绍一下python的生成器？</p>
+</li>
+<li><p>如果发现慢sql你怎么排查？</p>
+</li>
+<li><p>发现java服务出现了CPU飙升的现象，怎么排查？</p>
+</li>
+<li><p>除了代码问题之外，都有哪些情况会导致CPU 100%？</p>
+</li>
+<li><p>都做过什么优化？（主动运维方向）</p>
+</li>
+</ol>
+<p>剩下的就是一些流程性的问题了。<br><img src="/images/%E4%B8%80%E6%8B%B3%E6%AD%A6%E6%9C%AF.jpg" alt="akb48"></p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E9%9D%A2%E8%AF%95/" rel="tag"># 面试</a>
+              <a href="/tags/%E5%A4%A7%E7%89%9B%E4%B9%8B%E8%B7%AF/" rel="tag"># 大牛之路</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/06/17/XtraBackup%E7%9A%84%E5%AE%89%E8%A3%85%E5%92%8C%E4%BD%BF%E7%94%A8/" rel="prev" title="XtraBackup的安装和使用">
+      <i class="fa fa-chevron-left"></i> XtraBackup的安装和使用
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/06/21/%E7%A0%94%E7%A9%B6%E4%B8%80%E4%B8%8BZabbix-3-4%E7%9A%84%E6%9C%8D%E5%8A%A1%E4%B8%BB%E5%8A%A8%E5%8F%91%E7%8E%B0%E5%8A%9F%E8%83%BD/" rel="next" title="研究一下Zabbix 3.4的服务主动发现功能">
+      研究一下Zabbix 3.4的服务主动发现功能 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%94%B5%E8%AF%9D%E4%B8%80%E9%9D%A2"><span class="nav-number">1.</span> <span class="nav-text">电话一面</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%94%B5%E8%AF%9D%E4%BA%8C%E9%9D%A2"><span class="nav-number">2.</span> <span class="nav-text">电话二面</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%8E%B0%E5%9C%BA%E6%8A%80%E6%9C%AF%E4%B8%80%E9%9D%A2"><span class="nav-number">3.</span> <span class="nav-text">现场技术一面</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

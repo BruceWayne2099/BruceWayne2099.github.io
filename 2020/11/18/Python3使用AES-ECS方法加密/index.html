@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="公司对于非JAVA系的同学是在太太太不友好了！">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Python3使用AES-ECS方法加密">
+<meta property="og:url" content="http://example.com/2020/11/18/Python3%E4%BD%BF%E7%94%A8AES-ECS%E6%96%B9%E6%B3%95%E5%8A%A0%E5%AF%86/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="公司对于非JAVA系的同学是在太太太不友好了！">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/%E8%AF%BA%E4%BC%8A%E5%B0%94%E8%A2%AB%E8%B8%A2%E5%82%BB%E4%BA%86.JPG">
+<meta property="article:published_time" content="2020-11-18T03:28:16.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:47:09.802Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="Django">
+<meta property="article:tag" content="平台搭建">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/%E8%AF%BA%E4%BC%8A%E5%B0%94%E8%A2%AB%E8%B8%A2%E5%82%BB%E4%BA%86.JPG">
+
+<link rel="canonical" href="http://example.com/2020/11/18/Python3%E4%BD%BF%E7%94%A8AES-ECS%E6%96%B9%E6%B3%95%E5%8A%A0%E5%AF%86/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>Python3使用AES-ECS方法加密 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2020/11/18/Python3%E4%BD%BF%E7%94%A8AES-ECS%E6%96%B9%E6%B3%95%E5%8A%A0%E5%AF%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Python3使用AES-ECS方法加密
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-11-18 11:28:16" itemprop="dateCreated datePublished" datetime="2020-11-18T11:28:16+08:00">2020-11-18</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:47:09" itemprop="dateModified" datetime="2025-11-08T08:47:09+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>771</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>3 mins.</span>
+            </span>
+            <div class="post-description">公司对于非JAVA系的同学是在太太太不友好了！</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>突然发现好久没有更新了，主要是前段时间忙双十一太忙了，通宵压测几乎15次，可以说从国庆放假回来不是在压测就是在补觉，然后公司的夜宵吃几次也就腻了，所以全链路压测的新鲜感一消失就会很迷茫。不过每次看到那些大佬们也都熬夜压测，心里还多少平衡一点…</p>
+<h2 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h2><p>在公司的一部分产品的API中，有接口是使用AES对称加解密方法来实现，并且采用ECB模式，是链接内部工具的，但是这个API的demo是用python2来写的，由于我的Django是python3.8，于是就要自己手改。代码如下，这里没有加上加解密的部分。</p>
+<pre><code><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#引入依赖包</span></span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">import</span> base64</span><br><span class="line"><span class="keyword">from</span> Crypto.Cipher <span class="keyword">import</span> AES</span><br><span class="line"></span><br><span class="line">appname = <span class="string">&quot;这里是应用名称&quot;</span></span><br><span class="line">timestamp = <span class="built_in">int</span>(time.time() * <span class="number">1000</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;当前时间戳是:&quot;</span> + <span class="built_in">str</span>(timestamp))</span><br><span class="line"></span><br><span class="line"><span class="comment">#封装AECS</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">prpcrypt</span>():</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, key</span>):</span><br><span class="line">        <span class="variable language_">self</span>.key = key</span><br><span class="line">        <span class="variable language_">self</span>.mode = AES.MODE_ECB</span><br><span class="line">        <span class="variable language_">self</span>.BS = <span class="built_in">len</span>(key)</span><br><span class="line">        <span class="comment"># 如果刚好是s是BS的倍数，那么补一组</span></span><br><span class="line">        <span class="variable language_">self</span>.pad = <span class="keyword">lambda</span> s: s + (<span class="variable language_">self</span>.BS - <span class="built_in">len</span>(s) % <span class="variable language_">self</span>.BS) * <span class="built_in">chr</span>(<span class="variable language_">self</span>.BS - <span class="built_in">len</span>(s) % <span class="variable language_">self</span>.BS).encode()</span><br><span class="line">        <span class="comment"># python3这里多了一个encode，python2的写法是self.pad = lambda s: s + (self.BS - len(s) % self.BS) * chr(self.BS - len(s) % self.BS)</span></span><br><span class="line">        <span class="variable language_">self</span>.unpad = <span class="keyword">lambda</span> s: s[<span class="number">0</span>:-s[-<span class="number">1</span>]]  <span class="comment"># python2的写法是：self.unpad = lambda s : s[0:-ord(s[-1])]，这里把ord去掉了</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#  加密</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">Encrypt</span>(<span class="params">self,text</span>):</span><br><span class="line">        text = <span class="variable language_">self</span>.pad(text)</span><br><span class="line">        cryptor = AES.new(<span class="variable language_">self</span>.key,<span class="variable language_">self</span>.mode, <span class="string">b&#x27;0000000000000000&#x27;</span>) <span class="comment">#必须16位</span></span><br><span class="line">        ciphertext = cryptor.encrypt(text)</span><br><span class="line">        <span class="keyword">return</span> ciphertext</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">#签名计算</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">sign</span>(<span class="params">timestamp</span>):</span><br><span class="line">    content = <span class="built_in">format</span>(<span class="string">&quot;appName=%s;timestamp=%s&quot;</span> % (appname, timestamp))</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;传入的动态值：&quot;</span>, content)</span><br><span class="line">    key = base64.decodebytes(<span class="string">b&#x27;1234567890abcdefghijkl==&#x27;</span>)       <span class="comment"># 这里是secret，我这里是24位</span></span><br><span class="line">    ciphertext = prpcrypt(key).Encrypt(content.encode(<span class="string">&#x27;utf-8&#x27;</span>))  <span class="comment"># utf8编码</span></span><br><span class="line">    endata = base64.urlsafe_b64encode(ciphertext).decode().rstrip(<span class="string">&#x27;=&#x27;</span>)  <span class="comment"># 必须urlsafe格式后，tstrip掉&quot;=&quot;，这里python3，需要添加一个decode()，这样就可以由bytes转str了</span></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&#x27;加密签名是：&#x27;</span>,endata)</span><br><span class="line">    <span class="keyword">return</span> endata</span><br><span class="line">    <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    signature = sign(timestamp)  <span class="comment"># 这里通过时间戳的变化和不同的appname，来得到加密签名</span></span><br></pre></td></tr></table></figure>
+</code></pre>
+<p>其实这比较恶心的地方就是Python3.x和Python2.x在一些类型上不同，比如长类型和bytes的用法上，总结一下，Python3.x和Python2.x在套接字返回值解码上有区别:<br>python bytes和str两种类型可以通过函数<code>encode()</code>和<code>decode()</code>相互转换，<br><code>str→bytes</code>：<code>encode()</code>方法。<code>str</code>通过<code>encode()</code>方法可以转换为<code>bytes</code>。<br><code>bytes→str</code>：<code>decode()</code>方法。如果我们从网络或磁盘上读取了字节流，那么读到的数据就是<code>bytes</code>。要把<code>bytes</code>变为<code>str</code>，就需要用<code>decode()</code>方法。</p>
+<h2 id="hex加密的python2-3"><a href="#hex加密的python2-3" class="headerlink" title="hex加密的python2-&gt;3"></a>hex加密的python2-&gt;3</h2><p>python2的脚本是这样的：<br>	<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">#根据你申请的账号和对应的key,加上当前的时间戳,得到一个秘钥</span><br><span class="line">import md5</span><br><span class="line"></span><br><span class="line">account=&quot;test-skyline&quot;;</span><br><span class="line">key = &quot;myPrivateKey&quot;;</span><br><span class="line">timeStamp = 1531310369L;</span><br><span class="line">toEncrypt = account+key+str(timeStamp);</span><br><span class="line">signature=md5.new(toEncrypt).digest().encode(&#x27;hex&#x27;)</span><br><span class="line"># 结果: (&#x27;5fbd62ee4cf62c503ec8e417d7289816&#x27;, &lt;type &#x27;str&#x27;&gt;)</span><br></pre></td></tr></table></figure></p>
+<p>而python3的版本就是这样了:<br>	<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"># 原脚本是python2的，现在要转成python3版本,https://yuque.antfin-inc.com/at7ocb/qbn0oy/cahbgn</span><br><span class="line"></span><br><span class="line">from hashlib import md5</span><br><span class="line">import binascii</span><br><span class="line"></span><br><span class="line">account = &quot;test-skyline&quot;</span><br><span class="line">key = &quot;myPrivateKey&quot;</span><br><span class="line"></span><br><span class="line">timeStamp = 1531310369  # python3直接这么写就行，不用带L</span><br><span class="line">en_data = account+key+str(timeStamp)</span><br><span class="line">toEncrypt = md5(en_data.encode(&quot;utf-8&quot;))  # python3的写法</span><br><span class="line">signature = binascii.b2a_hex(toEncrypt.digest())</span><br><span class="line"></span><br><span class="line">print(signature,type(signature))</span><br><span class="line"># 结果：b&#x27;5fbd62ee4cf62c503ec8e417d7289816&#x27; &lt;class &#x27;bytes&#x27;&gt;</span><br></pre></td></tr></table></figure><br><img src="/images/%E8%AF%BA%E4%BC%8A%E5%B0%94%E8%A2%AB%E8%B8%A2%E5%82%BB%E4%BA%86.JPG" alt="akb48" title="输了0比6，看看勒夫啥时候下课"></p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Django/" rel="tag"># Django</a>
+              <a href="/tags/%E5%B9%B3%E5%8F%B0%E6%90%AD%E5%BB%BA/" rel="tag"># 平台搭建</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/10/30/Mysql%E6%A0%B9%E6%8D%AE%E6%9F%90%E4%B8%80%E5%88%97%E8%BF%87%E6%BB%A4%E9%87%8D%E5%A4%8D%E9%A1%B9/" rel="prev" title="Mysql根据某几列过滤重复项">
+      <i class="fa fa-chevron-left"></i> Mysql根据某几列过滤重复项
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/11/30/Join%E4%B8%8Ewhere%E7%9A%84%E8%BF%9E%E7%94%A8Sql/" rel="next" title="Join与Where的链接Sql">
+      Join与Where的链接Sql <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AD%A3%E6%96%87"><span class="nav-number">1.</span> <span class="nav-text">正文</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#hex%E5%8A%A0%E5%AF%86%E7%9A%84python2-3"><span class="nav-number">2.</span> <span class="nav-text">hex加密的python2-&gt;3</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

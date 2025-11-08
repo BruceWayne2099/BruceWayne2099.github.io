@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="print(f&#39;{i+1}&#x2F;{a}&#39;, end&#x3D;&quot;\r &quot;) 打印当前进度（如 1&#x2F;10000），end&#x3D;&quot;\r &quot; 表示每次打印后将光标移回行首，实现“进度条”覆盖刷新效果">
+<meta property="og:type" content="article">
+<meta property="og:title" content="记录一次排查cpu飙高的问题">
+<meta property="og:url" content="http://example.com/2025/05/23/%E2%80%9C%E8%AE%B0%E5%BD%95%E4%B8%80%E6%AC%A1%E6%8E%92%E6%9F%A5cpu%E9%A3%99%E9%AB%98%E7%9A%84%E9%97%AE%E9%A2%98%E2%80%9D/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="print(f&#39;{i+1}&#x2F;{a}&#39;, end&#x3D;&quot;\r &quot;) 打印当前进度（如 1&#x2F;10000），end&#x3D;&quot;\r &quot; 表示每次打印后将光标移回行首，实现“进度条”覆盖刷新效果">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/cpu%E4%B8%8A%E6%B6%A8.png">
+<meta property="og:image" content="http://example.com/images/cpu%E4%B8%8A%E6%B6%A82.png">
+<meta property="og:image" content="http://example.com/images/cpu%E4%B8%8A%E6%B6%A84.png">
+<meta property="og:image" content="http://example.com/images/cpu%E4%B8%8A%E6%B6%A85.png">
+<meta property="og:image" content="http://example.com/images/cpu%E4%B8%8A%E6%B6%A83.png">
+<meta property="og:image" content="http://example.com/images/cpu%E4%B8%8A%E6%B6%A86.png">
+<meta property="article:published_time" content="2025-05-23T03:41:53.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:47:23.787Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="CPU">
+<meta property="article:tag" content="问题定位">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/cpu%E4%B8%8A%E6%B6%A8.png">
+
+<link rel="canonical" href="http://example.com/2025/05/23/%E2%80%9C%E8%AE%B0%E5%BD%95%E4%B8%80%E6%AC%A1%E6%8E%92%E6%9F%A5cpu%E9%A3%99%E9%AB%98%E7%9A%84%E9%97%AE%E9%A2%98%E2%80%9D/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>记录一次排查cpu飙高的问题 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2025/05/23/%E2%80%9C%E8%AE%B0%E5%BD%95%E4%B8%80%E6%AC%A1%E6%8E%92%E6%9F%A5cpu%E9%A3%99%E9%AB%98%E7%9A%84%E9%97%AE%E9%A2%98%E2%80%9D/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          记录一次排查cpu飙高的问题
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2025-05-23 11:41:53" itemprop="dateCreated datePublished" datetime="2025-05-23T11:41:53+08:00">2025-05-23</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:47:23" itemprop="dateModified" datetime="2025-11-08T08:47:23+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>534</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>2 mins.</span>
+            </span>
+            <div class="post-description">print(f'{i+1}/{a}', end="\r ") 打印当前进度（如 1/10000），end="\r " 表示每次打印后将光标移回行首，实现“进度条”覆盖刷新效果</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="过程"><a href="#过程" class="headerlink" title="过程"></a>过程</h2><p>今天发现一个集群里的某一台机器CPU涨了很多。如图：<br><img src="/images/cpu%E4%B8%8A%E6%B6%A8.png" alt="paradin" title="流量没变化，sys和user都上涨了很多"></p>
+<p>爬到容器里，<code>top -Hp 对应的PID</code>看了一下，里面是很多个线程都CPU很高：<br><img src="/images/cpu%E4%B8%8A%E6%B6%A82.png" alt="paradin" title="好几个线程"></p>
+<p>跑到宿主机里一看，整个宿主机cpu和load都有上涨：<br><img src="/images/cpu%E4%B8%8A%E6%B6%A84.png" alt="paradin" title="时间也吻合，所以可见是容器带高了整体宿主机"></p>
+<p>从宿主机的监控看，这个容器的cpi也上涨：<br><img src="/images/cpu%E4%B8%8A%E6%B6%A85.png" alt="paradin" title="CPI 是衡量CPU性能的指标，表示执行一条指令所需的平均时钟周期数"></p>
+<p>同时发现这个容器的younggc频率没变化，但是gc耗时比以前明显多了很多：<br><img src="/images/cpu%E4%B8%8A%E6%B6%A83.png" alt="paradin" title="gc耗时上涨的时刻跟cpu上涨时刻吻合"></p>
+<p>由于频率没变化，但是耗时上涨，我怀疑可能是内存出了问题，导致现在每一次gc的时候更加消耗cpu了，于是<code>sudo dmesg -T |grep -i &quot;Hardware Error&quot;</code>，果然容器在对应的时刻附近有内存硬件的报警：<br><img src="/images/cpu%E4%B8%8A%E6%B6%A86.png" alt="paradin" title="看到大量的mce告警"></p>
+<p>于是将这个容器进行了置换，置换后的ip再看CPU和load都恢复了正常。</p>
+<h2 id="心得"><a href="#心得" class="headerlink" title="心得"></a>心得</h2><p>其实一个集群里某一个机器出了问题，是比较难查的。因为那么多机器没问题，唯独你有问题，那么就要想哪些地方是这个机器跟其他同集群里机器不同。可以从以下几个方面排查解决：</p>
+<ol>
+<li>这个机器遇到了一个很特殊的参数，比如我们曾经见过一个很奇葩的商品，里面好几万的sku和子品。唯独流量走到了这个机器上，当这个应用的逻辑处理的时候，暴露了逻辑上问题，所以要结合时间去业务的日志里查。</li>
+<li>容器的底层出了问题，看看网络重传率，对比宿主机其他的容器系统情况，使用dmesg定位，然后需要宿主机的同学进一步配合排查。如果容器进行置换之后，问题解决更可以说明是宿主机的问题。</li>
+<li>可以跟其他的机器进行对比：对比线程使用cpu的细节，对比内存里都存了啥，对比流量是不是跟其他容器的流量有不同，但是这种有点大海捞针，比较费时间。</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/CPU/" rel="tag"># CPU</a>
+              <a href="/tags/%E9%97%AE%E9%A2%98%E5%AE%9A%E4%BD%8D/" rel="tag"># 问题定位</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2025/05/17/%E5%B7%B4%E8%90%A8%E7%9A%8424%EF%BD%9E25%E8%B5%9B%E5%AD%A3%E6%9C%AB%E6%80%BB%E7%BB%93/" rel="prev" title="巴萨的24～25赛季末总结">
+      <i class="fa fa-chevron-left"></i> 巴萨的24～25赛季末总结
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2025/05/25/%E2%80%9C%E7%8E%B0%E5%BD%B9%E4%BA%9A%E6%B4%B2%E8%B6%B3%E7%90%83%E6%98%8E%E6%98%9F%E5%89%8D%E5%8D%81%E6%8E%92%E5%90%8D%E2%80%9D/" rel="next" title="现役亚洲足球明星排名">
+      现役亚洲足球明星排名 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%87%E7%A8%8B"><span class="nav-number">1.</span> <span class="nav-text">过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BF%83%E5%BE%97"><span class="nav-number">2.</span> <span class="nav-text">心得</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

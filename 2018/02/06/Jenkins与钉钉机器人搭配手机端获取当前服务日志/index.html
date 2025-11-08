@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="钉钉机器人要是能发送参数到服务器里然后执行脚本就太好了！">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Jenkins与钉钉机器人实现手机端获取当前服务日志">
+<meta property="og:url" content="http://example.com/2018/02/06/Jenkins%E4%B8%8E%E9%92%89%E9%92%89%E6%9C%BA%E5%99%A8%E4%BA%BA%E6%90%AD%E9%85%8D%E6%89%8B%E6%9C%BA%E7%AB%AF%E8%8E%B7%E5%8F%96%E5%BD%93%E5%89%8D%E6%9C%8D%E5%8A%A1%E6%97%A5%E5%BF%97/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="钉钉机器人要是能发送参数到服务器里然后执行脚本就太好了！">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/dingding1.png">
+<meta property="og:image" content="http://example.com/images/dingding2.png">
+<meta property="og:image" content="http://example.com/images/dingding3.png">
+<meta property="og:image" content="http://example.com/images/dingding4.png">
+<meta property="og:image" content="http://example.com/images/dingding5.png">
+<meta property="og:image" content="http://example.com/images/dingding6.png">
+<meta property="og:image" content="http://example.com/images/dingding7.png">
+<meta property="og:image" content="http://example.com/images/dingding8.png">
+<meta property="og:image" content="http://example.com/images/dingding9.png">
+<meta property="og:image" content="http://example.com/images/dingding10.png">
+<meta property="og:image" content="http://example.com/images/dingding11.png">
+<meta property="article:published_time" content="2018-02-06T12:56:33.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:46:59.197Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="jenkins">
+<meta property="article:tag" content="钉钉">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/dingding1.png">
+
+<link rel="canonical" href="http://example.com/2018/02/06/Jenkins%E4%B8%8E%E9%92%89%E9%92%89%E6%9C%BA%E5%99%A8%E4%BA%BA%E6%90%AD%E9%85%8D%E6%89%8B%E6%9C%BA%E7%AB%AF%E8%8E%B7%E5%8F%96%E5%BD%93%E5%89%8D%E6%9C%8D%E5%8A%A1%E6%97%A5%E5%BF%97/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>Jenkins与钉钉机器人实现手机端获取当前服务日志 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2018/02/06/Jenkins%E4%B8%8E%E9%92%89%E9%92%89%E6%9C%BA%E5%99%A8%E4%BA%BA%E6%90%AD%E9%85%8D%E6%89%8B%E6%9C%BA%E7%AB%AF%E8%8E%B7%E5%8F%96%E5%BD%93%E5%89%8D%E6%9C%8D%E5%8A%A1%E6%97%A5%E5%BF%97/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Jenkins与钉钉机器人实现手机端获取当前服务日志
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-02-06 20:56:33" itemprop="dateCreated datePublished" datetime="2018-02-06T20:56:33+08:00">2018-02-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:46:59" itemprop="dateModified" datetime="2025-11-08T08:46:59+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>1.6k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>6 mins.</span>
+            </span>
+            <div class="post-description">钉钉机器人要是能发送参数到服务器里然后执行脚本就太好了！</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>马上要过年了，各位运维们除了因为买不到回家的火车票而嚎嚎大哭之外也开始扩容服务器和提前调整监控值，目的就是为了过一个消停的春节。可是这毕竟十天左右不在公司，要是模块真出了什么意外肯定没法第一找到日志分析问题，毕竟这几天都在串门拜年和醉生梦死中度过，走到哪都要再背一个笔记本实在太不方便了。</p>
+<p>那么这个时候，我就琢磨使用手机端来启动服务器里脚本，让这个脚本可以去获取当前的日志，然后再把结果返回到手机端。这样就不用到哪里都带那个一看就很扫兴的公司笔记本电脑了。</p>
+<p>使用手机端启动服务器里脚本？我又不会开发android和ios，那么肯定就要使用第三方工具，我条件反射的想到了jenkins，因为jenkins是用手机可以登录的，那么在手机端得到结果用什么呢？在微信公众号和钉钉机器人里，我选择了钉钉机器人。</p>
+<h2 id="创造钉钉机器人"><a href="#创造钉钉机器人" class="headerlink" title="创造钉钉机器人"></a>创造钉钉机器人</h2><p>我的钉钉版本是4.2.6.37，首先在左上角头像的三角菜单有一个<code>机器人管理</code>，如图：<br><img src="/images/dingding1.png" alt="paradin"></p>
+<p>然后选择自定义机器人，给它起个名又换一个图标之后，添加到一个群聊里，如图：<br><img src="/images/dingding2.png" alt="paradin"></p>
+<p>添加的时候，这个机器人会生成一个<code>webhook</code>，它的结构应该是：<code>https://oapi.dingtalk.com/robot/send?access_token=XXX</code>，后面的XXX是标识符，不同的标识符代表不同的机器人，这个标识符如果丢了，可以在机器人头像点击一下然后选择<code>机器人设置</code>重新看到。</p>
+<h2 id="编写机器人脚本"><a href="#编写机器人脚本" class="headerlink" title="编写机器人脚本"></a>编写机器人脚本</h2><p>机器人的官方说明网址就是<code>https://open-doc.dingtalk.com/docs/doc.htm?spm=a219a.7629140.0.0.zZIvnt&amp;treeId=257&amp;articleId=105735&amp;docType=1</code>，这里面已经把使用方法写的够清楚了。我这里的这个python脚本是用json的格式，如下：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">#!<span class="regexp">/bin/</span>python</span><br><span class="line">#<span class="attr">coding</span>: utf-<span class="number">8</span></span><br><span class="line"><span class="keyword">import</span> json,urllib2</span><br><span class="line"></span><br><span class="line">#这里是机器人对应的<span class="title class_">Webhook</span>地址</span><br><span class="line">url = <span class="string">&quot;https://oapi.dingtalk.com/robot/send?access_token=这里输入你机器人的标识符</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">#这里是头，原样复制就好</span></span><br><span class="line"><span class="string">header = &#123;</span></span><br><span class="line"><span class="string">    &quot;</span><span class="title class_">Content</span>-<span class="title class_">Type</span><span class="string">&quot;: &quot;</span>application/json<span class="string">&quot;,</span></span><br><span class="line"><span class="string">    &quot;</span>charset<span class="string">&quot;: &quot;</span>utf-<span class="number">8</span><span class="string">&quot;</span></span><br><span class="line"><span class="string">    &#125;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">#这里是传送的消息</span></span><br><span class="line"><span class="string">data = &#123;</span></span><br><span class="line"><span class="string">   	 &quot;</span>msgtype<span class="string">&quot;: &quot;</span>text<span class="string">&quot;,</span></span><br><span class="line"><span class="string">   	    &quot;</span>text<span class="string">&quot;: &#123;</span></span><br><span class="line"><span class="string">   	        &quot;</span>content<span class="string">&quot;: &quot;</span>这里是消息正文！<span class="string">&quot;</span></span><br><span class="line"><span class="string">  		    &#125;,</span></span><br><span class="line"><span class="string">  		 &quot;</span>at<span class="string">&quot;: &#123;</span></span><br><span class="line"><span class="string">		 &quot;</span>atMobiles<span class="string">&quot;: [</span></span><br><span class="line"><span class="string">           &quot;</span>A的手机号<span class="string">&quot;,</span></span><br><span class="line"><span class="string">		&quot;</span>B的手机号<span class="string">&quot;</span></span><br><span class="line"><span class="string">		]， </span></span><br><span class="line"><span class="string">  	         &quot;</span>isAtAll<span class="string">&quot;:False   #这里True代表要发给所有人，False的话，要代表消息只发给A和B这两个人</span></span><br><span class="line"><span class="string">  	      &#125;</span></span><br><span class="line"><span class="string">  	 &#125;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">sendData = json.dumps(data)</span></span><br><span class="line"><span class="string">request = urllib2.Request(url,data = sendData,headers = header)</span></span><br><span class="line"><span class="string">urlopen = urllib2.urlopen(request)</span></span><br><span class="line"><span class="string">print urlopen.read()</span></span><br></pre></td></tr></table></figure></p>
+<p>直接执行这个脚本，就会看到我刚新建的钉钉机器人在群聊里说话了。<br><img src="/images/dingding3.png" alt="paradin"></p>
+<h2 id="机器人搭配nginx"><a href="#机器人搭配nginx" class="headerlink" title="机器人搭配nginx"></a>机器人搭配nginx</h2><p>上面那个脚本已经可以初步实现我们的目的，但是有一个缺点，就是正文内容不能过长。但是我想多打印一点日志，至少50行，怎么办？我想了想，可以把日志放进nginx的一个网页里，然后用钉钉机器人反馈这个网页地址啊，这样内容想写多少就可以写多少了。</p>
+<p>假设我现在获取到的日志的文件写进一个叫<code>chairmanmao.html</code>里，在浏览器打开看是这样的：<br><img src="/images/dingding4.png" alt="paradin"></p>
+<p>那么上面那个机器人的python脚本就要改成这样：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">#!<span class="regexp">/bin/</span>python</span><br><span class="line">#<span class="attr">coding</span>: utf-<span class="number">8</span></span><br><span class="line"><span class="keyword">import</span> json,urllib2,commands</span><br><span class="line"></span><br><span class="line">commands.<span class="title function_">getstatusoutput</span>(<span class="string">&#x27;echo -e &quot;THIS IS TEST MESSAGE！ \n&quot; &gt; /路径/chairmantail.html&#x27;</span>)	#这里可以给网页加一个标题</span><br><span class="line">commands.<span class="title function_">getstatusoutput</span>(<span class="string">&#x27;cat /路径/chairmanmao.txt &gt;&gt;  /路径/chairmanmao.html&#x27;</span>)		#这里就是把诗词写进html文件里</span><br><span class="line"></span><br><span class="line">#这里是机器人的webhook地址</span><br><span class="line">url = <span class="string">&quot;https://oapi.dingtalk.com/robot/send?access_token=这里输入你机器人的标识符&quot;</span></span><br><span class="line"></span><br><span class="line">header = &#123;</span><br><span class="line">    <span class="string">&quot;Content-Type&quot;</span>: <span class="string">&quot;application/json&quot;</span>,</span><br><span class="line">    <span class="string">&quot;charset&quot;</span>: <span class="string">&quot;utf-8&quot;</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">data = &#123;</span><br><span class="line">     <span class="string">&quot;msgtype&quot;</span>: <span class="string">&quot;link&quot;</span>,</span><br><span class="line">        <span class="string">&quot;link&quot;</span>: &#123;</span><br><span class="line">                <span class="string">&quot;text&quot;</span>: <span class="string">&quot;点击网址就可获取到本次日志查询的结果&quot;</span>,</span><br><span class="line">                <span class="string">&quot;title&quot;</span>: <span class="string">&quot;日志查询结果已经生成！&quot;</span>,</span><br><span class="line">                <span class="string">&quot;picUrl&quot;</span>: <span class="string">&quot;http://p1x3hd2at.bkt.clouddn.com/nanshen.jpg&quot;</span>,	#这里可以加一个缩略图片</span><br><span class="line">                <span class="string">&quot;messageUrl&quot;</span>: <span class="string">&quot;http://服务器外网IP地址/chairmanmao.html&quot;</span></span><br><span class="line">    &#125;,</span><br><span class="line">     <span class="string">&quot;at&quot;</span>: &#123;</span><br><span class="line">            <span class="string">&quot;isAtAll&quot;</span>:<span class="title class_">True</span>   # at为非必须</span><br><span class="line">         &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">sendData = json.<span class="title function_">dumps</span>(data)</span><br><span class="line">request = urllib2.<span class="title class_">Request</span>(url,data = sendData,headers = header)</span><br><span class="line">urlopen = urllib2.<span class="title function_">urlopen</span>(request)</span><br><span class="line">print urlopen.<span class="title function_">read</span>()</span><br></pre></td></tr></table></figure></p>
+<p>执行这个脚本可以看到机器人发送的信息如下：<br><img src="/images/dingding5.png" alt="paradin"></p>
+<p>然后打开这个网址，就看到完整的网页信息：<br><img src="/images/dingding6.png" alt="paradin"></p>
+<p>到时候把毛主席诗词换成实际的日志文件就好了，不用一口气打印所有的日志出来，<code>tail -n 50 日志文件名</code>，50行足够用了。</p>
+<h2 id="配置Jenkins"><a href="#配置Jenkins" class="headerlink" title="配置Jenkins"></a>配置Jenkins</h2><p>脚本写完了，机器人也写完了，这个时候就要添加“启动端”。安装Jenkins的步骤我这里就不写了，直接可以去看<code>https://rorschachchan.github.io/2018/02/05/Jenkins安装与创建简单任务/</code>。现在去登录Jenkins的网页，去添加一个新的Job，比如我这个Job就叫“获取模块日志”，如图：<br><img src="/images/dingding7.png" alt="paradin"></p>
+<p>如果是要在Jenkins上去读取其他服务器的日志，就可以在<code>构建project</code>的时候选择<code>参数化构建过程</code>，然后配置参数ip，到时候把这些ip传递给目标脚本。如果觉得这样hold不住，可以不用jenkins的这个功能，把ip写到脚本里去，一了百了：<br><img src="/images/dingding8.png" alt="paradin"></p>
+<p>在<code>构建</code>那一步，选择<code>Execute Shell</code>，然后里面写上具体的shell命令，如果在上面使用了参数，那么参数就可以在这里使用，我的脚本里是没有ip这个参数的，在图里写<code>$ip</code>就是做一个例子讲解一下用法而已：<br><img src="/images/dingding9.png" alt="paradin"></p>
+<p>在<code>构建后操作</code>这一步可以选择<code>E-mail Notification</code>，这样如果失败了会发送邮件通知。如果用不着就什么都不用选。然后就是保存好这个project，点击左侧菜单栏的<code>立即构建</code>，就会看到下面<code>Build History</code>会多一个<code>#1</code>出来，同时钉钉机器人也在群里发消息，这个<code>#1</code>就是构建的记录，这个纪录多了的话，新纪录会覆盖掉老的记录。<br><img src="/images/dingding10.png" alt="paradin"></p>
+<p>点击这个<code>#1</code>，选择<code>控制台输出</code>，就能看到具体的操作结果了，跟在shell界面里执行的效果差不多的。可见操作成功，目的已经达到了！<br><img src="/images/dingding11.png" alt="paradin"></p>
+<p>以后需要调用脚本，就在手机端浏览器里登陆jenkins，然后构建一下这个project，同时就可以看到钉钉里机器人有反馈了。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a target="_blank" rel="noopener" href="https://xu3352.github.io/linux/2017/05/01/jenkins-restart-remote-server-tomcat">https://xu3352.github.io/linux/2017/05/01/jenkins-restart-remote-server-tomcat</a><br><a target="_blank" rel="noopener" href="https://github.com/typ431127/zabbix_dingding">https://github.com/typ431127/zabbix_dingding</a></p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E9%92%89%E9%92%89/" rel="tag"># 钉钉</a>
+              <a href="/tags/jenkins/" rel="tag"># jenkins</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/02/06/%E4%B8%80%E6%AC%A1%E5%AE%98%E7%BD%91%E6%89%93%E4%B8%8D%E5%BC%80%E7%9A%84%E7%BB%8F%E5%8E%86/" rel="prev" title="一次官网打不开的经历">
+      <i class="fa fa-chevron-left"></i> 一次官网打不开的经历
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/02/07/%E8%AE%B0%E5%BD%95Uwsgi%E4%B8%8EDjango%E6%88%90%E5%8A%9F%E5%8B%BE%E6%90%AD%E7%9A%84%E5%A7%8B%E6%9C%AB/" rel="next" title="记录Uwsgi与Django成功勾搭的始末">
+      记录Uwsgi与Django成功勾搭的始末 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E9%80%A0%E9%92%89%E9%92%89%E6%9C%BA%E5%99%A8%E4%BA%BA"><span class="nav-number">1.</span> <span class="nav-text">创造钉钉机器人</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BC%96%E5%86%99%E6%9C%BA%E5%99%A8%E4%BA%BA%E8%84%9A%E6%9C%AC"><span class="nav-number">2.</span> <span class="nav-text">编写机器人脚本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%BA%E5%99%A8%E4%BA%BA%E6%90%AD%E9%85%8Dnginx"><span class="nav-number">3.</span> <span class="nav-text">机器人搭配nginx</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%85%8D%E7%BD%AEJenkins"><span class="nav-number">4.</span> <span class="nav-text">配置Jenkins</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">5.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

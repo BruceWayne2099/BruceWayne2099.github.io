@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="这次偏数据开发">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux运维工程师笔试题第二十一套">
+<meta property="og:url" content="http://example.com/2021/04/14/%E6%95%B0%E6%8D%AE%E5%BA%93%E5%86%99sql%E9%9D%A2%E8%AF%95%E9%A2%98/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="这次偏数据开发">
+<meta property="og:locale">
+<meta property="article:published_time" content="2021-04-14T12:24:33.000Z">
+<meta property="article:modified_time" content="2025-11-08T00:48:04.560Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="数据库">
+<meta property="article:tag" content="数据开发">
+<meta property="article:tag" content="面试题">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2021/04/14/%E6%95%B0%E6%8D%AE%E5%BA%93%E5%86%99sql%E9%9D%A2%E8%AF%95%E9%A2%98/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>Linux运维工程师笔试题第二十一套 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">那些在阳光下挥洒青春的日子啊！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/04/14/%E6%95%B0%E6%8D%AE%E5%BA%93%E5%86%99sql%E9%9D%A2%E8%AF%95%E9%A2%98/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="勤奋捞钱，早日退休！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Linux运维工程师笔试题第二十一套
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-04-14 20:24:33" itemprop="dateCreated datePublished" datetime="2021-04-14T20:24:33+08:00">2021-04-14</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:48:04" itemprop="dateModified" datetime="2025-11-08T08:48:04+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%A4%A7%E7%89%9B%E4%B9%8B%E8%B7%AF/" itemprop="url" rel="index"><span itemprop="name">大牛之路</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>1.5k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>5 mins.</span>
+            </span>
+            <div class="post-description">这次偏数据开发</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="第一题"><a href="#第一题" class="headerlink" title="第一题"></a>第一题</h2><p>表结构:uid,subject_id,score。求:找出所有科目成绩都大于某一学科平均成绩的学生</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">--数据集</span><br><span class="line"><span class="number">1001</span> 01 <span class="number">90</span></span><br><span class="line"><span class="number">1001</span> 02 <span class="number">90</span></span><br><span class="line"><span class="number">1001</span> 03 <span class="number">90</span></span><br><span class="line"><span class="number">1002</span> 01 <span class="number">85</span></span><br><span class="line"><span class="number">1002</span> 02 <span class="number">85</span></span><br><span class="line"><span class="number">1002</span> 03 <span class="number">70</span></span><br><span class="line"><span class="number">1003</span> 01 <span class="number">70</span></span><br><span class="line"><span class="number">1003</span> 02 <span class="number">70</span></span><br><span class="line"><span class="number">1003</span> 03 <span class="number">85</span></span><br></pre></td></tr></table></figure>
+
+<p>解题思路:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">(<span class="number">1</span>）求出每个学科平均成绩</span><br><span class="line">    select uid,</span><br><span class="line">    score,</span><br><span class="line">    avg(score) over(partition by subject_id) AS avg_score <span class="keyword">from</span></span><br><span class="line">    score;t1</span><br><span class="line"></span><br><span class="line">    这里比较关注的是OVER 窗口函数：</span><br><span class="line">	AVG(score) OVER (PARTITION BY subject_id): 这是窗口函数的一部分，表示按 subject_id 分组计算每组的平均分数。PARTITION BY subject_id: 将数据分成多个分区，每个分区对应一个 subject_id。AVG(score): 对每个分区内的 score 列计算平均值。</span><br><span class="line"></span><br><span class="line">（<span class="number">2</span>）根据是否大于平均成绩记录 flag，大于则记为 <span class="number">0</span> 否则记为 <span class="number">1</span></span><br><span class="line">    select uid,</span><br><span class="line">    <span class="keyword">if</span>(score&gt;avg_score,<span class="number">0</span>,<span class="number">1</span>) AS flag <span class="keyword">from</span></span><br><span class="line">    t1;t2</span><br><span class="line"></span><br><span class="line">（<span class="number">3</span>）根据学生 <span class="built_in">id</span> 进行分组统计 flag 的和，和为 <span class="number">0</span> 则是所有学科都大于平均成绩</span><br><span class="line">    select uid</span><br><span class="line">    <span class="keyword">from</span></span><br><span class="line">    t2 group by</span><br><span class="line">    uid having</span><br><span class="line">       <span class="built_in">sum</span>(flag)=<span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">（<span class="number">4</span>）最终SQL</span><br><span class="line">    select uid</span><br><span class="line">    <span class="keyword">from</span> (select</span><br><span class="line">    uid,</span><br><span class="line">    <span class="keyword">if</span>(score&gt;avg_score,<span class="number">0</span>,<span class="number">1</span>) flag <span class="keyword">from</span></span><br><span class="line">    (select uid,</span><br><span class="line">    score,</span><br><span class="line">    avg(score) over(partition by subject_id) avg_score <span class="keyword">from</span></span><br><span class="line">       score)t1)t2</span><br><span class="line">    group by</span><br><span class="line">    uid having</span><br><span class="line">       <span class="built_in">sum</span>(flag)=<span class="number">0</span>;</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="第二题"><a href="#第二题" class="headerlink" title="第二题"></a>第二题</h2><p>有 50W 个京东店铺，每个顾客访问任何一个店铺的任何一个商品时都会产生一条访问日志，访问日志存储的表名为 Visit，访客的用户 id 为 user_id，被访问的店铺名称为shop，请统计:每个店铺访问次数 top3 的访客信息。输出店铺名称、访客 id、访问次数。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">--数据集</span><br><span class="line">u1 a</span><br><span class="line">u2 b</span><br><span class="line">u1 b</span><br><span class="line">u1 a</span><br><span class="line">u3 c</span><br><span class="line">u4 b</span><br><span class="line">u1 a</span><br><span class="line">u2 c</span><br><span class="line">u5 b</span><br><span class="line">u4 b</span><br><span class="line">u6 c</span><br><span class="line">u2 c</span><br><span class="line">u1 b</span><br><span class="line">u2 a</span><br><span class="line">u2 a</span><br><span class="line">u3 a</span><br><span class="line">u5 a</span><br><span class="line">u5 a</span><br><span class="line">u5 a</span><br></pre></td></tr></table></figure>
+
+<p>解题思路:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">(<span class="number">1</span>)查询每个店铺被每个用户访问次数</span><br><span class="line">      select shop,user_id,count(*) ct</span><br><span class="line">      <span class="keyword">from</span> visit</span><br><span class="line">      group by shop,user_id;t1</span><br><span class="line"></span><br><span class="line">(<span class="number">2</span>)计算每个店铺被用户访问次数排名</span><br><span class="line">      select shop,user_id,ct,rank() over(partition by shop order by ct) rk</span><br><span class="line">      <span class="keyword">from</span> t1;t2</span><br><span class="line">      这里也要关注一下rank（)函数，RANK() OVER (PARTITION BY shop ORDER BY ct): 这是窗口函数的一部分，表示按 shop 分组计算每组内的时间戳排名。</span><br><span class="line">			PARTITION BY shop: 将数据分成多个分区，每个分区对应一个 shop。</span><br><span class="line">			ORDER BY ct: 在每个分区内按上面的count(*)排序。</span><br><span class="line">			RANK(): 计算每个分区内按时间戳排序后的排名。</span><br><span class="line"></span><br><span class="line">(<span class="number">3</span>)取每个店铺排名前 <span class="number">3</span> 的</span><br><span class="line">      select shop,user_id,ct</span><br><span class="line">      <span class="keyword">from</span> t2</span><br><span class="line">      where rk&lt;=<span class="number">3</span>;</span><br><span class="line"></span><br><span class="line">(<span class="number">4</span>)最终SQL</span><br><span class="line">      select shop,</span><br><span class="line">      user_id,</span><br><span class="line">      ct <span class="keyword">from</span></span><br><span class="line">         (select</span><br><span class="line">             shop,</span><br><span class="line">             user_id,</span><br><span class="line">             ct,</span><br><span class="line">             rank() over(partition by shop order by ct) rk</span><br><span class="line">      <span class="keyword">from</span> (select</span><br><span class="line">                shop,</span><br><span class="line">                user_id,</span><br><span class="line">                count(*) ct</span><br><span class="line">             <span class="keyword">from</span> visit</span><br><span class="line">             group by</span><br><span class="line">      shop,</span><br><span class="line">                user_id)t1</span><br><span class="line">         )t2</span><br><span class="line">      where rk&lt;=<span class="number">3</span>;</span><br></pre></td></tr></table></figure>
+
+<h2 id="第三题"><a href="#第三题" class="headerlink" title="第三题"></a>第三题</h2><p>请用 sql 写出所有用户中在今年 10 月份第一次购买商品的金额，表 ordertable 字段(购买用户:userid，金额:money，购买时间:paymenttime(格式:2017-10-01)，订单 id:orderid)</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">(<span class="number">1</span>)查询出用户最小使用时间</span><br><span class="line">    select</span><br><span class="line">      userid,</span><br><span class="line">      <span class="built_in">min</span>(paymenttime) paymenttime</span><br><span class="line">    <span class="keyword">from</span></span><br><span class="line">    ordertable</span><br><span class="line">    where</span><br><span class="line">      date_format(paymenttime,<span class="string">&#x27;yyyy-MM&#x27;</span>)=<span class="string">&#x27;2017-10&#x27;</span></span><br><span class="line">    group by</span><br><span class="line">      userid;t1</span><br><span class="line">(<span class="number">2</span>) 拿到用户金额</span><br><span class="line">    select</span><br><span class="line">      t1.userid,</span><br><span class="line">      t1.paymenttime,</span><br><span class="line">      od.money</span><br><span class="line">    <span class="keyword">from</span> t1</span><br><span class="line">    join</span><br><span class="line">      ordertable od</span><br><span class="line">    on</span><br><span class="line">    t1.userid=od.userid</span><br><span class="line">    <span class="keyword">and</span></span><br><span class="line">    t1.paymenttime=od.paymenttime;</span><br><span class="line">（<span class="number">3</span>）最终SQL</span><br><span class="line">    select</span><br><span class="line">      t1.userid,</span><br><span class="line">      t1.paymenttime,</span><br><span class="line">      od.money</span><br><span class="line">    <span class="keyword">from</span> (select</span><br><span class="line">    userid,</span><br><span class="line">      <span class="built_in">min</span>(paymenttime) paymenttime</span><br><span class="line">    <span class="keyword">from</span></span><br><span class="line">      ordertable</span><br><span class="line">    where</span><br><span class="line">      date_format(paymenttime,<span class="string">&#x27;yyyy-MM&#x27;</span>)=<span class="string">&#x27;2017-10&#x27;</span></span><br><span class="line">    group by</span><br><span class="line">      userid)t1</span><br><span class="line">    join</span><br><span class="line">      ordertable od</span><br><span class="line">    on</span><br><span class="line">      t1.userid=od.userid</span><br><span class="line">      <span class="keyword">and</span></span><br><span class="line">      t1.paymenttime=od.paymenttime;</span><br></pre></td></tr></table></figure>
+
+<h2 id="第四题"><a href="#第四题" class="headerlink" title="第四题"></a>第四题</h2><p>有日志如下，请写出代码求得所有用户和活跃用户的总数及平均年龄。(活跃用户指连续两天都有访问记录的用户)</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">--数据集</span><br><span class="line">日期dt   用户user_id 年龄age</span><br><span class="line"><span class="number">2019</span>-02-<span class="number">11</span>,test_1,<span class="number">23</span></span><br><span class="line"><span class="number">2019</span>-02-<span class="number">11</span>,test_2,<span class="number">19</span></span><br><span class="line"><span class="number">2019</span>-02-<span class="number">11</span>,test_3,<span class="number">39</span></span><br><span class="line"><span class="number">2019</span>-02-<span class="number">11</span>,test_1,<span class="number">23</span></span><br><span class="line"><span class="number">2019</span>-02-<span class="number">11</span>,test_3,<span class="number">39</span></span><br><span class="line"><span class="number">2019</span>-02-<span class="number">11</span>,test_1,<span class="number">23</span></span><br><span class="line"><span class="number">2019</span>-02-<span class="number">12</span>,test_2,<span class="number">19</span></span><br><span class="line"><span class="number">2019</span>-02-<span class="number">13</span>,test_1,<span class="number">23</span></span><br><span class="line"><span class="number">2019</span>-02-<span class="number">15</span>,test_2,<span class="number">19</span></span><br><span class="line"><span class="number">2019</span>-02-<span class="number">16</span>,test_2,<span class="number">19</span></span><br></pre></td></tr></table></figure>
+
+<p>解题思路:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br></pre></td><td class="code"><pre><span class="line">(<span class="number">1</span>)按照日期以及用户分组，按照日期排序并给出排名</span><br><span class="line">    select dt,</span><br><span class="line">      user_id,</span><br><span class="line">      <span class="built_in">min</span>(age) age,</span><br><span class="line">      rank() over(partition by user_id order by dt) rk</span><br><span class="line">    <span class="keyword">from</span></span><br><span class="line">      user_age</span><br><span class="line">    group by</span><br><span class="line">      dt,user_id;t1</span><br><span class="line"></span><br><span class="line">(<span class="number">2</span>)计算日期及排名的差值</span><br><span class="line">    select</span><br><span class="line">      user_id,</span><br><span class="line">    age,</span><br><span class="line">      date_sub(dt,rk) flag</span><br><span class="line">    <span class="keyword">from</span></span><br><span class="line">    t1;t2</span><br><span class="line">    这里注意一下：DATE_SUB(dt, INTERVAL rk DAY) AS flag: 使用 DATE_SUB 函数从日期 dt 中减去 rk 天数，生成新的字段 flag。</span><br><span class="line"></span><br><span class="line">(<span class="number">3</span>)过滤出差值大于等于 <span class="number">2</span> 的，即为连续两天活跃的用户</span><br><span class="line">    select</span><br><span class="line">    user_id,</span><br><span class="line">      <span class="built_in">min</span>(age) age</span><br><span class="line">    <span class="keyword">from</span></span><br><span class="line">    t2 group by</span><br><span class="line">      user_id,flag</span><br><span class="line">    having</span><br><span class="line">      count(*)&gt;=<span class="number">2</span>;t3</span><br><span class="line"></span><br><span class="line">(<span class="number">4</span>)对数据进行去重处理(一个用户可以在两个不同的时间点连续登录)，例如:a 用户在 <span class="number">1</span> 月<span class="number">10</span>号<span class="number">1</span>月<span class="number">11</span>号以及<span class="number">1</span>月<span class="number">20</span>号和<span class="number">1</span>月<span class="number">21</span>号<span class="number">4</span>天登录。</span><br><span class="line">    select</span><br><span class="line">      user_id,</span><br><span class="line">      <span class="built_in">min</span>(age) age</span><br><span class="line">    <span class="keyword">from</span></span><br><span class="line">    t3 group by</span><br><span class="line">    user_id;t4</span><br><span class="line"></span><br><span class="line">(<span class="number">5</span>)计算活跃用户(两天连续有访问)的人数以及平均年龄</span><br><span class="line">    select</span><br><span class="line">      count(*) ct,</span><br><span class="line">      cast(<span class="built_in">sum</span>(age)/count(*) <span class="keyword">as</span> decimal(<span class="number">10</span>,<span class="number">2</span>))</span><br><span class="line">    <span class="keyword">from</span> t4;</span><br><span class="line"></span><br><span class="line">(<span class="number">6</span>) 对全量数据集进行按照用户去重</span><br><span class="line">    select</span><br><span class="line">      user_id,</span><br><span class="line">    <span class="built_in">min</span>(age) age</span><br><span class="line">    <span class="keyword">from</span></span><br><span class="line">      user_age</span><br><span class="line">    group by</span><br><span class="line">      user_id;t5</span><br><span class="line"></span><br><span class="line">(<span class="number">7</span>)计算所有用户的数量以及平均年龄</span><br><span class="line">    select</span><br><span class="line">      count(*) user_count,</span><br><span class="line">      cast((<span class="built_in">sum</span>(age)/count(*)) <span class="keyword">as</span> decimal(<span class="number">10</span>,<span class="number">1</span>))</span><br><span class="line">    <span class="keyword">from</span> t5;</span><br><span class="line"></span><br><span class="line">(<span class="number">8</span>) 将第 <span class="number">5</span> 步以及第 <span class="number">7</span> 步两个数据集进行 union <span class="built_in">all</span> 操作</span><br><span class="line">    select</span><br><span class="line">      <span class="number">0</span> user_total_count,</span><br><span class="line">      <span class="number">0</span> user_total_avg_age,</span><br><span class="line">      count(*) twice_count,</span><br><span class="line">      cast(<span class="built_in">sum</span>(age)/count(*)</span><br><span class="line">    twice_count_avg_age</span><br><span class="line">    <span class="keyword">from</span></span><br><span class="line">    (</span><br><span class="line">      select</span><br><span class="line">      user_id,</span><br><span class="line">      <span class="built_in">min</span>(age) age</span><br><span class="line">    <span class="keyword">as</span> decimal(<span class="number">10</span>,<span class="number">2</span>))</span><br><span class="line">    <span class="keyword">from</span> (select</span><br><span class="line">    user_id,</span><br><span class="line">      <span class="built_in">min</span>(age) age</span><br><span class="line">    <span class="keyword">from</span></span><br><span class="line">    ( select</span><br><span class="line">      user_id,</span><br><span class="line">      age,</span><br><span class="line">      date_sub(dt,rk) flag</span><br><span class="line">    <span class="keyword">from</span> (</span><br><span class="line">    select dt,</span><br><span class="line">          user_id,</span><br><span class="line">          <span class="built_in">min</span>(age) age,</span><br><span class="line">          rank() over(partition by user_id order by dt) rk</span><br><span class="line">       <span class="keyword">from</span></span><br><span class="line">          user_age</span><br><span class="line">       group by</span><br><span class="line">          dt,user_id</span><br><span class="line">    )t1</span><br><span class="line">    )t2 group by</span><br><span class="line">      user_id,flag</span><br><span class="line">    having</span><br><span class="line">      count(*)&gt;=<span class="number">2</span>)t3</span><br><span class="line">    group by</span><br><span class="line">      user_id</span><br><span class="line">    )t4</span><br><span class="line">    union <span class="built_in">all</span></span><br><span class="line">    select</span><br><span class="line">      count(*) user_total_count,</span><br><span class="line">    cast((<span class="built_in">sum</span>(age)/count(*)) <span class="keyword">as</span> decimal(<span class="number">10</span>,<span class="number">1</span>)),</span><br><span class="line">      <span class="number">0</span> twice_count,</span><br><span class="line">      <span class="number">0</span> twice_count_avg_age</span><br><span class="line">    <span class="keyword">from</span> (</span><br><span class="line">           user_id</span><br><span class="line">      )t5;t6</span><br><span class="line"></span><br><span class="line">(<span class="number">9</span>) 求和并拼接为最终SQL</span><br><span class="line">    select</span><br><span class="line">       <span class="built_in">sum</span>(user_total_count),</span><br><span class="line">       <span class="built_in">sum</span>(user_total_avg_age),</span><br><span class="line">       <span class="built_in">sum</span>(twice_count),</span><br><span class="line">       <span class="built_in">sum</span>(twice_count_avg_age)</span><br><span class="line">    <span class="keyword">from</span> (select</span><br><span class="line">    <span class="number">0</span> user_total_count,</span><br><span class="line">    <span class="number">0</span> user_total_avg_age,</span><br><span class="line">    count(*) twice_count, cast(<span class="built_in">sum</span>(age)/count(*) <span class="keyword">as</span></span><br><span class="line">    twice_count_avg_age</span><br><span class="line">    <span class="keyword">from</span></span><br><span class="line">    (</span><br><span class="line">      select</span><br><span class="line">      user_id,</span><br><span class="line">      <span class="built_in">min</span>(age) age</span><br><span class="line">    <span class="keyword">from</span> (select</span><br><span class="line">    user_id,</span><br><span class="line">      <span class="built_in">min</span>(age) age</span><br><span class="line">    <span class="keyword">from</span></span><br><span class="line">    ( select</span><br><span class="line">      user_id,</span><br><span class="line">      age,</span><br><span class="line">      date_sub(dt,rk) flag</span><br><span class="line">    decimal(<span class="number">10</span>,<span class="number">2</span>))</span><br><span class="line">    <span class="keyword">from</span> (</span><br><span class="line">    select dt,</span><br><span class="line">          user_id,</span><br><span class="line">          <span class="built_in">min</span>(age) age,</span><br><span class="line">          rank() over(partition by user_id order by dt) rk</span><br><span class="line">    <span class="keyword">from</span></span><br><span class="line">    user_age</span><br><span class="line">       group by</span><br><span class="line">          dt,user_id</span><br><span class="line">       )t1</span><br><span class="line">    )t2 group by</span><br><span class="line">      user_id,flag</span><br><span class="line">    having</span><br><span class="line">      count(*)&gt;=<span class="number">2</span>)t3</span><br><span class="line">    group by</span><br><span class="line">    user_id )t4</span><br><span class="line">    union <span class="built_in">all</span></span><br><span class="line">    select</span><br><span class="line">      count(*) user_total_count,</span><br><span class="line">      cast((<span class="built_in">sum</span>(age)/count(*)) <span class="keyword">as</span> decimal(<span class="number">10</span>,<span class="number">1</span>)),</span><br><span class="line">      <span class="number">0</span> twice_count,</span><br><span class="line">      <span class="number">0</span> twice_count_avg_age</span><br><span class="line">    <span class="keyword">from</span> (</span><br><span class="line">           user_id</span><br><span class="line">      )t5)t6;</span><br></pre></td></tr></table></figure>
+
+<p>以上只是个人的写法，如果有更好的或者实际情况中有更符合现实的可以更加优化，让我们一起追求数据库查询的艺术。</p>
+
+    </div>
+
+    
+    
+    
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag"># 数据库</a>
+              <a href="/tags/%E9%9D%A2%E8%AF%95%E9%A2%98/" rel="tag"># 面试题</a>
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BC%80%E5%8F%91/" rel="tag"># 数据开发</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/03/25/Mysql%E9%87%8C%E6%B7%BB%E5%8A%A0%E4%B8%80%E5%88%97%E5%86%85%E5%AE%B9%E6%98%AF%E5%8F%A6%E4%B8%80%E4%B8%AA%E8%A1%A8%E7%9A%84%E5%AF%B9%E5%BA%94%E5%88%97/" rel="prev" title="Mysql里添加一列内容是另一个表的对应列">
+      <i class="fa fa-chevron-left"></i> Mysql里添加一列内容是另一个表的对应列
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/04/15/%E5%A6%82%E4%BD%95%E7%90%86%E8%A7%A3GOPATH/" rel="next" title="如何理解GOPATH">
+      如何理解GOPATH <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E9%A2%98"><span class="nav-number">1.</span> <span class="nav-text">第一题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%BA%8C%E9%A2%98"><span class="nav-number">2.</span> <span class="nav-text">第二题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%B8%89%E9%A2%98"><span class="nav-number">3.</span> <span class="nav-text">第三题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E5%9B%9B%E9%A2%98"><span class="nav-number">4.</span> <span class="nav-text">第四题</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">勤奋捞钱，早日退休！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">415</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">371</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">538k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">32:38</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
