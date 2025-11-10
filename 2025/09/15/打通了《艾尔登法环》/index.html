@@ -19,7 +19,7 @@
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":true,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
   <meta name="description" content="在离职期间我把法环打通了两遍...">
@@ -33,7 +33,7 @@
 <meta property="og:image" content="http://example.com/images/%E6%B3%95%E7%8E%AF2.jpg">
 <meta property="og:image" content="http://example.com/images/%E6%B3%95%E7%8E%AF3.jpg">
 <meta property="article:published_time" content="2025-09-15T15:01:13.000Z">
-<meta property="article:modified_time" content="2025-11-08T12:34:18.836Z">
+<meta property="article:modified_time" content="2025-11-08T14:37:35.942Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="单机游戏">
 <meta property="article:tag" content="魂系游戏">
@@ -113,6 +113,7 @@
 
   <div class="site-nav-right">
     <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
     </div>
   </div>
 </div>
@@ -147,11 +148,38 @@
     <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
 
   </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
   </ul>
 </nav>
 
 
 
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
 
 </div>
     </header>
@@ -205,7 +233,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2025-11-08 20:34:18" itemprop="dateModified" datetime="2025-11-08T20:34:18+08:00">2025-11-08</time>
+                <time title="Modified: 2025-11-08 22:37:35" itemprop="dateModified" datetime="2025-11-08T22:37:35+08:00">2025-11-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -223,14 +251,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>2.6k</span>
+              <span>2.7k</span>
             </span>
             <span class="post-meta-item" title="Reading time">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>9 mins.</span>
+              <span>10 mins.</span>
             </span>
             <div class="post-description">在离职期间我把法环打通了两遍...</div>
 
@@ -244,7 +272,7 @@
 
       
         <p>“老头环”的名声如雷贯耳，其实游戏刚发售的时候我就已经购买了，但是却没有玩下去。可能是碎片化叙事+魂系难度，导致我当时没有好好的感受它。结果最近不知道为啥，短视频给我推了“老头环”的片段，让我燃起了兴趣，正好我面试也结束了，就重新拿起手柄来感受一下当年的最佳游戏。这一摸不要紧，玩了几乎150小时，真是太爽了。</p>
-<p>我基本就是跟着老戴和老迪这两个著名up主的视频攻略走下来的，我也看了一下，《法环》系列都是他俩播放次数最高的游戏。</p>
+<p>我基本就是跟着老戴和老迪这两个著名up主的视频攻略走下来的，我也看了一下，《法环》系列都是他俩播放次数最高的B站视频。</p>
 <h2 id="先说说剧情"><a href="#先说说剧情" class="headerlink" title="先说说剧情"></a>先说说剧情</h2><p>对我这种非专业的玩家来说，评价一个游戏好与不好主要还是画面和剧情。</p>
 <p>说实话，《法环》的剧情开头玩的我一脸懵，完全不知道为啥见面总要打架，经常俩人见面二话不说就是互殴。但是耐下心去看了看剧情解说和环学家们的分析，觉得这个家族内战还挺有意思的。尤其是本体的“癫火故事线、魔法老师瑟琳故事线、米莉森故事线”都给我很深刻的记忆。</p>
 <p>火山大蛇的故事线就是标准的东亚传统鬼故事的套路：把你吸引进破败老宅，主人表面对你热情周到，其实想害了你。可以说拉卡德我打他的时候是毫无心理压力的，而且它也比较简单，但是火山官邸的地图很阴间。</p>
@@ -260,11 +288,11 @@
 <h2 id="我的成王记录"><a href="#我的成王记录" class="headerlink" title="我的成王记录"></a>我的成王记录</h2><p>我第一周目开始的时候走的就是莽夫力量路线，直到拿到了粉碎巨人锤，就开始坚定的走向了纯力量路线，第一周目也70%的时间拿巨人锤，20%的时间拿名刀月影过关的，剩下10%特殊场合特殊对待。骨灰的话基本就是大哥带我飞，结局也毫无疑问的选择了癫火之王的路线。</p>
 <p>不过一周目死了也大约有个1000次吧…</p>
 <p>二周目时候开头我COS嘎子哥，上来就直接去拿了巨剑然后搭配狮子斩砍来砍去，总体来说还是没有跳出力量流的玩法。后来改用了尸山血海，原因是蒙格卡了我很久，后来发现拿尸山血海的感觉比巨剑好很多。于是尸山血海就成了我二周目的主要武器，二周目折磨我最久的是女武神和黑剑，他俩加起来几乎打了6个小时，古龙桑克斯也有2个小时了。反倒是荷莱露，我2~3次就过了，毕竟是正义的三打一（如果颠火的话还有夏波利利助阵，那就是四打一了）。拉达冈和皮蛋本身也弱火和出血，没费太大劲就过了。</p>
-<p>二周目我选的是黄金律法修复结局。</p>
-<p>DLC总体来说，可能是我等级不低的原因（250级去的DLC，最后幽影树碎片15、灵灰8个），几个BOSS都过得不太难，只有指头之母卡了我大约1个多小时，剩下几个包括米塔恩都没有超过5次，可能是骨灰太强力吧。我DLC开始的骨灰就是黑刀大姐，后来换成了黑骑士姐妹花，到了米塔恩换成了大铁匠，话说大铁匠真的猛，我觉得它比大哥还大哥，我就是一个抱大腿的。</p>
+<p>二周目我选的是金面具黄金律法修复结局。</p>
+<p>DLC可能是我等级不低的原因（250级去的DLC，最后幽影树碎片15、灵灰8个），几个BOSS都过得不太难，只有指头之母卡了我大约1个多小时，剩下几个包括米塔恩都没有超过5次，可能是骨灰太强力吧。我DLC开始的骨灰就是黑刀大姐，后来换成了黑骑士姐妹花，到了米塔恩换成了大铁匠，话说大铁匠真的猛，我觉得它比大哥还大哥，而我就是一个无耻抱大腿的。</p>
 <p>但是DLC小怪还是很猛的，我死在小怪的次数很多很多。DLC我推图的主力武器就是“玛利卡的小锤”，战技霸体且输出不低，但是既然霸体强也肯定面临大量的换血，如果小怪扎堆的话，很多场合都是被换血换死的。</p>
-<p>不过结合剧情我倒是有一个疑问，法环里规定一个神搭配一个王，但是如果在非菈妮结局里，成为了艾尔登之王的我，对应的神是哪位？</p>
-<p>后来我又开了一个新号，重走了一遍一周目，不过这次走的是法师路线，开局陨石术砸来砸去，后来换成了帚星简直爽歪歪，但是法师有一点比较难受就是如果被偷袭就很被动，而且后期尤其DLC的怪都是韧狗，很难打断对应的动作所以法师要是后手就很难受。<br><img src="/images/%E6%B3%95%E7%8E%AF2.jpg" title="不晓得将来法环会不会考虑多加一点衣服，把夜环的一些衣服可以加进来呀"></p>
+<p>不过结合剧情我倒是有一个疑问，法环里规定一个神搭配一个王，但是如果在非菈妮结局里，成为了艾尔登之王的我，对应的神是哪位？当然也有可能这是刻意的安排，因为玛莉卡的本意应该就是“打破例行，世界不应该有神，只有王就够了”。</p>
+<p>后来我又开了一个新号，重走了一遍一周目，不过这次走的是法师路线，开局陨石术砸来砸去，后来换成了帚星舒服了不少，但是法师有一点比较难受就是如果被偷袭就很被动，而且后期尤其DLC的怪都是韧狗，很难打断对应的动作所以法师要是后手就很难受。<br><img src="/images/%E6%B3%95%E7%8E%AF2.jpg" title="不晓得将来法环会不会考虑多加一点衣服，把夜环的一些衣服可以加进来呀"></p>
 <h2 id="玩的不爽的地方"><a href="#玩的不爽的地方" class="headerlink" title="玩的不爽的地方"></a>玩的不爽的地方</h2><p>首先任何产品都有不完美的一面，对我个人来说《艾尔登法环》吐槽的地方是以下几点：</p>
 <ol>
 <li>DLC很多场景太黑，亮度调到最高也看不清，眼睛非常吃力。我后来恨不得拿光明剑的战技来照明。后来新号我就一路常驻魔法照亮。</li>
@@ -283,6 +311,26 @@
     
     
     
+        <div class="reward-container">
+  <div>感谢你请我喝咖啡～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/weixinzhifu.png" alt="Chris Chan WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="//images/zhifubaopay.jpg" alt="Chris Chan Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
         
 
   <div class="followme">
@@ -489,6 +537,10 @@
   
 
 
+
+
+  
+<script src="/js/local-search.js"></script>
 
 
 
