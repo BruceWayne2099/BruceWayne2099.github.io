@@ -322,7 +322,7 @@
 <ol start="8">
 <li>如果一个应用在启动的时候发现线程池满，有什么思路？<br>一般来说应用启动的时候线程池满，会同时搭配cpu飙升的情况，同时要看他的<code>code_cache</code>利用率，如果<code>code_cache</code>利用率此时利用率较低，则可以证明“这个应用在启动的过程中是没有预热的，所以启动完成后，cpu直接会到100%”。</li>
 </ol>
-<p><img src="/images/cpu%E5%90%AF%E5%8A%A8%E7%9A%84%E6%97%B6%E5%80%99%E9%AB%98.png" alt="paradin" title="启动的时候CPU一波飙升"><br><img src="/images/%E9%93%BE%E6%8E%A5%E6%B1%A0%E6%89%93%E6%BB%A1.png" alt="paradin" title="可以看到HSF线程池打满"><br><img src="/images/code_cache%E4%BD%8E.png" alt="paradin" title="但是code_cache很低，是慢慢爬上来的"></p>
+<p><img data-src="/images/cpu%E5%90%AF%E5%8A%A8%E7%9A%84%E6%97%B6%E5%80%99%E9%AB%98.png" alt="paradin" title="启动的时候CPU一波飙升"><br><img data-src="/images/%E9%93%BE%E6%8E%A5%E6%B1%A0%E6%89%93%E6%BB%A1.png" alt="paradin" title="可以看到HSF线程池打满"><br><img data-src="/images/code_cache%E4%BD%8E.png" alt="paradin" title="但是code_cache很低，是慢慢爬上来的"></p>
 <p>那么遇到这种情况，就需要对“代码进行预热”，以解决应用刚启动时，部分请求超时或线程池被打满问题，保证应用提供持续稳定的低响应时间和高吞吐量。</p>
 <ol start="9">
 <li><p>去年你做过的最关键的事儿？</p>

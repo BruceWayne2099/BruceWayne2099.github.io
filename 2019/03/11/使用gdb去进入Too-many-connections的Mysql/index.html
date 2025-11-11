@@ -289,12 +289,12 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>今天在登录mysql的时候，发现Too many connections的错误，如图：<br><img src="/images/mysql.png" alt="akb48"></p>
+        <p>今天在登录mysql的时候，发现Too many connections的错误，如图：<br><img data-src="/images/mysql.png" alt="akb48"></p>
 <p>很明显，连接数不够用了，在<code>my.cnf</code>里看到当前的最大链接是500。一般来说很多人就会修改<code>my.cnf</code>将<code>max_connections</code>改大然后重启mysql生效。但是我这个mysql是生产环境的，如果重启势必产生不小的影响，于是就需要不重启mysql还要能达到修改<code>max_connections</code>的目的。</p>
 <p>那就用gdb，语句如下：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@db-02 data]<span class="comment"># gdb -p $(cat /opt/mysql/data/Storage.pid) -ex  &quot;set max_connections=1024&quot; -batch</span></span><br></pre></td></tr></table></figure></p>
-<p>执行完毕之后，就可以正常登录到mysql的交互页面了：<br><img src="/images/mysql2.png" alt="akb48"></p>
-<p>此时查询一下最大连接数：<br><img src="/images/mysql3.png" alt="akb48"></p>
-<p>可见已经生效了，但是如果这个时候mysql有重启的话，还是会读取<code>my.cnf</code>里的<code>max_connections</code>配置，所以再手动改下<code>max_connections</code>即可。<br><img src="/images/king%E5%87%BA%E5%9C%BA.jpg" alt="akb48"></p>
+<p>执行完毕之后，就可以正常登录到mysql的交互页面了：<br><img data-src="/images/mysql2.png" alt="akb48"></p>
+<p>此时查询一下最大连接数：<br><img data-src="/images/mysql3.png" alt="akb48"></p>
+<p>可见已经生效了，但是如果这个时候mysql有重启的话，还是会读取<code>my.cnf</code>里的<code>max_connections</code>配置，所以再手动改下<code>max_connections</code>即可。<br><img data-src="/images/king%E5%87%BA%E5%9C%BA.jpg" alt="akb48"></p>
 
     </div>
 

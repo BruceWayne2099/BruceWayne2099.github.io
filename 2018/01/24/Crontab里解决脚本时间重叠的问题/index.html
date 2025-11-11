@@ -287,7 +287,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h2><p>Linux里的Crontab是一个好东西，但是它的默认最小执行频率是1分钟，但是我们在实际生产环境里有的时候遇到的脚本执行时间是大于1分钟的，这样就会出现一个很尴尬的情况，就是在1分钟过后，系统进程会出现多个脚本，neck and neck式的在后台运行，比如这样：<br><img src="/images/log499.png" alt="akb48"></p>
+        <h2 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h2><p>Linux里的Crontab是一个好东西，但是它的默认最小执行频率是1分钟，但是我们在实际生产环境里有的时候遇到的脚本执行时间是大于1分钟的，这样就会出现一个很尴尬的情况，就是在1分钟过后，系统进程会出现多个脚本，neck and neck式的在后台运行，比如这样：<br><img data-src="/images/log499.png" alt="akb48"></p>
 <p>从上面的图可以看到，10点36分<code>log499.sh</code>没有执行完毕，10点37又开始了执行了一个新的<code>log499.sh</code>脚本。这种脚本冲突肯定不是我们所希望的，那么如何才能保证后台只是在一段时间里只执行一个脚本呢？</p>
 <p>这个时候我们就要使用文件锁，<code>flock</code>，这种方法要比判断pid高大上的多。</p>
 <p>首先假设我们的脚本名字叫abc.sh，这个脚本文件的执行时间是要大于1分钟的，同时我们再设定一个锁文件，位置就叫<code>/tmp/abc.lock</code>,这个文件可以是空的，然后<code>crontab -e</code>，添加一句命令如下：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">* * * * * flock -xn /tmp/abc.<span class="property">lock</span> -c <span class="string">&#x27;sh /路径/abc.sh &gt;&gt; /记录日志的路径 2&gt;&amp;1&#x27;</span></span><br></pre></td></tr></table></figure></p>

@@ -289,15 +289,15 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>今天遇到一个超奇怪的现象：同一台服务器，有的可以ssh通，有的不可以ssh通。故障机器的ssh细节如下：<br><img src="/images/ssh.png" alt="akb48" title="左边是可以连接的，右边是失败的"></p>
+        <p>今天遇到一个超奇怪的现象：同一台服务器，有的可以ssh通，有的不可以ssh通。故障机器的ssh细节如下：<br><img data-src="/images/ssh.png" alt="akb48" title="左边是可以连接的，右边是失败的"></p>
 <p>发现成功的服务器会持续到：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">debug1: Remote protocol version <span class="number">2.0</span>, remote software version OpenSSH_7<span class="number">.4</span></span><br><span class="line">debug1: <span class="keyword">match</span>: OpenSSH_7<span class="number">.4</span> pat OpenSSH*</span><br></pre></td></tr></table></figure></p>
 <p>这一步，而失败的服务器会直接断开，并且爆<code>ssh_exchange_identification: Connection closed by remote host</code>的错误。</p>
 <p>来到要连接的服务器上，查看<code>/var/log/secure</code>，发现每次失败的服务器每次发起ssh连接请求的时候，会有如下日志：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Nov <span class="number">19</span> <span class="number">15</span>:<span class="number">56</span>:<span class="number">26</span> iZuf6h1kfgutxc3el68z2lZ sshd[<span class="number">15096</span>]: Bad protocol version identification <span class="string">&#x27;\026\003\001&#x27;</span> <span class="keyword">from</span> X.X.X.X port <span class="number">38966</span></span><br><span class="line">Nov <span class="number">19</span> <span class="number">15</span>:<span class="number">56</span>:<span class="number">27</span> iZuf6h1kfgutxc3el68z2lZ sshd[<span class="number">15097</span>]: Bad protocol version identification <span class="string">&#x27;\026\003\001&#x27;</span> <span class="keyword">from</span> X.X.X.X port <span class="number">38990</span></span><br></pre></td></tr></table></figure></p>
 <p>查了很多资料，基本都说请检查<code>/etc/ssh/sshd_config</code>、<code>/etc/hosts.allow</code>、<code>/etc/hosts.deny</code>、安全组和iptables。我把上面的文件在两台服务器都进行了对比，发现没有什么不同。</p>
-<p>后来才发现这里有一个很深的坑，<code>iptables -L</code>的结果其实不一定是真的！最重要的是要看<code>iptables-save</code>的结果：<br><img src="/images/ssh2.png" alt="akb48"></p>
+<p>后来才发现这里有一个很深的坑，<code>iptables -L</code>的结果其实不一定是真的！最重要的是要看<code>iptables-save</code>的结果：<br><img data-src="/images/ssh2.png" alt="akb48"></p>
 <p>上面可见<code>iptables -L</code>返回的结果虽然是空的，但是<code>iptables-save</code>却是有内容的，怪不得连接不上。</p>
 <p>如果要删除<code>iptables-save</code>这里的规则，直接<code>service iptables stop</code>即可。但是如果在启动iptables时有<code>No config file</code>的警告错误的话，任意添加一条策略，然后保存就能正常启动了：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">iptables -P OUTPUT ACCEPT</span><br><span class="line">service iptables save</span><br></pre></td></tr></table></figure></p>
-<p><img src="/images/ssh3.png" alt="akb48"></p>
+<p><img data-src="/images/ssh3.png" alt="akb48"></p>
 
     </div>
 

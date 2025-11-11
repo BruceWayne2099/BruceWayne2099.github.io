@@ -288,10 +288,10 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>接到新的私有云工作，登录到甲方爸爸的服务器一看是centos6.1，上面安装了zabbix-server但是仅仅做了<code>auto-discovery</code>，于是我就做<code>templates</code>，可见名称是中文的。但是发现在保存的时候，出现了这样的错误：<br><img src="/images/zabbix4.png" alt="akb48"></p>
+        <p>接到新的私有云工作，登录到甲方爸爸的服务器一看是centos6.1，上面安装了zabbix-server但是仅仅做了<code>auto-discovery</code>，于是我就做<code>templates</code>，可见名称是中文的。但是发现在保存的时候，出现了这样的错误：<br><img data-src="/images/zabbix4.png" alt="akb48"></p>
 <p>定眼一看，这是数据库的编码问题，整个database都是拉丁编码而不是utf8编码，所以无法输入中文。</p>
 <p>要解决这个问题比较简单，毕竟zabbix刚启动而已，数据库里还没有数据。于是我就干脆把整个zabbix的database干掉，重建一个新的：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mysql -hlocalhost -uzabbix -p	<span class="comment">#登录数据库</span></span><br><span class="line">drop databases zabbix;	<span class="comment">#暴力全部删光</span></span><br></pre></td></tr></table></figure></p>
-<p>此时的zabbix-server的web界面是如下的：<br><img src="/images/zabbix5.png" alt="akb48"></p>
+<p>此时的zabbix-server的web界面是如下的：<br><img data-src="/images/zabbix5.png" alt="akb48"></p>
 <p>然后返回到mysql里：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">create database zabbix character <span class="built_in">set</span> utf8;	</span><br><span class="line"><span class="comment"># ctrl+c 退出数据库</span></span><br><span class="line">zcat /usr/share/doc/zabbix-server-mysql-<span class="number">3.4</span><span class="number">.15</span>/create.sql.gz  |mysql -uzabbix -p26e9p69r zabbix		<span class="comment">#重新导入初始化表</span></span><br></pre></td></tr></table></figure></p>
 <p>然后在web界面点击<code>retry</code>，然后重新登陆一下zabbix-server。再次尝试编辑带有中文的监控项，就能顺利保存了！</p>
 

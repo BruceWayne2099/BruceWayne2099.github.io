@@ -291,7 +291,7 @@
 <h2 id="第一种方法"><a href="#第一种方法" class="headerlink" title="第一种方法"></a>第一种方法</h2><p>重定向crontab到其他文件：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">crontab -l &gt; crontab.<span class="property">bak</span></span><br><span class="line">echo <span class="string">&quot;*/1 * * * * ./yourscript  &gt; /dev/null 2&gt;&amp;1&quot;</span> &gt;&gt; crontab.<span class="property">bak</span></span><br><span class="line">crontab crontab.<span class="property">bak</span></span><br></pre></td></tr></table></figure></p>
 <p>如果想删除某个计划任务，就进去<code>crontab -e</code>删除就好，<code>crontab.bak</code>不用管，不用担心内容会自动变成<code>crontab.bak</code>的样子。</p>
 <h2 id="第二种方法"><a href="#第二种方法" class="headerlink" title="第二种方法"></a>第二种方法</h2><p>如果你觉得使用<code>crontab 文件</code>这种方法心里没有底的话，就选择最妥善的方式，也就是下面这样：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo <span class="string">&quot;*/1 * * * * ./yourscript &gt; /dev/null 2&gt;&amp;1&quot;</span> &gt;&gt; <span class="regexp">/var/</span>spool/cron/root</span><br></pre></td></tr></table></figure></p>
-<p>当crontab突然失效时，可以尝试<code>/etc/init.d/crond restart</code>解决问题。或者查看日志看某个job有没有执行&#x2F;报错<code>tail -f /var/log/cron</code>。<br><img src="/images/vc15.jpg" alt="paradin" title="半人半神！"></p>
+<p>当crontab突然失效时，可以尝试<code>/etc/init.d/crond restart</code>解决问题。或者查看日志看某个job有没有执行&#x2F;报错<code>tail -f /var/log/cron</code>。<br><img data-src="/images/vc15.jpg" alt="paradin" title="半人半神！"></p>
 
     </div>
 

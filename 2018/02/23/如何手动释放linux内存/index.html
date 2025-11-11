@@ -288,12 +288,12 @@
 
       
         <p>在生产过程中，一些java模块会比较残忍的吃系统内存，然后如果这个模块写的比较挫，产生的垃圾就会比较多，如果linux系统的内存释放也不会及时，然后恶性循环，最后就把进程卡死，但是服务器是不可以down机的，所以这个时候就需要我们运维出来，手动的释放内存。</p>
-<p>首先，我们登陆一台服务器，<code>free -m</code>看一下目前的情况：<br><img src="/images/neicun1.png" alt="paradin"></p>
+<p>首先，我们登陆一台服务器，<code>free -m</code>看一下目前的情况：<br><img data-src="/images/neicun1.png" alt="paradin"></p>
 <p>然后<code>cat /proc/sys/vm/drop_caches</code>，会看到里面的值是0，0是不释放的意思。</p>
 <p><code>sync</code>,将系统缓存区中的脏数据写入磁盘中，包括已修改的i-node、已延迟的块I&#x2F;O和读写映射文件。</p>
 <p><code>echo 3 &gt; /proc/sys/vm/drop_caches</code></p>
 <p>为什么这里是<code>3</code>呢？这是因为<code>echo 1</code>的话代表“清理页面缓存”，<code>echo 2</code>的话代表“清理索引节点（inode）链接”，<code>echo 3</code>就是包括上面两者。</p>
-<p><code>sysctl -p</code>,这样不用重启服务器也可以生效。出现下面的一连串文字之后，再<code>free -m</code>看一下：<br><img src="/images/neicun2.png" alt="paradin"></p>
+<p><code>sysctl -p</code>,这样不用重启服务器也可以生效。出现下面的一连串文字之后，再<code>free -m</code>看一下：<br><img data-src="/images/neicun2.png" alt="paradin"></p>
 <p>从112释放到2790，可见效果立竿见影。</p>
 <p>上面整个过程的自动化脚本是这样的：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">#!<span class="regexp">/bin/</span>bash</span><br><span class="line">#<span class="title class_">Author</span>:<span class="title class_">Chris</span> <span class="title class_">Chan</span></span><br><span class="line">#E-<span class="attr">mail</span>:chen_shuo@dahuatech.<span class="property">com</span></span><br><span class="line">oldmemory=$(free -m|sed -n <span class="string">&#x27;2p&#x27;</span>|awk <span class="string">&#x27;&#123;printf $4&#125;&#x27;</span>)</span><br><span class="line">echo <span class="string">&quot;开始的空余内存值：&quot;</span>$oldmemory</span><br><span class="line">sync</span><br><span class="line">echo <span class="number">3</span> &gt; <span class="regexp">/proc/</span>sys/vm/drop_caches</span><br><span class="line">sysctl -p</span><br><span class="line">correctmemory=$(free -m|sed -n <span class="string">&#x27;2p&#x27;</span>|awk <span class="string">&#x27;&#123;printf $4&#125;&#x27;</span>)</span><br><span class="line">echo <span class="string">&quot;释放完后的空余内存值：&quot;</span>$correctmemory</span><br></pre></td></tr></table></figure></p>
 

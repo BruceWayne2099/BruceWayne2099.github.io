@@ -290,14 +290,14 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>写完了一个脚本，里面使用了阿里云的api，那自然也有公司的阿里云ak\sk，在调试的时候发现没问题，于是就上传到github上。传完之后一看，发现脚本里忘了删除敏感字段，连通公司的ak\sk一起被提交上去了…<br><img src="/images/github10.png" alt="akb48"></p>
+        <p>写完了一个脚本，里面使用了阿里云的api，那自然也有公司的阿里云ak\sk，在调试的时候发现没问题，于是就上传到github上。传完之后一看，发现脚本里忘了删除敏感字段，连通公司的ak\sk一起被提交上去了…<br><img data-src="/images/github10.png" alt="akb48"></p>
 <p>卧槽，这还得了？要是这个commit被人发现并且拷贝走了，岂不是得到了公司的ak\sk，后果不堪设想啊。但是如何在github远端删除掉一个commit呢？</p>
-<p>先记录下这次commit之前一次正常的版本号，查询版本号也可以通过命令<code>git log -5</code>（查询最近5次提交历史）：<br><img src="/images/github11.png" alt="akb48"></p>
+<p>先记录下这次commit之前一次正常的版本号，查询版本号也可以通过命令<code>git log -5</code>（查询最近5次提交历史）：<br><img data-src="/images/github11.png" alt="akb48"></p>
 <p>得到上一次的版本号是<code>051ebceaedd6b64801aada354f921d6ea7ef0622</code>，然后<code>git reset --hard  051ebceaedd6b64801aada354f921d6ea7ef0622</code>。</p>
-<p>然后再<code>git push origin HEAD --force</code>即可。整个过程如下：<br><img src="/images/github12.png" alt="akb48"></p>
-<p>此时再去github上刷新commit的历史页面，发现记录已经回滚到051ebce（版本号前面7位）了，如图：<br><img src="/images/github13.png" alt="akb48"></p>
+<p>然后再<code>git push origin HEAD --force</code>即可。整个过程如下：<br><img data-src="/images/github12.png" alt="akb48"></p>
+<p>此时再去github上刷新commit的历史页面，发现记录已经回滚到051ebce（版本号前面7位）了，如图：<br><img data-src="/images/github13.png" alt="akb48"></p>
 <p><font color=red>但是要注意！</font>如果你的代码是两个地方在上传github，比如含敏感词汇的文件是通过windows客户端上传的，但是你在某个linux服务器上进行了删除commit的操作，那么如果windows继续commit的话，是会再次提交所有的commit的(含带有机密字段的commit)，所以要把源头也就是windows里的commit也要用这个方法干掉，这样才算彻底删除。</p>
-<p><img src="/images/unnatural.gif" alt="akb48"></p>
+<p><img data-src="/images/unnatural.gif" alt="akb48"></p>
 
     </div>
 

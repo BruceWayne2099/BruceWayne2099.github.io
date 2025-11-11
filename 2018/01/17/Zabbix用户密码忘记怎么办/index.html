@@ -289,12 +289,12 @@
 
       
         <p>zabbix的超级用户也是人，人就难免会忘记密码（或者清除了当前浏览器的缓存），忘记密码不要怕，因为zabbix所有的用户数据都是保存在server机器上的mysql里，只要打开<code>zabbix_server.conf</code>，就会查得到mysql的登录账号密码以及zabbix对应的数据库。（这里多说一句，zabbix自带的guest基本就是一个废物，forget it~）</p>
-<p>在zabbix_server机器上输入mysql的账号密码来到mysql里，<code>USE zabbix</code>，然后<code>SELECT * FROM users</code>,就会看到笔者的画面。<br><img src="/images/zabbix_user1.png" alt="akb48"></p>
+<p>在zabbix_server机器上输入mysql的账号密码来到mysql里，<code>USE zabbix</code>，然后<code>SELECT * FROM users</code>,就会看到笔者的画面。<br><img data-src="/images/zabbix_user1.png" alt="akb48"></p>
 <p>这个时候就可以使用数据库的update命令去更改密码，比如说新的密码是“woshitiancai”，就可以写<code>update  users set passwd=md5(&quot;woshitiancai&quot;) where userid=&#39;1&#39;;</code><br>然后就可以用woshitiancai来登陆啦~</p>
 <p>但是！！！你以为这就结束了吗？nononono！！！</p>
 <p>很多人即使更改了密码还是登陆不上去，很简单，那就是你连用户名都忘记了！或者是用户名你记得但是你手贱在zabbix的administration里的users对原来的设定增加了新东西，而且这些东西还特么的是中文！！！于是就像我上面图那样出现了???的字样。</p>
 <p>那些？？？很重要吗？当然了！！！因为那些才是zabbix的登录用户名！！！看见了吗，zabbix使用蛋疼的alias作为真正的登录名而不是用name or surname，这真是一个蛋疼的事儿！</p>
-<p>那么剩下的问题很简单了，就是把???改变成中文，使用语句<code>set names utf8;</code> 然后界面就成了这样：<br><img src="/images/zabbix_user2.png" alt="akb48"></p>
+<p>那么剩下的问题很简单了，就是把???改变成中文，使用语句<code>set names utf8;</code> 然后界面就成了这样：<br><img data-src="/images/zabbix_user2.png" alt="akb48"></p>
 <p>这次再使用“主管理员”搭配新的密码就可以华丽的登录了！~~我他妈当时都差点要把这个user表格删掉然后重拽一个表格进来，但是终于还是被我识破了，啊哈哈哈哈，我真是个天才！！！</p>
 
     </div>
@@ -361,8 +361,8 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/%E8%BF%90%E7%BB%B4/" rel="tag"># 运维</a>
               <a href="/tags/zabbix/" rel="tag"># zabbix</a>
+              <a href="/tags/%E8%BF%90%E7%BB%B4/" rel="tag"># 运维</a>
           </div>
 
         

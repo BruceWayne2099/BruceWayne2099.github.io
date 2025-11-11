@@ -292,12 +292,12 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="过程"><a href="#过程" class="headerlink" title="过程"></a>过程</h2><p>今天发现一个集群里的某一台机器CPU涨了很多。如图：<br><img src="/images/cpu%E4%B8%8A%E6%B6%A8.png" alt="paradin" title="流量没变化，sys和user都上涨了很多"></p>
-<p>爬到容器里，<code>top -Hp 对应的PID</code>看了一下，里面是很多个线程都CPU很高：<br><img src="/images/cpu%E4%B8%8A%E6%B6%A82.png" alt="paradin" title="好几个线程"></p>
-<p>跑到宿主机里一看，整个宿主机cpu和load都有上涨：<br><img src="/images/cpu%E4%B8%8A%E6%B6%A84.png" alt="paradin" title="时间也吻合，所以可见是容器带高了整体宿主机"></p>
-<p>从宿主机的监控看，这个容器的cpi也上涨：<br><img src="/images/cpu%E4%B8%8A%E6%B6%A85.png" alt="paradin" title="CPI 是衡量CPU性能的指标，表示执行一条指令所需的平均时钟周期数"></p>
-<p>同时发现这个容器的younggc频率没变化，但是gc耗时比以前明显多了很多：<br><img src="/images/cpu%E4%B8%8A%E6%B6%A83.png" alt="paradin" title="gc耗时上涨的时刻跟cpu上涨时刻吻合"></p>
-<p>由于频率没变化，但是耗时上涨，我怀疑可能是内存出了问题，导致现在每一次gc的时候更加消耗cpu了，于是<code>sudo dmesg -T |grep -i &quot;Hardware Error&quot;</code>，果然容器在对应的时刻附近有内存硬件的报警：<br><img src="/images/cpu%E4%B8%8A%E6%B6%A86.png" alt="paradin" title="看到大量的mce告警"></p>
+        <h2 id="过程"><a href="#过程" class="headerlink" title="过程"></a>过程</h2><p>今天发现一个集群里的某一台机器CPU涨了很多。如图：<br><img data-src="/images/cpu%E4%B8%8A%E6%B6%A8.png" alt="paradin" title="流量没变化，sys和user都上涨了很多"></p>
+<p>爬到容器里，<code>top -Hp 对应的PID</code>看了一下，里面是很多个线程都CPU很高：<br><img data-src="/images/cpu%E4%B8%8A%E6%B6%A82.png" alt="paradin" title="好几个线程"></p>
+<p>跑到宿主机里一看，整个宿主机cpu和load都有上涨：<br><img data-src="/images/cpu%E4%B8%8A%E6%B6%A84.png" alt="paradin" title="时间也吻合，所以可见是容器带高了整体宿主机"></p>
+<p>从宿主机的监控看，这个容器的cpi也上涨：<br><img data-src="/images/cpu%E4%B8%8A%E6%B6%A85.png" alt="paradin" title="CPI 是衡量CPU性能的指标，表示执行一条指令所需的平均时钟周期数"></p>
+<p>同时发现这个容器的younggc频率没变化，但是gc耗时比以前明显多了很多：<br><img data-src="/images/cpu%E4%B8%8A%E6%B6%A83.png" alt="paradin" title="gc耗时上涨的时刻跟cpu上涨时刻吻合"></p>
+<p>由于频率没变化，但是耗时上涨，我怀疑可能是内存出了问题，导致现在每一次gc的时候更加消耗cpu了，于是<code>sudo dmesg -T |grep -i &quot;Hardware Error&quot;</code>，果然容器在对应的时刻附近有内存硬件的报警：<br><img data-src="/images/cpu%E4%B8%8A%E6%B6%A86.png" alt="paradin" title="看到大量的mce告警"></p>
 <p>于是将这个容器进行了置换，置换后的ip再看CPU和load都恢复了正常。</p>
 <h2 id="心得"><a href="#心得" class="headerlink" title="心得"></a>心得</h2><p>其实一个集群里某一个机器出了问题，是比较难查的。因为那么多机器没问题，唯独你有问题，那么就要想哪些地方是这个机器跟其他同集群里机器不同。可以从以下几个方面排查解决：</p>
 <ol>

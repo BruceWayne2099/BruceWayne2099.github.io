@@ -288,7 +288,7 @@
 
       
         <p>这几天重新翻看基础知识，看到了<code>vmstat</code>，我认为它是一个非常优秀的命令,因为它包括了<code>top</code>和<code>free</code>，甚至还包含了一些io的信息，可以说是运维人员常备命令之一。常用方法：<code>vmstat (-a) 多少秒刷一次 刷多少次</code>。</p>
-<p><img src="/images/vmstat.png" alt="vmstat" title="vmstat的效果"></p>
+<p><img data-src="/images/vmstat.png" alt="vmstat" title="vmstat的效果"></p>
 <p>对上面这个图来一个简单的解释：</p>
 <p>r: 运行队列中进程数量，这个值长期大于1就要判断是否需要增加CPU。<br>b: 等待IO的进程数量</p>
 <p>swpd: 使用虚拟内存大小(如果swpd的值不为0，但是SI，SO的值长期为0，这种情况不会影响系统性能）<br>free: 空闲物理内存大小<br>buff: 用作缓冲的内存大小<br>cache: 用作缓存的内存大小(如果cache的值大的时候，说明cache处的文件数多，如果频繁访问到的文件都能被cache处，那么磁盘的读IO bi会非常小)<br>inact: 非活跃内存大小（当使用-a选项时显示）<br>active: 活跃的内存大小（当使用-a选项时显示）</p>
@@ -366,8 +366,8 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/%E8%BF%90%E7%BB%B4/" rel="tag"># 运维</a>
               <a href="/tags/Linux/" rel="tag"># Linux</a>
+              <a href="/tags/%E8%BF%90%E7%BB%B4/" rel="tag"># 运维</a>
           </div>
 
         

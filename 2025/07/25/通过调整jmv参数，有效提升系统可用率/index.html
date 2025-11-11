@@ -308,41 +308,41 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="背景说明"><a href="#背景说明" class="headerlink" title="背景说明"></a>背景说明</h2><p>组内有一个业务系统 A，日常能达到十万级QPS（大促峰值超40WQPS），且上游系统基于同步调用，对RT非常敏感（毫秒级返回）。因此系统A不能轻易抖动，需要在超高流量下保持极致的服务稳定性：<br><img src="/images/jvm1.png" alt="paradin" title="调用关系很简单，但是对抖动的要求很高"></p>
-<p>某天发现上游系统有一些报错，找过来需要我们排查解决：<br><img src="/images/jvm2.png" alt="paradin" title="RT跟qps的曲线几乎相同，可见就是抖动导致的"></p>
+        <h2 id="背景说明"><a href="#背景说明" class="headerlink" title="背景说明"></a>背景说明</h2><p>组内有一个业务系统 A，日常能达到十万级QPS（大促峰值超40WQPS），且上游系统基于同步调用，对RT非常敏感（毫秒级返回）。因此系统A不能轻易抖动，需要在超高流量下保持极致的服务稳定性：<br><img data-src="/images/jvm1.png" alt="paradin" title="调用关系很简单，但是对抖动的要求很高"></p>
+<p>某天发现上游系统有一些报错，找过来需要我们排查解决：<br><img data-src="/images/jvm2.png" alt="paradin" title="RT跟qps的曲线几乎相同，可见就是抖动导致的"></p>
 <h2 id="排查过程"><a href="#排查过程" class="headerlink" title="排查过程"></a>排查过程</h2><h3 id="初步分析"><a href="#初步分析" class="headerlink" title="初步分析"></a>初步分析</h3><p>查看上游系统报错日志，发现全都是同步调用请求超时，报错<code>TimeoutException</code>。因此需要重点分析系统A是否有异常。<br>首先，在报错时间段业务流量并没有明显上涨，系统 A 的CPU水位、机器load也没有明显异常，因此可初步排除由于流量激增、超出系统最大负载所致。<br>其次，系统 A 执行请求的过程全都是一些内存计算逻辑，不需要远程调用数据库、中间件、外部系统，因此也可排除是外部依赖服务抖动&#x2F;有瓶颈导致。<br>其次，虽然系统 A 的并发流量很高（单机高达数千 QPS），但每条请求之间不涉及同步&#x2F;互斥的单机&#x2F;分布式锁逻辑，因此也可排除由于锁导致请求等待超时所致。<br>经过以上初步分析，已排除流量激增、外部服务有瓶颈、并发锁等可能影响因素，但并未定位到根因，需要进一步深入分析。</p>
-<h3 id="定位根因"><a href="#定位根因" class="headerlink" title="定位根因"></a>定位根因</h3><p>查看系统日志，发现服务抖动期间，该系统曾发生过一次热数据发布（系统索引切换）：<br><img src="/images/jvm3.png" alt="paradin" title="系统 A 在内存中加载了一份索引（可简单理解为一个比较复杂的大对象&#x2F;数据结构），且系统 A 会不定期（最快每 15 分钟）更换旧索引、加载最新版本索引"></p>
-<p>已知本系统的索引较大（约 0.5G），由于索引切换过程会产生大量新对象和内存垃圾，因此高度怀疑服务抖动与 GC 强相关。查看 <code>gc.log</code>，在系统抖动期间果然发现了长耗时的 YGC：<br><img src="/images/jvm4.png" alt="paradin" title="Object Copy：GC 时不再使用的对象会被清理释放，并整理剩余存活对象，整理过程存活对象会被复制到内存中新的位置"></p>
+<h3 id="定位根因"><a href="#定位根因" class="headerlink" title="定位根因"></a>定位根因</h3><p>查看系统日志，发现服务抖动期间，该系统曾发生过一次热数据发布（系统索引切换）：<br><img data-src="/images/jvm3.png" alt="paradin" title="系统 A 在内存中加载了一份索引（可简单理解为一个比较复杂的大对象&#x2F;数据结构），且系统 A 会不定期（最快每 15 分钟）更换旧索引、加载最新版本索引"></p>
+<p>已知本系统的索引较大（约 0.5G），由于索引切换过程会产生大量新对象和内存垃圾，因此高度怀疑服务抖动与 GC 强相关。查看 <code>gc.log</code>，在系统抖动期间果然发现了长耗时的 YGC：<br><img data-src="/images/jvm4.png" alt="paradin" title="Object Copy：GC 时不再使用的对象会被清理释放，并整理剩余存活对象，整理过程存活对象会被复制到内存中新的位置"></p>
 <p>观察日志可发现<code>Object Copy</code>环节耗时明显异常，高达200ms，且本过程会<code>STW（Stop The World）</code>。因此服务抖动的根本原因已锁定：<code>系统A加载的索引非常大，导致 YGC 时索引在堆内存的复制过程耗时久，复制期间业务线程被长时间暂停，导致上游请求大量超时报错</code>。</p>
-<h2 id="优化过程"><a href="#优化过程" class="headerlink" title="优化过程"></a>优化过程</h2><h3 id="常规思路"><a href="#常规思路" class="headerlink" title="常规思路"></a>常规思路</h3><p>针对 GC 暂停久这类常见问题，有如下一些常规优化思路：<br><img src="/images/jvm5.png" alt="paradin" title="这些思路都是面试时候可以拿来装逼的材料"></p>
+<h2 id="优化过程"><a href="#优化过程" class="headerlink" title="优化过程"></a>优化过程</h2><h3 id="常规思路"><a href="#常规思路" class="headerlink" title="常规思路"></a>常规思路</h3><p>针对 GC 暂停久这类常见问题，有如下一些常规优化思路：<br><img data-src="/images/jvm5.png" alt="paradin" title="这些思路都是面试时候可以拿来装逼的材料"></p>
 <p>然而，以上方法在本次场景中大多不适用。首先经排查代码并不存在Bug，且索引体积已无更多压缩空间，且索引算法层面并不支持增量式更新只能全量更替。其次，加机器虽然能通过稀释单机请求量，让 STW 长暂停影响到的请求量更少，但并未从根本解决问题，且会导致机器资源大量浪费。另外使用堆外内存虽然可不受 GC 管理，但高频访问下序列化&#x2F;反序列化开销无法容忍。</p>
 <p>因此，综合来看只能考虑在 JVM 参数方面做优化：通过修改参数调整 JVM 的行为模式，让索引复制带来的负面影响尽可能小，保障服务高可用。</p>
 <h3 id="详细分析GC日志"><a href="#详细分析GC日志" class="headerlink" title="详细分析GC日志"></a>详细分析GC日志</h3><p>根据 “定位根因” 那一段的分析，问题已归因为<code>YGC Object Copy</code>阶段复制索引时耗时太久，导致上游请求超时报错。本节进一步详细分析 GC 日志，更细粒度还原整个 GC 过程，探索有无潜在优化点。<br>已知当前 JVM 核心参数如下：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">-Xms12g</span><br><span class="line">-Xmx12g</span><br><span class="line">-XX:MetaspaceSize=512m</span><br><span class="line">-XX:MaxMetaspaceSize=512m</span><br><span class="line">-XX:+UseG1GC</span><br><span class="line">-XX:G1HeapRegionSize=16M</span><br><span class="line">-XX:MaxGCPauseMillis=100</span><br></pre></td></tr></table></figure>
 
-<p>通过集团 ATP 工具对原始 GC 日志进行可视化分析，下图中标出了各 GC 事件的时间点和变化曲线：<br><img src="/images/jvm6.png" alt="paradin" title="grace-parser 对于分析堆和线程栈是一个好东西"></p>
+<p>通过集团 ATP 工具对原始 GC 日志进行可视化分析，下图中标出了各 GC 事件的时间点和变化曲线：<br><img data-src="/images/jvm6.png" alt="paradin" title="grace-parser 对于分析堆和线程栈是一个好东西"></p>
 <p>从图中可以分析出如下信息：<br>① 蓝色圆点：一个点代表一次 YGC，横轴上堆满了密密麻麻的蓝点，说明 YGC 发生非常频繁且耗时短，毫秒级即可完成清理，这是理想中的情况。符合预期<br>② 粉色折线：代表堆内存占用量的变化情况，可以看到整体呈锯齿形，不断快速上升和下降。由于系统流量较大且请求执行过程会不断产生一些朝生夕灭的临时对象，因此可看到粉色折线快速上升。当 Eden 区不足时触发 YGC 清理，内存释放完成即可看到粉色折线下降到低点。符合预期<br>③ 异常蓝点：远离横轴说明耗时久，它们就是刚刚在日志中手动找到的长耗时 YGC 记录。需重点关注<br>④ 紫色折线：代表老年代堆内存占用量的变化情况。相比之下老年代占用率上涨缓慢，因为大多数临时对象都在年轻代被清理掉了，不会进入老年代。然而观察发现每次长耗时 YGC 蓝点附近，都会伴随着紫色折线阶梯式上升。需重点关注</p>
-<p>其次，还可发现长耗时YGC往往是成对出现的，有如下规律：<code>成对出现、时间接近、耗时都长、第一次晋升量少、第二次晋升量多</code>，如下图所示：<br><img src="/images/jvm7.png" alt="paradin" title="可见每次切换索引就超时抖动"></p>
+<p>其次，还可发现长耗时YGC往往是成对出现的，有如下规律：<code>成对出现、时间接近、耗时都长、第一次晋升量少、第二次晋升量多</code>，如下图所示：<br><img data-src="/images/jvm7.png" alt="paradin" title="可见每次切换索引就超时抖动"></p>
 <p>综上，整合目前所有已知线索：系统在每次切换索引时，都会超时抖动，且在抖动时间点会发现连续的两次长耗时 YGC（第二次 YGC 晋升量大）。</p>
-<p>经分析以上现象符合预期，详细过程推演还原如下：<br><img src="/images/jvm8.png" alt="paradin" title="gc原理"></p>
+<p>经分析以上现象符合预期，详细过程推演还原如下：<br><img data-src="/images/jvm8.png" alt="paradin" title="gc原理"></p>
 <p>● 阶段一：系统创建新索引，相关对象默认被分配至 Eden 区<br>● 阶段二：Eden 区空间不足，触发第一次 YGC，此时新索引被复制（Object Copy）到 Survivor 区，耗时久<br>● 阶段三：新索引构造完成，并被 GcRoot 引用上，旧索引与 GcRoot 引用被断开<br>● 阶段四：系统持续处理外部请求，Eden 区空间再次不足，触发第二次 YGC，此时旧索引被清理。新索引又被复制（Object Copy）到 Old 区（晋升），耗时久<br>● 阶段五：后续即使外部流量再次把 Eden 区打满，YGC 也能毫秒级快速完成。因为只需快速清理临时对象即可，新索引已稳定在老年代不会再被腾挪复制</p>
-<h3 id="一些尝试"><a href="#一些尝试" class="headerlink" title="一些尝试"></a>一些尝试</h3><p>至此，问题原因已非常清晰：每次新生成的索引会随着YGC连续复制多次，复制过程暂停久导致系统抖动。因此可考虑基于如下一些思路来针对性优化本问题，后文会逐个详细解释：<br><img src="/images/jvm9.png" alt="paradin" title="这几个参数又是给你面试装逼的资源"></p>
+<h3 id="一些尝试"><a href="#一些尝试" class="headerlink" title="一些尝试"></a>一些尝试</h3><p>至此，问题原因已非常清晰：每次新生成的索引会随着YGC连续复制多次，复制过程暂停久导致系统抖动。因此可考虑基于如下一些思路来针对性优化本问题，后文会逐个详细解释：<br><img data-src="/images/jvm9.png" alt="paradin" title="这几个参数又是给你面试装逼的资源"></p>
 <h4 id="让索引尽早晋升到老年代"><a href="#让索引尽早晋升到老年代" class="headerlink" title="让索引尽早晋升到老年代"></a>让索引尽早晋升到老年代</h4><p>通常情况下，一个对象最初会被分配在 Eden 区，第一次 YGC 后进入 Survivor 区。此后每次 YGC 对象会在 S0 和 S1 之间反复腾挪，且每次腾挪后对象 age+1，当 age 大于默认阈值时会晋升到 Old 区。因此对象在堆内存中的流转路径是：<code>Eden =&gt; S0 =&gt; S1 =&gt; S0 =&gt; S1 =&gt; ... =&gt; Old</code>。</p>
 <p>由于本例中索引对象复制开销太大，因此可考虑让索引尽早晋升到老年代，避免在年轻代反复腾挪影响系统稳定性。有如下 JVM 参数可以达到此目的：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MaxTenuringThreshold参数作用：表示对象在晋升到老年代之前，在年轻代中最多能够承受的 GC 周期次数</span><br></pre></td></tr></table></figure>
 
 <p>然而，结合上面 GC 日志截图可知，G1GC 对大对象做了动态优化——直接晋升（Direct Tenuring），并没有让索引在 Survivor 内反复腾挪。索引实际流转路径是：<code>Eden =&gt; S0 =&gt; Old</code>，总共只涉及 2 次复制而非默认值 15 次。此时相当于已经默认设置了 <code>MaxTenuringThreshold=1</code>，流程如下：<br>● 阶段一：新索引分配至 Eden 区，此时 age&#x3D;0<br>● 阶段二：触发第一次 YGC，索引存活，由于 age &lt; MaxTenuringThreshold &#x3D; 1，此时索引从 Eden 复制到 S0，随后 age 增长为1<br>● 阶段三：触发第二次 YGC，索引仍存活，此时由于 age &#x3D; MaxTenuringThreshold &#x3D; 1，则直接晋升并复制到 Old</p>
-<p>于是手动设置 <code>MaxTenuringThreshold=1</code> 重新实验。如下图所示，经实测索引流转路径仍然是 Eden &#x3D;&gt; S0 &#x3D;&gt; Old，证明以上猜想成立：<br><img src="/images/jvm10.png" alt="paradin" title="直接晋升"></p>
+<p>于是手动设置 <code>MaxTenuringThreshold=1</code> 重新实验。如下图所示，经实测索引流转路径仍然是 Eden &#x3D;&gt; S0 &#x3D;&gt; Old，证明以上猜想成立：<br><img data-src="/images/jvm10.png" alt="paradin" title="直接晋升"></p>
 <p>那能否更极端一点呢？让索引直接从 Eden 复制到 Old 而完全不经过 Survivor 区？因为<code>Eden =&gt; Old</code>相比<code>Eden =&gt; S0 =&gt; Old</code>，复制次数从 2 次进一步压缩为 1 次，总暂停时间直接减半，系统稳定性预期将提升明显。因此考虑进一步设置 <code>MaxTenuringThreshold=0</code>，预期流程如下：</p>
 <p>●阶段一：新索引分配至 Eden 区，此时 age&#x3D;0<br>●阶段二：触发第一次 YGC，此时由于 age &#x3D; MaxTenuringThreshold &#x3D; 0，则索引直接晋升并复制到 Old</p>
-<p>实验结果如下图，可知索引的确在第一次 YGC 时从 Eden 被直接复制到了 Old（因为清理后年轻代占用变为 0，否则年轻代清理后仍然会占用 400MB 左右）<br><img src="/images/jvm11.png" alt="paradin" title="直接晋升"></p>
-<p>总结：本次优化前，每次索引切换后会出现2次连续的长耗时YGC，在不改任何一行业务代码、不加一台机器的前提下，仅通过设置 <code>MaxTenuringThreshold=0</code>，GC 长暂停时间直接减半。体现在系统监控上就是索引切换时报错量明显变少，服务抖动时成功率从 95% 提高至 98%：<br><img src="/images/jvm12.png" alt="paradin" title="不走s区，直接去old"></p>
-<h4 id="InitialTenuringThreshold"><a href="#InitialTenuringThreshold" class="headerlink" title="InitialTenuringThreshold"></a>InitialTenuringThreshold</h4><p>经实测，设置 <code>InitialTenuringThreshold=1</code> 也能达到类似上面的效果，也能将索引复制次数从 2 次减少为 1 次，提高系统稳定性：<br><img src="/images/jvm12.png" alt="paradin" title="InitialTenuringThreshold和MaxTenuringThreshold的作用类似，都是用于调整对象晋升到老年代的年龄阈值"></p>
-<h4 id="AlwaysTenure"><a href="#AlwaysTenure" class="headerlink" title="AlwaysTenure"></a>AlwaysTenure</h4><p>AlwaysTenure参数作用如字面含义：让对象总是晋升。经实测，设置 AlwaysTenure 后，也能将索引复制次数从 2 次减少为 1 次，提高系统稳定性：<br><img src="/images/jvm14.png" alt="paradin" title="AlwaysTenure 参数也能达到该目的"></p>
+<p>实验结果如下图，可知索引的确在第一次 YGC 时从 Eden 被直接复制到了 Old（因为清理后年轻代占用变为 0，否则年轻代清理后仍然会占用 400MB 左右）<br><img data-src="/images/jvm11.png" alt="paradin" title="直接晋升"></p>
+<p>总结：本次优化前，每次索引切换后会出现2次连续的长耗时YGC，在不改任何一行业务代码、不加一台机器的前提下，仅通过设置 <code>MaxTenuringThreshold=0</code>，GC 长暂停时间直接减半。体现在系统监控上就是索引切换时报错量明显变少，服务抖动时成功率从 95% 提高至 98%：<br><img data-src="/images/jvm12.png" alt="paradin" title="不走s区，直接去old"></p>
+<h4 id="InitialTenuringThreshold"><a href="#InitialTenuringThreshold" class="headerlink" title="InitialTenuringThreshold"></a>InitialTenuringThreshold</h4><p>经实测，设置 <code>InitialTenuringThreshold=1</code> 也能达到类似上面的效果，也能将索引复制次数从 2 次减少为 1 次，提高系统稳定性：<br><img data-src="/images/jvm12.png" alt="paradin" title="InitialTenuringThreshold和MaxTenuringThreshold的作用类似，都是用于调整对象晋升到老年代的年龄阈值"></p>
+<h4 id="AlwaysTenure"><a href="#AlwaysTenure" class="headerlink" title="AlwaysTenure"></a>AlwaysTenure</h4><p>AlwaysTenure参数作用如字面含义：让对象总是晋升。经实测，设置 AlwaysTenure 后，也能将索引复制次数从 2 次减少为 1 次，提高系统稳定性：<br><img data-src="/images/jvm14.png" alt="paradin" title="AlwaysTenure 参数也能达到该目的"></p>
 <p>这里多说明一下：<br>● 由于索引较大，Eden 区剩余空间可能无法容纳整个索引，因此上图总共经历了 3 次 YGC 清理释放，才让索引全部创建完成。其中每次 YGC 会把已构造好的索引局部晋升到老年代，前后总共 3 次 YGC 才把索引完整搬到了老年代。这与“AlwaysTenure 将索引复制次数从 2 次减少为 1 次”结论并不冲突。</p>
 <p>● AlwaysTenure 相当于只使用 Eden 和 Old，而 Survivor 闲置。与之作用相反的参数是 NeverTenure，会让对象在年轻代中反复辗转而永远不晋升，意味着只使用了 Eden 和 Survivor 区，而 Old 区闲置。两个参数都比较极端，【只有在特殊业务场景才考虑使用】。</p>
 <p>● 降低晋升年龄阈值会让对象更容易进入老年代，但是会加重老年代 FGC 负担。而本业务场景比较特殊，对象的存活时间两极分化明显：一种是由 RPC 请求产生的朝生夕灭的对象，存活时间毫秒级；另一种则是巨型索引对象，存活时间最短都有数十分钟。因此就算把晋升年龄阈值改为1，这些临时对象大概率已失活（被清理）而非存活（被晋升），故修改以上 JVM 参数不会加重本系统FGC负担。</p>
-<h4 id="让索引直接分配到老年代"><a href="#让索引直接分配到老年代" class="headerlink" title="让索引直接分配到老年代"></a>让索引直接分配到老年代</h4><p>上节内容已将索引流转路径已从<code>Eden =&gt; Survivor =&gt; Old（2 次复制）</code>优化为 <code>Eden =&gt; Old（1 次复制）</code>。能否更极端一点，让新索引在最初创建时，就一步到位直接分配到老年代（0 次复制）？思路如下：<br><img src="/images/jvm15.png" alt="paradin" title="这样索引复制导致服务抖动的问题将得到根治"></p>
+<h4 id="让索引直接分配到老年代"><a href="#让索引直接分配到老年代" class="headerlink" title="让索引直接分配到老年代"></a>让索引直接分配到老年代</h4><p>上节内容已将索引流转路径已从<code>Eden =&gt; Survivor =&gt; Old（2 次复制）</code>优化为 <code>Eden =&gt; Old（1 次复制）</code>。能否更极端一点，让新索引在最初创建时，就一步到位直接分配到老年代（0 次复制）？思路如下：<br><img data-src="/images/jvm15.png" alt="paradin" title="这样索引复制导致服务抖动的问题将得到根治"></p>
 <p>围绕此思路，继续做了如下尝试：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PretenureSizeThreshold 参数作用：当对象的大小超过 PretenureSizeThreshold 时，该对象会直接分配到老年代</span><br></pre></td></tr></table></figure>
 
@@ -351,18 +351,18 @@
 
 <p>修改 G1HeapRegionSize 参数后继续观察，索引切换时系统仍然抖动，看 GC 日志索引流转路径仍然是 <code>Eden =&gt; Survivor =&gt; Old</code>，并没有达到预期效果。</p>
 <p>原因分析：业务上索引虽然整体很大（约500MB），但实际是由上百万个小对象组成的。索引的创建过程实际就是内部海量小对象逐个创建的过程，这些小对象被分配至 Eden（而非 Old）是合理的、符合预期的，因此从结果来看整个索引实际仍然被分配在 Eden 区。除非是 int[] arr &#x3D; new int[1000000000] 这类情况，JVM 能在最初明确知道 arr 需要多少空间，才可直接分配到老年代。</p>
-<h4 id="加速索引复制过程"><a href="#加速索引复制过程" class="headerlink" title="加速索引复制过程"></a>加速索引复制过程</h4><p>在不改变索引固有大小、索引复制次数的情况下，也可以考虑调节如下参数来提高复制速度、降低暂停时长：<br><img src="/images/jvm16.png" alt="paradin" title="这几个参数也都挨个试过"></p>
+<h4 id="加速索引复制过程"><a href="#加速索引复制过程" class="headerlink" title="加速索引复制过程"></a>加速索引复制过程</h4><p>在不改变索引固有大小、索引复制次数的情况下，也可以考虑调节如下参数来提高复制速度、降低暂停时长：<br><img data-src="/images/jvm16.png" alt="paradin" title="这几个参数也都挨个试过"></p>
 <p>实测调整以上参数无明显改善：MaxGCPauseMillis 只是一个目标值，然而复制索引固有耗时始终有那么久，作用不大。其次，经实测 GC 默认并发线程数已接近 CPU 核数，也无更多优化空间。</p>
 <h4 id="升级JDK11-ZGC"><a href="#升级JDK11-ZGC" class="headerlink" title="升级JDK11 - ZGC"></a>升级JDK11 - ZGC</h4><p>传统的CMS和G1都存在各自的理论局限（例如CMS的内存碎片化，G1只能在STW时移动对象，两者STW时长会随着活跃对象的增加而增加），这正是我们大索引复制所遇到的问题。</p>
 <p>JDK11 中新增 ZGC，核心变化是引入了着色指针（Colored Pointers）和读屏障（Load Barriers）机制，解决对象复制过程中准确访问对象的问题，从 STW 优化为并发转移。核心原理如下：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ZGC中业务线程访问对象将触发“读屏障”，如果发现对象被复制移动了（通过“着色指针”实现），则“读屏障”会把读出来的指针更新到对象的新地址上，让业务线程始终访问到对象更新后、移动后的正确地址。对比之下G1只能先暂停并复制对象、更新指针地址，随后再解除暂停让业务线程访问对象</span><br></pre></td></tr></table></figure>
 
-<p>以上机制让 ZGC 可以有更高的并发度、更低的 STW 时长。对比 G1 如下：<br><img src="/images/jvm17.png" alt="paradin" title="ZGC vs G1"></p>
-<p>经实测使用 ZGC 后稳定性有提升，但索引切换期间仍然会有轻微抖动。诊断分析 GC 日志发现此期间有 Allocation Stall（导致应用程序在尝试分配内存时暂时停止，直到有足够的内存可用）：<br><img src="/images/jvm18.png" alt="paradin" title="ZGC还是有点效果的"></p>
-<p>本系统每次分配新索引都需要约 500MB 内存，这是 JVM 无法预知的。对比监控可发现每次索引切换时，每个服务端 RT 尖刺均对应了一次堆内存占用尖刺，如下图：<br><img src="/images/jvm19.png" alt="paradin" title="时间轴都对得上"></p>
+<p>以上机制让 ZGC 可以有更高的并发度、更低的 STW 时长。对比 G1 如下：<br><img data-src="/images/jvm17.png" alt="paradin" title="ZGC vs G1"></p>
+<p>经实测使用 ZGC 后稳定性有提升，但索引切换期间仍然会有轻微抖动。诊断分析 GC 日志发现此期间有 Allocation Stall（导致应用程序在尝试分配内存时暂时停止，直到有足够的内存可用）：<br><img data-src="/images/jvm18.png" alt="paradin" title="ZGC还是有点效果的"></p>
+<p>本系统每次分配新索引都需要约 500MB 内存，这是 JVM 无法预知的。对比监控可发现每次索引切换时，每个服务端 RT 尖刺均对应了一次堆内存占用尖刺，如下图：<br><img data-src="/images/jvm19.png" alt="paradin" title="时间轴都对得上"></p>
 <p>由于 ZGC 在内存整理阶段是无锁复制，因此 GC 日志中没再发现耗时异常的记录，经实测服务成功率进一步提高到了 99.5%。但美中不足的是由于 Allocation Stall 问题，系统时常还是会有些小抖动。</p>
-<h2 id="问题复盘"><a href="#问题复盘" class="headerlink" title="问题复盘"></a>问题复盘</h2><p>回顾本问题，复盘为什么YGC的负面影响这么大，让本系统在索引切换时成功率跌至95%？核心问题是本系统挑战本身就非常大，需要同时满足以下三个条件，缺一不可：<br>● 对延迟非常敏感：同步调用且毫秒级返回，不能长时间暂停，否则每次长暂停都会直接体现为业务监控上的报错<br>● 极高的内存压力：每次索引切换会带来 GB 级的内存消耗、清理和复制开销，这是导致 YGC 耗时久的根源<br>● 极高的并发量：总流量十万级 QPS，单机数千 QPS。GC 暂停时所有请求都将暂停处理，导致大量超时<br><img src="/images/jvm20.png" alt="paradin" title="维护这么难得的系统也是一个挺有挑战的事儿"></p>
-<p>由此可见，针对组内某个高并发（10W+ QPS）、低延迟（毫秒级返回）、高内存压力（最快每 15 分钟一次 GB 级索引切换）系统的不稳定问题，可以尝试基于 JVM 调参做了一系列探索尝试，最终彻底实现了索引无感切换，让服务可用率稳定在 99.995%。经测试有效的优化手段如下：<br><img src="/images/jvm21.png" alt="paradin" title="最后总结一下"></p>
+<h2 id="问题复盘"><a href="#问题复盘" class="headerlink" title="问题复盘"></a>问题复盘</h2><p>回顾本问题，复盘为什么YGC的负面影响这么大，让本系统在索引切换时成功率跌至95%？核心问题是本系统挑战本身就非常大，需要同时满足以下三个条件，缺一不可：<br>● 对延迟非常敏感：同步调用且毫秒级返回，不能长时间暂停，否则每次长暂停都会直接体现为业务监控上的报错<br>● 极高的内存压力：每次索引切换会带来 GB 级的内存消耗、清理和复制开销，这是导致 YGC 耗时久的根源<br>● 极高的并发量：总流量十万级 QPS，单机数千 QPS。GC 暂停时所有请求都将暂停处理，导致大量超时<br><img data-src="/images/jvm20.png" alt="paradin" title="维护这么难得的系统也是一个挺有挑战的事儿"></p>
+<p>由此可见，针对组内某个高并发（10W+ QPS）、低延迟（毫秒级返回）、高内存压力（最快每 15 分钟一次 GB 级索引切换）系统的不稳定问题，可以尝试基于 JVM 调参做了一系列探索尝试，最终彻底实现了索引无感切换，让服务可用率稳定在 99.995%。经测试有效的优化手段如下：<br><img data-src="/images/jvm21.png" alt="paradin" title="最后总结一下"></p>
 <p>至此，未来无论系统 QPS 涨到多高、索引体积膨胀到多大、索引切换多么频繁，系统都能无感切换索引，稳定性不再受到任何影响。完结撒花~</p>
 
     </div>

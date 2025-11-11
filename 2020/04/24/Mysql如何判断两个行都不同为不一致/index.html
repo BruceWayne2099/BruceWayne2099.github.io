@@ -291,16 +291,16 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="Mysql下的判断"><a href="#Mysql下的判断" class="headerlink" title="Mysql下的判断"></a>Mysql下的判断</h2><p>我最近再做一个Django页面，这个页面主要是展现“攻防演习”的一个细节，判断攻击方一共攻击了多少个场景，如图：<br><img src="/images/mysql%E8%A1%8C%E4%B8%80%E8%87%B42.jpg" alt="akb48"></p>
+        <h2 id="Mysql下的判断"><a href="#Mysql下的判断" class="headerlink" title="Mysql下的判断"></a>Mysql下的判断</h2><p>我最近再做一个Django页面，这个页面主要是展现“攻防演习”的一个细节，判断攻击方一共攻击了多少个场景，如图：<br><img data-src="/images/mysql%E8%A1%8C%E4%B8%80%E8%87%B42.jpg" alt="akb48"></p>
 <p>可见<code>practice_scene</code>和<code>app</code>都不同才能算是一个不同的场景，如果他俩相同就是同一个场景，因为攻击方是可以重复攻击同一个场景的。那么如何输出<code>practice_scene</code>和<code>app</code>都不同的列？</p>
-<p>写法很简单：<code>SELECT * FROM naxxramas_cappractice where bluearmy_id =6 GROUP BY practice_scene, app ORDER BY id DESC</code>，效果如图：<br><img src="/images/mysql%E8%A1%8C%E4%B8%80%E8%87%B43.jpg" alt="akb48"></p>
+<p>写法很简单：<code>SELECT * FROM naxxramas_cappractice where bluearmy_id =6 GROUP BY practice_scene, app ORDER BY id DESC</code>，效果如图：<br><img data-src="/images/mysql%E8%A1%8C%E4%B8%80%E8%87%B43.jpg" alt="akb48"></p>
 <p>可见<code>practice_scene</code>和<code>app</code>相同的列已经整合成一个，只暴露了ID比较靠前的那一行。</p>
-<p>而现在我想要得到的是行数，那就<code>SELECT count(*) FROM naxxramas_cappractice where bluearmy_id = 6 GROUP BY practice_scene, app ORDER BY id DESC</code>吧，很不幸，答案是错的，如图：<br><img src="/images/mysql%E8%A1%8C%E4%B8%80%E8%87%B41.jpg" alt="akb48" title="每一个不同的行数都输出了"><br>	<br>可见这样是把每一个类型的行数输出了，而我想要的只是一个3，怎么办？</p>
-<p>答案是：<code>SELECT count(DISTINCT app,practice_scene) FROM naxxramas_cappractice where bluearmy_id =6;</code>  就搞定了，如图：<br><img src="/images/mysql%E8%A1%8C%E4%B8%80%E8%87%B44.jpg" alt="akb48"></p>
+<p>而现在我想要得到的是行数，那就<code>SELECT count(*) FROM naxxramas_cappractice where bluearmy_id = 6 GROUP BY practice_scene, app ORDER BY id DESC</code>吧，很不幸，答案是错的，如图：<br><img data-src="/images/mysql%E8%A1%8C%E4%B8%80%E8%87%B41.jpg" alt="akb48" title="每一个不同的行数都输出了"><br>	<br>可见这样是把每一个类型的行数输出了，而我想要的只是一个3，怎么办？</p>
+<p>答案是：<code>SELECT count(DISTINCT app,practice_scene) FROM naxxramas_cappractice where bluearmy_id =6;</code>  就搞定了，如图：<br><img data-src="/images/mysql%E8%A1%8C%E4%B8%80%E8%87%B44.jpg" alt="akb48"></p>
 <h2 id="Django-里的判断"><a href="#Django-里的判断" class="headerlink" title="Django 里的判断"></a>Django 里的判断</h2><p>Django的<code>views.py</code>如何通过models来得到上面的“3”呢？如果是<code>Django 1.X</code>的话，可以使用<code>CAPPractice.objects.filter(bluearmy_id = 6).distinct(&#39;practice_scene, app&#39;)</code> 或者是 <code>CAPPractice.objects.values(&#39;Category&#39;).distinct()</code>。（CAPPractice是naxxramas_cappractice对应的model）</p>
 <p>但是这个方法在2.2里已经不能使用了，会爆<code>django.db.utils.NotSupportedError: DISTINCT ON fields is not supported by this database backend</code>，这里我们改一下，<code>CAPPractice.objects.filter(bluearmy_id=6).values(&#39;app&#39;, &quot;practice_scene&quot;).distinct().count()</code> 就好了，然后直接在前端页面直接引用变量即可。</p>
 <h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/3852104/select-distinct-individual-columns-in-django">https://stackoverflow.com/questions/3852104/select-distinct-individual-columns-in-django</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/cpl9412290130/p/11777633.html">https://www.cnblogs.com/cpl9412290130/p/11777633.html</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_36815739/article/details/83624100">https://blog.csdn.net/qq_36815739/article/details/83624100</a></p>
-<p><img src="/images/%E9%87%91%E4%B8%89%E8%83%96%E7%9C%8B%E7%81%AB%E7%AE%AD.jpg" alt="akb48" title="时光匆匆，八年一过，抬头仰望，导弹入云"></p>
+<p><img data-src="/images/%E9%87%91%E4%B8%89%E8%83%96%E7%9C%8B%E7%81%AB%E7%AE%AD.jpg" alt="akb48" title="时光匆匆，八年一过，抬头仰望，导弹入云"></p>
 
     </div>
 
@@ -366,8 +366,8 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/Django/" rel="tag"># Django</a>
               <a href="/tags/Mysql/" rel="tag"># Mysql</a>
+              <a href="/tags/Django/" rel="tag"># Django</a>
           </div>
 
         

@@ -287,7 +287,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="挖坑过程"><a href="#挖坑过程" class="headerlink" title="挖坑过程"></a>挖坑过程</h2><p>有时候，我们可能发现服务器里存在大量的<code>TIME_WAIT</code>，如图：<br><img src="/images/time4.png" alt="办公室"></p>
+        <h2 id="挖坑过程"><a href="#挖坑过程" class="headerlink" title="挖坑过程"></a>挖坑过程</h2><p>有时候，我们可能发现服务器里存在大量的<code>TIME_WAIT</code>，如图：<br><img data-src="/images/time4.png" alt="办公室"></p>
 <p>其实这2000+的<code>TIME_WAIT</code>真的不算多，至少低于10000条都不算多。但是<code>TIME_WAIT</code>本身是一个占用内存和CPU的东西，所以很多人就想把它干掉。往往这个时候，就会看到这样的答案：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">打开 sysctl.conf 文件，修改以下几个参数：</span><br><span class="line">net.ipv4.tcp_tw_recycle = <span class="number">1</span></span><br><span class="line">net.ipv4.tcp_tw_reuse = <span class="number">1</span></span><br><span class="line">net.ipv4.tcp_timestamps = <span class="number">1</span>	<span class="comment">#只有打开这个，前俩才能生效</span></span><br></pre></td></tr></table></figure></p>
 <p>修改完毕之后，再<code>/sbin/sysctl -p</code>一下，就会看到<code>TIME_WAIT</code>果然大量减少，效果立竿见影！但是不要高兴太早，其实你给自己埋下了一个大坑…</p>
 <h2 id="TIME-WAIT是干啥的"><a href="#TIME-WAIT是干啥的" class="headerlink" title="TIME_WAIT是干啥的"></a>TIME_WAIT是干啥的</h2><p><font color=red>只有主动关闭连接的一方，才会转移到<code>TIME_WAIT</code>。只有被动断开连接的一方会出现<code>CLOSE_WAIT</code>，等待<code>close()</code>执行完毕之后，状态变成<code>LAST_ACK</code>。</font></p>

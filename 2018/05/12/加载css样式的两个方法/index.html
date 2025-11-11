@@ -289,7 +289,7 @@
 
       
         <h2 id="背景说明"><a href="#背景说明" class="headerlink" title="背景说明"></a>背景说明</h2><p>环境： <code>django 2.0</code>+<code>python 3.6</code>+<code>pycharm 2018</code><br>project名称: <code>blog</code></p>
-<h2 id="普通的网页加载css"><a href="#普通的网页加载css" class="headerlink" title="普通的网页加载css"></a>普通的网页加载css</h2><p>网页使用了css才会更好看更炫酷，一般情况下的网页是这样的：<br><img src="/images/css0.png" alt="akb48"></p>
+<h2 id="普通的网页加载css"><a href="#普通的网页加载css" class="headerlink" title="普通的网页加载css"></a>普通的网页加载css</h2><p>网页使用了css才会更好看更炫酷，一般情况下的网页是这样的：<br><img data-src="/images/css0.png" alt="akb48"></p>
 <p>上面这个html文件里用到了模板，而且又对div和 a标签做了class定义，最后分别对各自的class进行了css说明。整个文档看下来比较直观。</p>
 <p>但是这样就会有一个问题，就是把html内容和css内容写到了一起，一般来说为了后期维护，都会把css单独写到一个文件夹里，然后让这个html来引用这个css文件夹的具体某个css文件。</p>
 <p>于是，我们就在<code>blog</code>这个project目录下建立一个叫static的文件夹，用它来专门装<code>css\js</code>这样的静态文件。</p>
@@ -298,7 +298,7 @@
 <p>上面的<code>django.contrib.staticfiles</code>就是django的css加载方法，使用这个方法也很简单。</p>
 <p>首先要在html文件最上面先声明要调用这个方法:<br>	<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&#123;% load staticfiles %&#125;</span><br><span class="line">&#123;# 这个staticfiles是django自带的，可以在settings文件里看到 #&#125;</span><br></pre></td></tr></table></figure></p>
 <p>然后把link标签改成如下：<br>	<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;link  rel=&quot;stylesheet&quot; href=&quot;&#123;% static &#x27;base.css&#x27; %&#125;&quot;&gt;</span><br></pre></td></tr></table></figure></p>
-<p>保存文件刷新即可，而且用了这种方法，在chrome浏览器里F12 查看，会解析成普通模式的方法，如图：<br><img src="/images/css2.png" alt="akb48"></p>
+<p>保存文件刷新即可，而且用了这种方法，在chrome浏览器里F12 查看，会解析成普通模式的方法，如图：<br><img data-src="/images/css2.png" alt="akb48"></p>
 <p><font color=red>在django项目里，还是更推荐用django的方法。</font></p>
 <h2 id="额外补充"><a href="#额外补充" class="headerlink" title="额外补充"></a>额外补充</h2><p>如果html文件开头声明引用了某个模板，比如：<br>	<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&#123;% extends &#x27;base.html&#x27; %&#125;	#声明引用了base.html这个模板</span><br><span class="line">&#123;% load staticfiles %&#125;	</span><br></pre></td></tr></table></figure></p>
 <p>那么<code>extends</code>语句必须在最上面，不然就会报错：<code>TemplateSyntaxError at /&lt;ExtendsNode: extends &#39;base.html&#39;&gt; must be the first tag in the template.</code></p>

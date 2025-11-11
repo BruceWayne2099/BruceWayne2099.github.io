@@ -293,14 +293,14 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="网页状态码监控"><a href="#网页状态码监控" class="headerlink" title="网页状态码监控"></a>网页状态码监控</h2><p>在zabbix的web界面，<code>配置</code>–<code>主机</code>–选择一个有外网权限的服务器，比如选择zabbix server–<code>Web检测</code>，如图：<br><img src="/images/checkweb1.png" alt="paradin"></p>
-<p>然后点击右上角的<code>创建Web场景</code>，然后依次填入<code>名称</code>，<code>间隔</code>，<code>客户端</code>等等，如图：<br><img src="/images/checkweb2.png" alt="paradin"></p>
-<p>然后编辑<code>步骤</code>，先<code>添加</code>，填入对应的url，然后写上200状态码，意思就是返回200是OK的。<br><img src="/images/checkweb4.png" alt="paradin"><br>保存即可，如果还有http认证，那么就继续填写认证。</p>
-<p>至此，一个简单的监控官网状态码的配置过程就结束了，剩下就是增添一下触发器，如下：<br><img src="/images/checkweb3.png" alt="paradin"></p>
+        <h2 id="网页状态码监控"><a href="#网页状态码监控" class="headerlink" title="网页状态码监控"></a>网页状态码监控</h2><p>在zabbix的web界面，<code>配置</code>–<code>主机</code>–选择一个有外网权限的服务器，比如选择zabbix server–<code>Web检测</code>，如图：<br><img data-src="/images/checkweb1.png" alt="paradin"></p>
+<p>然后点击右上角的<code>创建Web场景</code>，然后依次填入<code>名称</code>，<code>间隔</code>，<code>客户端</code>等等，如图：<br><img data-src="/images/checkweb2.png" alt="paradin"></p>
+<p>然后编辑<code>步骤</code>，先<code>添加</code>，填入对应的url，然后写上200状态码，意思就是返回200是OK的。<br><img data-src="/images/checkweb4.png" alt="paradin"><br>保存即可，如果还有http认证，那么就继续填写认证。</p>
+<p>至此，一个简单的监控官网状态码的配置过程就结束了，剩下就是增添一下触发器，如下：<br><img data-src="/images/checkweb3.png" alt="paradin"></p>
 <h2 id="tcp连接监控"><a href="#tcp连接监控" class="headerlink" title="tcp连接监控"></a>tcp连接监控</h2><p>首先在<code>zabbix-agentd.conf</code>里添加一个新的自定义监控项：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="title class_">UserParameter</span>=tcp.<span class="property">status</span>[*],netstat -a | awk <span class="string">&#x27;/^tcp/ &#123;++y[$NF]&#125; END &#123;for(i in y) print i,y[i]&#125;&#x27;</span> |  grep $1 | awk <span class="string">&#x27;&#123;print $NF&#125;&#x27;</span></span><br></pre></td></tr></table></figure></p>
-<p>然后<code>service zabbix-agent restart</code>重启客户端，模板就是<a target="_blank" rel="noopener" href="https://gitee.com/careyjike_173/zabbix/tree/master/template">https://gitee.com/careyjike_173/zabbix/tree/master/template</a> 里的<code>zbx_tcp_status_templates.xml</code>，直接导入即可。如图：<br><img src="/images/checkweb5.png" alt="paradin"></p>
+<p>然后<code>service zabbix-agent restart</code>重启客户端，模板就是<a target="_blank" rel="noopener" href="https://gitee.com/careyjike_173/zabbix/tree/master/template">https://gitee.com/careyjike_173/zabbix/tree/master/template</a> 里的<code>zbx_tcp_status_templates.xml</code>，直接导入即可。如图：<br><img data-src="/images/checkweb5.png" alt="paradin"></p>
 <p>然后自己配置一下<code>time_wait</code>&#x2F;<code>close_wait</code>的告警阈值。</p>
-<p><img src="/images/%E8%A3%A4%E5%AD%90%E5%8D%A1%E4%B8%96%E7%95%8C%E6%B3%A2.gif" alt="akb48" title="裤子卡中圈世界波"></p>
+<p><img data-src="/images/%E8%A3%A4%E5%AD%90%E5%8D%A1%E4%B8%96%E7%95%8C%E6%B3%A2.gif" alt="akb48" title="裤子卡中圈世界波"></p>
 
     </div>
 

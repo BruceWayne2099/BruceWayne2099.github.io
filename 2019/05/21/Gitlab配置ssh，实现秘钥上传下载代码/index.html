@@ -291,13 +291,13 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="常规配置"><a href="#常规配置" class="headerlink" title="常规配置"></a>常规配置</h2><p>gitlab配置ssh比较简单，在代码机上使用<code>ssh-keygen -t rsa -C &quot;你的邮箱&quot;</code>制作<code>id_rsa</code>和<code>id_rsa.pub</code>，然后来到gitlab的web页面，settings—ssh keys,把<code>id_rsa.pub</code>拷贝进去，然后点击<code>Add key</code>:<br><img src="/images/gitlab32.png" alt="akb48"></p>
+        <h2 id="常规配置"><a href="#常规配置" class="headerlink" title="常规配置"></a>常规配置</h2><p>gitlab配置ssh比较简单，在代码机上使用<code>ssh-keygen -t rsa -C &quot;你的邮箱&quot;</code>制作<code>id_rsa</code>和<code>id_rsa.pub</code>，然后来到gitlab的web页面，settings—ssh keys,把<code>id_rsa.pub</code>拷贝进去，然后点击<code>Add key</code>:<br><img data-src="/images/gitlab32.png" alt="akb48"></p>
 <p>然后返回到代码机器上，再对应的代码目录里使用<code>git remote -v</code>查看一下当前的方式，如果不是git的话，通过<code>git remote set-url origin git@你的project地址</code>修改，然后再试一下 <code>ssh -T git@&quot;你的gitlab服务器地址&quot;</code>是否会出现welcome，如果可以的话，那么就可以通过ssh的方式下载上传代码以及<code>git clone 对应的project</code>了。</p>
 <h2 id="容器配置"><a href="#容器配置" class="headerlink" title="容器配置"></a>容器配置</h2><p>但是现在很多人都用容器部署gitlab，而且在部署的时候除了指定80，443端口的映射，还制定了22端口的映射。比如我的这个gitlab容器的启动命令就是：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run --detach --hostname 外网IP --publish <span class="number">443</span>:<span class="number">443</span> --publish <span class="number">80</span>:<span class="number">80</span> --publish <span class="number">2222</span>:<span class="number">22</span> --name gitlab --restart always gitlab/gitlab-ce:latest</span><br></pre></td></tr></table></figure></p>
 <p>可见我把宿主机的2222端口对应给了gitlab容器。那么像上面的方法肯定不会成功，这里就需要我们修改一处地方。</p>
-<p>首先进入容器，然后修改<code>gitlab.rb</code>文件，这个文件在容器里有很多，我这个镜像里的gitlab.rb是<code>/etc/gitlab/gitlab.rb</code>，然后把<code>gitlab_rails[&#39;gitlab_shell_ssh_port&#39;]</code>改成2222并且去掉注释，如图：<br><img src="/images/gitlab33.png" alt="akb48"></p>
-<p>然后<code>gitlab-ctl restart</code>重启之，重启完毕之后，在代码机上测试一下ssh：<br><img src="/images/gitlab34.png" alt="akb48"></p>
-<p>可以已经连通，修改一下remote master地址之后，就可以直接上传了：<br><img src="/images/gitlab35.png" alt="akb48"></p>
+<p>首先进入容器，然后修改<code>gitlab.rb</code>文件，这个文件在容器里有很多，我这个镜像里的gitlab.rb是<code>/etc/gitlab/gitlab.rb</code>，然后把<code>gitlab_rails[&#39;gitlab_shell_ssh_port&#39;]</code>改成2222并且去掉注释，如图：<br><img data-src="/images/gitlab33.png" alt="akb48"></p>
+<p>然后<code>gitlab-ctl restart</code>重启之，重启完毕之后，在代码机上测试一下ssh：<br><img data-src="/images/gitlab34.png" alt="akb48"></p>
+<p>可以已经连通，修改一下remote master地址之后，就可以直接上传了：<br><img data-src="/images/gitlab35.png" alt="akb48"></p>
 
     </div>
 

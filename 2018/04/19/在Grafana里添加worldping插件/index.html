@@ -296,16 +296,16 @@
 
       
         <h2 id="安装插件"><a href="#安装插件" class="headerlink" title="安装插件"></a>安装插件</h2><p>worldping是一个监控网站的dns、ping、http响应、https响应的插件，要安装它很简单，在granafa服务器里执行如下命令：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">grafana-cli plugins install raintank-worldping-app</span><br><span class="line">systemctl restart grafana-server.<span class="property">service</span></span><br></pre></td></tr></table></figure></p>
-<p>执行完毕之后在grafana的界面里选择<code>Plugins</code>，然后在<code>APP</code>里找到<code>worldping</code>，启动它，但是此时发现需要一个api，如图：<br><img src="/images/worldping.png" alt="paradin"></p>
-<p>此时你需要登录grafana的官网，然后点击<code>api keys</code>和<code>ADD API KEY</code>，就可以生成一个<code>API KEY</code>，名字可以随便起，如下：<br><img src="/images/worldping2.png" alt="paradin"></p>
-<p>将生成的api key保存好，并且填回到grafana的api key里，这样worldping插件就可以使用了，如图：<br><img src="/images/worldping3.png" alt="paradin"></p>
-<h2 id="监控网站节点"><a href="#监控网站节点" class="headerlink" title="监控网站节点"></a>监控网站节点</h2><p>此时点击黄色旋涡，发现多了worldping的选项，点击<code>worldping Home</code>，如图：<br><img src="/images/worldping4.png" alt="paradin"></p>
-<p>然后点击<code>+ New Endpoint</code>，这里我输入我公司的官网域名，然后<code>begin auto-discovery</code>，如图：<br><img src="/images/worldping5.png" alt="paradin"></p>
-<p>生成了结果之后，点击add，此时开始检查几个大城市，如芝加哥、东京、纽约、巴黎等大城市连接到刚刚输入的域名的情况，如图：<br><img src="/images/worldping6.png" alt="paradin"></p>
-<p>大约需要1~2分钟后，数据检查完成，可以点击<code>GO to Summary Dashboard</code>，就会看到图像了：<br><img src="/images/worldping7.png" alt="paradin"></p>
+<p>执行完毕之后在grafana的界面里选择<code>Plugins</code>，然后在<code>APP</code>里找到<code>worldping</code>，启动它，但是此时发现需要一个api，如图：<br><img data-src="/images/worldping.png" alt="paradin"></p>
+<p>此时你需要登录grafana的官网，然后点击<code>api keys</code>和<code>ADD API KEY</code>，就可以生成一个<code>API KEY</code>，名字可以随便起，如下：<br><img data-src="/images/worldping2.png" alt="paradin"></p>
+<p>将生成的api key保存好，并且填回到grafana的api key里，这样worldping插件就可以使用了，如图：<br><img data-src="/images/worldping3.png" alt="paradin"></p>
+<h2 id="监控网站节点"><a href="#监控网站节点" class="headerlink" title="监控网站节点"></a>监控网站节点</h2><p>此时点击黄色旋涡，发现多了worldping的选项，点击<code>worldping Home</code>，如图：<br><img data-src="/images/worldping4.png" alt="paradin"></p>
+<p>然后点击<code>+ New Endpoint</code>，这里我输入我公司的官网域名，然后<code>begin auto-discovery</code>，如图：<br><img data-src="/images/worldping5.png" alt="paradin"></p>
+<p>生成了结果之后，点击add，此时开始检查几个大城市，如芝加哥、东京、纽约、巴黎等大城市连接到刚刚输入的域名的情况，如图：<br><img data-src="/images/worldping6.png" alt="paradin"></p>
+<p>大约需要1~2分钟后，数据检查完成，可以点击<code>GO to Summary Dashboard</code>，就会看到图像了：<br><img data-src="/images/worldping7.png" alt="paradin"></p>
 <p>为什么我这个图里没有http?因为在nginx里我们做了http强制rewrite跳转到https，所以是读不到值的。</p>
-<h2 id="删除网站节点"><a href="#删除网站节点" class="headerlink" title="删除网站节点"></a>删除网站节点</h2><p>如果要删除网站节点，还是在worldping里点击要删除网站后面的齿轮图标，如图：<br><img src="/images/worldping8.png" alt="paradin"></p>
-<p>然后选择<code>configuration</code>，这里可以修改网站域名，要删除的话，选择最下面的<code>destory</code>，输入DELETE确认，然后就可以点击<code>DELETE</code>删除了，如图：<br><img src="/images/worldping9.png" alt="paradin"></p>
+<h2 id="删除网站节点"><a href="#删除网站节点" class="headerlink" title="删除网站节点"></a>删除网站节点</h2><p>如果要删除网站节点，还是在worldping里点击要删除网站后面的齿轮图标，如图：<br><img data-src="/images/worldping8.png" alt="paradin"></p>
+<p>然后选择<code>configuration</code>，这里可以修改网站域名，要删除的话，选择最下面的<code>destory</code>，输入DELETE确认，然后就可以点击<code>DELETE</code>删除了，如图：<br><img data-src="/images/worldping9.png" alt="paradin"></p>
 
     </div>
 

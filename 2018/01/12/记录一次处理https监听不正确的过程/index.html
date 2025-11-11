@@ -307,7 +307,7 @@
 <p>这时候就发现了问题，原来最早的时候金山云是没有配置https证书的，于是开发们就用nginx的8000端口去监听ssl这样达到https证书的效果，但是后来金山云控制台添加了https证书，就不再需要nginx去配置ssl证书了，再去https监听8000这一步也就是错误的了，于是在负载均衡那里改成了：</p>
 <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="title function_">https</span>(<span class="number">443</span>)-&gt;开发模块(<span class="number">9001</span>)</span><br></pre></td></tr></table></figure>
 
-<p>同时关闭了nginx，这时候再来测试一下https请求，就成功了！<br><img src="/images/ksslb.png" alt="7牛云存储" title="https返回OK"></p>
+<p>同时关闭了nginx，这时候再来测试一下https请求，就成功了！<br><img data-src="/images/ksslb.png" alt="7牛云存储" title="https返回OK"></p>
 <p>其实如果非要用nginx的ssl证书的话，那么的套路就是：开启nginx，但是在负载均衡那里使用tcp协议去监听nginx的8000端口，这样一样能达到效果。</p>
 
     </div>

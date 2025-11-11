@@ -297,8 +297,8 @@
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># GitHub</span><br><span class="line">Host github.com</span><br><span class="line">  IdentityFile ~/.ssh/id_github		# 指定对应的密钥</span><br><span class="line">  User git</span><br><span class="line"></span><br><span class="line"># GitLab</span><br><span class="line">Host code.my-company.com</span><br><span class="line">  IdentityFile ~/.ssh/id_rsa		# 指定对应的密钥</span><br><span class="line">  User git</span><br></pre></td></tr></table></figure>
 
 <p>测试一下<code>ssh -T git@github.com</code>，验证通过。</p>
-<p>但是再次<code>hexo d -g</code>推送的时候，发现报错<code>send-pack: unexpected disconnect while reading sideband packet</code>:<br><img src="/images/sendpack%E9%97%AE%E9%A2%98.png" alt="paradin" title="就很神奇"></p>
-<p>查了一下说是我缓存区设置小了，使用命令<code>git config --global http.postBuffer 524288000</code>，放大到500mb，问题解决：<br><img src="/images/sendpack%E9%97%AE%E9%A2%982.png" alt="paradin" title="恢复正常"></p>
+<p>但是再次<code>hexo d -g</code>推送的时候，发现报错<code>send-pack: unexpected disconnect while reading sideband packet</code>:<br><img data-src="/images/sendpack%E9%97%AE%E9%A2%98.png" alt="paradin" title="就很神奇"></p>
+<p>查了一下说是我缓存区设置小了，使用命令<code>git config --global http.postBuffer 524288000</code>，放大到500mb，问题解决：<br><img data-src="/images/sendpack%E9%97%AE%E9%A2%982.png" alt="paradin" title="恢复正常"></p>
 <p>但是我就改了一个public-key啊，为啥会说我缓存设置不足了呢，我又没加什么新的东西，这个问题还要深挖一下。</p>
 
     </div>

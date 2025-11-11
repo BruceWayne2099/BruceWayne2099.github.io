@@ -292,16 +292,16 @@
 
       
         <p>最近在忙AWS迁移阿里云的事情，在这之中发现了也解决了很多坑，这里记录一下。</p>
-<h2 id="只读RDS修改配置组无效果"><a href="#只读RDS修改配置组无效果" class="headerlink" title="只读RDS修改配置组无效果"></a>只读RDS修改配置组无效果</h2><p>我们这一次数据库的迁移是重点任务，考虑到AWS的源库都是无公网访问权限的，于是就创建一个有公网权限的只读库（read replica），然后在阿里云是用DTS，以这个只读库作为源库，然后进行数据的<code>增量同步</code>。这里有一点：“源库”的binlog必须是ROW模式，而默认的AWS创建的源库是MIX模式，于是就需要修改一下参数组（parameter group），将其改成ROW：<br><img src="/images/aws1.png" alt="akb48"></p>
+<h2 id="只读RDS修改配置组无效果"><a href="#只读RDS修改配置组无效果" class="headerlink" title="只读RDS修改配置组无效果"></a>只读RDS修改配置组无效果</h2><p>我们这一次数据库的迁移是重点任务，考虑到AWS的源库都是无公网访问权限的，于是就创建一个有公网权限的只读库（read replica），然后在阿里云是用DTS，以这个只读库作为源库，然后进行数据的<code>增量同步</code>。这里有一点：“源库”的binlog必须是ROW模式，而默认的AWS创建的源库是MIX模式，于是就需要修改一下参数组（parameter group），将其改成ROW：<br><img data-src="/images/aws1.png" alt="akb48"></p>
 <p>然后配置只读实例引用这个参数组，但是要等待参数组状态是（pending reboot），重启。</p>
-<p>但是这里有一个大坑！那么就是<code>read replica</code>的<code>Backup retention period</code>值不可以是0，不然参数组即使重启了是不会生效的！<br><img src="/images/aws2.png" alt="akb48"></p>
+<p>但是这里有一个大坑！那么就是<code>read replica</code>的<code>Backup retention period</code>值不可以是0，不然参数组即使重启了是不会生效的！<br><img data-src="/images/aws2.png" alt="akb48"></p>
 <p>当然直接使用DTS并不是一个好方案，因为即使是同一个可用区，比如都在法兰克福，但是不同厂商还是会有网络影响，所以更加推荐就是搭一个专线，然后走专线同步。而且DTS的时候，切忌目标库发生与源库不同的操作造成数据错乱，那样就前功尽弃了。</p>
 <p>DTS的原理就是不断的读取binlog然后执行binlog，但是row模式的binlog特别巨大，再加上网络有波动或者源库有跟主库名称一样但是内容不一致的数据导致所有唯一主键都要报错一遍，那么延迟可能就是一辈子的事儿…</p>
 <h2 id="无公网ec2访问外网"><a href="#无公网ec2访问外网" class="headerlink" title="无公网ec2访问外网"></a>无公网ec2访问外网</h2><p>本次迁移数据除了mysql还有redis，但是AWS的redis也都是内网服务器，于是这样我们就做了外网NLB，在阿里云的redis上做主从配置，并且在阿里云的redis.conf里把主写成了NLB的域名，这里如果担心NLB域名后面的IP发生变化而故障，那么可以事先在aws里购买弹性IP，然后将域名绑定死对应的IP就不怕了。</p>
-<p>但是如果想要返回来，让阿里云的redis做主，AWS这个无公网的ec2 redis做从的话，用外网NLB就不行了。不过AWS比较好，就是ec2虽然表面没有公网IP，但是它有一个<code>隐藏的公网</code>，比如我这个ec2:<br><img src="/images/aws3.png" alt="akb48"></p>
-<p>可见它没有公网IP，但是在服务器里使用<code>curl myip.ipip.net</code>可以获取到它的公网出口IP：<br><img src="/images/aws4.png" alt="akb48"></p>
+<p>但是如果想要返回来，让阿里云的redis做主，AWS这个无公网的ec2 redis做从的话，用外网NLB就不行了。不过AWS比较好，就是ec2虽然表面没有公网IP，但是它有一个<code>隐藏的公网</code>，比如我这个ec2:<br><img data-src="/images/aws3.png" alt="akb48"></p>
+<p>可见它没有公网IP，但是在服务器里使用<code>curl myip.ipip.net</code>可以获取到它的公网出口IP：<br><img data-src="/images/aws4.png" alt="akb48"></p>
 <p>将这个IP写到阿里云的安全组就可以在ec2这边访问到阿里云的公网了！</p>
-<h2 id="DMS白名单问题"><a href="#DMS白名单问题" class="headerlink" title="DMS白名单问题"></a>DMS白名单问题</h2><p>AWS的数据迁移叫DMS，这个地方也有一个坑，就是<code>Replication instances</code>的公网IP可能是不对的，如图：<br><img src="/images/aws5.png" alt="akb48"></p>
+<h2 id="DMS白名单问题"><a href="#DMS白名单问题" class="headerlink" title="DMS白名单问题"></a>DMS白名单问题</h2><p>AWS的数据迁移叫DMS，这个地方也有一个坑，就是<code>Replication instances</code>的公网IP可能是不对的，如图：<br><img data-src="/images/aws5.png" alt="akb48"></p>
 <p>我把图中的<code>Public IP address</code>填写到了阿里云对应数据库的白名单里但是test无法成功，后来改成<code>0.0.0.0/0</code>之后登陆上去一看，连接的IP并不是图中的IP，这真的是一个大坑！</p>
 
     </div>

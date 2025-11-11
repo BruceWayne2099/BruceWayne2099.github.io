@@ -289,12 +289,12 @@
 
       
         <p>给gitlab的各位开发设置权限是很重要的，不然他们就可能会偷偷的把执行分支合并甚至<code>git pull</code>来破坏线上环境。</p>
-<p>首先先确定在project下各位人员的身份，在<code>设置（setting）</code>–<code>成员(members)</code>里面，可以看到projects现有的用户和用户组，如图：<br><img src="/images/gitlab29.png" alt="akb48"></p>
+<p>首先先确定在project下各位人员的身份，在<code>设置（setting）</code>–<code>成员(members)</code>里面，可以看到projects现有的用户和用户组，如图：<br><img data-src="/images/gitlab29.png" alt="akb48"></p>
 <p>由于我这个gitlab已经是汉化版的了，这里做一个简单的中英对比：<code>Master</code>是“主程序员”、<code>Developer</code>是“开发人员”、<code>Reporter</code>是“报告者”，这个身份只有读权限可以创建代码片段，一般来说都给测试人员，而<code>Guest</code>就是“访客”了，它只能提交问题和评论。</p>
-<p>然后再到<code>版本库（Repository）</code>里选择<code>保护分支（Protected Branches）</code>，如图：<br><img src="/images/gitlab31.png" alt="akb48"></p>
+<p>然后再到<code>版本库（Repository）</code>里选择<code>保护分支（Protected Branches）</code>，如图：<br><img data-src="/images/gitlab31.png" alt="akb48"></p>
 <p><code>Allowed to merge</code>就是分支合并权限，<code>Allowed to push</code>就是推送权限，这两个可以根据不同人的身份进行控制。如果受保护，除了master权限的人员，其余人都不可以push、delete等操作。默认情况下<code>master</code>分支是处于被保护状态下的，<code>developer</code>角色的人是无法提交到<code>master</code>分支的。</p>
 <p>如果是docker的话，那么gitlab权限问题修复会用到如下命令：<br>	<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker exec -it gitlab update-permissions</span><br><span class="line">docker restart gitlab容器的ID</span><br></pre></td></tr></table></figure></p>
-<p><img src="/images/curry3p4.gif" alt="akb48"></p>
+<p><img data-src="/images/curry3p4.gif" alt="akb48"></p>
 
     </div>
 

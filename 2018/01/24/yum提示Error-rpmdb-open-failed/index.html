@@ -287,7 +287,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>今天在一台机器里，使用<code>yum</code>安装的时候，出现了如下的故障：<br><img src="/images/yum1.png" alt="akb48"></p>
+        <p>今天在一台机器里，使用<code>yum</code>安装的时候，出现了如下的故障：<br><img data-src="/images/yum1.png" alt="akb48"></p>
 <p>这种情况就是RPM数据库被破坏了，这个时候就需要我们重建数据库，于是就输入如下的命令：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cd / <span class="keyword">var</span> / lib / rpm /</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="string">` ls | grep &#x27;db.&#x27; `</span> ; <span class="keyword">do</span> mv $i $i .<span class="property">bak</span> ; done</span><br><span class="line">rpm -- rebuilddb</span><br><span class="line">yum clean all</span><br></pre></td></tr></table></figure></p>
 <p>重新<code>cleanup</code>就正常了。</p>
 

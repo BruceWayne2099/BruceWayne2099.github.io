@@ -292,17 +292,17 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>今天电子商城的市场接到一个故障，说更换了.lechange.com的https证书（原有的证书到期了，新买了一个依旧还是.lehcange.com域名证书）之后，订单在支付宝支付的时候提示支付失败。我把<code>request id</code>提供给支付宝的客服请他们查看一下后台，支付宝客服说我们电商的https证书没有认证成功。于是我就登陆<a target="_blank" rel="noopener" href="https://cryptoreport.websecurity.symantec.com/checker/">https://cryptoreport.websecurity.symantec.com/checker/</a> 去检查一下电商的域名，果不其然，赛门铁克的反馈是错误的，如图：<br><img src="/images/saimentieke1.png" alt="paradin"></p>
-<p>但是登陆网站，在浏览器里却显示https证书是OK的，如图：<br><img src="/images/saimentieke2.png" alt="paradin"></p>
-<p>然后我用<code>symantec</code>的那个网站测试了一下电商平台开发环境的域名，发现也是OK的，如图：<br><img src="/images/saimentieke3.png" alt="paradin"></p>
+        <h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>今天电子商城的市场接到一个故障，说更换了.lechange.com的https证书（原有的证书到期了，新买了一个依旧还是.lehcange.com域名证书）之后，订单在支付宝支付的时候提示支付失败。我把<code>request id</code>提供给支付宝的客服请他们查看一下后台，支付宝客服说我们电商的https证书没有认证成功。于是我就登陆<a target="_blank" rel="noopener" href="https://cryptoreport.websecurity.symantec.com/checker/">https://cryptoreport.websecurity.symantec.com/checker/</a> 去检查一下电商的域名，果不其然，赛门铁克的反馈是错误的，如图：<br><img data-src="/images/saimentieke1.png" alt="paradin"></p>
+<p>但是登陆网站，在浏览器里却显示https证书是OK的，如图：<br><img data-src="/images/saimentieke2.png" alt="paradin"></p>
+<p>然后我用<code>symantec</code>的那个网站测试了一下电商平台开发环境的域名，发现也是OK的，如图：<br><img data-src="/images/saimentieke3.png" alt="paradin"></p>
 <p>这就郁闷了，到底哪里出问题了？</p>
-<h2 id="问题排查"><a href="#问题排查" class="headerlink" title="问题排查"></a>问题排查</h2><p>首先跟研发确认，开发环境与线上环境在涉及到证书的代码是否一致，得到研发的确认之后。就检查服务器里的<code>nginx</code>，发现服务器<code>nginx</code>的配置文件里是没有涉及到<code>ssl</code>，无论是开发环境和线上环境都是通过阿里云slb配置的https证书。而且两者的证书指纹一模一样，如图：<br><img src="/images/saimentieke4.png" alt="paradin"></p>
-<p>既然都是用的一样的证书，为啥一个检验通过，另一个检验不通过呢？这个时候我想到线上环境与开发环境唯一的不同就是线上环境多了一个cdn，于是就登陆到cdn的控制页面，找到对应的https证书，发现cdn的https证书指纹也是跟上面的指纹一样，如图：<br><img src="/images/saimentieke5.png" alt="paradin"></p>
+<h2 id="问题排查"><a href="#问题排查" class="headerlink" title="问题排查"></a>问题排查</h2><p>首先跟研发确认，开发环境与线上环境在涉及到证书的代码是否一致，得到研发的确认之后。就检查服务器里的<code>nginx</code>，发现服务器<code>nginx</code>的配置文件里是没有涉及到<code>ssl</code>，无论是开发环境和线上环境都是通过阿里云slb配置的https证书。而且两者的证书指纹一模一样，如图：<br><img data-src="/images/saimentieke4.png" alt="paradin"></p>
+<p>既然都是用的一样的证书，为啥一个检验通过，另一个检验不通过呢？这个时候我想到线上环境与开发环境唯一的不同就是线上环境多了一个cdn，于是就登陆到cdn的控制页面，找到对应的https证书，发现cdn的https证书指纹也是跟上面的指纹一样，如图：<br><img data-src="/images/saimentieke5.png" alt="paradin"></p>
 <p>既然指纹一样，那证书也应该是一样的，场面又进入了一个僵局。</p>
-<p>于是我就到一台服务器里使用<code>curl -vv https://www.lechange.com</code>，看到的结果如下：<br><img src="/images/saimentieke6.png" alt="paradin"></p>
+<p>于是我就到一台服务器里使用<code>curl -vv https://www.lechange.com</code>，看到的结果如下：<br><img data-src="/images/saimentieke6.png" alt="paradin"></p>
 <p>提示<code>未配置签发者根证书</code>，我这时候想起来了，<font color=red>首先证书指纹一致不能说明证书是完全一致的，只能说明key文件是一样的！</font>其次这个https证书是中级机构证书，那么中级机构颁发的证书链规则是这样的：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">-----<span class="variable constant_">BEGIN</span> <span class="variable constant_">CERTIFICATE</span>-----</span><br><span class="line"></span><br><span class="line">-----<span class="variable constant_">END</span> <span class="variable constant_">CERTIFICATE</span>-----</span><br><span class="line"></span><br><span class="line">-----<span class="variable constant_">BEGIN</span> <span class="variable constant_">CERTIFICATE</span>-----</span><br><span class="line"></span><br><span class="line">-----<span class="variable constant_">END</span> <span class="variable constant_">CERTIFICATE</span>-----</span><br></pre></td></tr></table></figure></p>
 <p>那么我怀疑就是https证书链那部分可能在cdn配置错误了，或许在slb配置错误了，甚至两个都配置错误了！</p>
-<p>于是干脆删除掉线上电商原有的https证书，重新导入cdn和slb的https证书，返回到<code>symantec</code>刷新，这次的检验结果就OK了。<br><img src="/images/saimentieke7.png" alt="paradin"></p>
+<p>于是干脆删除掉线上电商原有的https证书，重新导入cdn和slb的https证书，返回到<code>symantec</code>刷新，这次的检验结果就OK了。<br><img data-src="/images/saimentieke7.png" alt="paradin"></p>
 <h2 id="补充"><a href="#补充" class="headerlink" title="补充"></a>补充</h2><p>虽然这个问题解决了，但是我还是不明白，为什么在网页端查看证书是绿色OK的呢？在<code>sf.gg</code>上提问之后，一个叫Avro的朋友是这么回答我的：</p>
 <blockquote>
 <p>以chrome为例，他信任了[所在平台的信任证书列表][1]，而这些平台集成了一系列信任的根证书，如iOS 11 中可用的受信任根证书列表可以找到你的根证书“04 00 00 00 00 01 15 4B 5A C3 94 ”(序列号)，因此验证过程中没有问题，而对于其他的工具，如果未使用这些平台根证书信任列表依然需要完整的证书链（这个证书链在ssl握手过程中被下发）进行校验。</p>

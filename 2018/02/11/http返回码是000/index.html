@@ -289,13 +289,13 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h2><p>今天开发童鞋在测试往一个网站发请求的时候，发现返回码是000，如图：<br><img src="/images/http0001.png" alt="paradin"></p>
+        <h2 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h2><p>今天开发童鞋在测试往一个网站发请求的时候，发现返回码是000，如图：<br><img data-src="/images/http0001.png" alt="paradin"></p>
 <p>众所周知，常见的返回码是以下四种：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">2XX 成功；</span><br><span class="line">3XX 重定向；</span><br><span class="line">4XX 客户端错误；</span><br><span class="line">5XX 服务器端错误；</span><br></pre></td></tr></table></figure></p>
 <p>但是000是啥玩意？简单的说就是没有有效的http状态码，比如连接被拒绝，连接超时等。</p>
-<p>使用<code>curl -w &quot;%{http_code}\n&quot; -m 5 https://60.191.94.115:38303/cloudSignalling/events/deviceState ; echo &quot;Exit code: $?</code>看一下详细的code，显示如图：<br><img src="/images/http0002.png" alt="paradin"></p>
+<p>使用<code>curl -w &quot;%{http_code}\n&quot; -m 5 https://60.191.94.115:38303/cloudSignalling/events/deviceState ; echo &quot;Exit code: $?</code>看一下详细的code，显示如图：<br><img data-src="/images/http0002.png" alt="paradin"></p>
 <p>可以看到提示：<code>curl: (60) Peer certificate cannot be authenticated with known CA certificates</code>，翻译过来就是<code>对方的证书不能用已知的CA证书验证</code>。但是下面也说了可以用<code>-k</code>或者<code>--insecure</code>来跳过这一步。</p>
-<p>于是我又使用<code>curl -I -k https://60.191.94.115:38303/cloudSignalling/events/deviceState</code>这个命令，效果如图：<br><img src="/images/http0003.png" alt="paradin"></p>
-<p>里面这一下说的就很明白了，405，方法不正确，再搭配一下<code>curl -k -w &quot;%{http_code}\n&quot; -m 5 https://60.191.94.115:38303/cloudSignalling/events/deviceState</code>，看一下：<br><img src="/images/http0004.png" alt="paradin"></p>
+<p>于是我又使用<code>curl -I -k https://60.191.94.115:38303/cloudSignalling/events/deviceState</code>这个命令，效果如图：<br><img data-src="/images/http0003.png" alt="paradin"></p>
+<p>里面这一下说的就很明白了，405，方法不正确，再搭配一下<code>curl -k -w &quot;%{http_code}\n&quot; -m 5 https://60.191.94.115:38303/cloudSignalling/events/deviceState</code>，看一下：<br><img data-src="/images/http0004.png" alt="paradin"></p>
 <p>这么上下一结合，明白了GET是不准许的，准许POST。于是反馈给60.191.94.115告诉他们把前后台接口请求方式、参数传递方式都拿回去整改。</p>
 <h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a target="_blank" rel="noopener" href="http://www.1987.name/365.html">http://www.1987.name/365.html</a><br><a target="_blank" rel="noopener" href="https://superuser.com/questions/501690/curl-http-code-of-000">https://superuser.com/questions/501690/curl-http-code-of-000</a></p>
 

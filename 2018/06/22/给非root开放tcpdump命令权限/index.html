@@ -290,8 +290,8 @@
       
         <p>这周给开发们上了堡垒机，使用的是开源的<code>jumpserver</code>，官网是<a target="_blank" rel="noopener" href="http://www.jumpserver.org/">http://www.jumpserver.org/</a> 。</p>
 <p>注册了账号下发给各位开发之后，开发反馈了一个问题：无法用<code>tcpdump</code>抓包。因为<code>tcpdump</code>默认是只能被root调用的，如果是非root用户使用就会报错：<code>You don&#39;t have permission to capture on that device</code>。</p>
-<p>如果要让普通用户也能顺利用上<code>tcpdump</code>，方法很简单，就是对tcpdump这个文件修改成<code>u+s</code>即可。整个过程如下图：<br><img src="/images/tcpdump1.png" alt="akb48"></p>
-<p>在堡垒机的web界面试一下：<br><img src="/images/tcpdump2.png" alt="akb48"></p>
+<p>如果要让普通用户也能顺利用上<code>tcpdump</code>，方法很简单，就是对tcpdump这个文件修改成<code>u+s</code>即可。整个过程如下图：<br><img data-src="/images/tcpdump1.png" alt="akb48"></p>
+<p>在堡垒机的web界面试一下：<br><img data-src="/images/tcpdump2.png" alt="akb48"></p>
 <p>但是<code>jstack</code>这个命令不能按照上面的方法配置给非root用户，因为<code>jstack</code>命令只能是当前java进程的用户才能用。</p>
 
     </div>

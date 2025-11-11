@@ -292,14 +292,14 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>这几天数据库更换密码，就在原有的atlas文件基础上拷贝出来一个新文件，修改了密码，然后启动进程。但是启动之后，发现虽然端口起来了，但是atlas没有连接数据库成功，如图:<br><img src="/images/atlas14.png" alt="akb48"></p>
-<p>登录到atlas后台一看，竟然是双down:<br><img src="/images/atlas15.png" alt="akb48"></p>
+        <p>这几天数据库更换密码，就在原有的atlas文件基础上拷贝出来一个新文件，修改了密码，然后启动进程。但是启动之后，发现虽然端口起来了，但是atlas没有连接数据库成功，如图:<br><img data-src="/images/atlas14.png" alt="akb48"></p>
+<p>登录到atlas后台一看，竟然是双down:<br><img data-src="/images/atlas15.png" alt="akb48"></p>
 <p>可是在atlas服务器上单独直连阿里云数据库是没任何问题的，而且数据库的监控也没有任何异常。我怀疑是密码含有了atlas不识别的特殊符号，改成了纯数字和字母的组合，重新启动还是不行，这就很尴尬了，明明原来的配置文件可以启动，我就更改了密码和端口，怎么新的进程就不好使？</p>
-<p><img src="/images/atlas16.png" alt="akb48" title="一边好使，一边不好使"></p>
-<p>于是我尝试抓包，使用<code>tcpdump -s 0 -i any -v port 3318 and src host mysql的ip -w test.pcap</code>，结果发现3318的包少的可怜，于是我就改用<code>tcpdump -s 0 -i any -v host mysql的ip -w test2.pcap</code>扩大了范围，然后发现包有这样的字样：<br><img src="/images/atlas17.png" alt="akb48"></p>
+<p><img data-src="/images/atlas16.png" alt="akb48" title="一边好使，一边不好使"></p>
+<p>于是我尝试抓包，使用<code>tcpdump -s 0 -i any -v port 3318 and src host mysql的ip -w test.pcap</code>，结果发现3318的包少的可怜，于是我就改用<code>tcpdump -s 0 -i any -v host mysql的ip -w test2.pcap</code>扩大了范围，然后发现包有这样的字样：<br><img data-src="/images/atlas17.png" alt="akb48"></p>
 <p>可见atlas一直以root去请求数据库，但是我这个是阿里云的RDS服务（Mysql 5.6.7)，本身是没有root的，所以就爆“User not exist”。</p>
 <p>这就很尴尬了，为什么会突然以root身份请求数据库？莫非这是atlas的BUG？先把问题记录下来，然后慢慢解决…</p>
-<p>**PS.**这个BUG后来修复了，需要重新编译安装，新的安装包地址见：<a target="_blank" rel="noopener" href="https://github.com/RorschachChan/noroot-atlas">https://github.com/RorschachChan/noroot-atlas</a><br><img src="/images/%E5%A6%B9%E5%AD%90.jpg" alt="akb48"></p>
+<p>**PS.**这个BUG后来修复了，需要重新编译安装，新的安装包地址见：<a target="_blank" rel="noopener" href="https://github.com/RorschachChan/noroot-atlas">https://github.com/RorschachChan/noroot-atlas</a><br><img data-src="/images/%E5%A6%B9%E5%AD%90.jpg" alt="akb48"></p>
 
     </div>
 

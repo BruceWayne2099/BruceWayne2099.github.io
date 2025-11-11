@@ -299,12 +299,12 @@
 <h2 id="搭建集群"><a href="#搭建集群" class="headerlink" title="搭建集群"></a>搭建集群</h2><p>首先先看一下本次zk实验服务器的名称和IP情况，这里我们选择了三台服务器作zkserver，因为三台是标配，一台的话就只有leader没有follower，不是很稳定的结构，当然啦如果你的公司土豪的话是可以玩三十台：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">dvl-mrszk-<span class="number">001</span>	<span class="number">10.117</span><span class="number">.0</span><span class="number">.125</span></span><br><span class="line">dvl-mrszk-<span class="number">002</span>	<span class="number">10.117</span><span class="number">.1</span><span class="number">.158</span></span><br><span class="line">dvl-mrszk-<span class="number">003</span>	<span class="number">10.168</span><span class="number">.152</span><span class="number">.227</span></span><br></pre></td></tr></table></figure></p>
 <p>对这三台服务器都要进行如下的步骤:</p>
 <p>1)先把zookeeper.zip传到linux里，然后解压到<code>/usr</code>文件夹下；</p>
-<p>2)进入<code>/usr/zookeeper/conf</code>文件夹，<code>vim zoo.cfg</code>，在最下面补充上面的三个zkserver，见图：<br><img src="/images/zook1.png" alt="paradin"></p>
+<p>2)进入<code>/usr/zookeeper/conf</code>文件夹，<code>vim zoo.cfg</code>，在最下面补充上面的三个zkserver，见图：<br><img data-src="/images/zook1.png" alt="paradin"></p>
 <p>3)再来到<code>/usr/zookeeper/data</code>文件夹，如果里面有文件就清空所有文件，如果是1号zkserver就<code>echo 1 &gt; myid</code>，如果当前机器是2号zkserver就<code>echo 2 &gt; myid</code>，依次类推，这里一定要注意，不可以都写一样。</p>
 <p>4)<code>vim /etc/hosts</code>，还要把这三台机器的ip地址和名字都写进去，如下：<br>	<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span> localhost</span><br><span class="line">::<span class="number">1</span>         localhost localhost.<span class="property">localdomain</span> localhost6 localhost6.<span class="property">localdomain6</span></span><br><span class="line"><span class="number">10.117</span><span class="number">.0</span><span class="number">.125</span> dvl-mrszk-<span class="number">001</span></span><br><span class="line"><span class="number">10.117</span><span class="number">.1</span><span class="number">.158</span> dvl-mrszk-<span class="number">002</span></span><br><span class="line"><span class="number">10.168</span><span class="number">.152</span><span class="number">.227</span> dvl-mrszk-<span class="number">003</span></span><br></pre></td></tr></table></figure></p>
-<p>5)再来<code>/usr/zookeeper/bin</code>文件夹，<code>./zkServer.sh start</code>启动zk，然后再<code>./zkServer.sh status</code>查看进程情况，如图看见第一台和第三台zkserver的身份是<code>follower</code>，第二台是<code>leader</code>：<br><img src="/images/zook2.png" alt="paradin"></p>
-<p><img src="/images/zook3.png" alt="paradin"></p>
-<p><img src="/images/zook4.png" alt="paradin"></p>
+<p>5)再来<code>/usr/zookeeper/bin</code>文件夹，<code>./zkServer.sh start</code>启动zk，然后再<code>./zkServer.sh status</code>查看进程情况，如图看见第一台和第三台zkserver的身份是<code>follower</code>，第二台是<code>leader</code>：<br><img data-src="/images/zook2.png" alt="paradin"></p>
+<p><img data-src="/images/zook3.png" alt="paradin"></p>
+<p><img data-src="/images/zook4.png" alt="paradin"></p>
 <p>至此整个zk集群就搭建并且启动完成了。<font color=red>注意：zookeeper集群时，zookeeper要求半数以上的机器可用，zookeeper才能提供服务。</font></p>
 <h2 id="故障排除"><a href="#故障排除" class="headerlink" title="故障排除"></a>故障排除</h2><p>如果这里有启动失败的情况，比如<code>Error contacting service. It is probably not running.</code>这样的字样，那么有这么几种可能：<br>1）data文件夹下的<code>myid</code>有数字重复或者是数字漏写的情况；<br>2）<code>zoo.cfg</code>里的指定日志文件夹没有手动创建；<br>3）<code>/etc/hosts</code>下的名字与zoo.cfg里的server字段不相符，注意一下，&#x2F;etc&#x2F;hosts里的127.0.0.1的名字不要与本ip后面的名字一模一样，不然zk也无法识别！<br>4）<code>/etc/hosts</code>名字使用了中文，java系对中文是很不友好的。</p>
 <p>如果出现的<code>Cannot open channel to X at election address /A.B.C.D:3888</code>的日志报错，检查一下<code>zoo.cfg</code>里的123与<code>myid</code>的123是否一致。</p>
@@ -313,14 +313,14 @@
 <p>我们实验的这三台服务器只有内网，但是如果要连接zooinspector，还是需要通过外网权限连接的，这里可以配一个iptables转发规则，配iptables的步骤在这里：<a target="_blank" rel="noopener" href="http://chenx1242.blog.51cto.com/10430133/1875950">http://chenx1242.blog.51cto.com/10430133/1875950</a> ，照葫芦画瓢即可，但是要注意，zk的端口是<code>2181</code>。</p>
 <p>当然，如果不想费事的话，就直接给zkserver配一个外网IP，直接连接。</p>
 <p>成功连接到<code>zooinspector</code>，就会看到这样的内容，这里的lcconfig是手动添加的，右击鼠标，选择<code>add node</code>，然后直接写上<code>lcconfig</code>就行，这个名字是根据实际需要填写的：</p>
-<p><img src="/images/zook5.png" alt="paradin"></p>
+<p><img data-src="/images/zook5.png" alt="paradin"></p>
 <p>上面我们已经配置了zkserver集群而且还启动zkserver进程，现在还需要zkclient，zkclient就是请求发起的一方，然后我们可以在各个的模块服务器上部署zkclient服务，通过启动zkclient服务，来让这些模块统一从zooinspector里取值，这样就达到了批量配置，同时保证一致性的效果。</p>
 <p>zk的模板文件是<code>_tpl.properties</code>为结尾的文件，我这里模块的名字叫mrs，那么在实验里这个模板文件就是<code>mrs_tpl.properties</code>，这个<code>mrs_tpl.properties</code>里有这样的一个字段，如图：</p>
-<p><img src="/images/zook6.png" alt="paradin"></p>
+<p><img data-src="/images/zook6.png" alt="paradin"></p>
 <p>而我们在zooinspector里对应就这么填写：</p>
-<p><img src="/images/zook7.png" alt="paradin"></p>
+<p><img data-src="/images/zook7.png" alt="paradin"></p>
 <p>保存zooinspector，然后从windows返回到linux，启动zkclient服务和对应的模块进程，如果配置都正常的话，那么程序就会正常启动，<code>ps -ef|grep java</code>就会看到一个叫<code>lczk.AppServerDaemon</code>的进程。这个时候在去看一下mrs的配置文件：</p>
-<p><img src="/images/zook8.png" alt="paradin"></p>
+<p><img data-src="/images/zook8.png" alt="paradin"></p>
 <p>可以看到areaAk取得值就是zk里面<code>data_center</code>里面<code>access_key</code>里面的ak的值，其他的几个值也是同理。可见整个zk已经配置成功，模块都进行了统一配置，而且这些配置既然能被一个接受，同时也会被其他相同的模块服务器所接受。这样就达到了批量配置的效果。</p>
 <h2 id="拓展阅读"><a href="#拓展阅读" class="headerlink" title="拓展阅读"></a>拓展阅读</h2><p><a target="_blank" rel="noopener" href="http://ibruce.info/2014/10/23/zookeeper/">http://ibruce.info/2014/10/23/zookeeper/</a></p>
 

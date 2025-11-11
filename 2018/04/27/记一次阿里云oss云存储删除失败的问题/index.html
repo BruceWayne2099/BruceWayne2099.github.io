@@ -295,19 +295,19 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>公司每天云存储都要删除过期的内容，工作细节是这样的：每天零点，采集模块开始收集应该删除掉的内容，然后把这个消息传给阿里云MQ，阿里云MQ又把消息传给删除模块，删除模块拿到名单之后，开始调用阿里云OSS的删除API进行删除。架构如图：<br><img src="/images/oss6.png" alt="paradin"></p>
-<p>但是今天登陆监控平台发现，昨天oss没有删除，上涨了80多个T，如图：<br><img src="/images/oss1.png" alt="paradin"></p>
+        <p>公司每天云存储都要删除过期的内容，工作细节是这样的：每天零点，采集模块开始收集应该删除掉的内容，然后把这个消息传给阿里云MQ，阿里云MQ又把消息传给删除模块，删除模块拿到名单之后，开始调用阿里云OSS的删除API进行删除。架构如图：<br><img data-src="/images/oss6.png" alt="paradin"></p>
+<p>但是今天登陆监控平台发现，昨天oss没有删除，上涨了80多个T，如图：<br><img data-src="/images/oss1.png" alt="paradin"></p>
 <p>老板一看，卧槽这怎么可以，80多个T的云存储费用可是不容小视的，于是责令追查一下为啥会发生这样的情况。</p>
-<p>昨天我的手机又没有收到任何阿里云消息队列告警的信息，可见MQ应该是没问题的，查看一下是否有MQ的产生和消费情况，如下图：<br><img src="/images/oss2.png" alt="paradin" title="这个是消息产生情况"></p>
-<p><img src="/images/oss3.png" alt="paradin" title="这个是消息消费情况"></p>
-<p>产生的消息基本都消费掉了，由此推断之前的过程都应该是OK的。再查看一下会不会是删除模块外网带宽到期的问题，此时发现两天的流量有显著的不同：<br><img src="/images/oss7.png" alt="paradin" title="这个是正常的流量情况"></p>
-<p><img src="/images/oss8.png" alt="paradin" title="这个是异常的流量情况"></p>
-<p>流量明显减少，可以说是删除模块执行任务少了。于是到执行OSS删除API的模块上去抓了几个包，里面情况如下：<br><img src="/images/oss4.png" alt="paradin"></p>
-<p>但是跑到阿里云对应的bucket里看一下文件情况，比如<code>https://lechangecloud.oss-cn-hangzhou.aliyuncs.com/lechange/4B01F1FPAGE4E9D_img/Alarm/20180427000913997_0_fa62bec6dee24cc0bee42e1ee3e75743_thumb_qcif.dav</code>这个文件，这个文件明明还在里面躺着好好的。如图：<br><img src="/images/oss5.png" alt="paradin"></p>
+<p>昨天我的手机又没有收到任何阿里云消息队列告警的信息，可见MQ应该是没问题的，查看一下是否有MQ的产生和消费情况，如下图：<br><img data-src="/images/oss2.png" alt="paradin" title="这个是消息产生情况"></p>
+<p><img data-src="/images/oss3.png" alt="paradin" title="这个是消息消费情况"></p>
+<p>产生的消息基本都消费掉了，由此推断之前的过程都应该是OK的。再查看一下会不会是删除模块外网带宽到期的问题，此时发现两天的流量有显著的不同：<br><img data-src="/images/oss7.png" alt="paradin" title="这个是正常的流量情况"></p>
+<p><img data-src="/images/oss8.png" alt="paradin" title="这个是异常的流量情况"></p>
+<p>流量明显减少，可以说是删除模块执行任务少了。于是到执行OSS删除API的模块上去抓了几个包，里面情况如下：<br><img data-src="/images/oss4.png" alt="paradin"></p>
+<p>但是跑到阿里云对应的bucket里看一下文件情况，比如<code>https://lechangecloud.oss-cn-hangzhou.aliyuncs.com/lechange/4B01F1FPAGE4E9D_img/Alarm/20180427000913997_0_fa62bec6dee24cc0bee42e1ee3e75743_thumb_qcif.dav</code>这个文件，这个文件明明还在里面躺着好好的。如图：<br><img data-src="/images/oss5.png" alt="paradin"></p>
 <p>文件00：27的时候就在了，但是2：53分的时候调用阿里云OSS的API去删除，明明返回了200，但是文件却没有真正的从OSS删除掉。</p>
-<p>我觉得这样就拿去跟阿里云撕逼还是有点不太妥当，又回到刚刚的那个包里，我发现里面还有一些返回的内容是这样的：<br><img src="/images/oss9.png" alt="paradin"></p>
+<p>我觉得这样就拿去跟阿里云撕逼还是有点不太妥当，又回到刚刚的那个包里，我发现里面还有一些返回的内容是这样的：<br><img data-src="/images/oss9.png" alt="paradin"></p>
 <p>这个图跟之前的图明显路径上不同，而这些文件在OSS上确认是被成功删除掉的，可见的确是文件路径的问题：失败的文件路径是完全路径，而成功的都是相对路径。于是就告诉开发赶快整改代码，把路径统一…</p>
-<p><img src="/images/%E6%9C%9D%E9%9F%A9%E4%BC%9A%E9%9D%A2.png" alt="paradin" title="历史性的会面"></p>
+<p><img data-src="/images/%E6%9C%9D%E9%9F%A9%E4%BC%9A%E9%9D%A2.png" alt="paradin" title="历史性的会面"></p>
 
     </div>
 

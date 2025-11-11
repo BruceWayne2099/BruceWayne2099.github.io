@@ -291,12 +291,12 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>今天在一台服务器上使用<code>useradd</code>创建用户，竟然爆<code>Permission denied</code>，我靠，我明明是root，竟然没有权限增加新用户，如图：<br><img src="/images/lsattr5.png" alt="抱光妹"></p>
-<p>此时注意到下面还有一句话：<code>useradd: cannot lock /etc/passwd; try again later</code>。于是怀疑到可能在&#x2F;etc&#x2F;下有一个文件把passwd锁住了。搜索一番，发现了<code>.pwd.lock</code>这个文件，但是发现这个文件不能删除和改名，如图：<br><img src="/images/lsattr1.png" alt="抱光妹"><br><img src="/images/lsattr2.png" alt="抱光妹"></p>
+        <p>今天在一台服务器上使用<code>useradd</code>创建用户，竟然爆<code>Permission denied</code>，我靠，我明明是root，竟然没有权限增加新用户，如图：<br><img data-src="/images/lsattr5.png" alt="抱光妹"></p>
+<p>此时注意到下面还有一句话：<code>useradd: cannot lock /etc/passwd; try again later</code>。于是怀疑到可能在&#x2F;etc&#x2F;下有一个文件把passwd锁住了。搜索一番，发现了<code>.pwd.lock</code>这个文件，但是发现这个文件不能删除和改名，如图：<br><img data-src="/images/lsattr1.png" alt="抱光妹"><br><img data-src="/images/lsattr2.png" alt="抱光妹"></p>
 <p>此时的我觉得root身份受到了很大的冒犯，怎么还有这种鬼现象？突然想到，可能这个锁文件被人给<code>chattr</code>修改了，于是使用<code>lsattr</code>查看这个文件，发现就剩下一个e属性了：<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@ip-<span class="number">172</span>-<span class="number">31</span>-<span class="number">7</span>-<span class="number">167</span> etc]<span class="comment"># lsattr .pwd.lock </span></span><br><span class="line">-------------e- .pwd.lock</span><br></pre></td></tr></table></figure></p>
 <p>e属性是不能用<code>chattr -e</code>删除的，而且也是一个很普通的属性，那么问题出在哪呢？</p>
-<p>在<code>/etc/</code>下执行<code>lsattr -R -a</code>递归的查看所有文件（包含隐藏文件），发现原来当初是把整个<code>/etc/</code>文件夹加了i，如图：<br><img src="/images/lsattr3.png" alt="抱光妹"></p>
-<p>于是就在<code>/etc/</code>路径下使用<code>chattr -i .</code>破掉了i属性，此时再次尝试删除lock锁文件，终于删除掉，并且成功创建了用户，如图：<br><img src="/images/lsattr4.png" alt="抱光妹"></p>
+<p>在<code>/etc/</code>下执行<code>lsattr -R -a</code>递归的查看所有文件（包含隐藏文件），发现原来当初是把整个<code>/etc/</code>文件夹加了i，如图：<br><img data-src="/images/lsattr3.png" alt="抱光妹"></p>
+<p>于是就在<code>/etc/</code>路径下使用<code>chattr -i .</code>破掉了i属性，此时再次尝试删除lock锁文件，终于删除掉，并且成功创建了用户，如图：<br><img data-src="/images/lsattr4.png" alt="抱光妹"></p>
 
     </div>
 

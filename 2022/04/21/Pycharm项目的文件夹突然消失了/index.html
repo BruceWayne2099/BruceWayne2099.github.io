@@ -292,14 +292,14 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="项目的文件夹都没了！"><a href="#项目的文件夹都没了！" class="headerlink" title="项目的文件夹都没了！"></a>项目的文件夹都没了！</h2><p>今天在搞pycharm的时候，打开了另一个项目，结果返回原来的项目的时候，意外的发现原来的项目里的文件夹都没了：<br><img src="/images/django%E6%96%87%E4%BB%B6%E5%A4%B9%E6%B2%A1%E4%BA%86.jpg"></p>
-<p>不过文件夹并没丢，代码没丢是一个好消息。但是pycharm的Django也无法启动，在Preferences里的<code>语言与框架</code>里的Django也是空：<br><img src="/images/django%E6%96%87%E4%BB%B6%E5%A4%B9%E6%B2%A1%E4%BA%862.jpg"></p>
+        <h2 id="项目的文件夹都没了！"><a href="#项目的文件夹都没了！" class="headerlink" title="项目的文件夹都没了！"></a>项目的文件夹都没了！</h2><p>今天在搞pycharm的时候，打开了另一个项目，结果返回原来的项目的时候，意外的发现原来的项目里的文件夹都没了：<br><img data-src="/images/django%E6%96%87%E4%BB%B6%E5%A4%B9%E6%B2%A1%E4%BA%86.jpg"></p>
+<p>不过文件夹并没丢，代码没丢是一个好消息。但是pycharm的Django也无法启动，在Preferences里的<code>语言与框架</code>里的Django也是空：<br><img data-src="/images/django%E6%96%87%E4%BB%B6%E5%A4%B9%E6%B2%A1%E4%BA%862.jpg"></p>
 <p>查了很久，发现了解法：那就是退出pycharm，删除项目文件夹里的<code>.idea</code>文件夹，然后再打开pycharm就恢复原样了。这个文件夹的主要作用在于存放项目的控制信息，包括版本信息，历史记录等等。删除它是不会影响代码的正常使用的，但是如果删除就不能使用pycharm进行回溯和复原了。</p>
 <p>不过为啥会让整个项目文件夹没变化却能让整个django的项目文件夹不展示以及让django的配置为空，那就不得而知了…</p>
-<h2 id="启动Django后发现setting不对的问题"><a href="#启动Django后发现setting不对的问题" class="headerlink" title="启动Django后发现setting不对的问题"></a>启动Django后发现setting不对的问题</h2><p>我的Pycharm版本由原来的2021.3版本升级到2022.1版本，但是启动django的时候，爆这个错误<code>You must either define the environment variable DJANGO_SETTINGS_MODULE or call settings.configure() before accessing settings.</code>：<br><img src="/images/django%E6%96%87%E4%BB%B6%E5%A4%B9%E6%B2%A1%E4%BA%863.png"></p>
-<p>这是因为你的片及配置里没有配置<code>settings</code>的路径，首先打开编辑配置：<br><img src="/images/django%E6%96%87%E4%BB%B6%E5%A4%B9%E6%B2%A1%E4%BA%864.png"></p>
-<p>在如图的地方加上<code>djangoproject.settings</code>就行了：<br><img src="/images/django%E6%96%87%E4%BB%B6%E5%A4%B9%E6%B2%A1%E4%BA%865.png"></p>
-<p>唉，这种稀奇古怪的问题竟然耽误了老子2个小时…<br><img src="/images/%E6%9D%8E%E6%B2%812.webp"></p>
+<h2 id="启动Django后发现setting不对的问题"><a href="#启动Django后发现setting不对的问题" class="headerlink" title="启动Django后发现setting不对的问题"></a>启动Django后发现setting不对的问题</h2><p>我的Pycharm版本由原来的2021.3版本升级到2022.1版本，但是启动django的时候，爆这个错误<code>You must either define the environment variable DJANGO_SETTINGS_MODULE or call settings.configure() before accessing settings.</code>：<br><img data-src="/images/django%E6%96%87%E4%BB%B6%E5%A4%B9%E6%B2%A1%E4%BA%863.png"></p>
+<p>这是因为你的片及配置里没有配置<code>settings</code>的路径，首先打开编辑配置：<br><img data-src="/images/django%E6%96%87%E4%BB%B6%E5%A4%B9%E6%B2%A1%E4%BA%864.png"></p>
+<p>在如图的地方加上<code>djangoproject.settings</code>就行了：<br><img data-src="/images/django%E6%96%87%E4%BB%B6%E5%A4%B9%E6%B2%A1%E4%BA%865.png"></p>
+<p>唉，这种稀奇古怪的问题竟然耽误了老子2个小时…<br><img data-src="/images/%E6%9D%8E%E6%B2%812.webp"></p>
 
     </div>
 

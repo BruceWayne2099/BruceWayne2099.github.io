@@ -294,7 +294,7 @@
       
         <h2 id="小经验和小心得"><a href="#小经验和小心得" class="headerlink" title="小经验和小心得"></a>小经验和小心得</h2><p>AI从下围棋跨界到聊天现在是作画，最近的大火让prompt也跟着火了起来。prompt是啥呢？就是跟AI交流的指令，目前prompt是支持英文和emoji图标的。AI通过阅读prompt传入的指令，来分析然后再反馈一个结果给人类。所以说如果职业是跟AI有交集的，都建议了解一下prompt，这个任意真的提升效率太多了（我现在业余时间的代码AI包办了80%了,剩下的20%具体情况要自己看）。</p>
 <p>当然我们的网络环境很拉，这是耽误各位进步的一个头疼问题…</p>
-<p>说回sdwebui的prompt。要用sdwebui画图，肯定要有一个<code>checkpoint</code>，那么这个就是AI画图的原材料。比如我个人比较喜欢的<code>BRA(beautiful realistic Asians)V3</code>这个<code>checkpoint</code>，他的效果就是产出的图非常真实，画亚洲人特别是韩国人，感觉就是照片照出来的照片，所以很多人都拿这个模型产出的图去那种XX论坛上卖…<br><img src="/images/ai%E7%94%BB%E5%9B%BE9.JPG" title="这个图我的prompt改了好几次，基本很满意，可惜耳环没画好，跟助听器似的"></p>
+<p>说回sdwebui的prompt。要用sdwebui画图，肯定要有一个<code>checkpoint</code>，那么这个就是AI画图的原材料。比如我个人比较喜欢的<code>BRA(beautiful realistic Asians)V3</code>这个<code>checkpoint</code>，他的效果就是产出的图非常真实，画亚洲人特别是韩国人，感觉就是照片照出来的照片，所以很多人都拿这个模型产出的图去那种XX论坛上卖…<br><img data-src="/images/ai%E7%94%BB%E5%9B%BE9.JPG" title="这个图我的prompt改了好几次，基本很满意，可惜耳环没画好，跟助听器似的"></p>
 <p>prompt里的元素是有前后的，推荐上来先顾全大局，写上<code>best quality</code>、<code>4K</code>、<code>masterpiece</code>这样的话，要求AI产出的图是很高清的。要表达的中心物体放前面写，就好像你拍照，拍人物照，肯定镜头的重心就是人物，然后远处的山啊水啊鸟啊狗啊都是配菜，那么prompt里，就把人物放在最前面。这里人物就要有一番描述了，比如是美国人还是日本人还是韩国人，皮肤如何，男性女性，戴个警察帽子，带一个手表，浅浅的微笑这样的细节描述；然后是场景，比如在银行里，或者在办公室里，黑天白天；动作，比如坐在椅子上翘二郎腿，双手叉腰等等，这样基本就能描述出来一个场景了。差不多也可以产出一个图了。</p>
 <p>prompt里也可以用<code>()</code>和<code>[]</code>来调整权重，每一个<code>()</code>代表权重多加1.1，每一个<code>[]</code>代表权重减少1.1。词语之间可以用下划线来链接，比如<code>long_wave_hair</code>就会产出大波浪。</p>
 <p>具体的prompt例子我就不说了，C站上有的是，discount和reddit也都有prompt交流群。随便看看就有收获，在那里即学习了prompt又学习了英语单词又学习了英语语法又伤了身体（囧）…</p>
@@ -303,9 +303,9 @@
 <p>通过<code>chickpoint</code>+<code>lora</code>+prompt这样的组合拳来产出图片，这样可以极大地提高出图效率、丰富出图的内容。</p>
 <p>最后再来一点实操prompt心得：想好了自己的图片样子，然后就照着这个样子去做。千万不要被眼花缭乱的prompt效果图打乱了计划，我知道C站上美女很多，看着看着就让人心猿意马…虽然他们的prompt能生成你想要的效果，但是他们也是好几次里挑出来那么一次的。一点一点丰富自己的prompt，失败了也不要灰心，只要前任跑出来过，那么多跑几次肯定能得到自己想要的图。如果觉得有些图弃之可惜，可以干脆自己动手，PS掉不爽的那部分。</p>
 <h2 id="目前AI的不足"><a href="#目前AI的不足" class="headerlink" title="目前AI的不足"></a>目前AI的不足</h2><ol>
-<li><p>还是那句话，产出的图的手脚大概率都是不正常的，这里直接上图：<br><img src="/images/ai%E7%94%BB%E5%9B%BE8.JPG" title="多好的姑娘啊，可惜手指头和脚都不对..."><br>但是好的lora+好的chickpoint可以有效的降低手脚畸形的概率。</p>
+<li><p>还是那句话，产出的图的手脚大概率都是不正常的，这里直接上图：<br><img data-src="/images/ai%E7%94%BB%E5%9B%BE8.JPG" title="多好的姑娘啊，可惜手指头和脚都不对..."><br>但是好的lora+好的chickpoint可以有效的降低手脚畸形的概率。</p>
 </li>
-<li><p>prompt可以用emoji里的”自拍”、”比耶”、”开心”等等表情来代替英语单词，进而来提升出图的准确性。emoji是能被AI识别的，但是不会每次都识别到。我见过最简单的一个prompt里面的内容就是：<code>🏃🏻‍♀️ 🎒 爬山的emoji</code>，这三个符号就完成了一幅画。但是我尝试把”自拍”的emoji放到prompt里，十几次就出来2次左右的效果。还有一次尝试”比耶”的emoji，直接比出来4个手指头，不知道的还以为是追梦格林…<br><img src="/images/%E8%BF%BD%E6%A2%A6%E6%A0%BC%E6%9E%97.JPG" title="老子我有四个总冠军"></p>
+<li><p>prompt可以用emoji里的”自拍”、”比耶”、”开心”等等表情来代替英语单词，进而来提升出图的准确性。emoji是能被AI识别的，但是不会每次都识别到。我见过最简单的一个prompt里面的内容就是：<code>🏃🏻‍♀️ 🎒 爬山的emoji</code>，这三个符号就完成了一幅画。但是我尝试把”自拍”的emoji放到prompt里，十几次就出来2次左右的效果。还有一次尝试”比耶”的emoji，直接比出来4个手指头，不知道的还以为是追梦格林…<br><img data-src="/images/%E8%BF%BD%E6%A2%A6%E6%A0%BC%E6%9E%97.JPG" title="老子我有四个总冠军"></p>
 </li>
 <li><p>目前AI只能从一个checkpoint里学习，玩不了混搭。而且<code>lora</code>虽然方便了一些动作的prompt，但是他还是有使用限制的，比如<code>dolllikeness</code>这个<code>lora</code>，它只能用于近景，如果prompt里又写了<code>full body</code>的话，就跟<code>lora</code>相冲突，<code>full body</code>的效果如果小于lora的权重的话那产出的图就不会出现全身的效果。</p>
 </li>
@@ -322,7 +322,7 @@
 </ol>
 <p>综上所述，可见目前的AI不是万能的，很多地方还需要人手工介入，就冲着它交工不能百分百让人满意，它就注定是一个工具。不要被别人妖言惑众，说AI可以代替谁谁谁的。掌握了工具，用好了工具大家都HAPPY。</p>
 <h2 id="如果我想用AI画知名人物"><a href="#如果我想用AI画知名人物" class="headerlink" title="如果我想用AI画知名人物"></a>如果我想用AI画知名人物</h2><p>很多人看到了网上的AI画出来什么特朗普被捕啊普京被捕啊就也想用sdwebui去试试，但是原生的sdwebui里的AI是只知道资料但是不清楚长相的，所以直接输入名字就想是画效果是不好的，比如你输入一个<code>kobe bryant</code>，能出一个穿湖人24号的光头黑人，但是脸跟Kobe差的挺多。</p>
-<p>比如二次元圈出名的蒂法，你在prompt里输入<code>Tifa Lockhart</code>，AI画的并不像，那么也想要得到蒂法就需要去训练一个蒂法模样的lora。让这个lora来帮你实现蒂法的长相，lora训练的越好，做出来的画就越逼真，如图：<br><img src="/images/ai%E7%94%BB%E5%9B%BE10.JPG" title="盔甲使用ai创造的，脸蛋使用lora校正的"><br><img src="/images/ai%E7%94%BB%E5%9B%BE11.JPG" title="这个也是一个上品了，手生成的很不错"></p>
+<p>比如二次元圈出名的蒂法，你在prompt里输入<code>Tifa Lockhart</code>，AI画的并不像，那么也想要得到蒂法就需要去训练一个蒂法模样的lora。让这个lora来帮你实现蒂法的长相，lora训练的越好，做出来的画就越逼真，如图：<br><img data-src="/images/ai%E7%94%BB%E5%9B%BE10.JPG" title="盔甲使用ai创造的，脸蛋使用lora校正的"><br><img data-src="/images/ai%E7%94%BB%E5%9B%BE11.JPG" title="这个也是一个上品了，手生成的很不错"></p>
 <p>但是lora就有一个问题，因为训练lora多半都是拿正脸照，所以生成的图片也基本都是正脸的，不太能有侧脸或者其他的样子。这一点也证实了上面的第四点“AI目前的视角还比较死板”。</p>
 <p>AI直接画名人要面临很严重的法律问题，所以即使你训练了lora，C站也不会直接让你放上去的，所以这种lora你也就只能自己本地留着，或者商用授权卖掉，毕竟这个世界宅男很多，愿意花钱的宅男也很多…</p>
 <p>不过前几天发现有一个妹子把自己的照片训练成了lora，并且放到了C站上，<a target="_blank" rel="noopener" href="https://civitai.com/models/34102/nana">https://civitai.com/models/34102/nana</a> ，这个妹子倒也不拿兄弟们当外人，任由别人来拿她的脸做福利姬。</p>
@@ -392,8 +392,8 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/AI/" rel="tag"># AI</a>
               <a href="/tags/Python/" rel="tag"># Python</a>
+              <a href="/tags/AI/" rel="tag"># AI</a>
               <a href="/tags/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/" rel="tag"># 人工智能</a>
           </div>
 

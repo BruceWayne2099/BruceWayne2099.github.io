@@ -291,11 +291,11 @@
 
       
         <h2 id="情况描述"><a href="#情况描述" class="headerlink" title="情况描述"></a>情况描述</h2><p>今天上班，甲方爸爸在微信里叫“设备直播无法播放”，登录到zabbix发现，播放模块的服务器的<code>zabbix-agent</code>已经脱落，而且这个服务器可以ping通但是不能ssh通。</p>
-<p>让机房的人去重启了一下服务器，登录之后发现里面有一个很奇怪的进程<code>watchbog</code>：<br><img src="/images/pastebin2.png" alt="办公室"></p>
-<p>这个进程不应该出现的，同时查看<code>crontab -l</code>的内容也已经变了：<br><img src="/images/pastebin1.png" alt="办公室"></p>
+<p>让机房的人去重启了一下服务器，登录之后发现里面有一个很奇怪的进程<code>watchbog</code>：<br><img data-src="/images/pastebin2.png" alt="办公室"></p>
+<p>这个进程不应该出现的，同时查看<code>crontab -l</code>的内容也已经变了：<br><img data-src="/images/pastebin1.png" alt="办公室"></p>
 <p>我登录了一下<code>https://pastebin.com</code>，发现这个是一个提供类似便签记事的网站，黑客应该就是现在这个网站里输入了远程的脚本，然后让这台肉鸡去curl这个网站的网页达到下载脚本然后启动了watchbog进程的目的。</p>
-<p>于是我就<code>find / -name \* -type f -print | xargs grep &quot;pastebin&quot;</code>，看一下系统里都有哪些文件里含有<code>pastebin</code>这个关键词。于是乎先发现<code>/usr/bin</code>里有几个不应该存在的命令：<br><img src="/images/pastebin3.png" alt="办公室"></p>
-<p>然后顺藤的发现几乎所有的crontab文件都已经被污染了：<br><img src="/images/pastebin4.png" alt="办公室"></p>
+<p>于是我就<code>find / -name \* -type f -print | xargs grep &quot;pastebin&quot;</code>，看一下系统里都有哪些文件里含有<code>pastebin</code>这个关键词。于是乎先发现<code>/usr/bin</code>里有几个不应该存在的命令：<br><img data-src="/images/pastebin3.png" alt="办公室"></p>
+<p>然后顺藤的发现几乎所有的crontab文件都已经被污染了：<br><img data-src="/images/pastebin4.png" alt="办公室"></p>
 <p>把以上所有被污染的文件全部删光内容，将watchbog进程彻底杀死。观察了一会，貌似没有复现问题。</p>
 <h2 id="后续解决方案"><a href="#后续解决方案" class="headerlink" title="后续解决方案"></a>后续解决方案</h2><ol>
 <li>在zabbix监控上添加对watchbog进程的监控，如果出现直接通知负责人；</li>

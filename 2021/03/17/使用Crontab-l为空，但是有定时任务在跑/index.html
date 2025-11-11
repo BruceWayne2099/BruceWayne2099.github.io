@@ -293,12 +293,12 @@
 
       
         <p>接到开发电话反馈，某个应用总是在规定时间出现CPU飙升的情况，看到是由于<code>netstat</code>命令引发的，但是kill掉后，还会问题复发。</p>
-<p>登录上去，果不其然，CPU满负荷，杀掉进程之后还恢复，判断后台是有定时任务在跑，或者有看门狗在循环执行定时检查任务，如图：<br><img src="/images/crond%E9%97%AE%E9%A2%981.png"></p>
-<p>但是通过<code>crontab -l</code>查看定时任务列表却空空如也，查了所有的用户都是空，于是怀疑这个任务是埋在机器里的crontab设定来执行的。通过<code>ps -axjf |grep cron</code>来看果然有一个叫<code>relation</code>的命令在执行，如图：<br><img src="/images/crond%E9%97%AE%E9%A2%982.png"></p>
-<p>到<code>/etc/cron.d</code>里查看所有的定时任务，还真有一个叫<code>relation</code>的文件，打开内容一看，果然是它，如图：<br><img src="/images/crond%E9%97%AE%E9%A2%983.png" title="藏在这里的东西是不会被crontab -l展示"></p>
-<p>这里写的是每分钟执行一下<code>/bin/relation</code>命令，然后再去<code>cat /bin/relation</code>发现果然是一个每天5点会执行一个netstat命令同时还去connect某个网址的命令，所以引发的CPU飙升，如图：<br><img src="/images/crond%E9%97%AE%E9%A2%984.png"></p>
+<p>登录上去，果不其然，CPU满负荷，杀掉进程之后还恢复，判断后台是有定时任务在跑，或者有看门狗在循环执行定时检查任务，如图：<br><img data-src="/images/crond%E9%97%AE%E9%A2%981.png"></p>
+<p>但是通过<code>crontab -l</code>查看定时任务列表却空空如也，查了所有的用户都是空，于是怀疑这个任务是埋在机器里的crontab设定来执行的。通过<code>ps -axjf |grep cron</code>来看果然有一个叫<code>relation</code>的命令在执行，如图：<br><img data-src="/images/crond%E9%97%AE%E9%A2%982.png"></p>
+<p>到<code>/etc/cron.d</code>里查看所有的定时任务，还真有一个叫<code>relation</code>的文件，打开内容一看，果然是它，如图：<br><img data-src="/images/crond%E9%97%AE%E9%A2%983.png" title="藏在这里的东西是不会被crontab -l展示"></p>
+<p>这里写的是每分钟执行一下<code>/bin/relation</code>命令，然后再去<code>cat /bin/relation</code>发现果然是一个每天5点会执行一个netstat命令同时还去connect某个网址的命令，所以引发的CPU飙升，如图：<br><img data-src="/images/crond%E9%97%AE%E9%A2%984.png"></p>
 <p>关闭之后，世界清净了。</p>
-<p>这里注意一下，线上环境的功能采用脚本+crontab的方式实现，未放到代码层实现，我想在大公司里都是违反安全生产协议的。涉及到线上产品的功能或者逻辑，一定要在代码层面实现掉，不要单独搞非标的方式，会给新接手的同学埋坑，同时容易给线上扩容或者其他操作造成故障。<br><img src="/images/%E5%A4%A7%E8%B6%85PK%E8%8D%92%E5%8E%9F%E7%8B%BC.gif" title="重生大超爆锤荒原狼"></p>
+<p>这里注意一下，线上环境的功能采用脚本+crontab的方式实现，未放到代码层实现，我想在大公司里都是违反安全生产协议的。涉及到线上产品的功能或者逻辑，一定要在代码层面实现掉，不要单独搞非标的方式，会给新接手的同学埋坑，同时容易给线上扩容或者其他操作造成故障。<br><img data-src="/images/%E5%A4%A7%E8%B6%85PK%E8%8D%92%E5%8E%9F%E7%8B%BC.gif" title="重生大超爆锤荒原狼"></p>
 
     </div>
 

@@ -291,13 +291,13 @@
 
       
         <p>同组新来的java开发突然发现一个问题来咨询，就是他的日志监控无法被监控平台识别：</p>
-<p><img src="/images/%E6%96%87%E4%BB%B6%E6%9D%83%E9%99%900027.png"></p>
+<p><img data-src="/images/%E6%96%87%E4%BB%B6%E6%9D%83%E9%99%900027.png"></p>
 <p>明明配置路径都正确，监控平台也能获取到他的文件名。结果上去一看发现文件都是”-rw-r—–”的权限：</p>
-<p><img src="/images/%E6%96%87%E4%BB%B6%E6%9D%83%E9%99%900027-3.png"></p>
+<p><img data-src="/images/%E6%96%87%E4%BB%B6%E6%9D%83%E9%99%900027-3.png"></p>
 <p>手动使用 <code>chmod -R 664 文件路径</code>临时解决了问题，果然，监控平台拿到了文件并展示了监控项：</p>
-<p><img src="/images/%E6%96%87%E4%BB%B6%E6%9D%83%E9%99%900027-2.png" title="数据齐全度从2个多了1个"></p>
+<p><img data-src="/images/%E6%96%87%E4%BB%B6%E6%9D%83%E9%99%900027-2.png" title="数据齐全度从2个多了1个"></p>
 <p>于是就怀疑到底改了啥会发生这样的事儿，果然我发现<code>grep Umask /proc/进程PID/status</code>得到java进程是0027，其他进程是0002，既然是0027，那肯定默认相关的文件也就是640。于是就定位在tomcat上，发现tomcat的catalina.sh里写了权限是0027:</p>
-<p><img src="/images/%E6%96%87%E4%BB%B6%E6%9D%83%E9%99%900027-4.png"></p>
+<p><img data-src="/images/%E6%96%87%E4%BB%B6%E6%9D%83%E9%99%900027-4.png"></p>
 <p>那就简单了，在引入tomcat8的时候，将catalina.sh改成0002就解决问题。可以说tomcat8这个umask的改动就是吃饱了撑的。</p>
 <p>最后补上tomcat8的官方文档：<a target="_blank" rel="noopener" href="https://tomcat.apache.org/tomcat-8.5-doc/security-howto.html">https://tomcat.apache.org/tomcat-8.5-doc/security-howto.html</a></p>
 

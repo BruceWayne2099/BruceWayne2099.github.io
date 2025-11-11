@@ -294,19 +294,19 @@
 
       
         <h2 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h2><p>假设我有个excel，想从两个不同的sheet里，根据相同的列合并这两部分的内容，怎么办？办法就是<code>vlookup</code>。</p>
-<p>比如我第一个sheet的内容如下：<br><img src="/images/Excel%E5%90%88%E5%B9%B61.png" title="这个就叫sheet1"></p>
-<p>而第二个sheet的内容如下<br><img src="/images/Excel%E5%90%88%E5%B9%B62.png" title="这个就叫sheet2"></p>
+<p>比如我第一个sheet的内容如下：<br><img data-src="/images/Excel%E5%90%88%E5%B9%B61.png" title="这个就叫sheet1"></p>
+<p>而第二个sheet的内容如下<br><img data-src="/images/Excel%E5%90%88%E5%B9%B62.png" title="这个就叫sheet2"></p>
 <p>现在需要根据相同的<code>应用名</code>这一列，合并两个sheet，这样可以在一个表里看到应用对应的owner、git库和是否开源。遇到这种情况时，我们可以使用Excel内置的<code>VLOOKUP</code> 功能来实现数据的查找与引用。</p>
 <p><code>VLOOKUP</code>的语法很简单，翻译成一眼就能看明白的话就是——<code>VLOOKUP</code>函数需要有 4 个部分：「需要以那个列为共同列、在哪个区域或者那个sheet的哪个区域查、查的列是第几列、是否返回近似值」。</p>
 <p>这个式子中的最后一个值是选填的，0（False）是精确，1（True）是近似。</p>
 <p>实际使用时只要记住最简单的 <code>=VLOOKUP(共同列,查的区域,返回第几列,0)</code>这样一个式子，就能顺利地使用<code>VLOOKUP</code>函数了。这里要注意，先把<code>共同列</code>放在两个sheet的第一列！</p>
 <p>说回上面这个例子，如何合并这两个sheet呢？</p>
-<p>先把<code>共同列</code>放在两个sheet的第一列，这里就是<code>应用名</code>这一列。然后把光标定位在需要展示数据的单元格中，也就是sheet1的D列，如图：<br><img src="/images/Excel%E5%90%88%E5%B9%B63.png"></p>
-<p>在单元格中输入”&#x3D;vl”，然后会自动提示出VLOOKUP函数，双击蓝色的函数部分，就可以看到单元格中显示出的完整的VLOOKUP函数。选择第一列中需要匹配数据的单元格，只选中<code>应用名</code>这一列就可以，然后再英文状态下输入逗号”,”，如图：<br><img src="/images/Excel%E5%90%88%E5%B9%B64.png"></p>
+<p>先把<code>共同列</code>放在两个sheet的第一列，这里就是<code>应用名</code>这一列。然后把光标定位在需要展示数据的单元格中，也就是sheet1的D列，如图：<br><img data-src="/images/Excel%E5%90%88%E5%B9%B63.png"></p>
+<p>在单元格中输入”&#x3D;vl”，然后会自动提示出VLOOKUP函数，双击蓝色的函数部分，就可以看到单元格中显示出的完整的VLOOKUP函数。选择第一列中需要匹配数据的单元格，只选中<code>应用名</code>这一列就可以，然后再英文状态下输入逗号”,”，如图：<br><img data-src="/images/Excel%E5%90%88%E5%B9%B64.png"></p>
 <p>因为我们要返回的信息是sheet2中第2列的“代码库”信息，所以在公式中再输入”,2,”（因为第2列），这时Excel提示信息让我们选择<code>TRUE</code>或<code>FLASE</code>，选不选都行，默认是<code>TRUE</code>，直接回车即可。</p>
-<p>可以看到，我们的公式就是<code>=VLOOKUP(A:A,Sheet2!A:C,2,FALSE)</code>,这个公式解读一下就是<code>以A列的全部作为公共列，在sheet2的A列到C列里查，返回A列到C列的第二列，精确查找</code>此时这个函数已经得到了值，如图：<br><img src="/images/Excel%E5%90%88%E5%B9%B66.png"></p>
-<p>然后“是否开源”这一列也是一样的方法，公式是<code>=VLOOKUP(A:A,Sheet2!A:C,3,)</code> 直接拉下来就把剩下的值都获取到了，如图：<br><img src="/images/Excel%E5%90%88%E5%B9%B67.png" title="WDK在sheet2里就是没有对应的行，所以N&#x2F;A"></p>
-<p>这里要注意！我们获取到的列内容是函数，如果sheet2的内容发生了变化，那么sheet1也要变更的，这个时候，我们只需要获取到对应的值就行，“值”选择的方法如下：<br><img src="/images/Excel%E5%90%88%E5%B9%B68.png" title="新开一列来复制值"></p>
+<p>可以看到，我们的公式就是<code>=VLOOKUP(A:A,Sheet2!A:C,2,FALSE)</code>,这个公式解读一下就是<code>以A列的全部作为公共列，在sheet2的A列到C列里查，返回A列到C列的第二列，精确查找</code>此时这个函数已经得到了值，如图：<br><img data-src="/images/Excel%E5%90%88%E5%B9%B66.png"></p>
+<p>然后“是否开源”这一列也是一样的方法，公式是<code>=VLOOKUP(A:A,Sheet2!A:C,3,)</code> 直接拉下来就把剩下的值都获取到了，如图：<br><img data-src="/images/Excel%E5%90%88%E5%B9%B67.png" title="WDK在sheet2里就是没有对应的行，所以N&#x2F;A"></p>
+<p>这里要注意！我们获取到的列内容是函数，如果sheet2的内容发生了变化，那么sheet1也要变更的，这个时候，我们只需要获取到对应的值就行，“值”选择的方法如下：<br><img data-src="/images/Excel%E5%90%88%E5%B9%B68.png" title="新开一列来复制值"></p>
 <p>vlookup里还有几个地方需要注意，首先<code>需要查的内容</code>必须是<code>查哪个区域</code>第一列。很多时候查不出数据，就是因为没有遵守这个规则，这里一定要切记切记！。</p>
 <p>第二条，选择寻找的区域的时候，不要点击左上角的三角来获取全部，一定要像例子写的那样，选择对应的列来作为目标范围，不然会有<code>#ERF</code>的错误。</p>
 <h2 id="参考内容"><a href="#参考内容" class="headerlink" title="参考内容"></a>参考内容</h2><p><a target="_blank" rel="noopener" href="https://www.zhihu.com/question/38606861">https://www.zhihu.com/question/38606861</a><br><a target="_blank" rel="noopener" href="https://sspai.com/post/53242">https://sspai.com/post/53242</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/laobai1015/article/details/85248125">https://blog.csdn.net/laobai1015/article/details/85248125</a></p>

@@ -291,7 +291,7 @@
 
       
         <h2 id="什么是-CPU-Share"><a href="#什么是-CPU-Share" class="headerlink" title="什么是 CPU Share?"></a>什么是 CPU Share?</h2><p>CPU Share 是容器调度时进行 CPU 资源分配的一种方式，相对于集团之前使用的 CPU Set 而言。CPU Set 模式下会为一个 4C 的容器分配固定的“独占的” 4 个 CPU 核，容器中所有进程&#x2F;任务只能跑在这 4 个核上（因此算力上限就这 4 核），同时其它容器中的进程&#x2F;任务不能使用这 4 个核。</p>
-<p>而 CPU Share 模式下一台 96 核的宿主机上一个 4C 容器绑定的 CPU 核数可能在 4 ~ 96 之间，取决这台宿主机上的资源分配情况及其它容器是否 CPU Share。目前一台宿主机上的所有 Share 容器都绑定相同的一批 CPU 核，容器中的进程&#x2F;任务可以跑在所有这些核上，每个容器可使用的 CPU 资源通过与容器规格相对应的权重来分配。<br><img src="/images/cpushare.webp" alt="paradin"></p>
+<p>而 CPU Share 模式下一台 96 核的宿主机上一个 4C 容器绑定的 CPU 核数可能在 4 ~ 96 之间，取决这台宿主机上的资源分配情况及其它容器是否 CPU Share。目前一台宿主机上的所有 Share 容器都绑定相同的一批 CPU 核，容器中的进程&#x2F;任务可以跑在所有这些核上，每个容器可使用的 CPU 资源通过与容器规格相对应的权重来分配。<br><img data-src="/images/cpushare.webp" alt="paradin"></p>
 <h2 id="为什么要做-CPU-Share"><a href="#为什么要做-CPU-Share" class="headerlink" title="为什么要做 CPU Share"></a>为什么要做 CPU Share</h2><p>优势：</p>
 <ol>
 <li>CPU 资源的分配可以更加精细化，原来 Set 模式下 CPU 资源的最小分配粒度是 1 核，而 Share 模式下可以做到 1&#x2F;1000 核；</li>
@@ -304,7 +304,7 @@
 <li>CPU Share是不会导致ip发生变化的。</li>
 </ol>
 <p>由于 CPU Share 在资源利用率和弹性资源调度上的优势，后续在非重点应用上大规模推进应用 Share 化应该是业界主流趋势。除极个别延迟特别敏感业务（Latency sensitive critical）外，绝大多数的在线延迟敏感通用业务（Latency sensitive general）都将切换为 Share 模式。</p>
-<p>最后简单总结：<br><img src="/images/cpushare2.png" alt="paradin" title="简单总结"></p>
+<p>最后简单总结：<br><img data-src="/images/cpushare2.png" alt="paradin" title="简单总结"></p>
 <p>上图说cpuset也存在两种详细的绑核模式，分为<code>Spread</code>和<code>SameCoreFirst</code>。差异主要如下（举例4core Pod）：<br>● Spread：优先绑定每个core的1个HT，最多可以用到4个core的cpu算力，算力上限高，但确定性较差（对端HT会争抢），且存在L1&#x2F;L2层面的cache污染<br>● SameCoreFirst：优先占用每个core的两个HT，最多用满2个core的4个HT算力，算力上限低，但确定性高。</p>
 <h2 id="如何查看应用的进程-线程数"><a href="#如何查看应用的进程-线程数" class="headerlink" title="如何查看应用的进程&#x2F;线程数"></a>如何查看应用的进程&#x2F;线程数</h2><p>绝大多数在线应用的启动脚本中通过读取容器内可见的 CPU 核数( grep -c ‘cpu[0-9][0-9]*’ &#x2F;proc&#x2F;stat )来设置应用进程&#x2F;线程数等，尤其是 Java 应用的 ParallelGCThreads 参数设置。由于 Share 容器绑定的 CPU 核可能远大于容器规格，因此需要读取容器内的 SIGMA_MAX_PROCESSORS_LIMIT 来作为相关设置的依据。</p>
 <h2 id="什么是-VPA"><a href="#什么是-VPA" class="headerlink" title="什么是 VPA"></a>什么是 VPA</h2><p>VPA(Vertical Pod Autoscaler，垂直弹性伸缩) 相对于 HPA(Horizontal Pod Autoscaler，水平弹性伸缩) 而言，HPA 通过增减应用的运行容器实例来提升资源利用率&#x2F;应对峰值，而 VPA 则是通过增减单个容器实例所分得的资源(CPU&#x2F;MEM)多少来提升资源利用率&#x2F;应对峰值。由于 CPU Share 具备的共享和弹性特性，VPA 在 CPU Share 模式下更易实施且更安全。</p>
@@ -312,7 +312,7 @@
 <h2 id="为什么要做-VPA"><a href="#为什么要做-VPA" class="headerlink" title="为什么要做 VPA"></a>为什么要做 VPA</h2><p>HPA 扩缩容器的方式链路较长，涉及应用启停、中间件等运维配置的变动等，对线上的影响比较大，但是在资源节省上也更彻底。另外，由于业务容灾部署的需要，应用保有最小容器数量有一定限制，可能远超应用真实的资源需求。</p>
 <p>VPA可以对应用容器进行原地秒级资源伸缩，链路短，风险更低，业务基本无感，从而更好的做到资源利用率的提升。CPU Share 容器资源分配由 request 和 limit 两个值决定，request 是强保障的资源，limit 是最大可用到的资源上限，默认情况下 容器规格 &#x3D;&#x3D; request &#x3D;&#x3D; limit，VPA 通过资源画像得到应用推荐的 request 值，同时保持 limit 不变，因此 CPU Share 模式的 VPA 风险较低。</p>
 <p>不过这里要注意！应用升配（比如 2c-&gt;3c）在当前宿主机剩余资源不足时会发生驱逐，驱逐会导致更换宿主机，进而更换ip和重启应用。</p>
-<h2 id="注意这里的坑"><a href="#注意这里的坑" class="headerlink" title="注意这里的坑"></a>注意这里的坑</h2><p>最近大促压测的时候，发现有一个应用同一个单元但是不同的机房cpu相差10%左右：<br><img src="/images/cpushare-1.png" alt="paradin" title="开始以为是有离线任务，但是后来发现离线任务压测时候已经压制掉了"></p>
+<h2 id="注意这里的坑"><a href="#注意这里的坑" class="headerlink" title="注意这里的坑"></a>注意这里的坑</h2><p>最近大促压测的时候，发现有一个应用同一个单元但是不同的机房cpu相差10%左右：<br><img data-src="/images/cpushare-1.png" alt="paradin" title="开始以为是有离线任务，但是后来发现离线任务压测时候已经压制掉了"></p>
 <p>同样的应用肯定代码都是一样的，后来发现低cpu的是cpuset资源分配机制，而高cpu的是cpushare资源分配机制。后来查了一下原因：</p>
 <ol>
 <li>amd8代机(256core)&#x2F;intel机器8代机有两个numa，cpushare会导致跨numa，这样会导致较高的延迟和较低的带宽利用率，性能变差。</li>

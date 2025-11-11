@@ -298,20 +298,20 @@
 
       
         <p>我们的zabbix监控项好几千个，这些告警都是使用同一个微信公众号的应用去报警，这样很多告警刷来刷去，就会把一些重要告警淹没。于是我们一方面做了更加详细的告警分级，而且也增加多个微信应用。让每个应用更加有针对性的告警，就不再大杂烩了，避免重要报警遗漏。</p>
-<p>本文目的就是创建一个新的微信应用，专门用来告警这个Templates下的情况：<br><img src="/images/proxy33.png" alt="akb48"></p>
-<p>首先，先去微信企业号里创建一个新的应用，如图：<br><img src="/images/proxy32.png" alt="akb48"></p>
+<p>本文目的就是创建一个新的微信应用，专门用来告警这个Templates下的情况：<br><img data-src="/images/proxy33.png" alt="akb48"></p>
+<p>首先，先去微信企业号里创建一个新的应用，如图：<br><img data-src="/images/proxy32.png" alt="akb48"></p>
 <p>然后将原来<code>zabbix-server</code>上的<code>wechat.py</code>复制一份，比如叫<code>proxysql-wechat.py</code>，修改对应的<code>corpsecret</code>和<code>agentid</code>，改成新应用的。这个脚本可以去看<a target="_blank" rel="noopener" href="https://rorschachchan.github.io/2018/01/10/Zabbix3-0%E6%90%AD%E9%85%8D%E5%BE%AE%E4%BF%A1%E4%BC%81%E4%B8%9A%E5%8F%B7%E6%8A%A5%E8%AD%A6/">https://rorschachchan.github.io/2018/01/10/Zabbix3-0%E6%90%AD%E9%85%8D%E5%BE%AE%E4%BF%A1%E4%BC%81%E4%B8%9A%E5%8F%B7%E6%8A%A5%E8%AD%A6/</a> 。</p>
-<p>下面就来到zabbix server的Web端，首先<code>Administrain---Media Types</code>，增加一个新的告警媒介<code>Proxysql-wechat</code>，使用的脚本就是刚刚复制出来的<code>proxysql-wechat.py</code>：<br><img src="/images/proxy34.png" alt="akb48"></p>
-<p>然后再去<code>Users</code>里创建一个新的用户，因为原来的<code>Administrator</code>已经有了微信告警，所以要创建一个新的用户来专门接收<code>proxysql-wechat.py</code>的告警：<br><img src="/images/proxy35.png" alt="akb48"></p>
-<p>把它的<code>media</code>改成<code>Proxysql-wechat</code>：<br><img src="/images/proxy36.png" alt="akb48"></p>
-<p>下一步很容易遗忘，就是在<code>Permissions</code>里给这个用户对应的Templates下所涉及用户组的全部权限，当然，如果你胆子大（比如我），可以给这个用户Super权限：<br><img src="/images/proxy37.png" alt="akb48"></p>
+<p>下面就来到zabbix server的Web端，首先<code>Administrain---Media Types</code>，增加一个新的告警媒介<code>Proxysql-wechat</code>，使用的脚本就是刚刚复制出来的<code>proxysql-wechat.py</code>：<br><img data-src="/images/proxy34.png" alt="akb48"></p>
+<p>然后再去<code>Users</code>里创建一个新的用户，因为原来的<code>Administrator</code>已经有了微信告警，所以要创建一个新的用户来专门接收<code>proxysql-wechat.py</code>的告警：<br><img data-src="/images/proxy35.png" alt="akb48"></p>
+<p>把它的<code>media</code>改成<code>Proxysql-wechat</code>：<br><img data-src="/images/proxy36.png" alt="akb48"></p>
+<p>下一步很容易遗忘，就是在<code>Permissions</code>里给这个用户对应的Templates下所涉及用户组的全部权限，当然，如果你胆子大（比如我），可以给这个用户Super权限：<br><img data-src="/images/proxy37.png" alt="akb48"></p>
 <p>告警人和告警路径已经搞定，下面就是要配置“什么样的告警才可以触发此微信应用，同时其他应用不要重复发信”。</p>
-<p>来到<code>Configuration---Actions</code>，新创建一个triggers的action：<br><img src="/images/proxy38.png" alt="akb48"></p>
+<p>来到<code>Configuration---Actions</code>，新创建一个triggers的action：<br><img data-src="/images/proxy38.png" alt="akb48"></p>
 <p>这里声明此action只会关注templates为”proxysql单独监控”的triggers情况。</p>
-<p>在<code>Operation details</code>别忘了配置各个环节的<code>Send to Users</code>和<code>Send only to</code>：<br><img src="/images/proxy39.png" alt="akb48"></p>
-<p>保存之后，我们还要把原有的微信应用告警更改一下，如果不该的话，”proxysql单独监控”这个Templates触发了告警，两个微信应用都会告警，于是就把老的action改成如下：<br><img src="/images/proxy40.png" alt="akb48"></p>
-<p>此时触发一下”proxysql单独监控”这个Templates涉及的告警项，就会看到只发送了<code>proxysql-wechat</code>，而老的wechat媒介没有被触发。<br><img src="/images/proxy41.png" alt="akb48"></p>
-<p>微信也能正常收到信息：<br><img src="/images/proxy42.png" alt="akb48"></p>
+<p>在<code>Operation details</code>别忘了配置各个环节的<code>Send to Users</code>和<code>Send only to</code>：<br><img data-src="/images/proxy39.png" alt="akb48"></p>
+<p>保存之后，我们还要把原有的微信应用告警更改一下，如果不该的话，”proxysql单独监控”这个Templates触发了告警，两个微信应用都会告警，于是就把老的action改成如下：<br><img data-src="/images/proxy40.png" alt="akb48"></p>
+<p>此时触发一下”proxysql单独监控”这个Templates涉及的告警项，就会看到只发送了<code>proxysql-wechat</code>，而老的wechat媒介没有被触发。<br><img data-src="/images/proxy41.png" alt="akb48"></p>
+<p>微信也能正常收到信息：<br><img data-src="/images/proxy42.png" alt="akb48"></p>
 <p>总结一下：如果希望新增加一个报警途径，那么就新在后台创建脚本，然后在前台创建媒介，创建连接此媒介的用户，最后在告警action上配置正确的规则就OK了！</p>
 
     </div>
@@ -378,8 +378,8 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/%E7%9B%91%E6%8E%A7/" rel="tag"># 监控</a>
               <a href="/tags/zabbix/" rel="tag"># zabbix</a>
+              <a href="/tags/%E7%9B%91%E6%8E%A7/" rel="tag"># 监控</a>
           </div>
 
         

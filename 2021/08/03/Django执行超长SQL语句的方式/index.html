@@ -298,7 +298,7 @@
 <p>最后补充一下，如果要看一下ORM写法对应的sql写法是啥，就用<code>query</code>，举个例子:<br>	<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>qs = Department.objects.<span class="built_in">filter</span>(departmentvolunteer__isnull=<span class="literal">True</span>).values_list(<span class="string">&#x27;name&#x27;</span>, flat=<span class="literal">True</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="built_in">print</span>(qs.query)</span><br><span class="line">SELECT <span class="string">&quot;app_department&quot;</span>.<span class="string">&quot;name&quot;</span> FROM <span class="string">&quot;app_department&quot;</span> LEFT OUTER JOIN</span><br><span class="line"><span class="string">&quot;app_departmentvolunteer&quot;</span> ON ( <span class="string">&quot;app_department&quot;</span>.<span class="string">&quot;id&quot;</span> = <span class="string">&quot;app_departmentvolunteer&quot;</span>.<span class="string">&quot;department_id&quot;</span> ) WHERE <span class="string">&quot;app_epartmentvolunteer&quot;</span>.<span class="string">&quot;id&quot;</span> IS NULL</span><br></pre></td></tr></table></figure></p>
 <p>这样可以帮你排查sql的问题。</p>
 <h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a target="_blank" rel="noopener" href="https://docs.djangoproject.com/zh-hans/3.2/topics/db/sql/">https://docs.djangoproject.com/zh-hans/3.2/topics/db/sql/</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/fmgao-technology/p/10119671.html">https://www.cnblogs.com/fmgao-technology/p/10119671.html</a></p>
-<p><img src="/images/%E8%87%B4%E5%91%BD%E5%A5%B3%E4%BA%BA.jpg"></p>
+<p><img data-src="/images/%E8%87%B4%E5%91%BD%E5%A5%B3%E4%BA%BA.jpg"></p>
 
     </div>
 
@@ -364,9 +364,9 @@
 
       <footer class="post-footer">
           <div class="post-tags">
+              <a href="/tags/Mysql/" rel="tag"># Mysql</a>
               <a href="/tags/Django/" rel="tag"># Django</a>
               <a href="/tags/ORM/" rel="tag"># ORM</a>
-              <a href="/tags/Mysql/" rel="tag"># Mysql</a>
               <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag"># 数据库</a>
           </div>
 

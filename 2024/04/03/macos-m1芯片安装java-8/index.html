@@ -295,7 +295,7 @@
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Error occurred during initialization of boot layer</span><br><span class="line">java.lang.module.FindException: Module java.xml.bind <span class="keyword">not</span> found</span><br></pre></td></tr></table></figure>
 
 <p>google了一下发现，原来 <code>java.xml.bind</code> 在JDK 11及以上的版本里被干掉了。原来python2升级python3后，因为功能调整而无法启动的痛苦在java也有。于是我就只能去下载一个java8，于是来到 <a target="_blank" rel="noopener" href="https://www.oracle.com/java/technologies/downloads/#java8-mac">https://www.oracle.com/java/technologies/downloads/#java8-mac</a> 里，下载对应的<code>ARM64 DMG Installer</code>，这里比较恶心，要下载老java必须要注册，于是耐着性子注册了一下，顺利下载并安装。然后这次启动<code>odpscmd</code>就好了：</p>
-<p><img src="/images/odpscmd.png" alt="paradin" title="终于好了"></p>
+<p><img data-src="/images/odpscmd.png" alt="paradin" title="终于好了"></p>
 <p>然后就是要删除之前下载的jdk-22，删除的方法很简单，在<code>/Library/Java/JavaVirtualMachines/</code> 里找到对应的jdk-22.jdk，然后直接<code>rm -rf</code>删除就好了。</p>
 <p>如果执行<code>java -version</code>的时候，出现了 <code>java.lang.Error:Properties init:Could not determine current working directory</code>，那是因为你当前的目录已经不存在了，换一个目录，重新执行<code>java -version</code>这个命令就行。</p>
 

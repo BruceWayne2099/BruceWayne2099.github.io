@@ -294,14 +294,14 @@
 
       
         <h2 id="配置阿里云"><a href="#配置阿里云" class="headerlink" title="配置阿里云"></a>配置阿里云</h2><p>安全部门最近放出了新需求，要数据库流量实现内网加密。即<code>mysql&lt;-----&gt;proxysql</code>之间是加密的，这里记录整个配置过程，安装部分可以移步去看 <a target="_blank" rel="noopener" href="https://rorschachchan.github.io/2019/05/31/%E8%AE%B0%E5%BD%95%E9%83%A8%E7%BD%B2ProxySql%E7%9A%84%E8%BF%87%E7%A8%8B/">https://rorschachchan.github.io/2019/05/31/%E8%AE%B0%E5%BD%95%E9%83%A8%E7%BD%B2ProxySql%E7%9A%84%E8%BF%87%E7%A8%8B/</a> 这篇文章。</p>
-<p>首先登陆阿里云控制台RDS，选择对应的数据库—数据安全性—SSL，点击<code>开通</code>，如图：<br><img src="/images/proxy27.png" alt="akb48"></p>
+<p>首先登陆阿里云控制台RDS，选择对应的数据库—数据安全性—SSL，点击<code>开通</code>，如图：<br><img data-src="/images/proxy27.png" alt="akb48"></p>
 <p><font color=red>注意！此项举动会重启数据库，所以线上环境请慎重！</font></p>
-<p>在配置的时候，同时下载CA证书，上传到proxysql所在的服务器的<code>/var/lib/proxysql/</code>里。解压缩之，发现压缩包里是三个文件，如图：<br><img src="/images/proxy28.png" alt="akb48"></p>
+<p>在配置的时候，同时下载CA证书，上传到proxysql所在的服务器的<code>/var/lib/proxysql/</code>里。解压缩之，发现压缩包里是三个文件，如图：<br><img data-src="/images/proxy28.png" alt="akb48"></p>
 <p>我们主要用的是<code>ApsaraDB-CA-Chain.pem</code>这个文件（如果是读写库，那么这个pem的文件是一模一样的）。</p>
-<p>如果数据库开通ssl成功，那么在阿里云的控制台上是显示为“已开通”，在mysql命令行里使用<code>show global variables like &#39;%ssl%&#39;;</code>查看如下：<br><img src="/images/proxy30.png" alt="akb48"></p>
-<p>登录proxysql，查看当前链接mysql情况，如图：<br><img src="/images/proxy29.png" alt="akb48"></p>
+<p>如果数据库开通ssl成功，那么在阿里云的控制台上是显示为“已开通”，在mysql命令行里使用<code>show global variables like &#39;%ssl%&#39;;</code>查看如下：<br><img data-src="/images/proxy30.png" alt="akb48"></p>
+<p>登录proxysql，查看当前链接mysql情况，如图：<br><img data-src="/images/proxy29.png" alt="akb48"></p>
 <p>发现里面的<code>use_ssl</code>是0，所以<code>update mysql_servers set use_ssl=1;</code>将他们改成1。</p>
-<p>然后<code>set mysql-ssl_p2s_ca = &#39;/var/lib/proxysql/ApsaraDB-CA-Chain.pem&#39;;</code>设定CA证书所在路径。随后就是<code>load mysql variables to runtime;</code>和<code>save mysql variables to disk;</code>，保存之后使用<code>select * from runtime_global_variables;</code>查看：<br><img src="/images/proxy31.png" alt="akb48"></p>
+<p>然后<code>set mysql-ssl_p2s_ca = &#39;/var/lib/proxysql/ApsaraDB-CA-Chain.pem&#39;;</code>设定CA证书所在路径。随后就是<code>load mysql variables to runtime;</code>和<code>save mysql variables to disk;</code>，保存之后使用<code>select * from runtime_global_variables;</code>查看：<br><img data-src="/images/proxy31.png" alt="akb48"></p>
 <p>验证的方法也很简单，在对应数据库里操作的同时<code>tcpdump -s 0 -i any -v port 3306 -w /root/test.pcap</code> 抓一下包看一下里面的内容是否加密了就行。</p>
 <p>补充：虽然SSL方式使得安全性提高了，但是相对地使得QPS也降低23%左右。所以要谨慎选择：</p>
 <ol>
@@ -312,7 +312,7 @@
 <p>AWS与阿里云不同的地方是，AWS可以针对某个用户开启SSL的，这需要用命令行登录RDS数据库，使用命令<code>GRANT USAGE ON *.* TO &#39;对应用户名&#39;@&#39;%&#39; REQUIRE SSL;</code>（MYSQL 5.6）开启加密，如果想取消掉，就是<code>GRANT USAGE ON *.* TO &#39;对应用户名&#39;@&#39;%&#39; REQUIRE NONE;</code>。</p>
 <p>更多信息可以去看：<a target="_blank" rel="noopener" href="https://docs.aws.amazon.com/zh_cn/AmazonRDS/latest/UserGuide/CHAP_MySQL.html#MySQL.Concepts.SSLSupport">https://docs.aws.amazon.com/zh_cn/AmazonRDS/latest/UserGuide/CHAP_MySQL.html#MySQL.Concepts.SSLSupport</a> 。</p>
 <h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a target="_blank" rel="noopener" href="https://github.com/sysown/proxysql/wiki/SSL-Support">https://github.com/sysown/proxysql/wiki/SSL-Support</a><br><a target="_blank" rel="noopener" href="https://googlebaba.io/mysqlcookbook/7.aboutssl.html">https://googlebaba.io/mysqlcookbook/7.aboutssl.html</a></p>
-<p><img src="/images/DH12-2.gif" alt="akb48" title="2009年东部半决赛魔术VS骑士"></p>
+<p><img data-src="/images/DH12-2.gif" alt="akb48" title="2009年东部半决赛魔术VS骑士"></p>
 
     </div>
 

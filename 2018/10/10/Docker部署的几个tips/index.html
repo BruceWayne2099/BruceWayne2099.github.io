@@ -290,7 +290,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>公司的电商平台使用的是阿里云VPC网络，整个交换机和云服务器都是部署在D区。今天在部署测试环境的时候，发现无法购买服务器，在钉钉上与阿里云售后交涉后，接到噩耗—D区已经不再出售服务器了，如图：<br><img src="/images/docker14.png" alt="akb48"></p>
+        <p>公司的电商平台使用的是阿里云VPC网络，整个交换机和云服务器都是部署在D区。今天在部署测试环境的时候，发现无法购买服务器，在钉钉上与阿里云售后交涉后，接到噩耗—D区已经不再出售服务器了，如图：<br><img data-src="/images/docker14.png" alt="akb48"></p>
 <p>没办法，只能把现有的服务器调高配置，在里面安装docker，尽可能的让各进程的环境彼此之间不受干扰。由于事发仓促，整个架构都要重新调整，镜像就先选用<code>centos：latest</code>，生成容器后在里面装环境以及<code>git  pull</code>代码，把容器当做虚拟机来用了。</p>
 <h2 id="几个小提示"><a href="#几个小提示" class="headerlink" title="几个小提示"></a>几个小提示</h2><ol>
 <li><p>如果要<code>pecl install swoole</code>的话，要先<code>yum install -y glibc-headers gcc-c++ kernel-headers gcc openssl pcre-devel</code>和<code>yum install -y openssl-devel</code>；</p>
@@ -322,14 +322,14 @@
 </li>
 <li><p>如果多个容器要挂载一样的数据就是用<code>-volumes-from </code>，比如<code>docker run --volume-from 容器ID号</code>； </p>
 </li>
-<li><p>在容器外启动容器内部进程的方法是：<code>docker exec 容器ID /bin/bash -c &quot;对应的命令&quot; </code>，在zabbix监控docker发现进程死了后，就可以用这个方法拉起来；<br><img src="/images/docker17.png" alt="akb48" title="在容器外面启动并且关闭apache"></p>
+<li><p>在容器外启动容器内部进程的方法是：<code>docker exec 容器ID /bin/bash -c &quot;对应的命令&quot; </code>，在zabbix监控docker发现进程死了后，就可以用这个方法拉起来；<br><img data-src="/images/docker17.png" alt="akb48" title="在容器外面启动并且关闭apache"></p>
 </li>
 <li><p>接上一条的说，docker跟虚拟机不同，它启动的时候是不会运行<code>/etc/rc.d/rc.local</code>的，如果想要Docker在启动后就自动运行<code>/etc/rc.d/rc.local</code>，请看<a target="_blank" rel="noopener" href="https://github.com/johnnian/Blog/issues/13">https://github.com/johnnian/Blog/issues/13</a> 里面说的方法；</p>
 </li>
-<li><p>容器内的进程是会映射到宿主机上的，举个例子，比如容器里运行了swoole，如图：<br><img src="/images/docker15.png" alt="akb48"></p>
+<li><p>容器内的进程是会映射到宿主机上的，举个例子，比如容器里运行了swoole，如图：<br><img data-src="/images/docker15.png" alt="akb48"></p>
 </li>
 </ol>
-<p>在宿主机上看也是能看到这个进程的：<br><img src="/images/docker16.png" alt="akb48" title="容器与宿主机时差相差8小时"></p>
+<p>在宿主机上看也是能看到这个进程的：<br><img data-src="/images/docker16.png" alt="akb48" title="容器与宿主机时差相差8小时"></p>
 <ol start="17">
 <li>有时候是需要用一个脚本来启动镜像进程的，但是要知道容器只能管理一个主进程，当脚本执行完毕了，容器也会EXIT，所以我们需要在启动脚本后面添加<code>tail -f /dev/null</code>让这个启动脚本永远执行不结束。举个例子：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run --name XXX -dit -v /data/httpd/yii_ecadmin/:/var/www -w /var/www --restart=always registry.cn-hangzhou.aliyuncs.com/lechangeshop/ecadmin:20190520 ./start.sh</span><br></pre></td></tr></table></figure></li>
 </ol>

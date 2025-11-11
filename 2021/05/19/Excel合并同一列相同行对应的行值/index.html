@@ -290,10 +290,10 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>在处理Excel的时候，有时候会遇到这样的情况：有几行的列是一样的，那么想把后面对应的行也合并到一行里，如下图：<br><img src="/images/Excel%E5%90%88%E5%B9%B64.png" title="将三行abc合并成a,b,c"></p>
-<p>首先在D列复制整个A列过来，然后点击“数据”，选择“删除重复项”，如图：<br><img src="/images/Excel%E5%90%88%E5%B9%B65.png" title="这样只剩下“张三，李四，王五"></p>
-<p>然后在E1单元格输入<code>=mid(SUBSTITUTE(PHONETIC(offset(INDIRECT(&quot;A&quot;&amp;match(D1,A:A,)),,,countif(A:A,D1),2)),D1,&quot;,&quot;),2,99)</code>，这里D1是因为我们的新的标准列是在D列。如图：<br><img src="/images/Excel%E5%90%88%E5%B9%B69.png" title="此时A应该是红色"></p>
-<p>然后回车就看到效果了，最后就是拉下来即可：<br><img src="/images/Excel%E5%90%88%E5%B9%B610.png"></p>
+        <p>在处理Excel的时候，有时候会遇到这样的情况：有几行的列是一样的，那么想把后面对应的行也合并到一行里，如下图：<br><img data-src="/images/Excel%E5%90%88%E5%B9%B64.png" title="将三行abc合并成a,b,c"></p>
+<p>首先在D列复制整个A列过来，然后点击“数据”，选择“删除重复项”，如图：<br><img data-src="/images/Excel%E5%90%88%E5%B9%B65.png" title="这样只剩下“张三，李四，王五"></p>
+<p>然后在E1单元格输入<code>=mid(SUBSTITUTE(PHONETIC(offset(INDIRECT(&quot;A&quot;&amp;match(D1,A:A,)),,,countif(A:A,D1),2)),D1,&quot;,&quot;),2,99)</code>，这里D1是因为我们的新的标准列是在D列。如图：<br><img data-src="/images/Excel%E5%90%88%E5%B9%B69.png" title="此时A应该是红色"></p>
+<p>然后回车就看到效果了，最后就是拉下来即可：<br><img data-src="/images/Excel%E5%90%88%E5%B9%B610.png"></p>
 <p>如果是要获取相同内容行对应行的和，使用透视表即可。</p>
 
     </div>

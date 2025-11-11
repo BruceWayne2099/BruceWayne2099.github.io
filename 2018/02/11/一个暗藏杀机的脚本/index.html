@@ -296,7 +296,7 @@
 <p>2）shell脚本里调用shell，不能采用<code>$()</code>的方法了，因为<code>$()</code>是一个返回值，而.sh是一个不断进行的脚本，所以要用<code>bash +脚本名</code>的方式；</p>
 <p>3）recordTOP.sh这个脚本是可以同时存在多个的，但是如果不小心后台启动多个，用checksize脚本ps -ef语句就会报错，因为获得到的不是一个数字，而是多个数字，没法一波kill掉。同理，直接调用checksize也会报错，因为没有ps -ef的值；</p>
 <p>4）因为是要先关闭原来的top重定向脚本，所以才用了保守的ps -ef，然后kill的方式，这里不可以使用pkill，因为pkill是干掉整个类型程序，比如<code>pkill -9 java</code>，就是干掉所有java的进程。而在linux里，千万不可以<code>pkill -9 sh</code>，可以想象一下，这个命令的结果就是会从ssh上跳出，同时无法登陆，因为整个sh都被你杀死了。那么真的出现了这个结果怎么办？答曰：重启，重启能救命。</p>
-<p>整个执行效果如下，可见top.txt文件是在不断的扩大，由于是测试，我把文件大小调整为20000字节，即大于20000字节就覆盖原文件，当文件大于20000字节的时候，就会把原来的top.txt删除，同时生成一个新的top.txt。<br><img src="/images/top5.png" alt="paradin"></p>
+<p>整个执行效果如下，可见top.txt文件是在不断的扩大，由于是测试，我把文件大小调整为20000字节，即大于20000字节就覆盖原文件，当文件大于20000字节的时候，就会把原来的top.txt删除，同时生成一个新的top.txt。<br><img data-src="/images/top5.png" alt="paradin"></p>
 
     </div>
 

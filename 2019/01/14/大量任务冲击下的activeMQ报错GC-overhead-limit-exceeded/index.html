@@ -290,10 +290,10 @@
 
       
         <p>半夜阿里云的杭州可用B区出现了机房抖动，几乎所有的B区服务全部掉线。阿里云的技术人员捅咕了半个小时左右，在大约11点40左右恢复了正常。此时几百万的设备开始同时恢复上线，然而经过了1个小时左右，依旧有几十万设备无法上线，有的甚至上线后又掉线。</p>
-<p>我们的架构是设备要先去“注册中心”注册，注册成功之后才会正常的工作。如果多次注册不成功，就会释放连接，把连接让给其他需要注册的设备。但是发现设备上线的速度很慢，扩容了几台“注册中心”模块，效果依旧不见好转。发现注册模块的CPU全部都达到了100%：<br><img src="/images/activemq4.png" alt="akb48"></p>
-<p>登录到服务器里一看，日志不断的刷新这样的内容：<br><img src="/images/activemq1.png" alt="akb48"></p>
-<p>模块与activemq的延迟特别大，此时activemq又有几百万的消息没有消费堆积在队列里。大约十分钟左右，就开始抛出<code>java.lang.OutOfMemoryError: GC overhead limit exceeded</code>的错误，如图：<br><img src="/images/activemq2.png" alt="akb48"></p>
-<p>但是同一时间段里的activemq并没有出现内存吃紧的情况：<br><img src="/images/activemq3.png" alt="akb48"></p>
+<p>我们的架构是设备要先去“注册中心”注册，注册成功之后才会正常的工作。如果多次注册不成功，就会释放连接，把连接让给其他需要注册的设备。但是发现设备上线的速度很慢，扩容了几台“注册中心”模块，效果依旧不见好转。发现注册模块的CPU全部都达到了100%：<br><img data-src="/images/activemq4.png" alt="akb48"></p>
+<p>登录到服务器里一看，日志不断的刷新这样的内容：<br><img data-src="/images/activemq1.png" alt="akb48"></p>
+<p>模块与activemq的延迟特别大，此时activemq又有几百万的消息没有消费堆积在队列里。大约十分钟左右，就开始抛出<code>java.lang.OutOfMemoryError: GC overhead limit exceeded</code>的错误，如图：<br><img data-src="/images/activemq2.png" alt="akb48"></p>
+<p>但是同一时间段里的activemq并没有出现内存吃紧的情况：<br><img data-src="/images/activemq3.png" alt="akb48"></p>
 <p>没有办法，就先赌一下的重启了activemq，没想到问题就解决了…</p>
 <p>奇怪，明明activemq没有内存的明显消耗，却报内存耗尽。先把结果记录下来，等下一次再有类似的情况，好好观察一下（也但愿不要再在放假的时候出现故障了…）</p>
 

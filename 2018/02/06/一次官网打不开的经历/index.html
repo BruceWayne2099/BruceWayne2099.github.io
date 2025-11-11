@@ -286,7 +286,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>今天有人反映官网在登陆的时候，chrome浏览器不能正常打开页面，反而会出现一个下载框。我使用IE浏览器尝试登录官网，页面也不是正常的页面，而是下面的内容：<br><img src="/images/guanwang1.png" alt="paradin"></p>
+        <p>今天有人反映官网在登陆的时候，chrome浏览器不能正常打开页面，反而会出现一个下载框。我使用IE浏览器尝试登录官网，页面也不是正常的页面，而是下面的内容：<br><img data-src="/images/guanwang1.png" alt="paradin"></p>
 <p>由于官网的域名跳转是在阿里云的域名解析的地方配置的，于是就登陆到阿里云的域名解析地方，查看了一下发现，这里的配置是<code>www.lechange.com</code>会302跳转到<code>home.lechange.com</code>，而ping一下<code>home.lechange.com</code>得到的ip地址是一个负载均衡的地址，然后在阿里云的控制台查询这个负载均衡的情况，发现这个负载均衡后面挂载的是两台服务器A和B。</p>
 <p>于是我在浏览器里面直接输入负载均衡的ip地址，发现还是像上面那样错误的php界面，而浏览器地址栏使用两个服务器的外网ip却是正常可以打开的。这个时候初步怀疑是SLB的问题，而我当时就觉得就凭上面这一点就去跟阿里撕逼不太妥当，但是事实告诉我们事情不是那么简单的。</p>
 <p>我检查一下slb的端口配置情况，分别是<code>http 80转8080</code>和<code>https 443转80</code>，可见这个网站有两个协议，一个是http的而一个是https的，我们刚才虽然在浏览器里直接使用A和B的外网ip访问是可以正常打开页面，只能说明http协议是OK的，我们还要测试一下https协议访问的效果。</p>

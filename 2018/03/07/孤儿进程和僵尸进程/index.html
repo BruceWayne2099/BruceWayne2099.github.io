@@ -289,7 +289,7 @@
       
         <h2 id="原理与定义"><a href="#原理与定义" class="headerlink" title="原理与定义"></a>原理与定义</h2><p>首先要知道，<code>linux</code>有父进程和子进程这样的说法。那父进程如何创建子进程呢？<code>fork</code>。</p>
 <p>子进程的进行和父进程的进行是异步的，但是父进程就像父母一样对自己的小孩也有一定的控制欲，这个控制欲就表现在如果子进程如果结束了，它释放了之前占用的资源、内存、文件等等，但是它还保留了一点信息：进程号PID、退出状态、运行时间等等。而这些残留信息是父进程通过<code>wait/waitpid</code>来获取，如果父进程一直不获取，那么子进程就会一直保留这些信息直到海枯石烂。</p>
-<p><strong>孤儿进程</strong>：父进程退出，子进程继续进行，那么此时子进程就是孤儿进程。这个时候<code>init</code>进程（进程号为1）来作为子进程的监护人，发出<code>wait/waitpid</code>来完成状态收集工作；<br><img src="/images/jiangshi.png" alt="paradin" title="这个nginx的worker process就成了孤儿进程"></p>
+<p><strong>孤儿进程</strong>：父进程退出，子进程继续进行，那么此时子进程就是孤儿进程。这个时候<code>init</code>进程（进程号为1）来作为子进程的监护人，发出<code>wait/waitpid</code>来完成状态收集工作；<br><img data-src="/images/jiangshi.png" alt="paradin" title="这个nginx的worker process就成了孤儿进程"></p>
 <p><strong>僵尸进程</strong>：父进程没有退出，但是它迟迟不发出<code>wait/waitpid</code>来回收子进程的资源。就好比儿子死了，当爹的不给收尸，这个儿子就成了孤魂野鬼成了僵尸。</p>
 <h2 id="影响与危害"><a href="#影响与危害" class="headerlink" title="影响与危害"></a>影响与危害</h2><p>孤儿进程是没有什么大的危害，虽然他虽然没有了亲生父亲，但是也有<code>init</code>进程来通过循环的<code>wait()</code>来处理它的善后工作，所以迟早会把占用的资源释放掉。</p>
 <p>甚至有的用户可以把进程弄成孤儿进程，以使之与用户会话脱钩，并转至后台运行。这一做法常应用于启动需要长时间运行的进程，也即守护进程。另外，<code>nohup</code>命令也可以完成这一操作。</p>
@@ -298,7 +298,7 @@
 <p>查看当前服务器僵尸进程的方法：<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ps -A -o stat,ppid,pid,cmd | grep -e <span class="string">&#x27;^[Zz]&#x27;</span></span><br></pre></td></tr></table></figure></p>
 <p>如果服务器上的僵尸进程不是出自一个父进程之手，那么就用下面这个命令批量解决：<br>    <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ps -A -o stat,ppid,pid,cmd | grep -e <span class="string">&#x27;^[Zz]&#x27;</span> | awk <span class="string">&#x27;&#123;print $2&#125;&#x27;</span> | xargs kill -<span class="number">9</span></span><br></pre></td></tr></table></figure></p>
 <p>但是如果父进程是init进程，那么这样的僵尸进程怎么办？答案，不用刻意管他，相信<code>init</code>的能力，它迟早会被<code>init</code>回收的，成为僵尸进程也是暂时的。</p>
-<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E5%83%B5%E5%B0%B8%E8%BF%9B%E7%A8%8B">https://zh.wikipedia.org/wiki/%E5%83%B5%E5%B0%B8%E8%BF%9B%E7%A8%8B</a><br><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E5%AD%A4%E5%84%BF%E8%BF%9B%E7%A8%8B">https://zh.wikipedia.org/wiki/%E5%AD%A4%E5%84%BF%E8%BF%9B%E7%A8%8B</a><br><a target="_blank" rel="noopener" href="http://blog.csdn.net/YuZhiHui_No1/article/details/53011390">http://blog.csdn.net/YuZhiHui_No1/article/details/53011390</a><br><img src="/images/perfume.jpg" alt="paradin"> </p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E5%83%B5%E5%B0%B8%E8%BF%9B%E7%A8%8B">https://zh.wikipedia.org/wiki/%E5%83%B5%E5%B0%B8%E8%BF%9B%E7%A8%8B</a><br><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E5%AD%A4%E5%84%BF%E8%BF%9B%E7%A8%8B">https://zh.wikipedia.org/wiki/%E5%AD%A4%E5%84%BF%E8%BF%9B%E7%A8%8B</a><br><a target="_blank" rel="noopener" href="http://blog.csdn.net/YuZhiHui_No1/article/details/53011390">http://blog.csdn.net/YuZhiHui_No1/article/details/53011390</a><br><img data-src="/images/perfume.jpg" alt="paradin"> </p>
 
     </div>
 

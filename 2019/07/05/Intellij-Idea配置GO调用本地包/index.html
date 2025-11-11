@@ -291,13 +291,13 @@
 
       
         <p>go代码里使用import去导入包文件，比如常见的<code>import fmt</code>，这个命令实际上导入的就是<code>GOROOT\src\fmt</code>。但是当遇到需要导入本地包的时候，就需要配置一下。</p>
-<p>我windows里的go脚本文件夹是<code>E:\github\GoeveryDay</code>，现在在这个文件夹里创建<code>src\chentest\</code>，然后在<code>src\</code>下面创建一个<code>chenchen.go</code>，在<code>chentest\</code>下创建<code>testtest.go</code>，如图：<br><img src="/images/go4.png" alt="抱光妹"></p>
+<p>我windows里的go脚本文件夹是<code>E:\github\GoeveryDay</code>，现在在这个文件夹里创建<code>src\chentest\</code>，然后在<code>src\</code>下面创建一个<code>chenchen.go</code>，在<code>chentest\</code>下创建<code>testtest.go</code>，如图：<br><img data-src="/images/go4.png" alt="抱光妹"></p>
 <p>而<code>chenchen.go</code>的内容如下：<br>	<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;chentest&quot;</span></span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">	chentest.XXX()</span><br><span class="line">	<span class="keyword">var</span> s1 chentest.Player</span><br><span class="line">	s1.Name = <span class="string">&quot;iverson&quot;</span></span><br><span class="line">	s1.Number = <span class="number">3</span></span><br><span class="line">	s1.Team = <span class="string">&quot;76ers&quot;</span></span><br><span class="line">	fmt.Println(s1)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>现在需要让<code>chenchen.go</code>能成功调用到<code>chentest.go</code>里的<code>XXX</code>函数，如果此时在<code>chenchen.go</code>里直接<code>import testtest.go所在文件夹</code>是会报错的，错误提示是<code>Cannot resolve file ‘testtest.go所在文件夹’</code>，这是因为程序在运行时先去GOROOT去搜索导入包，然后去GOPATH寻找导入包，最后在当前项目模块下寻找导入包，如果三个都找不到就会报错。</p>
 <p>可见在idea中默认不支持直接导入本地Golang包，那么解决该问题的关键是明白GOROOT和GOPATH的作用，根据官方文档的解释GOPATH的主要作用是存放文件以便Golang程序编译时可以进行搜索引用，GOPATH可以设置一个值或多个值，多个值之间以分号隔开。很明显只要我们将本地Golang加入到GOPATH中即可在IDEA中正常运行该程序。</p>
-<p>那么先<code>File--Settings--Languages &amp; Frameworks--Go--GOPATH</code>，在project GOPATH里添加<code>E:\github\GoeveryDay</code>这个总的文件路径，如图：<br><img src="/images/go5.png" alt="抱光妹"></p>
-<p>apply保存即可，记住这里不能填<code>E:\github\GoeveryDay\src</code>，因为系统会自带src目录，如图：<br><img src="/images/go6.png" alt="抱光妹"></p>
-<p>此时再执行就得到正确结果了！如图：<br><img src="/images/go7.png" alt="抱光妹"></p>
+<p>那么先<code>File--Settings--Languages &amp; Frameworks--Go--GOPATH</code>，在project GOPATH里添加<code>E:\github\GoeveryDay</code>这个总的文件路径，如图：<br><img data-src="/images/go5.png" alt="抱光妹"></p>
+<p>apply保存即可，记住这里不能填<code>E:\github\GoeveryDay\src</code>，因为系统会自带src目录，如图：<br><img data-src="/images/go6.png" alt="抱光妹"></p>
+<p>此时再执行就得到正确结果了！如图：<br><img data-src="/images/go7.png" alt="抱光妹"></p>
 <p>但是要注意，<font color=red>要使用本地包函数、结构体、结构体的成员，首字母必须是大写！</font>如果首字母是小写是私有的，即不可见的，只能在同一个包里使用。</p>
 
     </div>
@@ -364,8 +364,8 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/intellij-idea/" rel="tag"># intellij idea</a>
               <a href="/tags/golang/" rel="tag"># golang</a>
+              <a href="/tags/intellij-idea/" rel="tag"># intellij idea</a>
           </div>
 
         
