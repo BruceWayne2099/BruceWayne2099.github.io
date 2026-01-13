@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2026-01-13T06:27:29.674Z</updated>
+  <updated>2026-01-13T12:38:20.688Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -21,12 +21,12 @@
     <link href="http://example.com/2026/01/13/%E5%9C%A8excel%E9%87%8C%E7%94%A8k%E5%92%8Cm%E6%9D%A5%E4%BD%9C%E4%B8%BA%E5%8D%95%E4%BD%8D%E5%B1%95%E7%A4%BA/"/>
     <id>http://example.com/2026/01/13/%E5%9C%A8excel%E9%87%8C%E7%94%A8k%E5%92%8Cm%E6%9D%A5%E4%BD%9C%E4%B8%BA%E5%8D%95%E4%BD%8D%E5%B1%95%E7%A4%BA/</id>
     <published>2026-01-13T06:14:25.000Z</published>
-    <updated>2026-01-13T06:27:29.674Z</updated>
+    <updated>2026-01-13T12:38:20.688Z</updated>
     
-    <content type="html"><![CDATA[<p>虽然人类已经进化到“AI这，机器人那”。但是到了数据统计区域，excel目前还是那唯一的王。</p><p>不过在excel默认的单元格格式里，是不自带k 和 m这样单位的能力的，那么比如我们想把50000展示成50k，把7000000展示成7m，就要自己写这一段公式了：</p><p>首先，选择包含要设置格式的数字的单元格，然后选择“单元格格式”。</p><p>然后，在“单元格格式”对话框中的“类别“选择“自定义”，然后在类型里输入： [&lt;999950]0.0,”K”;[&lt;999950000]0.0,,”M”;0.0,,,”B”，请参见屏幕截图：<br><img data-src="/images/excel%E8%BD%AC%E5%8C%96km.jpg" alt="paradin"></p><p>最后，然后点击 OK 按钮，所有数字均已根据数字格式化为所需格式，请参见屏幕截图：<br><img data-src="/images/excel%E8%BD%AC%E5%8C%96km2.jpg" alt="paradin"></p><p>如果你只想用k这一个单位，同时保留2位小数，那么很简单：0.00,”k” 即可，0.00表示小数点后2位，“,”表示i一个comma,即“千”，这是Excel内置语法，1个逗号代表将原始数值自动除以1000。最后补上k这个符号后缀即可。注意，这样仅改变显示样式，不影响单元格实际数值。</p>]]></content>
+    <content type="html"><![CDATA[<p>虽然人类已经进化到“AI这，机器人那”的程度。但是在数据统计区域，excel目前还是那唯一的王。</p><p>不过在excel默认的单元格格式里，是不自带以“k和m这样单位”的数字格式的能力的，那么比如我们想把50000展示成50k，把7000000展示成7m，就要自己写这一段公式了，具体做法如下：</p><p>首先，选择包含要设置格式的数字的单元格，然后选择“单元格格式”。</p><p>然后，在“单元格格式”对话框中的“类别“选择“自定义”，然后在类型里输入：<code>[&lt;999950]0.0,&quot;K&quot;;[&lt;999950000]0.0,,&quot;M&quot;;0.0,,,&quot;B&quot;</code>，请参见屏幕截图：<br><img data-src="/images/excel%E8%BD%AC%E5%8C%96km.jpg" alt="paradin"></p><p>最后，然后点击<code>确定</code>按钮，所有数字均已根据数字格式化为所需格式，请参见屏幕截图：<br><img data-src="/images/excel%E8%BD%AC%E5%8C%96km2.jpg" alt="paradin"></p><p>如果你只想用k这一个单位，同时保留2位小数，那么很简单：<code>0.00,&quot;k&quot;</code>即可，0.00表示小数点后2位，“,”表示i一个comma,即“千”，这是Excel内置语法，1个逗号代表将原始数值自动除以1000。最后补上k这个符号后缀即可。注意，这样仅改变显示样式，不影响单元格实际数值。</p>]]></content>
     
     
-    <summary type="html">到了新东家，文档写了一大堆，自己的博客却很少写了。</summary>
+    <summary type="html">如果Password authentication is not supported for Git operations，请先去github上检查token是否过期了？</summary>
     
     
     
