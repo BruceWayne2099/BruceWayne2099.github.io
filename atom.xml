@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2026-01-13T12:38:20.688Z</updated>
+  <updated>2026-02-11T15:53:46.170Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,31 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>2025年终总结</title>
+    <link href="http://example.com/2026/02/11/2025%E5%B9%B4%E7%BB%88%E6%80%BB%E7%BB%93/"/>
+    <id>http://example.com/2026/02/11/2025%E5%B9%B4%E7%BB%88%E6%80%BB%E7%BB%93/</id>
+    <published>2026-02-11T15:51:55.000Z</published>
+    <updated>2026-02-11T15:53:46.170Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="电影-电视剧-读书"><a href="#电影-电视剧-读书" class="headerlink" title="电影&amp;电视剧&amp;读书"></a>电影&amp;电视剧&amp;读书</h2><h2 id="综艺-游戏-博客"><a href="#综艺-游戏-博客" class="headerlink" title="综艺&amp;游戏&amp;博客"></a>综艺&amp;游戏&amp;博客</h2><h2 id="说说新公司"><a href="#说说新公司" class="headerlink" title="说说新公司"></a>说说新公司</h2>]]></content>
+    
+    
+    <summary type="html">既2024年之后，2025年也是我的一个坎，最近坎有点多，需要调整一下了。</summary>
+    
+    
+    
+    <category term="坠乱花天" scheme="http://example.com/categories/%E5%9D%A0%E4%B9%B1%E8%8A%B1%E5%A4%A9/"/>
+    
+    
+    <category term="年终总结" scheme="http://example.com/tags/%E5%B9%B4%E7%BB%88%E6%80%BB%E7%BB%93/"/>
+    
+    <category term="读书" scheme="http://example.com/tags/%E8%AF%BB%E4%B9%A6/"/>
+    
+    <category term="电影" scheme="http://example.com/tags/%E7%94%B5%E5%BD%B1/"/>
+    
+  </entry>
   
   <entry>
     <title>在excel里用k和m来作为单位展示</title>
@@ -472,31 +497,6 @@
     <category term="文化" scheme="http://example.com/tags/%E6%96%87%E5%8C%96/"/>
     
     <category term="香港" scheme="http://example.com/tags/%E9%A6%99%E6%B8%AF/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>大key和高流量导致redis挂掉的故障</title>
-    <link href="http://example.com/2024/10/20/%E5%A4%A7key%E5%92%8C%E9%AB%98%E6%B5%81%E9%87%8F%E5%AF%BC%E8%87%B4redis%E6%8C%82%E6%8E%89%E7%9A%84%E6%95%85%E9%9A%9C/"/>
-    <id>http://example.com/2024/10/20/%E5%A4%A7key%E5%92%8C%E9%AB%98%E6%B5%81%E9%87%8F%E5%AF%BC%E8%87%B4redis%E6%8C%82%E6%8E%89%E7%9A%84%E6%95%85%E9%9A%9C/</id>
-    <published>2024-10-20T09:03:52.000Z</published>
-    <updated>2025-11-08T00:47:55.565Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="故障回顾"><a href="#故障回顾" class="headerlink" title="故障回顾"></a>故障回顾</h2><p>问题redis的配置如下：<br><img data-src="/images/redis%E9%97%AE%E9%A2%98-1.png" title="出问题的redis是一个4G的"></p><p>（1）因为大KEY调用量，随着白天自然流量趋势增长而增长，最终在业务高峰最高点期占满带宽使用100%<br><img data-src="/images/redis%E9%97%AE%E9%A2%98-2.png" title="可见流出带宽越来越高"></p><p>（2）从而引发redis的内存使用率，在5min之内从0%-&gt;100%<br><img data-src="/images/redis%E9%97%AE%E9%A2%98-4.png" title="redis的内存使用率达到了100%"></p><p>（3）最终全面GET SET timeout崩溃（11点22分02秒）<br><img data-src="/images/redis%E9%97%AE%E9%A2%98-3.png" title="从日志看，redis基本不可用了"><br><img data-src="/images/redis%E9%97%AE%E9%A2%98-5.png" title="从日志看，redis基本不可用了"></p><p>（4）最终导致页面返回timeout，故障发生。</p><h2 id="排查思路"><a href="#排查思路" class="headerlink" title="排查思路"></a>排查思路</h2><p>内存使用率100% 就等同于redis不可用吗？<br>解答：正常使用情况下，不是。因为redis有【缓存淘汰机制】。Redis 在内存使用率达到 100% 时不会直接崩溃。相反，它依赖内存淘汰策略来释放内存，确保系统的稳定性。</p><p>这个配置在哪里呢？如图：<br><img data-src="/images/redis%E9%97%AE%E9%A2%98-6.png" title="这里默认的是：volatile-lru"><br>大部分开发都是不会主动去调整这里的参数的。</p><p>你根据实际需求配置适当的内存淘汰策略，以便在内存达到上限时，系统能够稳定地处理新请求，而不会出现写操作失败的情况（只要不是noeviction）。也就是说，照理SET and GET都应该没啥问题才对（先不考虑其他复杂命令）。</p><p>尽管 Redis 本身不会轻易崩溃，但如果内存耗尽且没有淘汰策略或者淘汰策略未能生效，Redis 可能拒绝新的写操作，并返回错误：<code>OOM command not allowed when used memory &gt; &#39;maxmemory&#39; </code>。如果系统的配置或者操作系统的内存管理不当，可能会导致 Redis 进程被操作系统杀死。</p><p>但是事故现象就是：内存使用率100% 时，redis不可用，怎么解释？</p><p>【猜测1】会是淘汰不及时导致的性能瓶颈吗？也就是说 写入的速度&gt;&gt;淘汰的速度。</p><p>解答：如果是正常的业务写入，不可能！因为redis纯内存，淘汰速度是非常快的。而且这个业务特性，也并非高频写入。这个redis实例其实里面存储的KEY很少，查了一下，最终占了整个实例的内存使用率&lt;5%。如图：<br><img data-src="/images/redis%E9%97%AE%E9%A2%98-7.png" title="真正key占用的内存其实很少"></p><p>不太符合正常使用下KEY不断增多，最终挤爆内存使用率的问题。</p><p>因此，初步结论：Redis 的崩溃一般不会是由于单纯写入速度超过淘汰速度引起的，尤其是使用了合理的内存淘汰策略时；如果写入速度非常高，而淘汰策略无法及时清除旧数据，Redis 可能会非常频繁地进行键的查找和淘汰操作，从而导致性能下降。</p><p>那么问题来了，到底是什么导致了内存使用率激增那？？因此查阅了资料，发现最为贴近的答案：<br><img data-src="/images/redis%E9%97%AE%E9%A2%98-8.png" title="内存使用率突然升高的几个原因"><br>证据支撑<br><img data-src="/images/redis%E9%97%AE%E9%A2%98-9.png" title="在出故障的时候，流入带宽竟然也有一波激增"><br><img data-src="/images/redis%E9%97%AE%E9%A2%98-10.png" title="redis客户端的buffer打满了"></p><p>果然是这样，说明内存是被【缓冲区】挤爆的。为了验证，使用info memory进行分析（我随便模拟了一个缓冲区溢出的case，并非事故现场）：</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"># Memory</span><br><span class="line">used_memory:1072693248</span><br><span class="line">used_memory_human:1023.99M</span><br><span class="line">used_memory_rss:1090519040</span><br><span class="line">used_memory_rss_human:1.02G</span><br><span class="line">used_memory_peak:1072693248</span><br><span class="line">used_memory_peak_human:1023.99M</span><br><span class="line">used_memory_peak_perc:100.00%</span><br><span class="line">used_memory_overhead:1048576000</span><br><span class="line">used_memory_startup:1024000</span><br><span class="line">used_memory_dataset:23929848</span><br><span class="line">used_memory_dataset_perc:2.23%</span><br><span class="line">allocator_allocated:1072693248</span><br><span class="line">allocator_active:1090519040</span><br><span class="line">allocator_resident:1090519040</span><br><span class="line">total_system_memory:16777216000</span><br><span class="line">total_system_memory_human:16.00G</span><br><span class="line">used_memory_lua:37888</span><br><span class="line">used_memory_lua_human:37.89K</span><br><span class="line">used_memory_scripts:1024000</span><br><span class="line">used_memory_scripts_human:1.00M</span><br><span class="line">maxmemory:1073741824</span><br><span class="line">maxmemory_human:1.00G</span><br><span class="line">maxmemory_policy:noeviction</span><br><span class="line">allocator_frag_ratio:1.02</span><br><span class="line">allocator_frag_bytes:17825792</span><br><span class="line">allocator_rss_ratio:1.00</span><br><span class="line">allocator_rss_bytes:0</span><br><span class="line">rss_overhead_ratio:1.00</span><br><span class="line">rss_overhead_bytes:0</span><br><span class="line">mem_fragmentation_ratio:1.02</span><br><span class="line">mem_fragmentation_bytes:17825792</span><br><span class="line">mem_not_counted_for_evict:0</span><br><span class="line">mem_replication_backlog:0</span><br><span class="line">mem_clients_slaves:0</span><br><span class="line">mem_clients_normal:1048576000</span><br><span class="line">mem_aof_buffer:0</span><br><span class="line">mem_allocator:jemalloc-5.1.0</span><br><span class="line">active_defrag_running:0</span><br><span class="line">lazyfree_pending_objects:0</span><br></pre></td></tr></table></figure><p>从上面的<code>INFO memory</code>输出中，我们可以看到一些关键信息，这些信息表明大部分内存被缓冲区占用殆尽：<br>1.内存使用情况：<br>used_memory: 1072693248 （1.02 GB）<br>maxmemory: 1073741824 （1.00 GB）<br>上面的输出表明，当前内存使用几乎达到了配置的最大内存限制，内存已接近耗尽。<br>2.缓冲区占用：<br>used_memory_overhead: 1048576000 （1.00 GB）<br>这个值表示 Redis 开销的内存，包括缓冲区、连接和其他元数据。在这种情况下，大部分 used_memory (1.02 GB) 被 used_memory_overhead (1.00 GB) 占用，这意味着大部分内存都被缓冲区等开销占据。<br>3.数据集占用：<br>used_memory_dataset: 23929848 （23.93 MB）<br>used_memory_dataset_perc: 2.23%<br>这里显示，实际存储的数据只占了非常少的一部分内存（约 23.93 MB），而绝大部分内存被缓冲区占据。<br>4.客户端缓冲区：<br>mem_clients_normal: 1048576000 （1.00 GB）<br>这表明普通客户端连接占用了约 1.00 GB 内存，这通常意味着输出缓冲区可能已经接近或达到了设定的限制。<br>5.内存碎片：<br>allocator_frag_ratio: 1.02<br>mem_fragmentation_ratio: 1.02<br>碎片率不高，表明内存被合理使用但被缓冲区占用过多。</p><p>总结:<br>从上面的例子可以看出，Redis 的内存几乎被缓冲区占用殆尽。以下是具体的结论：</p><ol><li>当前内存使用 (used_memory) 已经接近最大内存限制 (maxmemory)，即 1.02 GB 接近 1.00 GB 的限制。</li><li>内存开销 (used_memory_overhead) 很大，主要被客户端普通连接使用（可能是输出缓冲区），而实际的数据仅占用了很少的内存。</li><li>分配器和 RSS 碎片率 (allocator_frag_ratio 和 mem_fragmentation_ratio) 较低，表明碎片不是问题。</li></ol><p>为啥要有这个缓存区，先看这个原理图：<br><img data-src="/images/redis%E9%97%AE%E9%A2%98-11.jpg" title="简单明了的展示了Redis工作原理（含缓冲区）"></p><p>缓冲区的功能其实很简单，主要就是用一块内存空间来暂时存放命令数据，以免出现因为数据和命令的处理速度慢于发送速度而导致的数据丢失和性能问题。</p><p>那么缓冲区的大小可以通过参数调整么？答案是没有。因为这个是在代码里写死的，1GB。也就是说redis客户端最多可以暂存1GB的数据，在生产环境里1GB其实挺合适了，对绝大多数的请求够用了，而且如果再大的话，就会对应用所在的容器内存占用过多，导致应用无法正常使用而崩溃。</p><p>最后的结论就是：</p><ol><li>对象存储的部分因为是有过期时间的，过期了自然被清理了；</li><li>【缓冲内存】↑ （涌入）；</li><li>【对象内存】↓ （定时清理）；</li><li>并受MAX内存掣肘（上限）；<br>最终的结局：Redis 的内存完全被缓冲区占据。</li></ol><p>自然，每当有SET请求进来的时候，SET却不进来——因为「内存淘汰策略」(maxmemory-policy) 淘汰的是【对象内存】，对缓存区压根起不到作用！！！</p><p>结论：<br>Redis 的内存完全被缓冲区占据，实际上 Redis 将无法正常工作，包括数据存储（SET 操作）和数据读取（GET 操作）。</p><h2 id="还原真相"><a href="#还原真相" class="headerlink" title="还原真相"></a>还原真相</h2><ol><li><p>当时自然增长导致流出带宽不断变大直至96MB&#x2F;s。<br><img data-src="/images/redis%E9%97%AE%E9%A2%98-12.png" title="这里人工调整到96mb"></p></li><li><p>流出带宽超过96MB&#x2F;s，输出缓冲区内存占用激增甚至溢出 （300setMaxTotal*10机器ip数量个客户端，之前推导过可以到9G）。</p></li><li><p>导致输出缓冲区爆了，redis客户端连接不得不关闭。<br><img data-src="/images/redis%E9%97%AE%E9%A2%98-13.png" title="这里人工调整到96mb"></p></li><li><p>客户端连接关闭后，导致请求都走DB。</p></li><li><p>DB走完之后都会执行SET。</p></li><li><p>SET流量飙升，且因都是大KEY，导致流入带宽激增（别看写QPS只有50，但是如果每个写都是2MB，就可以做到瞬间占满流入带宽）。</p></li><li><p>Redis主线程模型，处理请求的速度过慢（大KEY），出现了间歇性阻塞，无法及时处理正常发送的请求，导致客户端发送的请求在输入缓冲区越积越多。</p></li><li><p>输入缓冲区内存随即激增。</p></li><li><p>最终，redis内存被缓冲区内存（输入、输出）完全侵占。</p></li><li><p>后续的SET GET命令甚至都进不了输入缓冲区，阻塞持续到客户端配置的<code>SoTimeout</code>时间。</p></li><li><p>造成最终的不可用（后续的命令想进场，要依赖当前输入缓冲区里的命令被执行给你腾出来位置，但是还是那句话Redis主线程处理消化的速度，实在是太慢了,此时可以结合监控看到Redis的QPS骤降。</p></li></ol><p>归根揭底，造成问题原因是因为大key并且是热点数据，最终导致输出缓冲区到达限制，进而引发雪崩。</p><h2 id="大KEY的问题"><a href="#大KEY的问题" class="headerlink" title="大KEY的问题"></a>大KEY的问题</h2><p>首先，大KEY其实并不是长度过长的KEY，而是存放了慢查询命令的KEY。对于String类型，慢查询的本质在于value的大小。对于其他类型，慢查询的本质在于集合的大小（时间复杂度带来）。</p><p>如何解决大key，可以看阿里云的这篇文章：<a href="https://help.aliyun.com/zh/redis/user-guide/identify-and-handle-large-keys-and-hotkeys/?spm=a2c4g.11186623.0.i1">https://help.aliyun.com/zh/redis/user-guide/identify-and-handle-large-keys-and-hotkeys/?spm=a2c4g.11186623.0.i1</a> ，除了这个文章之外，可以再加一个本地缓存来解决大key风险。</p>]]></content>
-    
-    
-    <summary type="html">归根揭底，造成问题原因是因为大key并且是热点数据，最终导致输出缓冲区到达限制，进而引发雪崩</summary>
-    
-    
-    
-    <category term="工作与技术" scheme="http://example.com/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/"/>
-    
-    
-    <category term="redis" scheme="http://example.com/tags/redis/"/>
-    
-    <category term="SRE" scheme="http://example.com/tags/SRE/"/>
-    
-    <category term="缓存" scheme="http://example.com/tags/%E7%BC%93%E5%AD%98/"/>
     
   </entry>
   
