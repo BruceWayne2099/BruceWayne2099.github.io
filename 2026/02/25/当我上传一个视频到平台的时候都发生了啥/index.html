@@ -31,7 +31,7 @@
 <meta property="og:description" content="以前就对视频直播很感兴趣，而且我也觉得这个东西的热度会持续很久">
 <meta property="og:locale">
 <meta property="article:published_time" content="2026-02-25T06:13:32.000Z">
-<meta property="article:modified_time" content="2026-02-26T07:38:28.767Z">
+<meta property="article:modified_time" content="2026-02-26T13:14:31.429Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="抽帧">
 <meta property="article:tag" content="视频上传">
@@ -227,7 +227,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2026-02-26 15:38:28" itemprop="dateModified" datetime="2026-02-26T15:38:28+08:00">2026-02-26</time>
+                <time title="Modified: 2026-02-26 21:14:31" itemprop="dateModified" datetime="2026-02-26T21:14:31+08:00">2026-02-26</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -266,14 +266,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>1.3k</span>
+              <span>1.5k</span>
             </span>
             <span class="post-meta-item" title="Reading time">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>5 mins.</span>
+              <span>6 mins.</span>
             </span>
             <div class="post-description">以前就对视频直播很感兴趣，而且我也觉得这个东西的热度会持续很久</div>
 
@@ -294,6 +294,7 @@
 <h2 id="具体流程"><a href="#具体流程" class="headerlink" title="具体流程"></a>具体流程</h2><p>当你打开一个视频平台，准备上传视频到平台上的时候，会触发如下的流程：</p>
 <p>首先，一个视频刚刚上传，会是一个不可见也不可推送的状态。然后根据审核的结果，来转变状态。</p>
 <p>原始帧original-frame和加工的视频都会上传到云存储，原始帧默认60天过期（上传图片可能不会保存原始图片到CDN）。然后平台会绑定视频ID（video id）和原始帧在TOS的存储地址，实现一对一的绑定。当video id创建好了的时候，视频也开始进行转码，转码成功后会返回“成功”的消息。</p>
+<p>拿到了原始帧之后不是马上就审核，而是采集模型特征后进入“相似度检测”。“相似度检测”就是以前的违规视频会有一些特征种子，这些种子在一个种子库里，然后会用原始帧去跟这些种子对比，如果是相似度高的，就省去审核了，直接下架or 限流处理，所以“相似度检测”是审核的第一道防线。</p>
 <p>视频初审的模块会拿到视频“特征”，包括音频、作者、标题、etag等等，然后把这些特征去走一遍“模型审核的集合”，这个集合就是一个大模型，根据审核的结果会给这个视频综合的进行打分，比如色情分70分，暴力分20分，最后再来一个加权的计算，最后得到是否有风险的结论。审核大模型的分数就是判断是否送人审的依据。</p>
 <p>这里注意一下，如果机器审核总是重试，重试到一定次数的话，就会直接送到人审。</p>
 <p>审核的时候还会拿到up主的粉丝数，粉丝数高的优先审核，粉丝数低的慢点审核。然后就去机器任何平台进行机器审核。</p>
@@ -301,6 +302,7 @@
 <p>用户如果注销了，那么它账号里所有的视频都会进入一个“下架”的状态。但是如果他后悔了操作恢复了账号，而他之前视频是不能恢复的。</p>
 <p>上传图片和上传视频，在审核上是不一样的，上传图片只要审核最后的图片（比如加工特效的图片），但是上传视频是既要审核原始视频也要审核加工后的视频。因为审核视频的背后是“审核音频、审核时序、审核滤镜（这里涉及到肤色问题）”。但是极特殊的情况下还是要审核原始图片的，比如“未成年、政治敏感、AI生成”等等。</p>
 <p>审核也不是只有视频上传的时候才会触发，还有一种可能，就是up主原来上传就是一个隐私视频，因为是隐私视频，所以只会通过一些非常底层基础的模型，但是一旦up主把这个隐私视频转成了公开视频或好友可见，那么就要去判断它之前是否有过转公开的记录，如果没有就变成“待进检”的状态，然后重新跑一下整个审核的流程。</p>
+<p>如果你的视频有了观看次数（VV），那么就会触发“泛召回”，“泛召回”是调一部分怀疑有问题的item(可能是图文 视频 音乐)再来审核一遍，这样尽量避免有问题的视频影响面扩大，在扩大之前做出来处理。</p>
 <h2 id="什么样会漏审？"><a href="#什么样会漏审？" class="headerlink" title="什么样会漏审？"></a>什么样会漏审？</h2><ol>
 <li>原始帧丢失</li>
 <li>上下文依赖：某些违规内容需要结合上下文才能判断，单独审核时可能漏判</li>
@@ -522,7 +524,7 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">32:56</span>
+    <span title="Reading time total">32:57</span>
 </div>
   <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
   </div>
