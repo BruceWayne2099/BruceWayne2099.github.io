@@ -31,7 +31,7 @@
 <meta property="og:description" content="以前就对视频直播很感兴趣，而且我也觉得这个东西的热度会持续很久">
 <meta property="og:locale">
 <meta property="article:published_time" content="2026-02-25T06:13:32.000Z">
-<meta property="article:modified_time" content="2026-02-25T06:48:20.792Z">
+<meta property="article:modified_time" content="2026-02-25T07:01:52.399Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="抽帧">
 <meta property="article:tag" content="视频上传">
@@ -221,7 +221,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2026-02-25 14:13:32 / Modified: 14:48:20" itemprop="dateCreated datePublished" datetime="2026-02-25T14:13:32+08:00">2026-02-25</time>
+              <time title="Created: 2026-02-25 14:13:32 / Modified: 15:01:52" itemprop="dateCreated datePublished" datetime="2026-02-25T14:13:32+08:00">2026-02-25</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -291,7 +291,7 @@
 <p>视频初审的模块会拿到视频“特征”，包括音频、作者、标题、etag等等，然后把这些特征去走一遍“模型审核的集合”，这个集合就是一个大模型，根据审核的结果会给这个视频综合的进行打分，比如色情分70分，暴力分20分，最后再来一个加权的计算，最后得到是否有风险的结论。审核大模型的分数就是判断是否送人审的依据。</p>
 <p>审核的时候还会拿到up主的粉丝数，粉丝数高的优先审核，粉丝数低的慢点审核。然后就去机器任何平台进行机器审核。</p>
 <p>人工审核也不是所有的帧都看，人工审核系统会给它重点送“高危”的帧，这样极大提高了人审的效率。然后在人审平台里，审核员主要就是根据policy进行勾选，比如“抽烟”、“国家领导人”这样的，然后对勾选的结果进一步进行打分，最后得到对这个视频的处理结果。然后这个结果回调给业务方。</p>
-<p>用户如果注销了，那么它账号里所有的视频都会进入一个“下架”的状态。但是如果他后悔了恢复了账号，那么视频是不能恢复的。</p>
+<p>用户如果注销了，那么它账号里所有的视频都会进入一个“下架”的状态。但是如果他后悔了操作恢复了账号，而他之前视频是不能恢复的。</p>
 <p>上传图片和上传视频，在审核上是不一样的，上传图片只要审核最后的图片（比如加工特效的图片），但是上传视频是既要审核原始视频也要审核加工后的视频。因为审核视频的背后是“审核音频、审核时序、审核滤镜（这里涉及到肤色问题）”。但是极特殊的情况下还是要审核原始图片的，比如“未成年、政治敏感、AI生成”等等。</p>
 <p>审核也不是只有视频上传的时候才会触发，还有一种可能，就是up主原来上传就是一个隐私视频，因为是隐私视频，所以只会通过一些非常底层基础的模型，但是一旦up主把这个隐私视频转成了公开视频或好友可见，那么就要去判断它之前是否有过转公开的记录，如果没有就变成“待进检”的状态，然后重新跑一下整个审核的流程。</p>
 
@@ -505,12 +505,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="Symbols count total">542k</span>
+    <span title="Symbols count total">543k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">32:52</span>
+    <span title="Reading time total">32:54</span>
 </div>
   <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
   </div>
