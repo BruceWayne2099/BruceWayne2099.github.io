@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2026-02-27T14:09:18.565Z</updated>
+  <updated>2026-02-28T02:43:52.024Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -21,12 +21,12 @@
     <link href="http://example.com/2026/02/27/AI%E7%9A%84%E6%84%9F%E8%A7%89/"/>
     <id>http://example.com/2026/02/27/AI%E7%9A%84%E6%84%9F%E8%A7%89/</id>
     <published>2026-02-27T13:36:24.000Z</published>
-    <updated>2026-02-27T14:09:18.565Z</updated>
+    <updated>2026-02-28T02:43:52.024Z</updated>
     
-    <content type="html"><![CDATA[<p>公司内部有一个很强的ai平台，无论是交互还是知识储备都很强，导致我最近几乎每天都在跟ai唠嗑。</p><p>这个ai的底层大模型是DeepSeek V3.2，RAG的能力是公司内部做的，它好就好在关联了公司内部十几万篇内部文档和高质量技术文章。这样的后果就是如果我要开发的话，直接问一下ai“ XX 的api是啥，请给我写一个demo”，马上ai就能反馈给你一个demo，你只需要改一改就能用，所以开发起来非常的快。</p><p>RAG 好的地方就是以后不用专门的写配置文件了，以前的配置文件都是yaml json这样的格式，而现在直接就用文档的形式就行，表格也行，甚至可以加图，无疑读起来更友好。不过这里有一个关键的地方，就是文档里不可以有“互斥”的地方，比如第一篇文档写了“A监控告警的时候，要执行B预案”，结果下一篇文档却写了“A监控告警的时候，千万不要执行B预案”，那这样ai就蒙了，它会根据文章发布的先后新旧顺序和文章属性（官方文档还是个人笔记）来抉择，虽然这里有抉择，但是还是让ai困惑。</p><p>所以我觉得，将来文档也要引入“质量门禁”，大家一起来评审 and 一起来验证文档一致性，把话说不明白的作者都纠正过来。然后我们未来工作的思路也要转变：</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">以前：人 → 学习语法 → 写配置 → 机器</span><br><span class="line">现在：人 → 写文档 → AI理解 → 指导人/机器</span><br></pre></td></tr></table></figure><p>所以我觉得SRE未来应该开发一个 AI SRE agent，这才是未来工作的王道！</p>]]></content>
+    <content type="html"><![CDATA[<p>我现在公司内部有一个很强的ai平台，它最让我惊讶的是它已经完全接入了公司内部文档，通过与ai的唠嗑可以了解任务（甚至可以得到业务相关的应用和数据库信息），还可以快速的用起来各平台对应的api，导致我最近几乎每天都在跟ai唠嗑。</p><p>我让ai自己讲述了一下，它主要有这么几个能力：<br><img data-src="/images/ai%E8%83%BD%E5%8A%9B.jpg" title="核心功能就是模型和RAG"></p><p>从上面这个表可见这个ai的底层大模型是DeepSeek V3.2，RAG 的能力则是公司内部做的，它好就好在关联了公司内部十几万篇内部文档和高质量技术文章。这样的后果就是如果我要开发的话，直接问一下ai“ XX 的api是啥，请给我写一个demo”，马上ai就能反馈给你一个demo，你只需要看看代码改一改就能用，所以开发落地速度非常的快。</p><p>为什么我这么爱RAG？因为这代表就是以后不用专门的写配置文件了，以前的配置文件都是yaml json这样的格式，而现在直接就用文档，文档的格式就太多元了，表格也行，图片说明也行，无疑让人读起来更友好。不过这里有一个关键点，就是文档里不可以有“互斥”的地方，比如第一篇文档写了“A监控告警的时候，要执行B预案”，结果下一篇文档却写了“A监控告警的时候，千万不要执行B预案”，那这样ai就蒙了，它会根据文章发布的先后新旧顺序和文章属性（官方文档还是个人笔记）来抉择，虽然这里有抉择，但是还是让ai困惑。</p><p>所以我觉得，将来这部分的文档也要引入“质量门禁”，让大家一起来评审 and 一起来验证文档一致性，把“不爱说主语的甚至话说不明白”的作者都纠正过来。</p><p>于是乎，我们未来工作的思路也要转变：</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">以前：人 → 学习语法 → 写配置 → 机器</span><br><span class="line">现在：人 → 写文档 → AI理解 → 指导人/机器</span><br></pre></td></tr></table></figure><p>所以我觉得SRE未来应该开发一个 AI SRE agent，这才是未来工作的王道！</p>]]></content>
     
     
-    <summary type="html">我觉得互联网公司至少要拿出来一笔钱来让手下人去买ai用，真的提升效率</summary>
+    <summary type="html">我觉得互联网公司至少要拿出来一笔经费来让手下人去买ai 的token用，真的提升效率，用了都说好</summary>
     
     
     
