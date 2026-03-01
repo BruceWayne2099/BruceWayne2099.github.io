@@ -31,7 +31,7 @@
 <meta property="og:description" content="随着现在SRE的代码越来越多是AI来写，那么面试的时候也没必要非要考手写算法题了，但是code review的能力一定要有，这是未来面试新趋势。">
 <meta property="og:locale">
 <meta property="article:published_time" content="2026-03-01T12:05:58.000Z">
-<meta property="article:modified_time" content="2026-03-01T12:53:29.976Z">
+<meta property="article:modified_time" content="2026-03-01T12:55:25.624Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="SRE">
 <meta property="article:tag" content="python">
@@ -221,7 +221,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2026-03-01 20:05:58 / Modified: 20:53:29" itemprop="dateCreated datePublished" datetime="2026-03-01T20:05:58+08:00">2026-03-01</time>
+              <time title="Created: 2026-03-01 20:05:58 / Modified: 20:55:25" itemprop="dateCreated datePublished" datetime="2026-03-01T20:05:58+08:00">2026-03-01</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -260,14 +260,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>1.3k</span>
+              <span>1.6k</span>
             </span>
             <span class="post-meta-item" title="Reading time">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>5 mins.</span>
+              <span>6 mins.</span>
             </span>
             <div class="post-description">随着现在SRE的代码越来越多是AI来写，那么面试的时候也没必要非要考手写算法题了，但是code review的能力一定要有，这是未来面试新趋势。</div>
 
@@ -280,7 +280,20 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <ol>
+        <p>作为SRE，肯定要认真的审视每一行代码，不能因为你的巡检工具把正常服务打挂了。不仅要问”这行代码能运行吗？”，更要问：</p>
+<ol>
+<li>“如果输入异常大，会怎样？”（容量规划）</li>
+<li>“如果中途需要停止，能优雅退出吗？”（可中断性）</li>
+<li>“如果运行在受限环境，会出问题吗？”（资源限制）</li>
+<li>“如果被恶意使用，会造成什么危害？”（安全性）</li>
+</ol>
+<p>当面对面试官的时候，面试官想看到当面试人分析代码时：</p>
+<ul>
+<li>排查思路是否系统化？（是东一榔头西一棒子，还是有清晰的优先级）</li>
+<li>对风险的评估是否准确？（是过度紧张，还是能区分“严重漏洞”和“代码异味”）</li>
+<li>解决方案是否工程化？（是打补丁，还是能设计出健壮的、可复用的模式）</li>
+</ul>
+<ol>
 <li>分析下面的代码有什么BUG或者隐患？</li>
 </ol>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">import os</span><br><span class="line">import re</span><br><span class="line">def analyze_error_logs(log_dir, pattern=&quot;ERROR&quot;):</span><br><span class="line"> &quot;&quot;&quot;</span><br><span class="line"> 分析指定目录下所有日志文件中的错误行</span><br><span class="line"> &quot;&quot;&quot;</span><br><span class="line"> error_count = 0</span><br><span class="line"> for filename in os.listdir(log_dir):</span><br><span class="line">  if filename.endswith(&#x27;.log&#x27;):</span><br><span class="line">  filepath = os.path.join(log_dir, filename)</span><br><span class="line">  with open(filepath, &#x27;r&#x27;) as f:</span><br><span class="line">  for line in f:</span><br><span class="line">  if re.search(pattern, line):</span><br><span class="line">  error_count += 1</span><br><span class="line">  print(f&quot;Found error in &#123;filename&#125;: &#123;line.strip()&#125;&quot;)</span><br><span class="line"> print(f&quot;Total errors found: &#123;error_count&#125;&quot;)</span><br><span class="line"> return error_count</span><br><span class="line"># 使用示例</span><br><span class="line">if name == &quot;main&quot;:</span><br><span class="line"> analyze_error_logs(&quot;/var/log/myapp/&quot;)。</span><br></pre></td></tr></table></figure>
@@ -514,7 +527,7 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="Symbols count total">546k</span>
+    <span title="Symbols count total">547k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
