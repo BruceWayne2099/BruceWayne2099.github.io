@@ -192,6 +192,124 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2026/03/01/Linux%E8%BF%90%E7%BB%B4%E5%B7%A5%E7%A8%8B%E5%B8%88%E7%AC%94%E8%AF%95%E9%A2%98%E7%AC%AC%E4%BA%8C%E5%8D%81%E5%85%AD%E5%A5%97/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="那些在阳光下挥洒青春的日子啊！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2026/03/01/Linux%E8%BF%90%E7%BB%B4%E5%B7%A5%E7%A8%8B%E5%B8%88%E7%AC%94%E8%AF%95%E9%A2%98%E7%AC%AC%E4%BA%8C%E5%8D%81%E5%85%AD%E5%A5%97/" class="post-title-link" itemprop="url">Linux运维工程师笔试题第二十六套</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2026-03-01 20:05:58 / Modified: 20:35:37" itemprop="dateCreated datePublished" datetime="2026-03-01T20:05:58+08:00">2026-03-01</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%A4%A7%E7%89%9B%E4%B9%8B%E8%B7%AF/" itemprop="url" rel="index"><span itemprop="name">大牛之路</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2026/03/01/Linux%E8%BF%90%E7%BB%B4%E5%B7%A5%E7%A8%8B%E5%B8%88%E7%AC%94%E8%AF%95%E9%A2%98%E7%AC%AC%E4%BA%8C%E5%8D%81%E5%85%AD%E5%A5%97/" class="post-meta-item leancloud_visitors" data-flag-title="Linux运维工程师笔试题第二十六套" title="Views">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/2026/03/01/Linux%E8%BF%90%E7%BB%B4%E5%B7%A5%E7%A8%8B%E5%B8%88%E7%AC%94%E8%AF%95%E9%A2%98%E7%AC%AC%E4%BA%8C%E5%8D%81%E5%85%AD%E5%A5%97/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2026/03/01/Linux%E8%BF%90%E7%BB%B4%E5%B7%A5%E7%A8%8B%E5%B8%88%E7%AC%94%E8%AF%95%E9%A2%98%E7%AC%AC%E4%BA%8C%E5%8D%81%E5%85%AD%E5%A5%97/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>707</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>3 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <ol>
+<li>分析下面的代码有什么BUG或者隐患？</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">import os</span><br><span class="line">import re</span><br><span class="line">def analyze_error_logs(log_dir, pattern=&quot;ERROR&quot;):</span><br><span class="line"> &quot;&quot;&quot;</span><br><span class="line"> 分析指定目录下所有日志文件中的错误行</span><br><span class="line"> &quot;&quot;&quot;</span><br><span class="line"> error_count = 0</span><br><span class="line"> for filename in os.listdir(log_dir):</span><br><span class="line">  if filename.endswith(&#x27;.log&#x27;):</span><br><span class="line">  filepath = os.path.join(log_dir, filename)</span><br><span class="line">  with open(filepath, &#x27;r&#x27;) as f:</span><br><span class="line">  for line in f:</span><br><span class="line">  if re.search(pattern, line):</span><br><span class="line">  error_count += 1</span><br><span class="line">  print(f&quot;Found error in &#123;filename&#125;: &#123;line.strip()&#125;&quot;)</span><br><span class="line"> print(f&quot;Total errors found: &#123;error_count&#125;&quot;)</span><br><span class="line"> return error_count</span><br><span class="line"># 使用示例</span><br><span class="line">if name == &quot;main&quot;:</span><br><span class="line"> analyze_error_logs(&quot;/var/log/myapp/&quot;)。</span><br></pre></td></tr></table></figure>
+
+<p>【提示】<code>with</code>用法是Python推荐的文件操作方式，比手动<code>f.close()</code>更安全，不会导致文件描述符泄漏。 其次，<code>for line in f: </code>这段代码实际上是逐行读取的，不会一次性加载整个文件到内存，所以不会导致OOM。这是处理大日志文件的正确方式。</p>
+<ol start="2">
+<li>分析下面的代码有什么BUG或者隐患？</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line">import requests</span><br><span class="line">import time</span><br><span class="line">from datetime import datetime</span><br><span class="line"></span><br><span class="line">class ServiceMonitor:</span><br><span class="line">    def __init__(self, endpoints):</span><br><span class="line">        self.endpoints = endpoints</span><br><span class="line">        self.results = []</span><br><span class="line">    </span><br><span class="line">    def check_endpoint(self, url):</span><br><span class="line">        try:</span><br><span class="line">            start = time.time()</span><br><span class="line">            response = requests.get(url, timeout=5)</span><br><span class="line">            elapsed = time.time() - start</span><br><span class="line">            </span><br><span class="line">            if response.status_code == 200:</span><br><span class="line">                return &#123;</span><br><span class="line">                    &#x27;url&#x27;: url,</span><br><span class="line">                    &#x27;status&#x27;: &#x27;UP&#x27;,</span><br><span class="line">                    &#x27;response_time&#x27;: elapsed,</span><br><span class="line">                    &#x27;timestamp&#x27;: datetime.now()</span><br><span class="line">                &#125;</span><br><span class="line">            else:</span><br><span class="line">                return &#123;</span><br><span class="line">                    &#x27;url&#x27;: url,</span><br><span class="line">                    &#x27;status&#x27;: &#x27;DOWN&#x27;,</span><br><span class="line">                    &#x27;response_time&#x27;: elapsed,</span><br><span class="line">                    &#x27;timestamp&#x27;: datetime.now()</span><br><span class="line">                &#125;</span><br><span class="line">        except Exception as e:</span><br><span class="line">            return &#123;</span><br><span class="line">                &#x27;url&#x27;: url,</span><br><span class="line">                &#x27;status&#x27;: &#x27;ERROR&#x27;,</span><br><span class="line">                &#x27;error&#x27;: str(e),</span><br><span class="line">                &#x27;timestamp&#x27;: datetime.now()</span><br><span class="line">            &#125;</span><br><span class="line">    </span><br><span class="line">    def run_checks(self):</span><br><span class="line">        for endpoint in self.endpoints:</span><br><span class="line">            result = self.check_endpoint(endpoint)</span><br><span class="line">            self.results.append(result)</span><br><span class="line">            time.sleep(1)  # 避免请求过于密集</span><br><span class="line">        </span><br><span class="line">        # 统计并告警</span><br><span class="line">        down_count = sum(1 for r in self.results if r[&#x27;status&#x27;] != &#x27;UP&#x27;)</span><br><span class="line">        if down_count &gt; len(self.endpoints) * 0.3:</span><br><span class="line">            self.send_alert(f&quot;&#123;down_count&#125; services down!&quot;)</span><br><span class="line">    </span><br><span class="line">    def send_alert(self, message):</span><br><span class="line">        # 模拟发送告警</span><br><span class="line">        print(f&quot;ALERT: &#123;message&#125;&quot;)</span><br><span class="line"></span><br><span class="line"># 使用示例</span><br><span class="line">if __name__ == &quot;__main__&quot;:</span><br><span class="line">    monitor = ServiceMonitor([</span><br><span class="line">        &quot;http://api.service1.com/health&quot;,</span><br><span class="line">        &quot;http://api.service2.com/health&quot;,</span><br><span class="line">        &quot;http://api.service3.com/health&quot;</span><br><span class="line">    ])</span><br><span class="line">    monitor.run_checks()</span><br></pre></td></tr></table></figure>
+
+<p>【提示】result &#x3D; self.check_endpoint(endpoint) 这个写法在高频率监控时产生大量TCP连接，消耗系统资源，使用<code>requests.Session()</code>复用连接，而且<code>endpoints</code>列表被恶意注入或配置错误，那么这个脚本就会持续攻击目标服务器，直接P4故障升级P0。而且这里没有重试机制，要是网络抖动一下就记成了ERROR,那就误报了。然后time.sleep(1)是同步进行了，如果endpoints是100个就要100秒，实效性太差了。</p>
+<p>3. </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">import yaml</span><br><span class="line">import json</span><br><span class="line"></span><br><span class="line">def load_and_validate_config(config_path):</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line">    加载并验证配置文件</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line">    with open(config_path, &#x27;r&#x27;) as f:</span><br><span class="line">        if config_path.endswith(&#x27;.yaml&#x27;) or config_path.endswith(&#x27;.yml&#x27;):</span><br><span class="line">            config = yaml.safe_load(f)</span><br><span class="line">        elif config_path.endswith(&#x27;.json&#x27;):</span><br><span class="line">            config = json.load(f)</span><br><span class="line">        else:</span><br><span class="line">            raise ValueError(&quot;Unsupported config format&quot;)</span><br><span class="line">    </span><br><span class="line">    # 验证必需字段</span><br><span class="line">    required_fields = [&#x27;service_name&#x27;, &#x27;port&#x27;, &#x27;database&#x27;]</span><br><span class="line">    for field in required_fields:</span><br><span class="line">        if field not in config:</span><br><span class="line">            raise KeyError(f&quot;Missing required field: &#123;field&#125;&quot;)</span><br><span class="line">    </span><br><span class="line">    # 验证端口范围</span><br><span class="line">    if config[&#x27;port&#x27;] &lt; 1 or config[&#x27;port&#x27;] &gt; 65535:</span><br><span class="line">        raise ValueError(f&quot;Invalid port number: &#123;config[&#x27;port&#x27;]&#125;&quot;)</span><br><span class="line">    </span><br><span class="line">    # 验证数据库连接信息</span><br><span class="line">    db_config = config[&#x27;database&#x27;]</span><br><span class="line">    if &#x27;host&#x27; not in db_config or &#x27;name&#x27; not in db_config:</span><br><span class="line">        raise ValueError(&quot;Invalid database configuration&quot;)</span><br><span class="line">    </span><br><span class="line">    return config</span><br><span class="line"></span><br><span class="line"># 使用示例</span><br><span class="line">if __name__ == &quot;__main__&quot;:</span><br><span class="line">    try:</span><br><span class="line">        config = load_and_validate_config(&quot;app_config.yaml&quot;)</span><br><span class="line">        print(f&quot;Config loaded successfully: &#123;config[&#x27;service_name&#x27;]&#125;&quot;)</span><br><span class="line">    except Exception as e:</span><br><span class="line">        print(f&quot;Failed to load config: &#123;e&#125;&quot;)</span><br></pre></td></tr></table></figure>
+
+<p>【提示】<code>config = yaml.safe_load(f)</code> 这个已经将整个文件加载到内存，由于配置文件都不会超级大，所以不会导致内存OOM。但是它没有进一步校验 “port应该是整数”，“host应该是有效主机名&#x2F;IP”这些格式问题。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="http://example.com/2026/02/27/AI%E7%9A%84%E6%84%9F%E8%A7%89/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1226,122 +1344,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2025/06/09/Linux%E8%BF%90%E7%BB%B4%E5%B7%A5%E7%A8%8B%E5%B8%88%E7%AC%94%E8%AF%95%E9%A2%98%E7%AC%AC%E4%BA%8C%E5%8D%81%E5%9B%9B%E5%A5%97/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Chris Chan">
-      <meta itemprop="description" content="那些在阳光下挥洒青春的日子啊！">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="石锤淡啤酒">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2025/06/09/Linux%E8%BF%90%E7%BB%B4%E5%B7%A5%E7%A8%8B%E5%B8%88%E7%AC%94%E8%AF%95%E9%A2%98%E7%AC%AC%E4%BA%8C%E5%8D%81%E5%9B%9B%E5%A5%97/" class="post-title-link" itemprop="url">Linux运维工程师笔试题第二十四套</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2025-06-09 12:05:09" itemprop="dateCreated datePublished" datetime="2025-06-09T12:05:09+08:00">2025-06-09</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2025-11-08 08:47:01" itemprop="dateModified" datetime="2025-11-08T08:47:01+08:00">2025-11-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%A4%A7%E7%89%9B%E4%B9%8B%E8%B7%AF/" itemprop="url" rel="index"><span itemprop="name">大牛之路</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/2025/06/09/Linux%E8%BF%90%E7%BB%B4%E5%B7%A5%E7%A8%8B%E5%B8%88%E7%AC%94%E8%AF%95%E9%A2%98%E7%AC%AC%E4%BA%8C%E5%8D%81%E5%9B%9B%E5%A5%97/" class="post-meta-item leancloud_visitors" data-flag-title="Linux运维工程师笔试题第二十四套" title="Views">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">Views: </span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine: </span>
-    
-    <a title="valine" href="/2025/06/09/Linux%E8%BF%90%E7%BB%B4%E5%B7%A5%E7%A8%8B%E5%B8%88%E7%AC%94%E8%AF%95%E9%A2%98%E7%AC%AC%E4%BA%8C%E5%8D%81%E5%9B%9B%E5%A5%97/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2025/06/09/Linux%E8%BF%90%E7%BB%B4%E5%B7%A5%E7%A8%8B%E5%B8%88%E7%AC%94%E8%AF%95%E9%A2%98%E7%AC%AC%E4%BA%8C%E5%8D%81%E5%9B%9B%E5%A5%97/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="Symbols count in article">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>1.7k</span>
-            </span>
-            <span class="post-meta-item" title="Reading time">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>6 mins.</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>在Java中，未使用BufferedInputStream读取文件导致调用方sys过高，本质是频繁的系统调用引起的性能瓶颈</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2025/06/09/Linux%E8%BF%90%E7%BB%B4%E5%B7%A5%E7%A8%8B%E5%B8%88%E7%AC%94%E8%AF%95%E9%A2%98%E7%AC%AC%E4%BA%8C%E5%8D%81%E5%9B%9B%E5%A5%97/">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1411,7 +1413,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">419</span>
+          <span class="site-state-item-count">420</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -1469,12 +1471,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="Symbols count total">545k</span>
+    <span title="Symbols count total">546k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">33:02</span>
+    <span title="Reading time total">33:04</span>
 </div>
   <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
   </div>

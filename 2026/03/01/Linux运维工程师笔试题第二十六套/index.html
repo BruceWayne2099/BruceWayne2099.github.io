@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","width":300,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":true,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="分析下面的代码有什么BUG或者隐患？  1234567891011121314151617181920import osimport redef analyze_error_logs(log_dir, pattern&#x3D;&quot;ERROR&quot;): &quot;&quot;&quot; 分析指定目录下所有日志文件中的错误行 &quot;&quot;&quot; error_count &#x3D;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux运维工程师笔试题第二十六套">
+<meta property="og:url" content="http://example.com/2026/03/01/Linux%E8%BF%90%E7%BB%B4%E5%B7%A5%E7%A8%8B%E5%B8%88%E7%AC%94%E8%AF%95%E9%A2%98%E7%AC%AC%E4%BA%8C%E5%8D%81%E5%85%AD%E5%A5%97/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="分析下面的代码有什么BUG或者隐患？  1234567891011121314151617181920import osimport redef analyze_error_logs(log_dir, pattern&#x3D;&quot;ERROR&quot;): &quot;&quot;&quot; 分析指定目录下所有日志文件中的错误行 &quot;&quot;&quot; error_count &#x3D;">
+<meta property="og:locale">
+<meta property="article:published_time" content="2026-03-01T12:05:58.000Z">
+<meta property="article:modified_time" content="2026-03-01T12:35:37.203Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="SRE">
+<meta property="article:tag" content="python">
+<meta property="article:tag" content="面试">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2026/03/01/Linux%E8%BF%90%E7%BB%B4%E5%B7%A5%E7%A8%8B%E5%B8%88%E7%AC%94%E8%AF%95%E9%A2%98%E7%AC%AC%E4%BA%8C%E5%8D%81%E5%85%AD%E5%A5%97/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>Linux运维工程师笔试题第二十六套 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">生活就是等待戈多</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2026/03/01/Linux%E8%BF%90%E7%BB%B4%E5%B7%A5%E7%A8%8B%E5%B8%88%E7%AC%94%E8%AF%95%E9%A2%98%E7%AC%AC%E4%BA%8C%E5%8D%81%E5%85%AD%E5%A5%97/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="那些在阳光下挥洒青春的日子啊！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Linux运维工程师笔试题第二十六套
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2026-03-01 20:05:58 / Modified: 20:35:37" itemprop="dateCreated datePublished" datetime="2026-03-01T20:05:58+08:00">2026-03-01</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%A4%A7%E7%89%9B%E4%B9%8B%E8%B7%AF/" itemprop="url" rel="index"><span itemprop="name">大牛之路</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2026/03/01/Linux%E8%BF%90%E7%BB%B4%E5%B7%A5%E7%A8%8B%E5%B8%88%E7%AC%94%E8%AF%95%E9%A2%98%E7%AC%AC%E4%BA%8C%E5%8D%81%E5%85%AD%E5%A5%97/" class="post-meta-item leancloud_visitors" data-flag-title="Linux运维工程师笔试题第二十六套" title="Views">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/2026/03/01/Linux%E8%BF%90%E7%BB%B4%E5%B7%A5%E7%A8%8B%E5%B8%88%E7%AC%94%E8%AF%95%E9%A2%98%E7%AC%AC%E4%BA%8C%E5%8D%81%E5%85%AD%E5%A5%97/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2026/03/01/Linux%E8%BF%90%E7%BB%B4%E5%B7%A5%E7%A8%8B%E5%B8%88%E7%AC%94%E8%AF%95%E9%A2%98%E7%AC%AC%E4%BA%8C%E5%8D%81%E5%85%AD%E5%A5%97/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>707</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>3 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <ol>
+<li>分析下面的代码有什么BUG或者隐患？</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">import os</span><br><span class="line">import re</span><br><span class="line">def analyze_error_logs(log_dir, pattern=&quot;ERROR&quot;):</span><br><span class="line"> &quot;&quot;&quot;</span><br><span class="line"> 分析指定目录下所有日志文件中的错误行</span><br><span class="line"> &quot;&quot;&quot;</span><br><span class="line"> error_count = 0</span><br><span class="line"> for filename in os.listdir(log_dir):</span><br><span class="line">  if filename.endswith(&#x27;.log&#x27;):</span><br><span class="line">  filepath = os.path.join(log_dir, filename)</span><br><span class="line">  with open(filepath, &#x27;r&#x27;) as f:</span><br><span class="line">  for line in f:</span><br><span class="line">  if re.search(pattern, line):</span><br><span class="line">  error_count += 1</span><br><span class="line">  print(f&quot;Found error in &#123;filename&#125;: &#123;line.strip()&#125;&quot;)</span><br><span class="line"> print(f&quot;Total errors found: &#123;error_count&#125;&quot;)</span><br><span class="line"> return error_count</span><br><span class="line"># 使用示例</span><br><span class="line">if name == &quot;main&quot;:</span><br><span class="line"> analyze_error_logs(&quot;/var/log/myapp/&quot;)。</span><br></pre></td></tr></table></figure>
+
+<p>【提示】<code>with</code>用法是Python推荐的文件操作方式，比手动<code>f.close()</code>更安全，不会导致文件描述符泄漏。 其次，<code>for line in f: </code>这段代码实际上是逐行读取的，不会一次性加载整个文件到内存，所以不会导致OOM。这是处理大日志文件的正确方式。</p>
+<ol start="2">
+<li>分析下面的代码有什么BUG或者隐患？</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line">import requests</span><br><span class="line">import time</span><br><span class="line">from datetime import datetime</span><br><span class="line"></span><br><span class="line">class ServiceMonitor:</span><br><span class="line">    def __init__(self, endpoints):</span><br><span class="line">        self.endpoints = endpoints</span><br><span class="line">        self.results = []</span><br><span class="line">    </span><br><span class="line">    def check_endpoint(self, url):</span><br><span class="line">        try:</span><br><span class="line">            start = time.time()</span><br><span class="line">            response = requests.get(url, timeout=5)</span><br><span class="line">            elapsed = time.time() - start</span><br><span class="line">            </span><br><span class="line">            if response.status_code == 200:</span><br><span class="line">                return &#123;</span><br><span class="line">                    &#x27;url&#x27;: url,</span><br><span class="line">                    &#x27;status&#x27;: &#x27;UP&#x27;,</span><br><span class="line">                    &#x27;response_time&#x27;: elapsed,</span><br><span class="line">                    &#x27;timestamp&#x27;: datetime.now()</span><br><span class="line">                &#125;</span><br><span class="line">            else:</span><br><span class="line">                return &#123;</span><br><span class="line">                    &#x27;url&#x27;: url,</span><br><span class="line">                    &#x27;status&#x27;: &#x27;DOWN&#x27;,</span><br><span class="line">                    &#x27;response_time&#x27;: elapsed,</span><br><span class="line">                    &#x27;timestamp&#x27;: datetime.now()</span><br><span class="line">                &#125;</span><br><span class="line">        except Exception as e:</span><br><span class="line">            return &#123;</span><br><span class="line">                &#x27;url&#x27;: url,</span><br><span class="line">                &#x27;status&#x27;: &#x27;ERROR&#x27;,</span><br><span class="line">                &#x27;error&#x27;: str(e),</span><br><span class="line">                &#x27;timestamp&#x27;: datetime.now()</span><br><span class="line">            &#125;</span><br><span class="line">    </span><br><span class="line">    def run_checks(self):</span><br><span class="line">        for endpoint in self.endpoints:</span><br><span class="line">            result = self.check_endpoint(endpoint)</span><br><span class="line">            self.results.append(result)</span><br><span class="line">            time.sleep(1)  # 避免请求过于密集</span><br><span class="line">        </span><br><span class="line">        # 统计并告警</span><br><span class="line">        down_count = sum(1 for r in self.results if r[&#x27;status&#x27;] != &#x27;UP&#x27;)</span><br><span class="line">        if down_count &gt; len(self.endpoints) * 0.3:</span><br><span class="line">            self.send_alert(f&quot;&#123;down_count&#125; services down!&quot;)</span><br><span class="line">    </span><br><span class="line">    def send_alert(self, message):</span><br><span class="line">        # 模拟发送告警</span><br><span class="line">        print(f&quot;ALERT: &#123;message&#125;&quot;)</span><br><span class="line"></span><br><span class="line"># 使用示例</span><br><span class="line">if __name__ == &quot;__main__&quot;:</span><br><span class="line">    monitor = ServiceMonitor([</span><br><span class="line">        &quot;http://api.service1.com/health&quot;,</span><br><span class="line">        &quot;http://api.service2.com/health&quot;,</span><br><span class="line">        &quot;http://api.service3.com/health&quot;</span><br><span class="line">    ])</span><br><span class="line">    monitor.run_checks()</span><br></pre></td></tr></table></figure>
+
+<p>【提示】result &#x3D; self.check_endpoint(endpoint) 这个写法在高频率监控时产生大量TCP连接，消耗系统资源，使用<code>requests.Session()</code>复用连接，而且<code>endpoints</code>列表被恶意注入或配置错误，那么这个脚本就会持续攻击目标服务器，直接P4故障升级P0。而且这里没有重试机制，要是网络抖动一下就记成了ERROR,那就误报了。然后time.sleep(1)是同步进行了，如果endpoints是100个就要100秒，实效性太差了。</p>
+<p>3. </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">import yaml</span><br><span class="line">import json</span><br><span class="line"></span><br><span class="line">def load_and_validate_config(config_path):</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line">    加载并验证配置文件</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line">    with open(config_path, &#x27;r&#x27;) as f:</span><br><span class="line">        if config_path.endswith(&#x27;.yaml&#x27;) or config_path.endswith(&#x27;.yml&#x27;):</span><br><span class="line">            config = yaml.safe_load(f)</span><br><span class="line">        elif config_path.endswith(&#x27;.json&#x27;):</span><br><span class="line">            config = json.load(f)</span><br><span class="line">        else:</span><br><span class="line">            raise ValueError(&quot;Unsupported config format&quot;)</span><br><span class="line">    </span><br><span class="line">    # 验证必需字段</span><br><span class="line">    required_fields = [&#x27;service_name&#x27;, &#x27;port&#x27;, &#x27;database&#x27;]</span><br><span class="line">    for field in required_fields:</span><br><span class="line">        if field not in config:</span><br><span class="line">            raise KeyError(f&quot;Missing required field: &#123;field&#125;&quot;)</span><br><span class="line">    </span><br><span class="line">    # 验证端口范围</span><br><span class="line">    if config[&#x27;port&#x27;] &lt; 1 or config[&#x27;port&#x27;] &gt; 65535:</span><br><span class="line">        raise ValueError(f&quot;Invalid port number: &#123;config[&#x27;port&#x27;]&#125;&quot;)</span><br><span class="line">    </span><br><span class="line">    # 验证数据库连接信息</span><br><span class="line">    db_config = config[&#x27;database&#x27;]</span><br><span class="line">    if &#x27;host&#x27; not in db_config or &#x27;name&#x27; not in db_config:</span><br><span class="line">        raise ValueError(&quot;Invalid database configuration&quot;)</span><br><span class="line">    </span><br><span class="line">    return config</span><br><span class="line"></span><br><span class="line"># 使用示例</span><br><span class="line">if __name__ == &quot;__main__&quot;:</span><br><span class="line">    try:</span><br><span class="line">        config = load_and_validate_config(&quot;app_config.yaml&quot;)</span><br><span class="line">        print(f&quot;Config loaded successfully: &#123;config[&#x27;service_name&#x27;]&#125;&quot;)</span><br><span class="line">    except Exception as e:</span><br><span class="line">        print(f&quot;Failed to load config: &#123;e&#125;&quot;)</span><br></pre></td></tr></table></figure>
+
+<p>【提示】<code>config = yaml.safe_load(f)</code> 这个已经将整个文件加载到内存，由于配置文件都不会超级大，所以不会导致内存OOM。但是它没有进一步校验 “port应该是整数”，“host应该是有效主机名&#x2F;IP”这些格式问题。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢你请我喝咖啡～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/weixinzhifu.png" alt="Chris Chan WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/zhifubaopay.jpg" alt="Chris Chan Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>Chris Chan
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="http://example.com/2026/03/01/Linux%E8%BF%90%E7%BB%B4%E5%B7%A5%E7%A8%8B%E5%B8%88%E7%AC%94%E8%AF%95%E9%A2%98%E7%AC%AC%E4%BA%8C%E5%8D%81%E5%85%AD%E5%A5%97/" title="Linux运维工程师笔试题第二十六套">http://example.com/2026/03/01/Linux运维工程师笔试题第二十六套/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/python/" rel="tag"># python</a>
+              <a href="/tags/SRE/" rel="tag"># SRE</a>
+              <a href="/tags/%E9%9D%A2%E8%AF%95/" rel="tag"># 面试</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2026/02/27/AI%E7%9A%84%E6%84%9F%E8%A7%89/" rel="prev" title="简单唠唠AI的感觉">
+      <i class="fa fa-chevron-left"></i> 简单唠唠AI的感觉
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">那些在阳光下挥洒青春的日子啊！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">420</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">374</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">546k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">33:04</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script size="300" alpha="0.6" zIndex="-1" src="/lib/canvas-ribbon/canvas-ribbon.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/lozad@1/dist/lozad.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : true,
+      appId      : 'nSYhcIYyY8veS4CagLpfYOGQ-gzGzoHsz',
+      appKey     : 'yquKLAyWGvctpk9udF1ShQmr',
+      placeholder: "说点什么吧 ^_^",
+      avatar     : 'wavatar',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>
