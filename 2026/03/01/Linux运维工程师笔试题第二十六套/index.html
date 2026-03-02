@@ -31,7 +31,7 @@
 <meta property="og:description" content="随着现在SRE的代码越来越多是AI来写，那么面试的时候也没必要非要考手写算法题了，但是code review的能力一定要有，这是未来面试新趋势。">
 <meta property="og:locale">
 <meta property="article:published_time" content="2026-03-01T12:05:58.000Z">
-<meta property="article:modified_time" content="2026-03-01T13:36:35.609Z">
+<meta property="article:modified_time" content="2026-03-02T02:08:22.948Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="SRE">
 <meta property="article:tag" content="python">
@@ -219,10 +219,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2026-03-01 20:05:58 / Modified: 21:36:35" itemprop="dateCreated datePublished" datetime="2026-03-01T20:05:58+08:00">2026-03-01</time>
+              <time title="Created: 2026-03-01 20:05:58" itemprop="dateCreated datePublished" datetime="2026-03-01T20:05:58+08:00">2026-03-01</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2026-03-02 10:08:22" itemprop="dateModified" datetime="2026-03-02T10:08:22+08:00">2026-03-02</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -260,14 +266,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>2.8k</span>
+              <span>3.3k</span>
             </span>
             <span class="post-meta-item" title="Reading time">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>10 mins.</span>
+              <span>12 mins.</span>
             </span>
             <div class="post-description">随着现在SRE的代码越来越多是AI来写，那么面试的时候也没必要非要考手写算法题了，但是code review的能力一定要有，这是未来面试新趋势。</div>
 
@@ -293,6 +299,7 @@
 <li>对风险的评估是否准确？（是过度紧张，还是能区分“严重漏洞”和“代码异味”）</li>
 <li>解决方案是否工程化？（是打补丁，还是能设计出健壮的、可复用的模式）</li>
 </ul>
+<p>所以今天这几道题都是来考验code view的能力。</p>
 <ol>
 <li>分析下面的代码有什么BUG或者隐患？</li>
 </ol>
@@ -304,7 +311,7 @@
 </ol>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line">import requests</span><br><span class="line">import time</span><br><span class="line">from datetime import datetime</span><br><span class="line"></span><br><span class="line">class ServiceMonitor:</span><br><span class="line">    def __init__(self, endpoints):</span><br><span class="line">        self.endpoints = endpoints</span><br><span class="line">        self.results = []</span><br><span class="line">    </span><br><span class="line">    def check_endpoint(self, url):</span><br><span class="line">        try:</span><br><span class="line">            start = time.time()</span><br><span class="line">            response = requests.get(url, timeout=5)</span><br><span class="line">            elapsed = time.time() - start</span><br><span class="line">            </span><br><span class="line">            if response.status_code == 200:</span><br><span class="line">                return &#123;</span><br><span class="line">                    &#x27;url&#x27;: url,</span><br><span class="line">                    &#x27;status&#x27;: &#x27;UP&#x27;,</span><br><span class="line">                    &#x27;response_time&#x27;: elapsed,</span><br><span class="line">                    &#x27;timestamp&#x27;: datetime.now()</span><br><span class="line">                &#125;</span><br><span class="line">            else:</span><br><span class="line">                return &#123;</span><br><span class="line">                    &#x27;url&#x27;: url,</span><br><span class="line">                    &#x27;status&#x27;: &#x27;DOWN&#x27;,</span><br><span class="line">                    &#x27;response_time&#x27;: elapsed,</span><br><span class="line">                    &#x27;timestamp&#x27;: datetime.now()</span><br><span class="line">                &#125;</span><br><span class="line">        except Exception as e:</span><br><span class="line">            return &#123;</span><br><span class="line">                &#x27;url&#x27;: url,</span><br><span class="line">                &#x27;status&#x27;: &#x27;ERROR&#x27;,</span><br><span class="line">                &#x27;error&#x27;: str(e),</span><br><span class="line">                &#x27;timestamp&#x27;: datetime.now()</span><br><span class="line">            &#125;</span><br><span class="line">    </span><br><span class="line">    def run_checks(self):</span><br><span class="line">        for endpoint in self.endpoints:</span><br><span class="line">            result = self.check_endpoint(endpoint)</span><br><span class="line">            self.results.append(result)</span><br><span class="line">            time.sleep(1)  # 避免请求过于密集</span><br><span class="line">        </span><br><span class="line">        # 统计并告警</span><br><span class="line">        down_count = sum(1 for r in self.results if r[&#x27;status&#x27;] != &#x27;UP&#x27;)</span><br><span class="line">        if down_count &gt; len(self.endpoints) * 0.3:</span><br><span class="line">            self.send_alert(f&quot;&#123;down_count&#125; services down!&quot;)</span><br><span class="line">    </span><br><span class="line">    def send_alert(self, message):</span><br><span class="line">        # 模拟发送告警</span><br><span class="line">        print(f&quot;ALERT: &#123;message&#125;&quot;)</span><br><span class="line"></span><br><span class="line"># 使用示例</span><br><span class="line">if __name__ == &quot;__main__&quot;:</span><br><span class="line">    monitor = ServiceMonitor([</span><br><span class="line">        &quot;http://api.service1.com/health&quot;,</span><br><span class="line">        &quot;http://api.service2.com/health&quot;,</span><br><span class="line">        &quot;http://api.service3.com/health&quot;</span><br><span class="line">    ])</span><br><span class="line">    monitor.run_checks()</span><br></pre></td></tr></table></figure>
 
-<p>【提示】除了几个简单，还有这几个：result &#x3D; self.check_endpoint(endpoint) 这个写法在高频率监控时产生大量TCP连接，消耗系统资源，使用<code>requests.Session()</code>复用连接，而且<code>endpoints</code>列表被恶意注入或配置错误，那么这个脚本就会持续攻击目标服务器，直接P4故障升级P0。而且这里没有重试机制，要是网络抖动一下就记成了ERROR,那就误报了。然后time.sleep(1)是同步进行了，如果endpoints是100个就要100秒，实效性太差了。</p>
+<p>【提示】几个简单的错误这里不说的，还有这几个：<code>result = self.check_endpoint(endpoint)</code> 这个写法在高频率监控时产生大量TCP连接，消耗系统资源，使用<code>requests.Session()</code>复用连接，而且<code>endpoints</code>列表被恶意注入或配置错误，那么这个脚本就会持续攻击目标服务器，直接P4故障升级P0。而且这里没有重试机制，要是网络抖动一下就记成了ERROR,那就误报了。然后<code>time.sleep(1)</code>是同步进行了，如果endpoints是100个就要100秒，实效性太差了。</p>
 <ol start="3">
 <li>分析下面的代码有什么BUG或者隐患？</li>
 </ol>
@@ -329,6 +336,10 @@
 <li>&#96;# 标记原leader为非leader<br> failed_leader.is_leader &#x3D; False<h1 id="选择新的leader"><a href="#选择新的leader" class="headerlink" title="选择新的leader"></a>选择新的leader</h1> new_leader &#x3D; max(candidates, key&#x3D;lambda n: n.last_heartbeat)&#96;这个地方没有考虑到网络抖动就直接给老leader干掉了，但是老leader本身不知道自己被干掉了。所以出现两个leader，导致脑裂，一波老节点还在连老leader，新的节点去链接新leader。</li>
 <li><code>leader.tasks.append(task_data)  </code> 把结果仅保存在内存中，没有持久化，任务无法重新分配。会产生数据不一致。<br>当然还有额外几个，超出了我的能力了，能全看出来的，肯定是P9 P10级别的大神了。</li>
 </ol>
+<p>其实说来说去，大方向主要是这么几个：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">#### 1. 网络永远不可靠</span><br><span class="line">- 核心：超时、重试、熔断、降级</span><br><span class="line">- 补充：考虑幂等性（idempotency）——重试不能导致重复操作</span><br><span class="line">#### 2. 选举算法要严谨</span><br><span class="line">- 核心：多数决、租约、围栏令牌</span><br><span class="line">- 补充：考虑&quot;拜占庭将军问题&quot;——节点可能故意作恶</span><br><span class="line">#### 3. 内存是稀缺资源</span><br><span class="line">- 核心：流式处理、分页、持久化</span><br><span class="line">- 补充：考虑GC压力——大对象对垃圾回收的影响</span><br><span class="line">#### 4. 并发控制是基础</span><br><span class="line">- 核心：锁、原子操作、CAS</span><br><span class="line">- 补充：考虑死锁、活锁、饥饿问题</span><br><span class="line">#### 5. 边界条件要覆盖</span><br><span class="line">- 核心：重复、遗漏、异常输入</span><br><span class="line">- 补充：考虑国际化（编码、时区、语言）</span><br><span class="line">#### 6. 算法复杂度要评估</span><br><span class="line">- 核心：时间复杂度、空间复杂度</span><br><span class="line">- 补充：考虑缓存友好性、局部性原理</span><br><span class="line">#### 7. 资源管理要精细</span><br><span class="line">- 核心：连接池、线程池、文件描述符</span><br><span class="line">- 补充：考虑资源泄漏检测和自动回收</span><br><span class="line">#### 8. 现实情况要考虑</span><br><span class="line">- 核心：时钟漂移、磁盘满、内存不足</span><br><span class="line">- 补充：考虑灰度发布、回滚机制</span><br><span class="line">#### 9. 实时性要保证</span><br><span class="line">- 核心：事件驱动、异步、回调</span><br><span class="line">- 补充：考虑背压（backpressure）——防止生产者压垮消费者</span><br><span class="line">#### 10. 可观测性三支柱</span><br><span class="line">- 日志（Logs）：发生了什么？</span><br><span class="line">- 指标（Metrics）：系统状态如何？</span><br><span class="line">- 追踪（Traces）：请求路径是什么？</span><br><span class="line">#### 11. 混沌工程原则</span><br><span class="line">- 在生产环境故意引入故障</span><br><span class="line">- 验证系统的韧性（resilience）</span><br><span class="line">- 提前发现单点故障</span><br><span class="line">#### 12. 容量规划</span><br><span class="line">- 每个组件要有明确的SLA/SLO</span><br><span class="line">- 监控关键指标（QPS、延迟、错误率）</span><br><span class="line">- 设计自动扩缩容</span><br><span class="line">#### 13. 安全纵深防御</span><br><span class="line">- 每层都要有安全控制</span><br><span class="line">- 最小权限原则</span><br><span class="line">- 输入验证、输出编码</span><br></pre></td></tr></table></figure>
+
+<p>无论是面试还是实际工作，就要从这几点去重点看。</p>
 
     </div>
 
@@ -545,7 +556,7 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">33:12</span>
+    <span title="Reading time total">33:14</span>
 </div>
   <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
   </div>
