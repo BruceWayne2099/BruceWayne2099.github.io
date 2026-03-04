@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2026-03-03T16:44:30.077Z</updated>
+  <updated>2026-03-04T03:59:37.253Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,31 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>P99和avg</title>
+    <link href="http://example.com/2026/03/04/P99%E5%92%8Cavg/"/>
+    <id>http://example.com/2026/03/04/P99%E5%92%8Cavg/</id>
+    <published>2026-03-04T03:42:37.000Z</published>
+    <updated>2026-03-04T03:59:37.253Z</updated>
+    
+    <content type="html"><![CDATA[<p>首先先说P99的定义，它的意思是“第99百分位的XXX”。举个例子：</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">P99 RT = 所有请求中，第99百分位的响应时间,即99%的请求都快于或等于这个值</span><br><span class="line">P99 CPU = 99%的时间里，CPU使用率都低于这个值。</span><br></pre></td></tr></table></figure><p>假如P99 CPU使用率 &#x3D; 80%，意思是：99%的时间里，CPU使用率都低于80%。假设一个小时（3600秒），只有1%的时间，也就是36秒，CPU使用率会超过80%，剩下99%的时间（3564秒）都感受良好，1%是极端情况，但是如果极端情况很长久，也会影响SLI。</p><p>同理，P99 CPU使用率 &#x3D; 60%，说明“99%的时间里CPU使用率都低于60%”，有40%的缓冲空间应对突发流量，系统很轻松，用户体验好。</p><p>再举一个例子，场景：CPU使用率数据 &#x3D; [10%, 20%, 30%, 40%, 100%]</p><ul><li>AVG（平均值）&#x3D; (10+20+30+40+100)&#x2F;5 &#x3D; 40%</li><li>P99 ≈ 100%（因为只有1个值超过其他值）<br>结论：</li><li>AVG说：平均40%，看起来还好</li><li>P99说：有20%的时间（1&#x2F;5）CPU飙到100%，用户体验差！</li></ul><p>所以说，看P99是为了，了解用户体验，跟SLI相关。而看AVG更多了解资源利用率，了解一个大盘情况。</p><p><img data-src="/images/p99.png" title="这里有一个p99与avg相差较大的例子"></p><p>从这个图可以看出，平时负载确实不重：平均CPU只有46%，但有严重突发问题：1%的时间CPU冲到96.6%以上，甚至偶尔会”卡到几乎死机”！这1%可能影响用户体验，比如用户刚好在这1%的时间访问，就会卡顿。说明这个系统有稳定性风险（1%的时间接近满载），需要优化这1%的异常情况。</p>]]></content>
+    
+    
+    <summary type="html">简单来说AVG看整体趋势</summary>
+    
+    
+    
+    <category term="工作与技术" scheme="http://example.com/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/"/>
+    
+    
+    <category term="grafana" scheme="http://example.com/tags/grafana/"/>
+    
+    <category term="metrics" scheme="http://example.com/tags/metrics/"/>
+    
+    <category term="bosun" scheme="http://example.com/tags/bosun/"/>
+    
+  </entry>
   
   <entry>
     <title>简单唠唠AI的感觉</title>
@@ -470,31 +495,6 @@
     <category term="SRE" scheme="http://example.com/tags/SRE/"/>
     
     <category term="业务" scheme="http://example.com/tags/%E4%B8%9A%E5%8A%A1/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>如何彻底删除360</title>
-    <link href="http://example.com/2025/02/22/%E5%A6%82%E4%BD%95%E5%BD%BB%E5%BA%95%E5%88%A0%E9%99%A4360/"/>
-    <id>http://example.com/2025/02/22/%E5%A6%82%E4%BD%95%E5%BD%BB%E5%BA%95%E5%88%A0%E9%99%A4360/</id>
-    <published>2025-02-22T14:41:05.000Z</published>
-    <updated>2025-11-08T00:47:56.537Z</updated>
-    
-    <content type="html"><![CDATA[<p>前两天，我在尝试将微信语音转化mp3的时候，需要下载一个软件，但是不小心联同下载并安装了360。结果这个流氓软件果然在卸载之后，依旧会在电脑中有大量的残留。残留在c盘program files(x86)的360文件夹里，还随着开机启动。如果我直接删除这个文件，那么就会报“你需要来自administertors的权限才能删除”这样的提示。目前搜了一下，没有一个特别好的办法能够解决这个问题。</p><p>尝试了了半天，在csdn里有一个亲试可行的办法，来做记录和分享。</p><p>首先 <code>win+r</code> 进入运行窗口-&gt;输入<code>msconfig</code>-&gt;点击<code>引导</code>选项-&gt;选择<code>安全引导</code>-&gt;直接重启你的电脑。 重启之后你的电脑进入一个管控状态，然后找到360文件夹下的360safe文件夹，全选然后删除掉就行了。</p><p>确认都删除干净后。再次<code>win+r</code> 进入运行窗口-&gt;输入<code>msconfig</code>-&gt;点击引导选项-&gt;取消掉刚才点击的安全引导-&gt;再次重启你的电脑。你的win11就恢复正常了，同时360的内容也消失了。</p><p>最后让我骂一句，360以及周鸿祎，你们真特么的缺德，真他妈不要个脸！</p>]]></content>
-    
-    
-    <summary type="html">从做出的软件就知道这个公司的企业文化了</summary>
-    
-    
-    
-    <category term="工作与技术" scheme="http://example.com/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/"/>
-    
-    
-    <category term="360" scheme="http://example.com/tags/360/"/>
-    
-    <category term="流氓软件" scheme="http://example.com/tags/%E6%B5%81%E6%B0%93%E8%BD%AF%E4%BB%B6/"/>
-    
-    <category term="垃圾清理" scheme="http://example.com/tags/%E5%9E%83%E5%9C%BE%E6%B8%85%E7%90%86/"/>
     
   </entry>
   
