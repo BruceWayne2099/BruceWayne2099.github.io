@@ -25,8 +25,8 @@
 
   <meta name="description" content="Grafana的配置，对于SRE来说应该手拿把掐">
 <meta property="og:type" content="article">
-<meta property="og:title" content="使用　repeat + bosun 配置grafana界面">
-<meta property="og:url" content="http://example.com/2026/03/04/%E2%80%9C%E9%85%8D%E7%BD%AEgrafana%E7%9A%84%E5%87%A0%E4%B8%AA%E5%B0%8F%E6%8A%80%E5%B7%A7%E2%80%9D/index.html">
+<meta property="og:title" content="使 metrics + bosun 配置grafana界面">
+<meta property="og:url" content="http://example.com/2020/03/04/%E2%80%9C%E9%85%8D%E7%BD%AEgrafana%E7%9A%84%E5%87%A0%E4%B8%AA%E5%B0%8F%E6%8A%80%E5%B7%A7%E2%80%9D/index.html">
 <meta property="og:site_name" content="石锤淡啤酒">
 <meta property="og:description" content="Grafana的配置，对于SRE来说应该手拿把掐">
 <meta property="og:locale">
@@ -41,15 +41,16 @@
 <meta property="og:image" content="http://example.com/images/grafana10.jpg">
 <meta property="og:image" content="http://example.com/images/grafana11.jpg">
 <meta property="og:image" content="http://example.com/images/grafana12.jpg">
-<meta property="article:published_time" content="2026-03-03T17:14:28.000Z">
-<meta property="article:modified_time" content="2026-03-04T03:20:56.876Z">
+<meta property="article:published_time" content="2020-03-03T17:14:28.000Z">
+<meta property="article:modified_time" content="2026-03-04T03:24:50.439Z">
 <meta property="article:author" content="Chris Chan">
-<meta property="article:tag" content="k8s">
-<meta property="article:tag" content="面试">
+<meta property="article:tag" content="bosun">
+<meta property="article:tag" content="grafana">
+<meta property="article:tag" content="metrics">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://example.com/images/grafana1.jpeg">
 
-<link rel="canonical" href="http://example.com/2026/03/04/%E2%80%9C%E9%85%8D%E7%BD%AEgrafana%E7%9A%84%E5%87%A0%E4%B8%AA%E5%B0%8F%E6%8A%80%E5%B7%A7%E2%80%9D/">
+<link rel="canonical" href="http://example.com/2020/03/04/%E2%80%9C%E9%85%8D%E7%BD%AEgrafana%E7%9A%84%E5%87%A0%E4%B8%AA%E5%B0%8F%E6%8A%80%E5%B7%A7%E2%80%9D/">
 
 
 <script id="page-configurations">
@@ -62,7 +63,7 @@
   };
 </script>
 
-  <title>使用　repeat + bosun 配置grafana界面 | 石锤淡啤酒</title>
+  <title>使 metrics + bosun 配置grafana界面 | 石锤淡啤酒</title>
   
 
 
@@ -208,7 +209,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2026/03/04/%E2%80%9C%E9%85%8D%E7%BD%AEgrafana%E7%9A%84%E5%87%A0%E4%B8%AA%E5%B0%8F%E6%8A%80%E5%B7%A7%E2%80%9D/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2020/03/04/%E2%80%9C%E9%85%8D%E7%BD%AEgrafana%E7%9A%84%E5%87%A0%E4%B8%AA%E5%B0%8F%E6%8A%80%E5%B7%A7%E2%80%9D/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -221,7 +222,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          使用　repeat + bosun 配置grafana界面
+          使 metrics + bosun 配置grafana界面
         </h1>
 
         <div class="post-meta">
@@ -230,10 +231,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2026-03-04 01:14:28 / Modified: 11:20:56" itemprop="dateCreated datePublished" datetime="2026-03-04T01:14:28+08:00">2026-03-04</time>
+              <time title="Created: 2020-03-04 01:14:28" itemprop="dateCreated datePublished" datetime="2020-03-04T01:14:28+08:00">2020-03-04</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2026-03-04 11:24:50" itemprop="dateModified" datetime="2026-03-04T11:24:50+08:00">2026-03-04</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -245,7 +252,7 @@
             </span>
 
           
-            <span id="/2026/03/04/%E2%80%9C%E9%85%8D%E7%BD%AEgrafana%E7%9A%84%E5%87%A0%E4%B8%AA%E5%B0%8F%E6%8A%80%E5%B7%A7%E2%80%9D/" class="post-meta-item leancloud_visitors" data-flag-title="使用　repeat + bosun 配置grafana界面" title="Views">
+            <span id="/2020/03/04/%E2%80%9C%E9%85%8D%E7%BD%AEgrafana%E7%9A%84%E5%87%A0%E4%B8%AA%E5%B0%8F%E6%8A%80%E5%B7%A7%E2%80%9D/" class="post-meta-item leancloud_visitors" data-flag-title="使 metrics + bosun 配置grafana界面" title="Views">
               <span class="post-meta-item-icon">
                 <i class="fa fa-eye"></i>
               </span>
@@ -260,8 +267,8 @@
       </span>
       <span class="post-meta-item-text">Valine: </span>
     
-    <a title="valine" href="/2026/03/04/%E2%80%9C%E9%85%8D%E7%BD%AEgrafana%E7%9A%84%E5%87%A0%E4%B8%AA%E5%B0%8F%E6%8A%80%E5%B7%A7%E2%80%9D/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2026/03/04/%E2%80%9C%E9%85%8D%E7%BD%AEgrafana%E7%9A%84%E5%87%A0%E4%B8%AA%E5%B0%8F%E6%8A%80%E5%B7%A7%E2%80%9D/" itemprop="commentCount"></span>
+    <a title="valine" href="/2020/03/04/%E2%80%9C%E9%85%8D%E7%BD%AEgrafana%E7%9A%84%E5%87%A0%E4%B8%AA%E5%B0%8F%E6%8A%80%E5%B7%A7%E2%80%9D/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/03/04/%E2%80%9C%E9%85%8D%E7%BD%AEgrafana%E7%9A%84%E5%87%A0%E4%B8%AA%E5%B0%8F%E6%8A%80%E5%B7%A7%E2%80%9D/" itemprop="commentCount"></span>
     </a>
   </span>
   
@@ -271,7 +278,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>498</span>
+              <span>576</span>
             </span>
             <span class="post-meta-item" title="Reading time">
               <span class="post-meta-item-icon">
@@ -304,6 +311,7 @@
 <p>grafana的变量可以用在多个地方，甚至可以放到row的名称里，比如：<br><img data-src="/images/grafana7.jpg" title="query可以针对的添加变量和展示变量"></p>
 <p>如果你有不同的row，每一个row除了通用的变量之外，还要读取单独的变量，那么你就只能分开设定不同的变量。然后对应不同的row的bosun公式在repeat的地方配置上不同的变量即可：<br><img data-src="/images/grafana8.jpg" title="这样实现了一个类似tab的功能"></p>
 <p>如果你觉得bosun太难了，只是想单纯的选择mertics来配置，那么你需要确认好你的租户，以及具体的mertics指标，比如“tce.container.cpu_usage.mt”。然后对应选择好你的条件，这些条件都是根据数据库的实际情况实际字段来填写的：<br><img data-src="/images/grafana10.jpg" title="根据实际数据库的字段和对应的条件在grafana里填写"><br><img data-src="/images/grafana11.jpg" title="如果出现This is a multi-field metric, please specify a field name，说明还要再选一个多值"><br><img data-src="/images/grafana12.jpg" title="选择好了就会出现，这里的条件在grafana里就要一模一样的，因为他们其实的源是同一个"></p>
+<p>如果是mertics，想要“一图多线”，就直接用<code>XXX literal_or (AAA|BBB|ccc)，group by = true</code>的方式就行，但是在bosun里是不行的！因为<code>group by</code>的公式不是这么写的，具体怎么写我也还没弄清楚，所以boson我都是单图少线，mertics才是一图多线。</p>
 
     </div>
 
@@ -339,7 +347,7 @@
   </li>
   <li class="post-copyright-link">
     <strong>Post link: </strong>
-    <a href="http://example.com/2026/03/04/%E2%80%9C%E9%85%8D%E7%BD%AEgrafana%E7%9A%84%E5%87%A0%E4%B8%AA%E5%B0%8F%E6%8A%80%E5%B7%A7%E2%80%9D/" title="使用　repeat + bosun 配置grafana界面">http://example.com/2026/03/04/“配置grafana的几个小技巧”/</a>
+    <a href="http://example.com/2020/03/04/%E2%80%9C%E9%85%8D%E7%BD%AEgrafana%E7%9A%84%E5%87%A0%E4%B8%AA%E5%B0%8F%E6%8A%80%E5%B7%A7%E2%80%9D/" title="使 metrics + bosun 配置grafana界面">http://example.com/2020/03/04/“配置grafana的几个小技巧”/</a>
   </li>
   <li class="post-copyright-license">
     <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
@@ -369,8 +377,9 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/%E9%9D%A2%E8%AF%95/" rel="tag"># 面试</a>
-              <a href="/tags/k8s/" rel="tag"># k8s</a>
+              <a href="/tags/grafana/" rel="tag"># grafana</a>
+              <a href="/tags/metrics/" rel="tag"># metrics</a>
+              <a href="/tags/bosun/" rel="tag"># bosun</a>
           </div>
 
         
@@ -379,10 +388,13 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2026/02/27/AI%E7%9A%84%E6%84%9F%E8%A7%89/" rel="prev" title="简单唠唠AI的感觉">
-      <i class="fa fa-chevron-left"></i> 简单唠唠AI的感觉
+    <a href="/2020/02/03/2019%E5%B9%B4%E7%9A%84%E8%AF%BB%E4%B9%A6%E6%80%BB%E7%BB%93/" rel="prev" title="2019年的个人读书总结">
+      <i class="fa fa-chevron-left"></i> 2019年的个人读书总结
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2020/03/07/%E5%8D%87%E7%BA%A7%E4%BA%86tomcat%EF%BC%8C%E6%97%A5%E5%BF%97%E6%96%87%E4%BB%B6%E6%B2%A1%E6%9C%89%E8%AF%BB%E6%9D%83%E9%99%90%E4%BA%86/" rel="next" title="升级了tomcat8，日志文件没有读权限了">
+      升级了tomcat8，日志文件没有读权限了 <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -468,7 +480,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">374</span>
+        <span class="site-state-item-count">376</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
