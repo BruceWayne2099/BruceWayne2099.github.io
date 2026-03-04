@@ -36,8 +36,13 @@
 <meta property="og:image" content="http://example.com/images/grafana4.jepg">
 <meta property="og:image" content="http://example.com/images/grafana5.jepg">
 <meta property="og:image" content="http://example.com/images/grafana6.jepg">
+<meta property="og:image" content="http://example.com/images/grafana7.jepg">
+<meta property="og:image" content="http://example.com/images/grafana8.jepg">
+<meta property="og:image" content="http://example.com/images/grafana10.jepg">
+<meta property="og:image" content="http://example.com/images/grafana11.jepg">
+<meta property="og:image" content="http://example.com/images/grafana12.jepg">
 <meta property="article:published_time" content="2026-03-03T17:14:28.000Z">
-<meta property="article:modified_time" content="2026-03-04T03:05:41.663Z">
+<meta property="article:modified_time" content="2026-03-04T03:19:51.107Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="k8s">
 <meta property="article:tag" content="面试">
@@ -227,7 +232,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2026-03-04 01:14:28 / Modified: 11:05:41" itemprop="dateCreated datePublished" datetime="2026-03-04T01:14:28+08:00">2026-03-04</time>
+              <time title="Created: 2026-03-04 01:14:28 / Modified: 11:19:51" itemprop="dateCreated datePublished" datetime="2026-03-04T01:14:28+08:00">2026-03-04</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -266,14 +271,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>380</span>
+              <span>498</span>
             </span>
             <span class="post-meta-item" title="Reading time">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>1 mins.</span>
+              <span>2 mins.</span>
             </span>
             <div class="post-description">Grafana的配置，对于SRE来说应该手拿把掐</div>
 
@@ -296,7 +301,9 @@
 <p><img data-src="/images/grafana4.jepg" title="这样就OK"></p>
 <p>如果你觉得多根线在一个图里太难看了，看不出来啥，那么你可以使用<code>repeat</code>，这样它就会去读你的变量，针对每一个变量来生成一个一模一样的图片，但是repeat出来的图是不能edit的，只能edit第一个图：<br><img data-src="/images/grafana5.jepg" title="repeat在panel的最下面"></p>
 <p>但是如果一个图里可以放多根线，那么依旧是添加query即可：<br><img data-src="/images/grafana6.jepg" title="query可以针对的添加变量和展示变量"></p>
-<p>打开之后，这里可以配置对应的变量。如果你有不同的row，每一个row除了通用的变量之外，还要读取单独的变量，那么你就分开设定不同的变量。</p>
+<p>grafana的变量可以用在多个地方，甚至可以放到row的名称里，比如：<br><img data-src="/images/grafana7.jepg" title="query可以针对的添加变量和展示变量"></p>
+<p>如果你有不同的row，每一个row除了通用的变量之外，还要读取单独的变量，那么你就只能分开设定不同的变量。然后对应不同的row的bosun公式在repeat的地方配置上不同的变量即可：<br><img data-src="/images/grafana8.jepg" title="这样实现了一个类似tab的功能"></p>
+<p>如果你觉得bosun太难了，只是想单纯的选择mertics来配置，那么你需要确认好你的租户，以及具体的mertics指标，比如“tce.container.cpu_usage.mt”。然后对应选择好你的条件，这些条件都是根据数据库的实际情况实际字段来填写的：<br><img data-src="/images/grafana10.jepg" title="根据实际数据库的字段和对应的条件在grafana里填写"><br><img data-src="/images/grafana11.jepg" title="如果出现This is a multi-field metric, please specify a field name，说明还要再选一个多值"><br><img data-src="/images/grafana12.jepg" title="选择好了就会出现，这里的条件在grafana里就要一模一样的，因为他们其实的源是同一个"></p>
 
     </div>
 
@@ -506,12 +513,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="Symbols count total">549k</span>
+    <span title="Symbols count total">550k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">33:18</span>
+    <span title="Reading time total">33:19</span>
 </div>
   <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
   </div>
