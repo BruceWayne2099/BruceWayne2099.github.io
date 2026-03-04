@@ -42,7 +42,7 @@
 <meta property="og:image" content="http://example.com/images/grafana11.jpg">
 <meta property="og:image" content="http://example.com/images/grafana12.jpg">
 <meta property="article:published_time" content="2020-03-03T17:14:28.000Z">
-<meta property="article:modified_time" content="2026-03-04T03:35:37.689Z">
+<meta property="article:modified_time" content="2026-03-04T03:37:46.066Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="bosun">
 <meta property="article:tag" content="grafana">
@@ -239,7 +239,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2026-03-04 11:35:37" itemprop="dateModified" datetime="2026-03-04T11:35:37+08:00">2026-03-04</time>
+                <time title="Modified: 2026-03-04 11:37:46" itemprop="dateModified" datetime="2026-03-04T11:37:46+08:00">2026-03-04</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -299,7 +299,7 @@
 
       
         <p>Grafana 给当前页面配置变量是在右上角的settings里：<br><img data-src="/images/grafana1.jpeg" title="在这里点击小齿轮"></p>
-<p>在这里的变量支持多种“源”：<br><img data-src="/images/grafana2.jpg" title="这里是用数据库做成源"><br><img data-src="/images/grafana3.jpg" title="这里是自定义的源，可以多选，到时候在语句里当变量使用"></p>
+<p>在这里的变量支持多种“源”：<br><img data-src="/images/grafana2.jpg" title="看type字段，这里是用数据库当源"><br><img data-src="/images/grafana3.jpg" title="这里是用constom即自定义的源，可以自己写，可以多选，到时候在查询里当变量使用"></p>
 <p>如果你想用bosun语句来配置图表的话，首先你要确定好的bosun,我以我们的一个sli公式为例：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">((1 - (fv(nv((fv(nv(q(&quot;sum:1m-sum-none:top-1000-avg:bytedtrace.sdk.span.client.rate&#123;&#125;&#123;_is_error=1,_to_service=AAA&#125;&quot;,&quot;10800s&quot;,&quot;0s&quot;),0),0) + fv(nv(q(&quot;sum:1m-sum-none:top-1000-avg:bytedtrace.sdk.span.client.rate&#123;&#125;&#123;_biz_status_code=not_sliteral_or(0),_is_error=0,_to_service=AAA&#125;&quot;,&quot;10800s&quot;,&quot;0s&quot;),0),0)),0),0) / fv((nv(fv(nv(q(&quot;sum:1m-sum-none:top-1000-avg:bytedtrace.sdk.span.client.rate&#123;&#125;&#123;_to_service=AAA&#125;&quot;,&quot;10800s&quot;,&quot;0s&quot;),0),0),0) + 1e-9),0))) * 100)</span><br></pre></td></tr></table></figure>
 
