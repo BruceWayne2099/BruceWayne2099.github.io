@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","width":300,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":true,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="运维这种有经常重复的工作的工种，ai真的能极大的释放生产力">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Agent Skill小白入门蓝皮书">
+<meta property="og:url" content="http://example.com/2026/03/04/Agent-Skill%E5%B0%8F%E7%99%BD%E5%85%A5%E9%97%A8%E8%93%9D%E7%9A%AE%E4%B9%A6/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="运维这种有经常重复的工作的工种，ai真的能极大的释放生产力">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/skill.jpg">
+<meta property="article:published_time" content="2026-03-04T13:01:30.000Z">
+<meta property="article:modified_time" content="2026-03-04T13:21:31.187Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="OpenClaw">
+<meta property="article:tag" content="ai">
+<meta property="article:tag" content="skill">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/skill.jpg">
+
+<link rel="canonical" href="http://example.com/2026/03/04/Agent-Skill%E5%B0%8F%E7%99%BD%E5%85%A5%E9%97%A8%E8%93%9D%E7%9A%AE%E4%B9%A6/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>Agent Skill小白入门蓝皮书 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="石锤淡啤酒" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">石锤淡啤酒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">生活就是等待戈多</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2026/03/04/Agent-Skill%E5%B0%8F%E7%99%BD%E5%85%A5%E9%97%A8%E8%93%9D%E7%9A%AE%E4%B9%A6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="那些在阳光下挥洒青春的日子啊！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Agent Skill小白入门蓝皮书
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2026-03-04 21:01:30 / Modified: 21:21:31" itemprop="dateCreated datePublished" datetime="2026-03-04T21:01:30+08:00">2026-03-04</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2026/03/04/Agent-Skill%E5%B0%8F%E7%99%BD%E5%85%A5%E9%97%A8%E8%93%9D%E7%9A%AE%E4%B9%A6/" class="post-meta-item leancloud_visitors" data-flag-title="Agent Skill小白入门蓝皮书" title="Views">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/2026/03/04/Agent-Skill%E5%B0%8F%E7%99%BD%E5%85%A5%E9%97%A8%E8%93%9D%E7%9A%AE%E4%B9%A6/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2026/03/04/Agent-Skill%E5%B0%8F%E7%99%BD%E5%85%A5%E9%97%A8%E8%93%9D%E7%9A%AE%E4%B9%A6/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>1.1k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>4 mins.</span>
+            </span>
+            <div class="post-description">运维这种有经常重复的工作的工种，ai真的能极大的释放生产力</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Skill，顾名思义，就是技能的意思。在正式介绍 Skill 之前，可以想象一下骑自行车。这就是”技能（Skill）”的本质 —— 将复杂的、需要逐步推理的任务，封装成一套可以自动执行的流程。</p>
+<p>人类其实就是一个超级 Agent。让我们用 AI 的视角重新审视这个过程：人脑 &#x3D; 大语言模型（LLM）</p>
+<p>人类大脑的工作方式，和 Agent 惊人地相似：<br><img data-src="/images/skill.jpg" title="人与ai的对比"></p>
+<p>现在，我们可以正式定义了：Agent Skill，是一套标准化的能力封装，它将复杂的、需要多步推理和工具调用的任务，打包成一个可以直接使用的”技能包”。</p>
+<p>一个 Skill 通常是以一个文件夹的形式存在的，文件夹的目录结构如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">riding-skill/</span><br><span class="line">├── SKILL.md # 必须：Skill 的定义、执行流程（告诉LLM，如何执行这个 Skill）</span><br><span class="line">├── scripts/ # 可选：Skill 中可能用到的脚本（LLM 的“手脚”）</span><br><span class="line">├── assets/ # 可选：Skill 中可能用到的静态资源（也是LLM 的“手脚”）</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="举个例子"><a href="#举个例子" class="headerlink" title="举个例子"></a>举个例子</h2><p>为了给大家一个更直观的展示，这里给大家展示一个小示例：一个「两数相加的 Skill 」</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">two-numbers-sum/</span><br><span class="line">├── SKILL.md</span><br><span class="line">├── scripts/</span><br><span class="line">    ├── add_numbers.py</span><br></pre></td></tr></table></figure>
+
+<p>SKILL.md 文件内部主要包含两部分：</p>
+<ol>
+<li><p>元信息（Metadata）：告诉 Agent 这个 Skill 是什么，何时使用</p>
+</li>
+<li><p>name：技能名称</p>
+</li>
+<li><p>description：对技能功能的描述</p>
+</li>
+<li><p>操作流程（Steps）：告诉 Agent，如何执行这个 Skill</p>
+</li>
+</ol>
+<p>SKILL.md长下面这样：</p>
+<hr>
+<h2 id="name-two-numbers-sumdescription-两数之和计算工具，用于快速准确地计算两个数字的和。当用户需要计算两个数字的加法运算时使用，支持整数、小数和负数。输出格式：”哈哈哈，我算出来了！结果是-结果-”。适用场景包括：-1-简单的两个数字相加-2-需要确保计算准确性-3-批量的加法运算。"><a href="#name-two-numbers-sumdescription-两数之和计算工具，用于快速准确地计算两个数字的和。当用户需要计算两个数字的加法运算时使用，支持整数、小数和负数。输出格式：”哈哈哈，我算出来了！结果是-结果-”。适用场景包括：-1-简单的两个数字相加-2-需要确保计算准确性-3-批量的加法运算。" class="headerlink" title="name: two-numbers-sumdescription: 两数之和计算工具，用于快速准确地计算两个数字的和。当用户需要计算两个数字的加法运算时使用，支持整数、小数和负数。输出格式：”哈哈哈，我算出来了！结果是{结果}”。适用场景包括：(1) 简单的两个数字相加 (2) 需要确保计算准确性 (3) 批量的加法运算。"></a>name: two-numbers-sum<br>description: 两数之和计算工具，用于快速准确地计算两个数字的和。当用户需要计算两个数字的加法运算时使用，支持整数、小数和负数。输出格式：”哈哈哈，我算出来了！结果是{结果}”。适用场景包括：(1) 简单的两个数字相加 (2) 需要确保计算准确性 (3) 批量的加法运算。</h2><h1 id="两数之和"><a href="#两数之和" class="headerlink" title="两数之和"></a>两数之和</h1><h2 id="概览"><a href="#概览" class="headerlink" title="概览"></a>概览</h2><p>这个技能提供了一个专门用于计算两个数字之和的工具，使用Python脚本确保计算的准确性和一致性。当用户请求两个数字相加时，技能会调用优化的加法脚本并返回带有趣味性的格式化结果。</p>
+<h2 id="执行步骤"><a href="#执行步骤" class="headerlink" title="执行步骤"></a>执行步骤</h2><ol>
+<li><strong>提取数字</strong>：从用户输入中识别两个数字</li>
+<li><strong>调用脚本</strong>：使用 <code>scripts/add_numbers.py</code> 进行计算</li>
+<li><strong>格式化输出</strong>：按照要求的格式返回结果</li>
+</ol>
+<h2 id="使用方法"><a href="#使用方法" class="headerlink" title="使用方法"></a>使用方法</h2><h3 id="脚本执行"><a href="#脚本执行" class="headerlink" title="脚本执行"></a>脚本执行</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 基本用法</span></span><br><span class="line">python3 scripts/add_numbers.py &lt;number1&gt; &lt;number2&gt;</span><br></pre></td></tr></table></figure>
+
+
+<p>add_numbers.py长这个样：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"> &quot;&quot;&quot;为便于大家理解，只放了部分核心代码，大家只需要知道，这是一个两数相加的脚本就好&quot;&quot;&quot;</span><br><span class="line">def add_two_numbers(num1, num2):</span><br><span class="line">    return num1 + num2</span><br><span class="line"></span><br><span class="line">def main():</span><br><span class="line">    result = add_two_numbers(args.num1, args.num2)</span><br></pre></td></tr></table></figure>
+
+<h2 id="何时使用-Skill"><a href="#何时使用-Skill" class="headerlink" title="何时使用 Skill"></a>何时使用 Skill</h2><p>当你的任务满足以下一个或多个特征时，就应该考虑使用 Skill，而不是依赖临时的长提示词或简单的脚本：</p>
+<ol>
+<li>需要处理本地文件：当 Agent 需要读取、分析、修改或创建本地文件时（如 PDF、Word 文档、Excel 表格、图片、代码等），Skill 可以将这些操作封装成标准流程。</li>
+<li>任务流程相对固定且可复用：例如，“将一篇 Markdown 文章进行风格优化，并转换为符合公司品牌指南的 PPT”这类任务，涉及多个固定步骤，非常适合封装成一个或多个 Skill。</li>
+<li>需要集成特定的知识或规范：比如，将公司的“品牌设计指南”、“代码审查规范”或“法务文案要求”封装成 Skill，可以让 Agent 在执行相关任务时自动遵循这些标准。</li>
+<li>非技术人员希望扩展 AI 的能力：Skill 的创建过程可以通过自然语言完成（借助 skill-creator），这极大地降低了非开发者为 Agent “赋能”的门槛。</li>
+<li>希望对 AI 的能力进行模块化管理和迭代：随着任务变得复杂，可以将不同的能力拆分成独立的 Skill（如文档读取 Skill、内容分析 Skill、图表生成 Skill），然后像乐高积木一样组合使用。当某个环节需要优化时，只需迭代对应的 Skill 即可。</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢你请我喝咖啡～</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/weixinzhifu.png" alt="Chris Chan WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/zhifubaopay.jpg" alt="Chris Chan Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>Chris Chan
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="http://example.com/2026/03/04/Agent-Skill%E5%B0%8F%E7%99%BD%E5%85%A5%E9%97%A8%E8%93%9D%E7%9A%AE%E4%B9%A6/" title="Agent Skill小白入门蓝皮书">http://example.com/2026/03/04/Agent-Skill小白入门蓝皮书/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/ai/" rel="tag"># ai</a>
+              <a href="/tags/skill/" rel="tag"># skill</a>
+              <a href="/tags/OpenClaw/" rel="tag"># OpenClaw</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2026/02/27/AI%E7%9A%84%E6%84%9F%E8%A7%89/" rel="prev" title="简单唠唠AI的感觉">
+      <i class="fa fa-chevron-left"></i> 简单唠唠AI的感觉
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BE%E4%B8%AA%E4%BE%8B%E5%AD%90"><span class="nav-number">2.</span> <span class="nav-text">举个例子</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#name-two-numbers-sumdescription-%E4%B8%A4%E6%95%B0%E4%B9%8B%E5%92%8C%E8%AE%A1%E7%AE%97%E5%B7%A5%E5%85%B7%EF%BC%8C%E7%94%A8%E4%BA%8E%E5%BF%AB%E9%80%9F%E5%87%86%E7%A1%AE%E5%9C%B0%E8%AE%A1%E7%AE%97%E4%B8%A4%E4%B8%AA%E6%95%B0%E5%AD%97%E7%9A%84%E5%92%8C%E3%80%82%E5%BD%93%E7%94%A8%E6%88%B7%E9%9C%80%E8%A6%81%E8%AE%A1%E7%AE%97%E4%B8%A4%E4%B8%AA%E6%95%B0%E5%AD%97%E7%9A%84%E5%8A%A0%E6%B3%95%E8%BF%90%E7%AE%97%E6%97%B6%E4%BD%BF%E7%94%A8%EF%BC%8C%E6%94%AF%E6%8C%81%E6%95%B4%E6%95%B0%E3%80%81%E5%B0%8F%E6%95%B0%E5%92%8C%E8%B4%9F%E6%95%B0%E3%80%82%E8%BE%93%E5%87%BA%E6%A0%BC%E5%BC%8F%EF%BC%9A%E2%80%9D%E5%93%88%E5%93%88%E5%93%88%EF%BC%8C%E6%88%91%E7%AE%97%E5%87%BA%E6%9D%A5%E4%BA%86%EF%BC%81%E7%BB%93%E6%9E%9C%E6%98%AF-%E7%BB%93%E6%9E%9C-%E2%80%9D%E3%80%82%E9%80%82%E7%94%A8%E5%9C%BA%E6%99%AF%E5%8C%85%E6%8B%AC%EF%BC%9A-1-%E7%AE%80%E5%8D%95%E7%9A%84%E4%B8%A4%E4%B8%AA%E6%95%B0%E5%AD%97%E7%9B%B8%E5%8A%A0-2-%E9%9C%80%E8%A6%81%E7%A1%AE%E4%BF%9D%E8%AE%A1%E7%AE%97%E5%87%86%E7%A1%AE%E6%80%A7-3-%E6%89%B9%E9%87%8F%E7%9A%84%E5%8A%A0%E6%B3%95%E8%BF%90%E7%AE%97%E3%80%82"><span class="nav-number">3.</span> <span class="nav-text">name: two-numbers-sumdescription: 两数之和计算工具，用于快速准确地计算两个数字的和。当用户需要计算两个数字的加法运算时使用，支持整数、小数和负数。输出格式：”哈哈哈，我算出来了！结果是{结果}”。适用场景包括：(1) 简单的两个数字相加 (2) 需要确保计算准确性 (3) 批量的加法运算。</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%A4%E6%95%B0%E4%B9%8B%E5%92%8C"><span class="nav-number">4.</span> <span class="nav-text">两数之和</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E8%A7%88"><span class="nav-number">4.1.</span> <span class="nav-text">概览</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%89%A7%E8%A1%8C%E6%AD%A5%E9%AA%A4"><span class="nav-number">4.2.</span> <span class="nav-text">执行步骤</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95"><span class="nav-number">4.3.</span> <span class="nav-text">使用方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%84%9A%E6%9C%AC%E6%89%A7%E8%A1%8C"><span class="nav-number">4.3.1.</span> <span class="nav-text">脚本执行</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%95%E6%97%B6%E4%BD%BF%E7%94%A8-Skill"><span class="nav-number">4.4.</span> <span class="nav-text">何时使用 Skill</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">那些在阳光下挥洒青春的日子啊！</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">425</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">380</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">552k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">33:28</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script size="300" alpha="0.6" zIndex="-1" src="/lib/canvas-ribbon/canvas-ribbon.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/lozad@1/dist/lozad.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : true,
+      appId      : 'nSYhcIYyY8veS4CagLpfYOGQ-gzGzoHsz',
+      appKey     : 'yquKLAyWGvctpk9udF1ShQmr',
+      placeholder: "说点什么吧 ^_^",
+      avatar     : 'wavatar',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

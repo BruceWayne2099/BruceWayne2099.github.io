@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2026-03-03T16:44:30.077Z</updated>
+  <updated>2026-03-04T13:21:31.187Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,31 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Agent Skill小白入门蓝皮书</title>
+    <link href="http://example.com/2026/03/04/Agent-Skill%E5%B0%8F%E7%99%BD%E5%85%A5%E9%97%A8%E8%93%9D%E7%9A%AE%E4%B9%A6/"/>
+    <id>http://example.com/2026/03/04/Agent-Skill%E5%B0%8F%E7%99%BD%E5%85%A5%E9%97%A8%E8%93%9D%E7%9A%AE%E4%B9%A6/</id>
+    <published>2026-03-04T13:01:30.000Z</published>
+    <updated>2026-03-04T13:21:31.187Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Skill，顾名思义，就是技能的意思。在正式介绍 Skill 之前，可以想象一下骑自行车。这就是”技能（Skill）”的本质 —— 将复杂的、需要逐步推理的任务，封装成一套可以自动执行的流程。</p><p>人类其实就是一个超级 Agent。让我们用 AI 的视角重新审视这个过程：人脑 &#x3D; 大语言模型（LLM）</p><p>人类大脑的工作方式，和 Agent 惊人地相似：<br><img data-src="/images/skill.jpg" title="人与ai的对比"></p><p>现在，我们可以正式定义了：Agent Skill，是一套标准化的能力封装，它将复杂的、需要多步推理和工具调用的任务，打包成一个可以直接使用的”技能包”。</p><p>一个 Skill 通常是以一个文件夹的形式存在的，文件夹的目录结构如下：</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">riding-skill/</span><br><span class="line">├── SKILL.md # 必须：Skill 的定义、执行流程（告诉LLM，如何执行这个 Skill）</span><br><span class="line">├── scripts/ # 可选：Skill 中可能用到的脚本（LLM 的“手脚”）</span><br><span class="line">├── assets/ # 可选：Skill 中可能用到的静态资源（也是LLM 的“手脚”）</span><br><span class="line"></span><br></pre></td></tr></table></figure><h2 id="举个例子"><a href="#举个例子" class="headerlink" title="举个例子"></a>举个例子</h2><p>为了给大家一个更直观的展示，这里给大家展示一个小示例：一个「两数相加的 Skill 」</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">two-numbers-sum/</span><br><span class="line">├── SKILL.md</span><br><span class="line">├── scripts/</span><br><span class="line">    ├── add_numbers.py</span><br></pre></td></tr></table></figure><p>SKILL.md 文件内部主要包含两部分：</p><ol><li><p>元信息（Metadata）：告诉 Agent 这个 Skill 是什么，何时使用</p></li><li><p>name：技能名称</p></li><li><p>description：对技能功能的描述</p></li><li><p>操作流程（Steps）：告诉 Agent，如何执行这个 Skill</p></li></ol><p>SKILL.md长下面这样：</p><hr><h2 id="name-two-numbers-sumdescription-两数之和计算工具，用于快速准确地计算两个数字的和。当用户需要计算两个数字的加法运算时使用，支持整数、小数和负数。输出格式：”哈哈哈，我算出来了！结果是-结果-”。适用场景包括：-1-简单的两个数字相加-2-需要确保计算准确性-3-批量的加法运算。"><a href="#name-two-numbers-sumdescription-两数之和计算工具，用于快速准确地计算两个数字的和。当用户需要计算两个数字的加法运算时使用，支持整数、小数和负数。输出格式：”哈哈哈，我算出来了！结果是-结果-”。适用场景包括：-1-简单的两个数字相加-2-需要确保计算准确性-3-批量的加法运算。" class="headerlink" title="name: two-numbers-sumdescription: 两数之和计算工具，用于快速准确地计算两个数字的和。当用户需要计算两个数字的加法运算时使用，支持整数、小数和负数。输出格式：”哈哈哈，我算出来了！结果是{结果}”。适用场景包括：(1) 简单的两个数字相加 (2) 需要确保计算准确性 (3) 批量的加法运算。"></a>name: two-numbers-sum<br>description: 两数之和计算工具，用于快速准确地计算两个数字的和。当用户需要计算两个数字的加法运算时使用，支持整数、小数和负数。输出格式：”哈哈哈，我算出来了！结果是{结果}”。适用场景包括：(1) 简单的两个数字相加 (2) 需要确保计算准确性 (3) 批量的加法运算。</h2><h1 id="两数之和"><a href="#两数之和" class="headerlink" title="两数之和"></a>两数之和</h1><h2 id="概览"><a href="#概览" class="headerlink" title="概览"></a>概览</h2><p>这个技能提供了一个专门用于计算两个数字之和的工具，使用Python脚本确保计算的准确性和一致性。当用户请求两个数字相加时，技能会调用优化的加法脚本并返回带有趣味性的格式化结果。</p><h2 id="执行步骤"><a href="#执行步骤" class="headerlink" title="执行步骤"></a>执行步骤</h2><ol><li><strong>提取数字</strong>：从用户输入中识别两个数字</li><li><strong>调用脚本</strong>：使用 <code>scripts/add_numbers.py</code> 进行计算</li><li><strong>格式化输出</strong>：按照要求的格式返回结果</li></ol><h2 id="使用方法"><a href="#使用方法" class="headerlink" title="使用方法"></a>使用方法</h2><h3 id="脚本执行"><a href="#脚本执行" class="headerlink" title="脚本执行"></a>脚本执行</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 基本用法</span></span><br><span class="line">python3 scripts/add_numbers.py &lt;number1&gt; &lt;number2&gt;</span><br></pre></td></tr></table></figure><p>add_numbers.py长这个样：</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"> &quot;&quot;&quot;为便于大家理解，只放了部分核心代码，大家只需要知道，这是一个两数相加的脚本就好&quot;&quot;&quot;</span><br><span class="line">def add_two_numbers(num1, num2):</span><br><span class="line">    return num1 + num2</span><br><span class="line"></span><br><span class="line">def main():</span><br><span class="line">    result = add_two_numbers(args.num1, args.num2)</span><br></pre></td></tr></table></figure><h2 id="何时使用-Skill"><a href="#何时使用-Skill" class="headerlink" title="何时使用 Skill"></a>何时使用 Skill</h2><p>当你的任务满足以下一个或多个特征时，就应该考虑使用 Skill，而不是依赖临时的长提示词或简单的脚本：</p><ol><li>需要处理本地文件：当 Agent 需要读取、分析、修改或创建本地文件时（如 PDF、Word 文档、Excel 表格、图片、代码等），Skill 可以将这些操作封装成标准流程。</li><li>任务流程相对固定且可复用：例如，“将一篇 Markdown 文章进行风格优化，并转换为符合公司品牌指南的 PPT”这类任务，涉及多个固定步骤，非常适合封装成一个或多个 Skill。</li><li>需要集成特定的知识或规范：比如，将公司的“品牌设计指南”、“代码审查规范”或“法务文案要求”封装成 Skill，可以让 Agent 在执行相关任务时自动遵循这些标准。</li><li>非技术人员希望扩展 AI 的能力：Skill 的创建过程可以通过自然语言完成（借助 skill-creator），这极大地降低了非开发者为 Agent “赋能”的门槛。</li><li>希望对 AI 的能力进行模块化管理和迭代：随着任务变得复杂，可以将不同的能力拆分成独立的 Skill（如文档读取 Skill、内容分析 Skill、图表生成 Skill），然后像乐高积木一样组合使用。当某个环节需要优化时，只需迭代对应的 Skill 即可。</li></ol>]]></content>
+    
+    
+    <summary type="html">运维这种有经常重复的工作的工种，ai真的能极大的释放生产力</summary>
+    
+    
+    
+    <category term="工作与技术" scheme="http://example.com/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/"/>
+    
+    
+    <category term="ai" scheme="http://example.com/tags/ai/"/>
+    
+    <category term="skill" scheme="http://example.com/tags/skill/"/>
+    
+    <category term="OpenClaw" scheme="http://example.com/tags/OpenClaw/"/>
+    
+  </entry>
   
   <entry>
     <title>简单唠唠AI的感觉</title>
@@ -472,29 +497,6 @@
     <category term="职场" scheme="http://example.com/tags/%E8%81%8C%E5%9C%BA/"/>
     
     <category term="管理" scheme="http://example.com/tags/%E7%AE%A1%E7%90%86/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>当我们成功的把一个业务做下线了</title>
-    <link href="http://example.com/2025/03/10/%E5%BD%93%E6%88%91%E4%BB%AC%E6%88%90%E5%8A%9F%E7%9A%84%E6%8A%8A%E4%B8%80%E4%B8%AA%E4%B8%9A%E5%8A%A1%E5%81%9A%E4%B8%8B%E7%BA%BF%E4%BA%86/"/>
-    <id>http://example.com/2025/03/10/%E5%BD%93%E6%88%91%E4%BB%AC%E6%88%90%E5%8A%9F%E7%9A%84%E6%8A%8A%E4%B8%80%E4%B8%AA%E4%B8%9A%E5%8A%A1%E5%81%9A%E4%B8%8B%E7%BA%BF%E4%BA%86/</id>
-    <published>2025-03-10T03:20:05.000Z</published>
-    <updated>2025-11-08T00:48:01.984Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="背景和要求"><a href="#背景和要求" class="headerlink" title="背景和要求"></a>背景和要求</h2><p>公司有一个业务计划下线，业务方已在12月就通知商家不再进行续签，并评估将于25年1月陆续下架平台内商品：1月23日商家商品全部下架，2月5日自营商品全部下架，3月31日完成了商家清退，3月31日同时下架app。然后要求在5月份左右实现相关的系统、资源也会全部下线。</p><p>跟法务、财务还有业务开了一个会，听下来，目标很简单：</p><ol><li>要求技术侧配合业务完成商品下架、商家清退、资金盘点提现等，保证业务平稳下线。</li><li>平稳下线这个业务相关的全部系统、资源，同时留存合规&amp;客服需要的离线数据。</li></ol><h2 id="具体安排"><a href="#具体安排" class="headerlink" title="具体安排"></a>具体安排</h2><ol><li><p>先根据业务的时间轴，制定出技术的时间轴。</p></li><li><p>然后对该业务的下线资源进行盘点，盘点的范围包括“应用、ecs、rds数据库、polardb、elk、redis、habase_lindorm、oss、sls、mq、cdn”等等。</p></li><li><p>应用的盘点无疑是比较麻烦的一个，要根据整个业务的功能进行梳理：<br><img data-src="/images/%E7%94%B5%E5%95%86%E4%B8%9A%E5%8A%A1.png" title="做一个电商的平台是多么的复杂"></p></li><li><p>应用和资源都梳理完毕之后，就向资源和应用的owner宣布整个下线的事宜和时间上的安排。</p></li><li><p>先动手的是一些实时的对账脚本，因为目前平台已经几乎停止交易了，只剩下几个交了钱但是还在履约的场景。所以这部分脚本停止了之后影响最小。</p></li><li><p>一些业务数据大屏可以第二步安排下线。</p></li><li><p>各方挂出公告，宣布XXX天后开始动手。</p></li><li><p>检查业务工单是否已经停止增长。</p></li><li><p>先搞交易不强相关的业务入口关闭：各种互动，逛逛等等。</p></li><li><p>然后再搞交易强相关的业务入口关闭：<br>● 首页、ND、搜索、店铺、商详：传统搜推公域与店铺私域<br>● 直播，包括直播列表、直播间、评论、宝贝口袋、主播端等：达人与店播带货的场域<br>● 百亿补贴、天猫国际、天猫超市等垂直场域<br>● BC消息（含手淘和千牛）：用户的售前、售中、售后咨询<br>● 商详、购物车、下单页、订单列表与详情（我的淘宝 -&gt; 我的订单）：交易下单<br>● 退货退款：逆向交易<br>● 会员登录：交易下单、逆向交易、消息发送、部分场域均依赖登录态</p></li><li><p>观察入口应用的流量情况，如果没有业务流量了，就开始下掉一些入口的应用，确保入口的流量（比如CDN、前端页面）先停掉。如果有流量就分析一下流量来源，逐步分批次下线容器数。这里重点看一下cdn域名关联写死了vip的情况。</p></li><li><p>不挂在应用下的资源，需要针对每种资源做下线方案，待应用下线后，再下线相关资源。</p></li></ol>]]></content>
-    
-    
-    <summary type="html">业务买来的时候轰轰隆隆，然后下线的时候一地鸡毛</summary>
-    
-    
-    
-    <category term="工作与技术" scheme="http://example.com/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/"/>
-    
-    
-    <category term="SRE" scheme="http://example.com/tags/SRE/"/>
-    
-    <category term="业务" scheme="http://example.com/tags/%E4%B8%9A%E5%8A%A1/"/>
     
   </entry>
   
