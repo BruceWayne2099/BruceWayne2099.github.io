@@ -38,11 +38,12 @@
 <meta property="og:image" content="http://example.com/images/grafana6.jpg">
 <meta property="og:image" content="http://example.com/images/grafana7.jpg">
 <meta property="og:image" content="http://example.com/images/grafana8.jpg">
+<meta property="og:image" content="http://example.com/images/grafana9.jpg">
 <meta property="og:image" content="http://example.com/images/grafana10.jpg">
 <meta property="og:image" content="http://example.com/images/grafana11.jpg">
 <meta property="og:image" content="http://example.com/images/grafana12.jpg">
 <meta property="article:published_time" content="2020-03-03T17:14:28.000Z">
-<meta property="article:modified_time" content="2026-03-04T03:37:46.066Z">
+<meta property="article:modified_time" content="2026-03-04T06:53:18.507Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="bosun">
 <meta property="article:tag" content="grafana">
@@ -239,7 +240,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2026-03-04 11:37:46" itemprop="dateModified" datetime="2026-03-04T11:37:46+08:00">2026-03-04</time>
+                <time title="Modified: 2026-03-04 14:53:18" itemprop="dateModified" datetime="2026-03-04T14:53:18+08:00">2026-03-04</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -278,14 +279,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>646</span>
+              <span>752</span>
             </span>
             <span class="post-meta-item" title="Reading time">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>2 mins.</span>
+              <span>3 mins.</span>
             </span>
             <div class="post-description">我觉得每个集团应该把自己的mertics的定义放到一个最规范的文档里，然后系统页面做成选择题而不是填空题，不然谁知道要填什么？</div>
 
@@ -310,6 +311,11 @@
 <p>但是如果一个图里可以放多根线，那么依旧是添加query即可：<br><img data-src="/images/grafana6.jpg" title="query可以针对的添加变量和展示变量"></p>
 <p>grafana的变量可以用在多个地方，甚至可以放到row的名称里，比如：<br><img data-src="/images/grafana7.jpg" title="query可以针对的添加变量和展示变量"></p>
 <p>如果你有不同的row，每一个row除了通用的变量之外，还要读取单独的变量，那么你就只能分开设定不同的变量。然后对应不同的row的bosun公式在repeat的地方配置上不同的变量即可：<br><img data-src="/images/grafana8.jpg" title="这样实现了一个类似tab的功能"></p>
+<p>如果是你想用bosun来得到一些满足条件的结果，比如延迟大于18000的队列：<br><img data-src="/images/grafana9.jpg" title="这样实现了一个类似tab的功能"></p>
+<p>首先你要配置好对应的变量，然后bosun就是这样：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$metric = des.mq.handler.latency.pct99</span><br><span class="line">$queryA = q(&quot;max:1m-avg-zero:$metric&#123;res=suc,op=req,stage=replay,id=$need_filter,direction=literal_or($direction),caller=$caller,type=$type,cluster=$cluster&#125;&quot;,&quot;2m&quot;,&quot;1m&quot;) / 1000000000</span><br><span class="line">$base = filter($queryA,avg($queryA) &gt;$abnormal_delay)</span><br><span class="line">$base</span><br></pre></td></tr></table></figure>
+
+<p>以graph的形式输出，鼠标放到y轴就能看到队列细节了。</p>
 <p>如果你觉得bosun太难了，只是想单纯的选择mertics来配置，那么你需要确认好你的租户，以及具体的mertics指标，比如“tce.container.cpu_usage.mt”。然后对应选择好你的条件，这些条件都是根据数据库的实际情况实际字段来填写的：<br><img data-src="/images/grafana10.jpg" title="根据实际数据库的字段和对应的条件在grafana里填写"><br><img data-src="/images/grafana11.jpg" title="如果出现This is a multi-field metric, please specify a field name，说明还要再选一个多值"><br><img data-src="/images/grafana12.jpg" title="选择好了就会出现曲线图了，这里的条件在grafana里就要一模一样的，因为他们其实的源是同一个，这里实际情况根据你们公司的数据库字段来"></p>
 <p>如果是mertics，想要“一图多线”，就直接用<code>XXX literal_or (AAA|BBB|ccc)，group by = true</code>的方式就行，但是在bosun里是不行的！因为<code>group by</code>的公式不是这么写的，具体怎么写我也还没弄清楚，所以boson我都是单图少线，mertics才是一图多线。</p>
 <p>这里还有一点要注意，就是降采样聚合方式，建议如果你的“聚合方式”用的是p99，那么“降采样聚合方式”也用p99。如果“聚合方式”用的是avg，那么“降采样聚合方式”也用avg，他俩同步。</p>
@@ -526,7 +532,7 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="Symbols count total">550k</span>
+    <span title="Symbols count total">551k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
