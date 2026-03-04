@@ -23,12 +23,12 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","width":300,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":true,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="Grafana的配置，对于SRE来说应该手拿把掐">
+  <meta name="description" content="我觉得每个集团应该把自己的mertics的定义放到一个最规范的文档里，然后系统页面做成选择题而不是填空题，不然谁知道要填什么？">
 <meta property="og:type" content="article">
 <meta property="og:title" content="使用 metrics + bosun 配置grafana界面">
 <meta property="og:url" content="http://example.com/2020/03/04/%E2%80%9C%E9%85%8D%E7%BD%AEgrafana%E7%9A%84%E5%87%A0%E4%B8%AA%E5%B0%8F%E6%8A%80%E5%B7%A7%E2%80%9D/index.html">
 <meta property="og:site_name" content="石锤淡啤酒">
-<meta property="og:description" content="Grafana的配置，对于SRE来说应该手拿把掐">
+<meta property="og:description" content="我觉得每个集团应该把自己的mertics的定义放到一个最规范的文档里，然后系统页面做成选择题而不是填空题，不然谁知道要填什么？">
 <meta property="og:locale">
 <meta property="og:image" content="http://example.com/images/grafana1.jpeg">
 <meta property="og:image" content="http://example.com/images/grafana2.jpg">
@@ -42,7 +42,7 @@
 <meta property="og:image" content="http://example.com/images/grafana11.jpg">
 <meta property="og:image" content="http://example.com/images/grafana12.jpg">
 <meta property="article:published_time" content="2020-03-03T17:14:28.000Z">
-<meta property="article:modified_time" content="2026-03-04T03:33:45.869Z">
+<meta property="article:modified_time" content="2026-03-04T03:35:37.689Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="bosun">
 <meta property="article:tag" content="grafana">
@@ -239,7 +239,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2026-03-04 11:33:45" itemprop="dateModified" datetime="2026-03-04T11:33:45+08:00">2026-03-04</time>
+                <time title="Modified: 2026-03-04 11:35:37" itemprop="dateModified" datetime="2026-03-04T11:35:37+08:00">2026-03-04</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -287,7 +287,7 @@
                 <span class="post-meta-item-text">Reading time &asymp;</span>
               <span>2 mins.</span>
             </span>
-            <div class="post-description">Grafana的配置，对于SRE来说应该手拿把掐</div>
+            <div class="post-description">我觉得每个集团应该把自己的mertics的定义放到一个最规范的文档里，然后系统页面做成选择题而不是填空题，不然谁知道要填什么？</div>
 
         </div>
       </header>
@@ -310,7 +310,7 @@
 <p>但是如果一个图里可以放多根线，那么依旧是添加query即可：<br><img data-src="/images/grafana6.jpg" title="query可以针对的添加变量和展示变量"></p>
 <p>grafana的变量可以用在多个地方，甚至可以放到row的名称里，比如：<br><img data-src="/images/grafana7.jpg" title="query可以针对的添加变量和展示变量"></p>
 <p>如果你有不同的row，每一个row除了通用的变量之外，还要读取单独的变量，那么你就只能分开设定不同的变量。然后对应不同的row的bosun公式在repeat的地方配置上不同的变量即可：<br><img data-src="/images/grafana8.jpg" title="这样实现了一个类似tab的功能"></p>
-<p>如果你觉得bosun太难了，只是想单纯的选择mertics来配置，那么你需要确认好你的租户，以及具体的mertics指标，比如“tce.container.cpu_usage.mt”。然后对应选择好你的条件，这些条件都是根据数据库的实际情况实际字段来填写的：<br><img data-src="/images/grafana10.jpg" title="根据实际数据库的字段和对应的条件在grafana里填写"><br><img data-src="/images/grafana11.jpg" title="如果出现This is a multi-field metric, please specify a field name，说明还要再选一个多值"><br><img data-src="/images/grafana12.jpg" title="选择好了就会出现，这里的条件在grafana里就要一模一样的，因为他们其实的源是同一个"></p>
+<p>如果你觉得bosun太难了，只是想单纯的选择mertics来配置，那么你需要确认好你的租户，以及具体的mertics指标，比如“tce.container.cpu_usage.mt”。然后对应选择好你的条件，这些条件都是根据数据库的实际情况实际字段来填写的：<br><img data-src="/images/grafana10.jpg" title="根据实际数据库的字段和对应的条件在grafana里填写"><br><img data-src="/images/grafana11.jpg" title="如果出现This is a multi-field metric, please specify a field name，说明还要再选一个多值"><br><img data-src="/images/grafana12.jpg" title="选择好了就会出现曲线图了，这里的条件在grafana里就要一模一样的，因为他们其实的源是同一个，这里实际情况根据你们公司的数据库字段来"></p>
 <p>如果是mertics，想要“一图多线”，就直接用<code>XXX literal_or (AAA|BBB|ccc)，group by = true</code>的方式就行，但是在bosun里是不行的！因为<code>group by</code>的公式不是这么写的，具体怎么写我也还没弄清楚，所以boson我都是单图少线，mertics才是一图多线。</p>
 <p>这里还有一点要注意，就是降采样聚合方式，建议如果你的“聚合方式”用的是p99，那么“降采样聚合方式”也用p99。如果“聚合方式”用的是avg，那么“降采样聚合方式”也用avg，他俩同步。</p>
 
