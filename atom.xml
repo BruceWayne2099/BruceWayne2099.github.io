@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2026-03-03T17:46:24.708Z</updated>
+  <updated>2026-03-04T03:05:41.663Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -21,10 +21,12 @@
     <link href="http://example.com/2026/03/04/%E2%80%9C%E9%85%8D%E7%BD%AEgrafana%E7%9A%84%E5%87%A0%E4%B8%AA%E5%B0%8F%E6%8A%80%E5%B7%A7%E2%80%9D/"/>
     <id>http://example.com/2026/03/04/%E2%80%9C%E9%85%8D%E7%BD%AEgrafana%E7%9A%84%E5%87%A0%E4%B8%AA%E5%B0%8F%E6%8A%80%E5%B7%A7%E2%80%9D/</id>
     <published>2026-03-03T17:14:28.000Z</published>
-    <updated>2026-03-03T17:46:24.708Z</updated>
+    <updated>2026-03-04T03:05:41.663Z</updated>
+    
+    <content type="html"><![CDATA[<p>Grafana 给当前页面配置变量是在右上角的settings里：<br><img data-src="/images/grafana1.jepg" title="在这里点击小齿轮"></p><p>在这里的变量支持多种“源”：<br><img data-src="/images/grafana2.jepg" title="这里是用数据库做成源"><br><img data-src="/images/grafana3.jepg" title="这里是自定义的源，可以多选，到时候在语句里当变量使用"></p><p>如果你想用bosun语句来配置图表的话，首先你要确定好的bosun,我以我们的一个sli公式为例：</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">((1 - (fv(nv((fv(nv(q(&quot;sum:1m-sum-none:top-1000-avg:bytedtrace.sdk.span.client.rate&#123;&#125;&#123;_is_error=1,_to_service=AAA&#125;&quot;,&quot;10800s&quot;,&quot;0s&quot;),0),0) + fv(nv(q(&quot;sum:1m-sum-none:top-1000-avg:bytedtrace.sdk.span.client.rate&#123;&#125;&#123;_biz_status_code=not_sliteral_or(0),_is_error=0,_to_service=AAA&#125;&quot;,&quot;10800s&quot;,&quot;0s&quot;),0),0)),0),0) / fv((nv(fv(nv(q(&quot;sum:1m-sum-none:top-1000-avg:bytedtrace.sdk.span.client.rate&#123;&#125;&#123;_to_service=AAA&#125;&quot;,&quot;10800s&quot;,&quot;0s&quot;),0),0),0) + 1e-9),0))) * 100)</span><br></pre></td></tr></table></figure><p>这个公式就是算一个SLI成功率，认为AAA这个应用而言，<code>_is_error=1</code>和<code>_biz_status_code=not_sliteral_or(0) and _is_error=0</code>是不OK的，那么减掉这些流量拿到的成功率，就是这个应用的SLI。</p><p>但是一个一个写公式太累了，我们就可以用上面做的变量来替换。具体方法见图：</p><p><img data-src="/images/grafana4.jepg" title="这样就OK"></p><p>如果你觉得多根线在一个图里太难看了，看不出来啥，那么你可以使用<code>repeat</code>，这样它就会去读你的变量，针对每一个变量来生成一个一模一样的图片，但是repeat出来的图是不能edit的，只能edit第一个图：<br><img data-src="/images/grafana5.jepg" title="repeat在panel的最下面"></p><p>但是如果一个图里可以放多根线，那么依旧是添加query即可：<br><img data-src="/images/grafana6.jepg" title="query可以针对的添加变量和展示变量"></p><p>打开之后，这里可以配置对应的变量。如果你有不同的row，每一个row除了通用的变量之外，还要读取单独的变量，那么你就分开设定不同的变量。</p>]]></content>
     
     
-    <summary type="html">Grafana的玩法也要会，虽然这玩意我觉得不是很好使。</summary>
+    <summary type="html">Grafana的配置，对于SRE来说应该手拿把掐</summary>
     
     
     
