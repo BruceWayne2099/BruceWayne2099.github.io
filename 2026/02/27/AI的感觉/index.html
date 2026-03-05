@@ -30,14 +30,16 @@
 <meta property="og:site_name" content="石锤淡啤酒">
 <meta property="og:description" content="我觉得互联网公司至少要拿出来一笔经费来让手下人去买ai 的token用，真的提升效率，用了都说好">
 <meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/ai2.jpg">
+<meta property="og:image" content="http://example.com/images/ai3.jpg">
 <meta property="og:image" content="http://example.com/images/ai%E8%83%BD%E5%8A%9B.jpg">
 <meta property="article:published_time" content="2026-02-27T13:36:24.000Z">
-<meta property="article:modified_time" content="2026-03-03T16:44:30.077Z">
+<meta property="article:modified_time" content="2026-03-05T02:57:14.791Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="AI">
 <meta property="article:tag" content="编程">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://example.com/images/ai%E8%83%BD%E5%8A%9B.jpg">
+<meta name="twitter:image" content="http://example.com/images/ai2.jpg">
 
 <link rel="canonical" href="http://example.com/2026/02/27/AI%E7%9A%84%E6%84%9F%E8%A7%89/">
 
@@ -228,7 +230,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2026-03-04 00:44:30" itemprop="dateModified" datetime="2026-03-04T00:44:30+08:00">2026-03-04</time>
+                <time title="Modified: 2026-03-05 10:57:14" itemprop="dateModified" datetime="2026-03-05T10:57:14+08:00">2026-03-05</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -267,7 +269,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>1k</span>
+              <span>1.1k</span>
             </span>
             <span class="post-meta-item" title="Reading time">
               <span class="post-meta-item-icon">
@@ -288,6 +290,7 @@
 
       
         <p>我现在公司内部有一个很强的ai平台，它最让我惊讶的是它已经完全接入了公司内部文档，通过与ai的唠嗑可以了解业务（甚至可以得到业务相关的核心应用和数据库信息），还可以快速的用起来各平台对应的api，导致我最近几乎每天都在跟ai唠嗑。</p>
+<p>举给例子，我在公司文档里随便乱写了一个内容，然后把保密等级调整到L2（公开）：<br><img data-src="/images/ai2.jpg"><br><img data-src="/images/ai3.jpg" title="这个机器人就调用了ai，然后根据报警名称从文档里里读到了内容"></p>
 <p>我让ai自己讲述了一下，它主要有这么几个能力：<br><img data-src="/images/ai%E8%83%BD%E5%8A%9B.jpg" title="核心功能就是模型和RAG"></p>
 <p>从上面这个表可见这个ai的底层大模型是DeepSeek V3.2，RAG 的能力则是公司内部做的，它好就好在关联了公司内部十几万篇内部文档和高质量技术文章。这样的后果就是如果我要开发的话，直接问一下ai“ XX 的api是啥，请给我写一个demo”，马上ai就能反馈给你一个demo，你只需要看看代码改一改就能用（毕竟ai还是有些胡编乱造的情况），所以开发落地速度非常的快。</p>
 <p>为什么我这么爱RAG？因为这代表就是以后不用专门的写配置文件了，以前的配置文件都是yaml json这样的格式，而现在直接就用文档，文档的格式就太多元了，表格也行，图片说明也行，无疑让人读起来更友好。不过这里有一个关键点，就是文档里不可以有“互斥”的地方，比如第一篇文档写了“A监控告警的时候，要执行B预案”，结果下一篇文档却写了“A监控告警的时候，千万不要执行B预案”，那这样ai就蒙了，它会根据文章发布的先后新旧顺序和文章属性（官方文档还是个人笔记）来抉择，虽然这里有抉择，但是还是让ai困惑。</p>
