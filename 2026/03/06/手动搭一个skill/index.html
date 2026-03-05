@@ -35,7 +35,7 @@
 <meta property="og:image" content="http://example.com/images/skill4.jpg">
 <meta property="og:image" content="http://example.com/images/skill3.jpg">
 <meta property="article:published_time" content="2026-03-05T17:03:03.000Z">
-<meta property="article:modified_time" content="2026-03-05T17:33:33.130Z">
+<meta property="article:modified_time" content="2026-03-05T17:45:35.741Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="OpenClaw">
 <meta property="article:tag" content="ai">
@@ -228,7 +228,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2026-03-06 01:03:03 / Modified: 01:33:33" itemprop="dateCreated datePublished" datetime="2026-03-06T01:03:03+08:00">2026-03-06</time>
+              <time title="Created: 2026-03-06 01:03:03 / Modified: 01:45:35" itemprop="dateCreated datePublished" datetime="2026-03-06T01:03:03+08:00">2026-03-06</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -267,14 +267,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>621</span>
+              <span>705</span>
             </span>
             <span class="post-meta-item" title="Reading time">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>2 mins.</span>
+              <span>3 mins.</span>
             </span>
             <div class="post-description">你有没有想过，为啥ai为啥不能当定时任务？</div>
 
@@ -312,6 +312,7 @@
 <li>目前ai还不能直接改你的skill内容，比如你skill的py里有一个常量，想从A变成B，你跟AI说改一下，ai做不到因为他没权限，还是需要你手动改好然后上传上去。</li>
 <li>这俩skill里我硬编码了我账号的密钥，这代表我这个skill一旦上架skill market，别人随便用我的密钥，搞出了事儿然后让我背锅，为了解决这个问题要用到skill-sdk，不过我还没深入研究这块，或者把密钥改成常量。</li>
 <li>我公司的ai平台在运行这些skill的时候还是慢，我写过一个skill，就是大故障的时候，拉“故障找人地图”文档里的值班人以及对应的puo、安全等等20多号人进群，但是给ai下发命令后足足跑了2～3分钟，有这个时间我自己都拉完了。</li>
+<li>回答一下文章开头的“为啥ai为啥不能当定时任务？”，因为ai没有状态（虽然他有上下文的能力），而且它每次调用有严格的时间限制，不能无法执行长时间运行的进程。所以它还是一个网页，说完话提交就OK。</li>
 </ol>
 
     </div>
