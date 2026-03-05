@@ -32,10 +32,12 @@
 <meta property="og:locale">
 <meta property="og:image" content="http://example.com/images/skill.jpg">
 <meta property="article:published_time" content="2026-03-04T13:01:30.000Z">
-<meta property="article:modified_time" content="2026-03-04T13:36:03.619Z">
+<meta property="article:modified_time" content="2026-03-05T06:40:47.193Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="OpenClaw">
 <meta property="article:tag" content="ai">
+<meta property="article:tag" content="claude">
+<meta property="article:tag" content="mcp">
 <meta property="article:tag" content="skill">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://example.com/images/skill.jpg">
@@ -221,10 +223,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2026-03-04 21:01:30 / Modified: 21:36:03" itemprop="dateCreated datePublished" datetime="2026-03-04T21:01:30+08:00">2026-03-04</time>
+              <time title="Created: 2026-03-04 21:01:30" itemprop="dateCreated datePublished" datetime="2026-03-04T21:01:30+08:00">2026-03-04</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2026-03-05 14:40:47" itemprop="dateModified" datetime="2026-03-05T14:40:47+08:00">2026-03-05</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -262,14 +270,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>1.1k</span>
+              <span>1.8k</span>
             </span>
             <span class="post-meta-item" title="Reading time">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>4 mins.</span>
+              <span>6 mins.</span>
             </span>
             <div class="post-description">运维这种有经常重复的工作的工种，ai真的能极大的释放生产力</div>
 
@@ -309,6 +317,7 @@
 <p>add_numbers.py长这个样：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"> &quot;&quot;&quot;为便于大家理解，只放了部分核心代码，大家只需要知道，这是一个两数相加的脚本就好&quot;&quot;&quot;</span><br><span class="line">def add_two_numbers(num1, num2):</span><br><span class="line">    return num1 + num2</span><br><span class="line"></span><br><span class="line">def main():</span><br><span class="line">    result = add_two_numbers(args.num1, args.num2)</span><br></pre></td></tr></table></figure>
 
+<p>如果上面这个例子还不直观，你可以去 <a target="_blank" rel="noopener" href="https://www.coze.cn/skills">https://www.coze.cn/skills</a> 里看看，里面有很多“skill”，你可以添加然后跟他们进行自然语言交互得到返回结果。</p>
 <h2 id="何时使用-Skill"><a href="#何时使用-Skill" class="headerlink" title="何时使用 Skill"></a>何时使用 Skill</h2><p>当你的任务满足以下一个或多个特征时，就应该考虑使用 Skill，而不是依赖临时的长提示词或简单的脚本：</p>
 <ol>
 <li>需要处理本地文件：当 Agent 需要读取、分析、修改或创建本地文件时（如 PDF、Word 文档、Excel 表格、图片、代码等），Skill 可以将这些操作封装成标准流程。</li>
@@ -317,6 +326,11 @@
 <li>非技术人员希望扩展 AI 的能力：Skill 的创建过程可以通过自然语言完成（借助 skill-creator），这极大地降低了非开发者为 Agent “赋能”的门槛。</li>
 <li>希望对 AI 的能力进行模块化管理和迭代：随着任务变得复杂，可以将不同的能力拆分成独立的 Skill（如文档读取 Skill、内容分析 Skill、图表生成 Skill），然后像乐高积木一样组合使用。当某个环节需要优化时，只需迭代对应的 Skill 即可。</li>
 </ol>
+<p>skill最开始只是配合Claude网页端和ClaudeCode使用的，后来用的人多了，就像MCP一样，这个标准就变成了行业标准，各个Agent工具、IDE，例如Codex、OpenCode、Gemini Cli、Cursor都开始支持。</p>
+<p>MCP 看上去效果跟skill差不多，但是mcp比较重，因为在“每一个连接的 MCP Server 必须在对话开始前，将其所有工具的完整定义（名称、详细描述、参数 Schema、使用示例）一次性注入 LLM 的上下文中”。每个工具消耗 500 个 Token，那只链接这一个工具就需要消耗将近 20000 Token。在真实环境下，一个 Agent 不会仅链接一个 MCP Server。假如你只问了 AI 一个非常简单的问题（1+1&#x3D;？），Agent 已经烧掉了大几万的 Token，这个成本是非常恐怖的。</p>
+<p>而 Skills 的核心机制是“渐进式披露”，不仅节省token，还能提升注意力，正确率更高。Skill 本质是把 “大模型能力 + 工程化逻辑 + 场景规则” 打包成一个可复用、可调用、可配置的功能模块，解决的是 “端到端的业务问题”，而非单点的技术问题。所以这里的重点是“可复用”，对于运维来说，无论是重复搭建环境还是查看问题，其实很多都是重复的过程，这些都建议去写成skill里，然后给全组人甚至客户使用。用 Skill 做任务，持续迭代优化。以后都用这个 Skill 来执行任务。每次完成后检查输出，哪里不满意就告诉Agent，让它改进并更新 Skill。在实战中不断打磨，这才是正确的使用姿势。</p>
+<p>依赖关系：一个Skill可以通过MCP来连接所需资源，但并非必须；它也可以直接调用API。MCP为Skill提供了一种更标准化、安全的资源接入方式。简而言之，MCP是用来统一工具调用的协议，Skill可以指挥Agent去调用MCP。<br>二者是互补的关系，而非替代关系。MCP负责连接外部世界界，提供实际的操作能力；Skill则负责指导AI如何思考和执行任务，确保输出的准确性和一致性。在实际应用中中，通常需要结合两者，才能构建出功能强大、稳定可靠的AI智能体。 </p>
+<p>这一期就是理论，下一步，我准备搞一个skill，实现一个简单的功能“采集XXX容器的火焰图并把分析结果传给我”。到时候整个过程会记录并发上来。</p>
 
     </div>
 
@@ -385,6 +399,8 @@
               <a href="/tags/ai/" rel="tag"># ai</a>
               <a href="/tags/skill/" rel="tag"># skill</a>
               <a href="/tags/OpenClaw/" rel="tag"># OpenClaw</a>
+              <a href="/tags/mcp/" rel="tag"># mcp</a>
+              <a href="/tags/claude/" rel="tag"># claude</a>
           </div>
 
         
@@ -483,7 +499,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">380</span>
+        <span class="site-state-item-count">382</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
@@ -528,12 +544,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="Symbols count total">552k</span>
+    <span title="Symbols count total">553k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">33:28</span>
+    <span title="Reading time total">33:31</span>
 </div>
   <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
   </div>
