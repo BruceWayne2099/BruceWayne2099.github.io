@@ -38,12 +38,15 @@
 <meta property="og:image" content="http://example.com/images/grafana6.jpg">
 <meta property="og:image" content="http://example.com/images/grafana7.jpg">
 <meta property="og:image" content="http://example.com/images/grafana8.jpg">
+<meta property="og:image" content="http://example.com/images/grafana13.jpg">
+<meta property="og:image" content="http://example.com/images/grafana14.jpg">
+<meta property="og:image" content="http://example.com/images/grafana15.jpg">
 <meta property="og:image" content="http://example.com/images/grafana9.jpg">
 <meta property="og:image" content="http://example.com/images/grafana10.jpg">
 <meta property="og:image" content="http://example.com/images/grafana11.jpg">
 <meta property="og:image" content="http://example.com/images/grafana12.jpg">
 <meta property="article:published_time" content="2020-03-03T17:14:28.000Z">
-<meta property="article:modified_time" content="2026-03-11T02:59:39.431Z">
+<meta property="article:modified_time" content="2026-03-11T12:38:34.505Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="bosun">
 <meta property="article:tag" content="grafana">
@@ -240,7 +243,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2026-03-11 10:59:39" itemprop="dateModified" datetime="2026-03-11T10:59:39+08:00">2026-03-11</time>
+                <time title="Modified: 2026-03-11 20:38:34" itemprop="dateModified" datetime="2026-03-11T20:38:34+08:00">2026-03-11</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -279,7 +282,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>833</span>
+              <span>934</span>
             </span>
             <span class="post-meta-item" title="Reading time">
               <span class="post-meta-item-icon">
@@ -311,6 +314,8 @@
 <p>但是如果一个图里可以放多根线，那么依旧是添加query即可：<br><img data-src="/images/grafana6.jpg" title="query可以针对的添加变量和展示变量"></p>
 <p>grafana的变量可以用在多个地方，甚至可以放到row的名称里，比如：<br><img data-src="/images/grafana7.jpg" title="query可以针对的添加变量和展示变量"></p>
 <p>如果你有不同的row，每一个row除了通用的变量之外，还要读取单独的变量，那么你就只能分开设定不同的变量。然后对应不同的row的bosun公式在repeat的地方配置上不同的变量即可：<br><img data-src="/images/grafana8.jpg" title="这样实现了一个类似tab的功能"></p>
+<h2 id="改用stat"><a href="#改用stat" class="headerlink" title="改用stat"></a>改用stat</h2><p>现在你能看到满屏幕都是折线，但是却无法第一眼就看出来哪个曲线是有问题的，所以此时可以考虑改用stat，因为它有一个现成的Thresholds功能，这样就可以通过不同值得到不同的颜色:<br><img data-src="/images/grafana13.jpg" title="根据实际数据库的字段和对应的条件在grafana里填写"><br><img data-src="/images/grafana14.jpg" title="根据实际数据库的字段和对应的条件在grafana里填写"></p>
+<p>这样低于XXX值就是红色或者黄色，有问题的指标更加显眼：<br><img data-src="/images/grafana15.jpg" title="根据实际数据库的字段和对应的条件在grafana里填写"></p>
 <p>如果是你想用bosun来得到一些满足条件的结果，比如延迟大于18000的队列：<br><img data-src="/images/grafana9.jpg" title="这样实现了一个类似tab的功能"></p>
 <p>首先你要配置好对应的变量，然后bosun就是这样：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$metric = des.mq.handler.latency.pct99</span><br><span class="line">$queryA = q(&quot;max:1m-avg-zero:$metric&#123;res=suc,op=req,stage=replay,id=$need_filter,direction=literal_or($direction),caller=$caller,type=$type,cluster=$cluster&#125;&quot;,&quot;2m&quot;,&quot;1m&quot;) / 1000000000</span><br><span class="line">$base = filter($queryA,avg($queryA) &gt;$abnormal_delay)</span><br><span class="line">$base</span><br></pre></td></tr></table></figure>
@@ -463,7 +468,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%98%E9%87%8F%E9%85%8D%E7%BD%AE"><span class="nav-number">1.</span> <span class="nav-text">变量配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#bosun%E8%AF%AD%E5%8F%A5%E9%85%8D%E7%BD%AE"><span class="nav-number">2.</span> <span class="nav-text">bosun语句配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mertics%E9%85%8D%E7%BD%AE"><span class="nav-number">3.</span> <span class="nav-text">mertics配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B0%E6%A0%87%E7%AD%BE%E9%A1%B5%E9%93%BE%E6%8E%A5"><span class="nav-number">4.</span> <span class="nav-text">新标签页链接</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%98%E9%87%8F%E9%85%8D%E7%BD%AE"><span class="nav-number">1.</span> <span class="nav-text">变量配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#bosun%E8%AF%AD%E5%8F%A5%E9%85%8D%E7%BD%AE"><span class="nav-number">2.</span> <span class="nav-text">bosun语句配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%94%B9%E7%94%A8stat"><span class="nav-number">3.</span> <span class="nav-text">改用stat</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mertics%E9%85%8D%E7%BD%AE"><span class="nav-number">4.</span> <span class="nav-text">mertics配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B0%E6%A0%87%E7%AD%BE%E9%A1%B5%E9%93%BE%E6%8E%A5"><span class="nav-number">5.</span> <span class="nav-text">新标签页链接</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -540,7 +545,7 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">33:45</span>
+    <span title="Reading time total">33:46</span>
 </div>
   <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
   </div>
