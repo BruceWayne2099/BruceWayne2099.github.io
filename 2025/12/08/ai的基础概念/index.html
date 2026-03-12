@@ -31,7 +31,7 @@
 <meta property="og:description" content="会做饭的人很多，但是厨子依旧是独一档。未来只会是更懂高级生产工具的人。">
 <meta property="og:locale">
 <meta property="article:published_time" content="2025-12-08T14:00:23.000Z">
-<meta property="article:modified_time" content="2026-03-10T13:25:27.939Z">
+<meta property="article:modified_time" content="2026-03-12T02:24:10.750Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="ai">
 <meta name="twitter:card" content="summary">
@@ -225,7 +225,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2026-03-10 21:25:27" itemprop="dateModified" datetime="2026-03-10T21:25:27+08:00">2026-03-10</time>
+                <time title="Modified: 2026-03-12 10:24:10" itemprop="dateModified" datetime="2026-03-12T10:24:10+08:00">2026-03-12</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -264,14 +264,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>3.2k</span>
+              <span>3.3k</span>
             </span>
             <span class="post-meta-item" title="Reading time">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>11 mins.</span>
+              <span>12 mins.</span>
             </span>
             <div class="post-description">会做饭的人很多，但是厨子依旧是独一档。未来只会是更懂高级生产工具的人。</div>
 
@@ -332,7 +332,7 @@
 <p>所以这就看出来ai的局限性，它可以帮你干具体的活，帮你梳理，或者给你一些“你没想到但是其他人已经想到并写在网络上的建议”。但是你让它从0-1 挖掘出一个new point，是做不到的。所以说，ai总体来说还是一个提效的工具，所以如果你是一个有想法的人，ai在你手里就是一个很高效的武器。</p>
 <h2 id="那我有了ai是不是可以让它来帮我打《艾尔登法环》，我在旁边看着？"><a href="#那我有了ai是不是可以让它来帮我打《艾尔登法环》，我在旁边看着？" class="headerlink" title="那我有了ai是不是可以让它来帮我打《艾尔登法环》，我在旁边看着？"></a>那我有了ai是不是可以让它来帮我打《艾尔登法环》，我在旁边看着？</h2><p>理论上是可以的，但是会很花钱。</p>
 <p>首先AI可以通过脚本启动Steam和游戏，也会模拟键盘鼠标输入（WASD移动、鼠标点击），同时也能做到通过截图分析游戏画面（这一步很花钱）和识别血条、敌人位置、物品等（这一步也很花钱）。但是对于动作类游戏，需要毫秒级反应。ai做不到，需要明确的规则和大量训练数据。所以你会看到它操作你的主人公一遍一遍的死，死亡后回到检查点，AI还需要重新规划。但是ai肯定会通关，就是时间问题和token消耗的问题。</p>
-<p>所以ai目前可以给看你的录像给你一些建议，还不能亲自上手去打怪。</p>
+<p>所以ai目前可以给看你的录像给你一些建议，还不能亲自上手去打怪。即使你把你的录像给ai看，ai也是一模一样的打，但是怪物不一定会按照录像里的样子完全出招，所以还是死。</p>
 <p>再说了，游戏的魅力在于挑战和成长，如果让AI代劳，就失去了游戏的意义。</p>
 <h2 id="如果我问AI两遍一模一样的问题，比如“梅西有几个世界杯冠军”，它第二次的答案是从缓存里得到的吗？"><a href="#如果我问AI两遍一模一样的问题，比如“梅西有几个世界杯冠军”，它第二次的答案是从缓存里得到的吗？" class="headerlink" title="如果我问AI两遍一模一样的问题，比如“梅西有几个世界杯冠军”，它第二次的答案是从缓存里得到的吗？"></a>如果我问AI两遍一模一样的问题，比如“梅西有几个世界杯冠军”，它第二次的答案是从缓存里得到的吗？</h2><p>AI有两个缓存，一个是 KV Cache，这个是用来进行推理使用的，加速单个回答的生成过程，比如生成”梅西有1个世界杯冠军”这句话时，生成”梅”时计算的Key&#x2F;Value，生成”西”时可以直接用。</p>
 <p>还有一个缓存是结果缓存，这个缓存时间大约1～10分钟不等，而且有些模型支持这个结果缓存，那么如果你问了一模一样的问题，是有可能从这个缓存不用思考直接拿到结果返回给你的。</p>
@@ -344,6 +344,9 @@
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"># 第一次请求</span><br><span class="line">request_1 = &#123;</span><br><span class="line">    &quot;messages&quot;: [&#123;&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;梅西有几个世界杯冠军&quot;&#125;],</span><br><span class="line">    &quot;model&quot;: &quot;gpt-4&quot;,</span><br><span class="line">    &quot;temperature&quot;: 0.7</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># 第二次请求（多了一个空格）</span><br><span class="line">request_2 = &#123;</span><br><span class="line">    &quot;messages&quot;: [&#123;&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;梅西有几个世界杯冠军 &quot;&#125;],  # 多了一个空格</span><br><span class="line">    &quot;model&quot;: &quot;gpt-4&quot;,</span><br><span class="line">    &quot;temperature&quot;: 0.7</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># 结果：❌ 不会命中缓存（不是&quot;完全相同的请求&quot;）</span><br></pre></td></tr></table></figure>
 
 <p>用结果缓存这种“拿空间换时间”的行为，解决了“厂家大模型推理成本高（GPU、电力）”的问题，也提升了使用者体验。</p>
+<h2 id="节约token"><a href="#节约token" class="headerlink" title="节约token"></a>节约token</h2><ol>
+<li>比如我有一个文档，文档里面有100个中文字，然后我对ai说“按照这个链接，概括一下”，那么输入的token是包括文档里的100个中文字的，想用这种方法来规避输入token是不行的。</li>
+</ol>
 
     </div>
 
@@ -484,7 +487,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#AI%E7%9A%84%E6%A0%B8%E5%BF%83%E7%B2%BE%E5%8D%8E"><span class="nav-number">1.</span> <span class="nav-text">AI的核心精华</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%90%91%E9%87%8F%E5%8C%96%EF%BC%9F"><span class="nav-number">2.</span> <span class="nav-text">为什么要向量化？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AI%E6%98%AF%E5%A6%82%E4%BD%95%E6%90%9C%E7%B4%A2%E7%9A%84%EF%BC%9F"><span class="nav-number">3.</span> <span class="nav-text">AI是如何搜索的？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RAG%E7%9A%84%E5%8E%9F%E7%90%86"><span class="nav-number">4.</span> <span class="nav-text">RAG的原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%81%87%E5%A6%82%E6%88%91%E7%8E%B0%E5%9C%A8%E5%86%99%E4%BA%86%E4%B8%80%E7%AF%87%E2%80%9C%E4%BB%A4%E7%8B%90%E5%86%B2%E4%B8%8E%E8%BF%88%E5%85%8B%E5%B0%94%E4%B9%94%E4%B8%B9%E2%80%9D%E7%9A%84%E6%96%87%E7%AB%A0"><span class="nav-number">5.</span> <span class="nav-text">假如我现在写了一篇“令狐冲与迈克尔乔丹”的文章</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ai%E4%B8%8D%E4%BC%9A%E8%87%AA%E5%B7%B1%E5%AF%B9%E6%9F%90%E4%B8%AA%E4%BA%8B%E7%89%A9%E4%BA%A7%E7%94%9F%E7%9B%B4%E6%8E%A5%E6%83%85%E6%84%9F%E5%92%8C%E6%84%9F%E8%A7%A6%EF%BC%8C%E5%AE%83%E7%9A%84%E5%8F%8D%E9%A6%88%E9%83%BD%E6%98%AF%E5%9F%BA%E4%BA%8E%E6%9D%90%E6%96%99%EF%BC%8C%E7%84%B6%E5%90%8E%E5%AD%A6%E4%B9%A0%E5%BE%97%E5%87%BA%E7%9A%84"><span class="nav-number">6.</span> <span class="nav-text">ai不会自己对某个事物产生直接情感和感触，它的反馈都是基于材料，然后学习得出的</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%82%A3ai%E5%86%99%E6%AD%8C%EF%BC%8C%E6%98%AF%E4%B8%8D%E6%98%AF%E5%B0%B1%E6%98%AF%E4%BB%8E%E7%BD%91%E7%BB%9C%E4%B8%8A%E7%8E%B0%E6%9C%89%E7%9A%84%E9%9F%B3%E4%B9%90%E4%B8%9C%E6%89%92%E4%B8%80%E4%B8%8B%EF%BC%8C%E8%A5%BF%E6%89%92%E4%B8%80%E4%B8%8B%EF%BC%8C%E6%8A%84%E5%87%BA%E6%9D%A5%E7%9A%84%EF%BC%9F"><span class="nav-number">7.</span> <span class="nav-text">那ai写歌，是不是就是从网络上现有的音乐东扒一下，西扒一下，抄出来的？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%82%A3%E6%88%91%E6%9C%89%E4%BA%86ai%E6%98%AF%E4%B8%8D%E6%98%AF%E5%8F%AF%E4%BB%A5%E8%AE%A9%E5%AE%83%E6%9D%A5%E5%B8%AE%E6%88%91%E6%89%93%E3%80%8A%E8%89%BE%E5%B0%94%E7%99%BB%E6%B3%95%E7%8E%AF%E3%80%8B%EF%BC%8C%E6%88%91%E5%9C%A8%E6%97%81%E8%BE%B9%E7%9C%8B%E7%9D%80%EF%BC%9F"><span class="nav-number">8.</span> <span class="nav-text">那我有了ai是不是可以让它来帮我打《艾尔登法环》，我在旁边看着？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E6%9E%9C%E6%88%91%E9%97%AEAI%E4%B8%A4%E9%81%8D%E4%B8%80%E6%A8%A1%E4%B8%80%E6%A0%B7%E7%9A%84%E9%97%AE%E9%A2%98%EF%BC%8C%E6%AF%94%E5%A6%82%E2%80%9C%E6%A2%85%E8%A5%BF%E6%9C%89%E5%87%A0%E4%B8%AA%E4%B8%96%E7%95%8C%E6%9D%AF%E5%86%A0%E5%86%9B%E2%80%9D%EF%BC%8C%E5%AE%83%E7%AC%AC%E4%BA%8C%E6%AC%A1%E7%9A%84%E7%AD%94%E6%A1%88%E6%98%AF%E4%BB%8E%E7%BC%93%E5%AD%98%E9%87%8C%E5%BE%97%E5%88%B0%E7%9A%84%E5%90%97%EF%BC%9F"><span class="nav-number">9.</span> <span class="nav-text">如果我问AI两遍一模一样的问题，比如“梅西有几个世界杯冠军”，它第二次的答案是从缓存里得到的吗？</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#AI%E7%9A%84%E6%A0%B8%E5%BF%83%E7%B2%BE%E5%8D%8E"><span class="nav-number">1.</span> <span class="nav-text">AI的核心精华</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%90%91%E9%87%8F%E5%8C%96%EF%BC%9F"><span class="nav-number">2.</span> <span class="nav-text">为什么要向量化？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AI%E6%98%AF%E5%A6%82%E4%BD%95%E6%90%9C%E7%B4%A2%E7%9A%84%EF%BC%9F"><span class="nav-number">3.</span> <span class="nav-text">AI是如何搜索的？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RAG%E7%9A%84%E5%8E%9F%E7%90%86"><span class="nav-number">4.</span> <span class="nav-text">RAG的原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%81%87%E5%A6%82%E6%88%91%E7%8E%B0%E5%9C%A8%E5%86%99%E4%BA%86%E4%B8%80%E7%AF%87%E2%80%9C%E4%BB%A4%E7%8B%90%E5%86%B2%E4%B8%8E%E8%BF%88%E5%85%8B%E5%B0%94%E4%B9%94%E4%B8%B9%E2%80%9D%E7%9A%84%E6%96%87%E7%AB%A0"><span class="nav-number">5.</span> <span class="nav-text">假如我现在写了一篇“令狐冲与迈克尔乔丹”的文章</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ai%E4%B8%8D%E4%BC%9A%E8%87%AA%E5%B7%B1%E5%AF%B9%E6%9F%90%E4%B8%AA%E4%BA%8B%E7%89%A9%E4%BA%A7%E7%94%9F%E7%9B%B4%E6%8E%A5%E6%83%85%E6%84%9F%E5%92%8C%E6%84%9F%E8%A7%A6%EF%BC%8C%E5%AE%83%E7%9A%84%E5%8F%8D%E9%A6%88%E9%83%BD%E6%98%AF%E5%9F%BA%E4%BA%8E%E6%9D%90%E6%96%99%EF%BC%8C%E7%84%B6%E5%90%8E%E5%AD%A6%E4%B9%A0%E5%BE%97%E5%87%BA%E7%9A%84"><span class="nav-number">6.</span> <span class="nav-text">ai不会自己对某个事物产生直接情感和感触，它的反馈都是基于材料，然后学习得出的</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%82%A3ai%E5%86%99%E6%AD%8C%EF%BC%8C%E6%98%AF%E4%B8%8D%E6%98%AF%E5%B0%B1%E6%98%AF%E4%BB%8E%E7%BD%91%E7%BB%9C%E4%B8%8A%E7%8E%B0%E6%9C%89%E7%9A%84%E9%9F%B3%E4%B9%90%E4%B8%9C%E6%89%92%E4%B8%80%E4%B8%8B%EF%BC%8C%E8%A5%BF%E6%89%92%E4%B8%80%E4%B8%8B%EF%BC%8C%E6%8A%84%E5%87%BA%E6%9D%A5%E7%9A%84%EF%BC%9F"><span class="nav-number">7.</span> <span class="nav-text">那ai写歌，是不是就是从网络上现有的音乐东扒一下，西扒一下，抄出来的？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%82%A3%E6%88%91%E6%9C%89%E4%BA%86ai%E6%98%AF%E4%B8%8D%E6%98%AF%E5%8F%AF%E4%BB%A5%E8%AE%A9%E5%AE%83%E6%9D%A5%E5%B8%AE%E6%88%91%E6%89%93%E3%80%8A%E8%89%BE%E5%B0%94%E7%99%BB%E6%B3%95%E7%8E%AF%E3%80%8B%EF%BC%8C%E6%88%91%E5%9C%A8%E6%97%81%E8%BE%B9%E7%9C%8B%E7%9D%80%EF%BC%9F"><span class="nav-number">8.</span> <span class="nav-text">那我有了ai是不是可以让它来帮我打《艾尔登法环》，我在旁边看着？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E6%9E%9C%E6%88%91%E9%97%AEAI%E4%B8%A4%E9%81%8D%E4%B8%80%E6%A8%A1%E4%B8%80%E6%A0%B7%E7%9A%84%E9%97%AE%E9%A2%98%EF%BC%8C%E6%AF%94%E5%A6%82%E2%80%9C%E6%A2%85%E8%A5%BF%E6%9C%89%E5%87%A0%E4%B8%AA%E4%B8%96%E7%95%8C%E6%9D%AF%E5%86%A0%E5%86%9B%E2%80%9D%EF%BC%8C%E5%AE%83%E7%AC%AC%E4%BA%8C%E6%AC%A1%E7%9A%84%E7%AD%94%E6%A1%88%E6%98%AF%E4%BB%8E%E7%BC%93%E5%AD%98%E9%87%8C%E5%BE%97%E5%88%B0%E7%9A%84%E5%90%97%EF%BC%9F"><span class="nav-number">9.</span> <span class="nav-text">如果我问AI两遍一模一样的问题，比如“梅西有几个世界杯冠军”，它第二次的答案是从缓存里得到的吗？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%8A%82%E7%BA%A6token"><span class="nav-number">10.</span> <span class="nav-text">节约token</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -498,7 +501,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">427</span>
+          <span class="site-state-item-count">428</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -511,7 +514,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">382</span>
+        <span class="site-state-item-count">383</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
@@ -556,12 +559,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="Symbols count total">557k</span>
+    <span title="Symbols count total">558k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">33:46</span>
+    <span title="Reading time total">33:48</span>
 </div>
   <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
   </div>
