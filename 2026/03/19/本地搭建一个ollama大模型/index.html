@@ -32,8 +32,10 @@
 <meta property="og:locale">
 <meta property="og:image" content="http://example.com/images/k8s2.jpg">
 <meta property="og:image" content="http://example.com/images/k8s4.jpg">
+<meta property="og:image" content="http://example.com/images/k8s3.jpg">
+<meta property="og:image" content="http://example.com/images/k8s5.jpg">
 <meta property="article:published_time" content="2026-03-19T12:10:15.000Z">
-<meta property="article:modified_time" content="2026-03-19T13:16:17.447Z">
+<meta property="article:modified_time" content="2026-03-19T14:40:47.048Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="k8s">
 <meta property="article:tag" content="面试">
@@ -223,7 +225,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2026-03-19 20:10:15 / Modified: 21:16:17" itemprop="dateCreated datePublished" datetime="2026-03-19T20:10:15+08:00">2026-03-19</time>
+              <time title="Created: 2026-03-19 20:10:15 / Modified: 22:40:47" itemprop="dateCreated datePublished" datetime="2026-03-19T20:10:15+08:00">2026-03-19</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -262,14 +264,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>1.4k</span>
+              <span>1.7k</span>
             </span>
             <span class="post-meta-item" title="Reading time">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>5 mins.</span>
+              <span>6 mins.</span>
             </span>
             <div class="post-description">完整的走一遍，面试的时候可以拿来吹牛逼</div>
 
@@ -308,7 +310,7 @@
 <p>Dockerfile如下：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">FROM docker.m.daocloud.io/library/python:3.9-slim</span><br><span class="line">RUN pip install flask requests</span><br><span class="line">RUN  pip install --upgrade pip</span><br><span class="line">COPY backend.py /app.py</span><br><span class="line">CMD [&quot;python&quot;, &quot;/app.py&quot;]  # 容器就是直接启动这个backend.py</span><br></pre></td></tr></table></figure>
 
-<p>有了Dockerfile之后，我们来打包一个镜像ai-backend：<code>docker build -t ai-backend:v4 . </code>,然后通过<code>docker images |grep v4</code>里看本地的确有了docker images库里的确有了<code>ai-backend:v4</code>这个镜像，但是要注意这个镜像还不在k3s里，所以还要执行<code>docker save ai-backend:v4 |sudo k3s ctr images import - </code>, 这样k3s的镜像库才也有了这个<code>ai-backend:v4</code>的镜像。</p>
+<p>有了Dockerfile之后，我们来打包一个镜像ai-backend：<code>docker build -t ai-backend:v4 . </code>,然后通过<code>docker images |grep v4</code>里看本地的确有了docker images库里的确有了<code>ai-backend:v4</code>这个镜像，但是要注意这个镜像还不在k3s里，所以还要执行<code>docker save ai-backend:v4 |sudo k3s ctr images import - </code>, 这样k3s的镜像库才也有了这个<code>ai-backend:v4</code>的镜像，可以用<code>k3s ctr images list|grep ai-backend</code>这个命令来确认。</p>
 <p>backend-deployment.yaml如下：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: apps/v1</span><br><span class="line">kind: Deployment</span><br><span class="line">metadata:</span><br><span class="line">  name: ai-backend</span><br><span class="line">spec:</span><br><span class="line">  replicas: 3</span><br><span class="line">  selector:</span><br><span class="line">    matchLabels:</span><br><span class="line">      app: ai-backend</span><br><span class="line">  template:</span><br><span class="line">    metadata:</span><br><span class="line">      labels:</span><br><span class="line">        app: ai-backend</span><br><span class="line">    spec:</span><br><span class="line">      containers:</span><br><span class="line">      - name: backend</span><br><span class="line">        image: ai-backend:v4</span><br><span class="line">        imagePullPolicy: Never # 这里说明只用本地镜像， IfNotPresent是“优先用本地，没有就去docker hub拉”，Always是“不管本地有没有，每次都去网上对比版本”</span><br><span class="line">        ports:</span><br><span class="line">        - containerPort: 5000 #py文件里写了5000，这里也让pod暴露5000这个接口</span><br><span class="line">        resources:</span><br><span class="line">          requests:</span><br><span class="line">            cpu: &quot;500m&quot;  # 因为它本质的工作就是接受请求，转发给oolama-svc所以不用很高的配置。</span><br><span class="line">            memory: &quot;512Mi&quot;</span><br><span class="line">          limits:</span><br><span class="line">            cpu: &quot;1&quot;    </span><br><span class="line">            memory: &quot;1Gi&quot; </span><br><span class="line">          </span><br><span class="line">          </span><br><span class="line">---</span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Service</span><br><span class="line">metadata:</span><br><span class="line">  name: ai-backend-svc</span><br><span class="line">spec:</span><br><span class="line">  selector:</span><br><span class="line">    app: ai-backend</span><br><span class="line">  ports:</span><br><span class="line">  - protocol: TCP</span><br><span class="line">    port: 80</span><br><span class="line">    targetPort: 5000 # 后端Pod的5000对应这个service的80</span><br></pre></td></tr></table></figure>
 <p>然后可以通过<code>kubectl apply -f backend-deployment.yaml</code> 或者 <code>kubectl rollout restart deployment ai-backend</code>来滚动发布。</p>
@@ -327,6 +329,16 @@
 <li>做pv&#x2F;pvc持久化，重启后就不用再去公网上下载模型了，避免了pod先活了，但是还要下载模型，其实服务没准备好，但是流量先进来的尴尬。</li>
 </ol>
 <h2 id="排错过程"><a href="#排错过程" class="headerlink" title="排错过程"></a>排错过程</h2><p>如果发现pod起不来，可以先通过describe命令粗略看一下原因，如果看不出来啥，可以再用<code>kubectl logs pod名称 --previous</code> ，来查看具体的一个pods的日志，能看出来为啥“镜像顺利拉到手，但是程序为啥启动不起来”。</p>
+<h2 id="使用pvc做持久化"><a href="#使用pvc做持久化" class="headerlink" title="使用pvc做持久化"></a>使用pvc做持久化</h2><p>虽然上面的效果达到了目标，但是有一个致命的问题，就是ai模型动辄几十GB，容器的镜像拉取和启动太慢了，怎么缓解？</p>
+<p>所以这里要解耦一下，镜像只包括运行环境ollama，而巨大的模型权重用过pvc挂载，这样镜像只有只百MB,可快速分发，POD重启的时候直接挂在一下卷，实现秒级就绪。</p>
+<p>首先先创建一个ollama-pvc.yaml，做存储声明</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"># ollama-pvc.yaml</span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: PersistentVolumeClaim</span><br><span class="line">metadata:</span><br><span class="line">  name: ollama-storage-pvc</span><br><span class="line">spec:</span><br><span class="line">  # K3s 默认提供的存储类，会自动在宿主机 /var/lib/rancher/k3s/storage 下创建目录</span><br><span class="line">  storageClassName: local-path</span><br><span class="line">  accessModes:</span><br><span class="line">    - ReadWriteOnce  # 单节点读写，适合这种模型推理场景</span><br><span class="line">  resources:</span><br><span class="line">    requests:</span><br><span class="line">      storage: 50Gi  # 给够 50G，以后下个 70B 模型也放得下</span><br></pre></td></tr></table></figure>
+
+<p>然后修改ollama-deployment.yaml让它挂载到这个“pvc”上：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"># ollama-deployment.yaml</span><br><span class="line">apiVersion: apps/v1</span><br><span class="line">kind: Deployment</span><br><span class="line">metadata:</span><br><span class="line">  name: ollama</span><br><span class="line">spec:</span><br><span class="line">  replicas: 1</span><br><span class="line">  selector:</span><br><span class="line">    matchLabels:</span><br><span class="line">      app: ollama</span><br><span class="line">  template:</span><br><span class="line">    metadata:</span><br><span class="line">      labels:</span><br><span class="line">        app: ollama</span><br><span class="line">    spec:</span><br><span class="line">      containers:</span><br><span class="line">      - name: ollama</span><br><span class="line">        image: docker.m.daocloud.io/ollama/ollama:latest</span><br><span class="line">        ports:</span><br><span class="line">        - containerPort: 11434</span><br><span class="line">        volumeMounts:</span><br><span class="line">        - name: ollama-models</span><br><span class="line">          mountPath: /root/.ollama # 这里</span><br><span class="line">        resources:</span><br><span class="line">          requests:</span><br><span class="line">            cpu: &quot;4&quot;</span><br><span class="line">            memory: &quot;8Gi&quot;</span><br><span class="line">          limits:</span><br><span class="line">            cpu: &quot;16&quot;</span><br><span class="line">            memory: &quot;32Gi&quot;</span><br><span class="line">      volumes:</span><br><span class="line">      - name: ollama-models</span><br><span class="line">        persistentVolumeClaim:</span><br><span class="line">          claimName: ollama-storage-pvc   # 这个名称就是刚才pvc里写的名称</span><br><span class="line">---</span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Service</span><br><span class="line">metadata:</span><br><span class="line">  name: ollama-svc</span><br><span class="line">spec:</span><br><span class="line">  selector:</span><br><span class="line">    app: ollama</span><br><span class="line">  ports:</span><br><span class="line">  - port: 11434</span><br><span class="line">    targetPort: 11434</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>然后重新部署一下，先用<code>-it</code>的方式来测试一个问题：<br><img data-src="/images/k8s3.jpg" title="这次是要从头下载的，因为他在往刚设定的PVC里下载数据"></p>
+<p>同样，此时用浏览器发起请求也是报错：<br><img data-src="/images/k8s5.jpg" title="因为在下载中，所以提示llama3不存在"></p>
 
     </div>
 
@@ -465,7 +477,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%88%E8%AF%B4%E4%B8%80%E4%B8%8B%E6%95%B4%E4%B8%AA%E6%9E%B6%E6%9E%84"><span class="nav-number">1.</span> <span class="nav-text">先说一下整个架构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%90%AD%E5%BB%BA%E8%BF%87%E7%A8%8B"><span class="nav-number">2.</span> <span class="nav-text">搭建过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8E%92%E9%94%99%E8%BF%87%E7%A8%8B"><span class="nav-number">3.</span> <span class="nav-text">排错过程</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%88%E8%AF%B4%E4%B8%80%E4%B8%8B%E6%95%B4%E4%B8%AA%E6%9E%B6%E6%9E%84"><span class="nav-number">1.</span> <span class="nav-text">先说一下整个架构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%90%AD%E5%BB%BA%E8%BF%87%E7%A8%8B"><span class="nav-number">2.</span> <span class="nav-text">搭建过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8E%92%E9%94%99%E8%BF%87%E7%A8%8B"><span class="nav-number">3.</span> <span class="nav-text">排错过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8pvc%E5%81%9A%E6%8C%81%E4%B9%85%E5%8C%96"><span class="nav-number">4.</span> <span class="nav-text">使用pvc做持久化</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -542,7 +554,7 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">34:02</span>
+    <span title="Reading time total">34:03</span>
 </div>
   <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
   </div>
