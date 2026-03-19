@@ -25,13 +25,13 @@
 
   <meta name="description" content="k8s是sre的命根子，而且现在随着gpu的大红大紫，ai的运维对职业生涯是延长是很有帮助的。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="k8s的基础笔记">
+<meta property="og:title" content="k8s的基础知识and面试题">
 <meta property="og:url" content="http://example.com/2019/03/03/k8s%E7%9A%84%E5%9F%BA%E7%A1%80%E7%AC%94%E8%AE%B0/index.html">
 <meta property="og:site_name" content="石锤淡啤酒">
 <meta property="og:description" content="k8s是sre的命根子，而且现在随着gpu的大红大紫，ai的运维对职业生涯是延长是很有帮助的。">
 <meta property="og:locale">
 <meta property="article:published_time" content="2019-03-03T13:20:50.000Z">
-<meta property="article:modified_time" content="2026-03-13T03:59:08.948Z">
+<meta property="article:modified_time" content="2026-03-19T02:58:07.300Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="k8s">
 <meta property="article:tag" content="面试">
@@ -50,7 +50,7 @@
   };
 </script>
 
-  <title>k8s的基础笔记 | 石锤淡啤酒</title>
+  <title>k8s的基础知识and面试题 | 石锤淡啤酒</title>
   
 
 
@@ -209,7 +209,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          k8s的基础笔记
+          k8s的基础知识and面试题
         </h1>
 
         <div class="post-meta">
@@ -226,7 +226,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2026-03-13 11:59:08" itemprop="dateModified" datetime="2026-03-13T11:59:08+08:00">2026-03-13</time>
+                <time title="Modified: 2026-03-19 10:58:07" itemprop="dateModified" datetime="2026-03-19T10:58:07+08:00">2026-03-19</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -239,7 +239,7 @@
             </span>
 
           
-            <span id="/2019/03/03/k8s%E7%9A%84%E5%9F%BA%E7%A1%80%E7%AC%94%E8%AE%B0/" class="post-meta-item leancloud_visitors" data-flag-title="k8s的基础笔记" title="Views">
+            <span id="/2019/03/03/k8s%E7%9A%84%E5%9F%BA%E7%A1%80%E7%AC%94%E8%AE%B0/" class="post-meta-item leancloud_visitors" data-flag-title="k8s的基础知识and面试题" title="Views">
               <span class="post-meta-item-icon">
                 <i class="fa fa-eye"></i>
               </span>
@@ -265,14 +265,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>127</span>
+              <span>2k</span>
             </span>
             <span class="post-meta-item" title="Reading time">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>1 mins.</span>
+              <span>7 mins.</span>
             </span>
             <div class="post-description">k8s是sre的命根子，而且现在随着gpu的大红大紫，ai的运维对职业生涯是延长是很有帮助的。</div>
 
@@ -285,12 +285,52 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>K8s组件全景分类图:<br>┌─────────────────────────────────────────────────────────────┐<br>│                    Kubernetes 组件分类体系                   │<br>├─────────────┬─────────────┬─────────────┬─────────────┤<br>│  工作负载    │   网络      │   存储       │   配置       │<br>├─────────────┼─────────────┼─────────────┼─────────────┤<br>│  服务发现    │   安全      │   调度       │   扩展       │<br>└─────────────┴─────────────┴─────────────┴─────────────┘</p>
+        <h2 id="K8s组件全景分类图"><a href="#K8s组件全景分类图" class="headerlink" title="K8s组件全景分类图"></a>K8s组件全景分类图</h2><p>┌─────────────────────────────────────────────────────────────┐<br>│                    Kubernetes 组件分类体系                   │<br>├─────────────┬─────────────┬─────────────┬─────────────┤<br>│  工作负载    │   网络      │   存储       │   配置       │<br>├─────────────┼─────────────┼─────────────┼─────────────┤<br>│  服务发现    │   安全      │   调度       │   扩展       │<br>└─────────────┴─────────────┴─────────────┴─────────────┘</p>
 <p>核心依赖关系:</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Pod → (被) Deployment/StatefulSet/DaemonSet 管理</span><br><span class="line">Pod → (使用) Volume 挂载存储</span><br><span class="line">Pod → (通过) Service 暴露服务</span><br><span class="line">Service → (依赖) Endpoints 指向Pod</span><br><span class="line">PVC → (绑定) PV 提供存储</span><br><span class="line">PV → (由) StorageClass 动态创建</span><br></pre></td></tr></table></figure>
 
 <p>数据流向:</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">外部请求 → Ingress → Service → Pod</span><br><span class="line">Pod日志 → Sidecar容器 → 日志收集系统</span><br><span class="line">监控数据 → cAdvisor → Prometheus → Grafana</span><br><span class="line">配置更新 → ConfigMap/Secret → Pod自动重载</span><br></pre></td></tr></table></figure>
+
+<h2 id="从你kubectl-apply命令到pod创建的过程"><a href="#从你kubectl-apply命令到pod创建的过程" class="headerlink" title="从你kubectl apply命令到pod创建的过程"></a>从你kubectl apply命令到pod创建的过程</h2><ol>
+<li>kubectl 会将yaml文件转json，创建http post请求，发给api server.</li>
+<li>api server接收请求，然后进行认证（bear token），授权（这个账号能做啥不能做啥），控制，然后将deployment等对象信息存储到etcd。</li>
+<li>etcd存储的所有的k8s对象状态，是强一致性。它会监听k8s对象们的变化，确认状态批量期望。</li>
+<li>contrl manager发现一个新deployment，然后control manager创建对应的ReplicaSet，replicaset control去创建pod，所以是先有ReplicaSet后有pod。</li>
+<li>scheduler 为pod选择合适的节点，主要通过以下几个属性：<br> 过滤：通过资源的情况、污点、不匹配、亲和性<br> 打分：亲和性、均衡性<br> 绑定</li>
+<li>kubelet创建pod：创建pod沙箱，拉镜像，创建容器，然后用dockerfile的容器启动命令来启动容器。</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">t0: kubectl apply</span><br><span class="line">t1: API Server接收</span><br><span class="line">t2: etcd存储</span><br><span class="line">t3: Controller Manager创建ReplicaSet</span><br><span class="line">t4: Controller Manager创建Pod</span><br><span class="line">t5: Scheduler选择Node</span><br><span class="line">t6: kubelet接收Pod</span><br><span class="line">t7: 容器运行时创建容器</span><br><span class="line">t8: 容器进程运行</span><br></pre></td></tr></table></figure>
+
+<h2 id="为啥我delete一个pod，马上又生成一个新的？"><a href="#为啥我delete一个pod，马上又生成一个新的？" class="headerlink" title="为啥我delete一个pod，马上又生成一个新的？"></a>为啥我delete一个pod，马上又生成一个新的？</h2><ol>
+<li>replicaset才是管理pod的对象.</li>
+<li>deployment时理想状态管理器，它会不断地检查，一旦发现当前的pod状态与期望不一致就会修复，所以scale是修改期望，delete pod是直接删掉pod，但是期望没变，所以你手动delete，k8s会马上再生成一个。</li>
+</ol>
+<h2 id="pod-的状态是completed是啥意思？"><a href="#pod-的状态是completed是啥意思？" class="headerlink" title="pod 的状态是completed是啥意思？"></a>pod 的状态是completed是啥意思？</h2><p>说明这个pod圆满完成了任务，pod有五个生命周期：<br>pending：拉取镜像或者调度镜像<br>running：容器已经就绪并正常运行<br>succeeded or completed：容器成功运行结束并退出<br>failed：容器以非零状态码退出<br>unknown：node挂了，master联系不上pod了。</p>
+<h2 id="node断网10mins后，会发生啥？"><a href="#node断网10mins后，会发生啥？" class="headerlink" title="node断网10mins后，会发生啥？"></a>node断网10mins后，会发生啥？</h2><ol>
+<li>由于node-monitor-grace-period 默认是40秒，kubelet超过40秒没有报心跳，node变成notready。然后这个node会被打上污点，不会有新的pod调度进来了。</li>
+<li>pod-eviction-timeout 默认是5分钟，node变成notready后，controller-manager再等5分钟就开始驱逐pod。</li>
+<li>如果是depolyment，那么宿主机会在其他健康的node创建pod，将老的pod的状态设为terminating。</li>
+<li>endpoint-controller 监听到pod变化，将pod ip从service 的endpoints 列表里移除，coreDNS也同步更新，流量回切走。</li>
+<li>Node恢复后，kubelet恢复上报心跳，杀掉最后terminating的pod，然后已经迁移走的deployment pod不会自动返回。</li>
+</ol>
+<h2 id="我有一个service-clusterip-是10-0-0-2，我发现在pod里ping不通这个ip，但是可以curl通对应的接口，为啥？"><a href="#我有一个service-clusterip-是10-0-0-2，我发现在pod里ping不通这个ip，但是可以curl通对应的接口，为啥？" class="headerlink" title="我有一个service,clusterip 是10.0.0.2，我发现在pod里ping不通这个ip，但是可以curl通对应的接口，为啥？"></a>我有一个service,clusterip 是10.0.0.2，我发现在pod里ping不通这个ip，但是可以curl通对应的接口，为啥？</h2><p>Cluster IP是一个虚拟ip，它没有一个真实的网络接口，它只是一个iptables的规则。<br>但是k8s不让Cluster IP来响应ping，是因为“kube-proxy职位service定义了针对TCP UDP SCTP接口的转发规则。iptables转发规则是带接口的，而ICMP是三层协议，没有端口，所以kube-proxy默认不会给他生成NAT转换逻辑”。</p>
+<h2 id="如果我有一个服务器，它只有内网IP，可以与你的macos电脑相连，现在它上面启动了一个grafana，你怎么看它的grafana-web页面？"><a href="#如果我有一个服务器，它只有内网IP，可以与你的macos电脑相连，现在它上面启动了一个grafana，你怎么看它的grafana-web页面？" class="headerlink" title="如果我有一个服务器，它只有内网IP，可以与你的macos电脑相连，现在它上面启动了一个grafana，你怎么看它的grafana web页面？"></a>如果我有一个服务器，它只有内网IP，可以与你的macos电脑相连，现在它上面启动了一个grafana，你怎么看它的grafana web页面？</h2><p>开发阶段：可以通过”kubectl port-forward + ssh隧道”把远程的接口转发到本地浏览器,这个是目前最安全零开销的私密访问模式：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1. kubectl port-forward -n monitoring svc/monitoring-grafana 3000:80 --address 127.0.0.1  # 将grafana pod的80接口映射到这个宿主机的3000接口，这个命令就不要动了，新开一个终端</span><br><span class="line">2. ssh -L 3000:localhost:3000 你的宿主机帐号@宿主机ip   #把远程服务器的localhost:3000接口映射到本地macos电脑的localhost:3000上</span><br></pre></td></tr></table></figure>
+
+<p>如果是生产阶段：用一个ingress controller + 云厂商的loadbalancer 来解决。 </p>
+<h2 id="我这个是中国大陆的服务器，发现启动nginx这样的pod的时候，提示镜像拉取失败，应该怎么修？"><a href="#我这个是中国大陆的服务器，发现启动nginx这样的pod的时候，提示镜像拉取失败，应该怎么修？" class="headerlink" title="我这个是中国大陆的服务器，发现启动nginx这样的pod的时候，提示镜像拉取失败，应该怎么修？"></a>我这个是中国大陆的服务器，发现启动nginx这样的pod的时候，提示镜像拉取失败，应该怎么修？</h2><ol>
+<li>修改 &#x2F;etc&#x2F;rancher&#x2F;k3s&#x2F;registries.yaml 文件，如果没有就创建一个，然后把中国大陆的镜像地址写进去就行。</li>
+<li>pause容器比较特殊（k8s在启动任何pod之前，都会先去拉一个叫pause的基础镜像），它不归registries.yaml 管，需要在&#x2F;etc&#x2F;systemd&#x2F;system&#x2F;k3s.service的ExecStart后面加上–pause-image：</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># 修改前示例：</span><br><span class="line"># ExecStart=/usr/local/bin/k3s server</span><br><span class="line"># 修改后示例：</span><br><span class="line">ExecStart=/usr/local/bin/k3s server --pause-image registry.cn-hangzhou.aliyuncs.com/google_containers/pause:3.9</span><br></pre></td></tr></table></figure>
+
+<h2 id="为啥etcd磁盘变慢也会导致全集群的pod异常重启？"><a href="#为啥etcd磁盘变慢也会导致全集群的pod异常重启？" class="headerlink" title="为啥etcd磁盘变慢也会导致全集群的pod异常重启？"></a>为啥etcd磁盘变慢也会导致全集群的pod异常重启？</h2><p>etcd需要将心跳和数据持久化到日志里，如果磁盘太慢导致fsync超时，etcd就会进去选主状态or停止响应。<br>kubelet无法定期更新nodestatus，就认为nodes not ready。然后就开始大量驱逐。<br>此时会尝试在其他nodes上重新创建pod，但是etcd还是写入很慢，这些创建请求就堆积在api server内存里，这样新的创建不出来，老的被驱逐，整个集群都瘫痪了。<br>如果此时etcd恢复了，那么之前堆积的大量请求，etcd扛不住这么大的全量读压力，再次被高并发压垮，所以启动的时候，请求尽量从api server的内存缓存中读取，不要直接穿透到etcd。</p>
+<h2 id="如果pod的request设置的很小（为了塞下更多的pod），但是limit设置的很大，那么高流量来的时候，会发生啥？"><a href="#如果pod的request设置的很小（为了塞下更多的pod），但是limit设置的很大，那么高流量来的时候，会发生啥？" class="headerlink" title="如果pod的request设置的很小（为了塞下更多的pod），但是limit设置的很大，那么高流量来的时候，会发生啥？"></a>如果pod的request设置的很小（为了塞下更多的pod），但是limit设置的很大，那么高流量来的时候，会发生啥？</h2><p>这是资源超卖的定时炸弹，当流量洪峰来到，所有cpu会冲向limit，CPU是可压缩资源，然后出发CPU节流，链接池爆满。但是内存不可压缩，会大量的oom killer，然后大量pod挂掉，如果还有重试机制，那么整个系统雪崩了。</p>
+<p>建议生产环境requests和limits设置相同，然后核心应用采用guaranteed级别，k8s给他最高的oom优先级，并在节点压力大时最后才驱逐他们。也可以用priorityclass来打标签，这个值越高，pod越不会被强制驱逐。</p>
+<h2 id="高并发场景下，为啥pod滚动更新会有502-504错误？"><a href="#高并发场景下，为啥pod滚动更新会有502-504错误？" class="headerlink" title="高并发场景下，为啥pod滚动更新会有502&#x2F;504错误？"></a>高并发场景下，为啥pod滚动更新会有502&#x2F;504错误？</h2><p>api server将pod状态改成terminating，然后endpoint收到变更，将service 的endpoint列表里移除这个pod id。kubelet向pod发送SIGTERM信号，进程开始退出。<br>现在可能是ingress还没有刷新转发规则，pod进程就已经收到了SIGTERM信号，停止接收请求或者干脆退出，那么没有更新规则的endpoint就把流量转发到“已经不干活”的IP上，就502&#x2F;504 .<br>可以在容器销毁前手动加一个prestop延迟（这个延迟要小于terminationGracePeriodSeconds，默认30秒），让它在关闭前sleep一会。这样kubelet杀掉pod时，先执行prestop，此时pod状态已经是terminating，endpoint已经开始移除了，但是容器进程还在，实现优雅停机。</p>
+<h2 id="A部门是核心利润部门，B是边缘创新部门，但是A的架构师把A部门里所有pod的priorityClass改成10亿，导致A部门一压测或者扩容就把B部门的业务pod都驱逐了。现在A部门的priorityClass不能改，毕竟人家是核心利润部门，怎么操作来保护B部门基础生存空间？"><a href="#A部门是核心利润部门，B是边缘创新部门，但是A的架构师把A部门里所有pod的priorityClass改成10亿，导致A部门一压测或者扩容就把B部门的业务pod都驱逐了。现在A部门的priorityClass不能改，毕竟人家是核心利润部门，怎么操作来保护B部门基础生存空间？" class="headerlink" title="A部门是核心利润部门，B是边缘创新部门，但是A的架构师把A部门里所有pod的priorityClass改成10亿，导致A部门一压测或者扩容就把B部门的业务pod都驱逐了。现在A部门的priorityClass不能改，毕竟人家是核心利润部门，怎么操作来保护B部门基础生存空间？"></a>A部门是核心利润部门，B是边缘创新部门，但是A的架构师把A部门里所有pod的priorityClass改成10亿，导致A部门一压测或者扩容就把B部门的业务pod都驱逐了。现在A部门的priorityClass不能改，毕竟人家是核心利润部门，怎么操作来保护B部门基础生存空间？</h2><p>通过限制高优先级的总量R饿廋如厕Qu哦他。 或者给 B部门配置一个PDB，留一个minAvailable:1，这样调度器试图驱逐这个pod的时候，pdb会拦截这次行为。最后划分node affinity，大家分开池子。</p>
+
     </div>
 
     
@@ -325,7 +365,7 @@
   </li>
   <li class="post-copyright-link">
     <strong>Post link: </strong>
-    <a href="http://example.com/2019/03/03/k8s%E7%9A%84%E5%9F%BA%E7%A1%80%E7%AC%94%E8%AE%B0/" title="k8s的基础笔记">http://example.com/2019/03/03/k8s的基础笔记/</a>
+    <a href="http://example.com/2019/03/03/k8s%E7%9A%84%E5%9F%BA%E7%A1%80%E7%AC%94%E8%AE%B0/" title="k8s的基础知识and面试题">http://example.com/2019/03/03/k8s的基础笔记/</a>
   </li>
   <li class="post-copyright-license">
     <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
@@ -431,6 +471,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#K8s%E7%BB%84%E4%BB%B6%E5%85%A8%E6%99%AF%E5%88%86%E7%B1%BB%E5%9B%BE"><span class="nav-number">1.</span> <span class="nav-text">K8s组件全景分类图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8E%E4%BD%A0kubectl-apply%E5%91%BD%E4%BB%A4%E5%88%B0pod%E5%88%9B%E5%BB%BA%E7%9A%84%E8%BF%87%E7%A8%8B"><span class="nav-number">2.</span> <span class="nav-text">从你kubectl apply命令到pod创建的过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E5%95%A5%E6%88%91delete%E4%B8%80%E4%B8%AApod%EF%BC%8C%E9%A9%AC%E4%B8%8A%E5%8F%88%E7%94%9F%E6%88%90%E4%B8%80%E4%B8%AA%E6%96%B0%E7%9A%84%EF%BC%9F"><span class="nav-number">3.</span> <span class="nav-text">为啥我delete一个pod，马上又生成一个新的？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#pod-%E7%9A%84%E7%8A%B6%E6%80%81%E6%98%AFcompleted%E6%98%AF%E5%95%A5%E6%84%8F%E6%80%9D%EF%BC%9F"><span class="nav-number">4.</span> <span class="nav-text">pod 的状态是completed是啥意思？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#node%E6%96%AD%E7%BD%9110mins%E5%90%8E%EF%BC%8C%E4%BC%9A%E5%8F%91%E7%94%9F%E5%95%A5%EF%BC%9F"><span class="nav-number">5.</span> <span class="nav-text">node断网10mins后，会发生啥？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%88%91%E6%9C%89%E4%B8%80%E4%B8%AAservice-clusterip-%E6%98%AF10-0-0-2%EF%BC%8C%E6%88%91%E5%8F%91%E7%8E%B0%E5%9C%A8pod%E9%87%8Cping%E4%B8%8D%E9%80%9A%E8%BF%99%E4%B8%AAip%EF%BC%8C%E4%BD%86%E6%98%AF%E5%8F%AF%E4%BB%A5curl%E9%80%9A%E5%AF%B9%E5%BA%94%E7%9A%84%E6%8E%A5%E5%8F%A3%EF%BC%8C%E4%B8%BA%E5%95%A5%EF%BC%9F"><span class="nav-number">6.</span> <span class="nav-text">我有一个service,clusterip 是10.0.0.2，我发现在pod里ping不通这个ip，但是可以curl通对应的接口，为啥？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E6%9E%9C%E6%88%91%E6%9C%89%E4%B8%80%E4%B8%AA%E6%9C%8D%E5%8A%A1%E5%99%A8%EF%BC%8C%E5%AE%83%E5%8F%AA%E6%9C%89%E5%86%85%E7%BD%91IP%EF%BC%8C%E5%8F%AF%E4%BB%A5%E4%B8%8E%E4%BD%A0%E7%9A%84macos%E7%94%B5%E8%84%91%E7%9B%B8%E8%BF%9E%EF%BC%8C%E7%8E%B0%E5%9C%A8%E5%AE%83%E4%B8%8A%E9%9D%A2%E5%90%AF%E5%8A%A8%E4%BA%86%E4%B8%80%E4%B8%AAgrafana%EF%BC%8C%E4%BD%A0%E6%80%8E%E4%B9%88%E7%9C%8B%E5%AE%83%E7%9A%84grafana-web%E9%A1%B5%E9%9D%A2%EF%BC%9F"><span class="nav-number">7.</span> <span class="nav-text">如果我有一个服务器，它只有内网IP，可以与你的macos电脑相连，现在它上面启动了一个grafana，你怎么看它的grafana web页面？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%88%91%E8%BF%99%E4%B8%AA%E6%98%AF%E4%B8%AD%E5%9B%BD%E5%A4%A7%E9%99%86%E7%9A%84%E6%9C%8D%E5%8A%A1%E5%99%A8%EF%BC%8C%E5%8F%91%E7%8E%B0%E5%90%AF%E5%8A%A8nginx%E8%BF%99%E6%A0%B7%E7%9A%84pod%E7%9A%84%E6%97%B6%E5%80%99%EF%BC%8C%E6%8F%90%E7%A4%BA%E9%95%9C%E5%83%8F%E6%8B%89%E5%8F%96%E5%A4%B1%E8%B4%A5%EF%BC%8C%E5%BA%94%E8%AF%A5%E6%80%8E%E4%B9%88%E4%BF%AE%EF%BC%9F"><span class="nav-number">8.</span> <span class="nav-text">我这个是中国大陆的服务器，发现启动nginx这样的pod的时候，提示镜像拉取失败，应该怎么修？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E5%95%A5etcd%E7%A3%81%E7%9B%98%E5%8F%98%E6%85%A2%E4%B9%9F%E4%BC%9A%E5%AF%BC%E8%87%B4%E5%85%A8%E9%9B%86%E7%BE%A4%E7%9A%84pod%E5%BC%82%E5%B8%B8%E9%87%8D%E5%90%AF%EF%BC%9F"><span class="nav-number">9.</span> <span class="nav-text">为啥etcd磁盘变慢也会导致全集群的pod异常重启？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E6%9E%9Cpod%E7%9A%84request%E8%AE%BE%E7%BD%AE%E7%9A%84%E5%BE%88%E5%B0%8F%EF%BC%88%E4%B8%BA%E4%BA%86%E5%A1%9E%E4%B8%8B%E6%9B%B4%E5%A4%9A%E7%9A%84pod%EF%BC%89%EF%BC%8C%E4%BD%86%E6%98%AFlimit%E8%AE%BE%E7%BD%AE%E7%9A%84%E5%BE%88%E5%A4%A7%EF%BC%8C%E9%82%A3%E4%B9%88%E9%AB%98%E6%B5%81%E9%87%8F%E6%9D%A5%E7%9A%84%E6%97%B6%E5%80%99%EF%BC%8C%E4%BC%9A%E5%8F%91%E7%94%9F%E5%95%A5%EF%BC%9F"><span class="nav-number">10.</span> <span class="nav-text">如果pod的request设置的很小（为了塞下更多的pod），但是limit设置的很大，那么高流量来的时候，会发生啥？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%AB%98%E5%B9%B6%E5%8F%91%E5%9C%BA%E6%99%AF%E4%B8%8B%EF%BC%8C%E4%B8%BA%E5%95%A5pod%E6%BB%9A%E5%8A%A8%E6%9B%B4%E6%96%B0%E4%BC%9A%E6%9C%89502-504%E9%94%99%E8%AF%AF%EF%BC%9F"><span class="nav-number">11.</span> <span class="nav-text">高并发场景下，为啥pod滚动更新会有502&#x2F;504错误？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#A%E9%83%A8%E9%97%A8%E6%98%AF%E6%A0%B8%E5%BF%83%E5%88%A9%E6%B6%A6%E9%83%A8%E9%97%A8%EF%BC%8CB%E6%98%AF%E8%BE%B9%E7%BC%98%E5%88%9B%E6%96%B0%E9%83%A8%E9%97%A8%EF%BC%8C%E4%BD%86%E6%98%AFA%E7%9A%84%E6%9E%B6%E6%9E%84%E5%B8%88%E6%8A%8AA%E9%83%A8%E9%97%A8%E9%87%8C%E6%89%80%E6%9C%89pod%E7%9A%84priorityClass%E6%94%B9%E6%88%9010%E4%BA%BF%EF%BC%8C%E5%AF%BC%E8%87%B4A%E9%83%A8%E9%97%A8%E4%B8%80%E5%8E%8B%E6%B5%8B%E6%88%96%E8%80%85%E6%89%A9%E5%AE%B9%E5%B0%B1%E6%8A%8AB%E9%83%A8%E9%97%A8%E7%9A%84%E4%B8%9A%E5%8A%A1pod%E9%83%BD%E9%A9%B1%E9%80%90%E4%BA%86%E3%80%82%E7%8E%B0%E5%9C%A8A%E9%83%A8%E9%97%A8%E7%9A%84priorityClass%E4%B8%8D%E8%83%BD%E6%94%B9%EF%BC%8C%E6%AF%95%E7%AB%9F%E4%BA%BA%E5%AE%B6%E6%98%AF%E6%A0%B8%E5%BF%83%E5%88%A9%E6%B6%A6%E9%83%A8%E9%97%A8%EF%BC%8C%E6%80%8E%E4%B9%88%E6%93%8D%E4%BD%9C%E6%9D%A5%E4%BF%9D%E6%8A%A4B%E9%83%A8%E9%97%A8%E5%9F%BA%E7%A1%80%E7%94%9F%E5%AD%98%E7%A9%BA%E9%97%B4%EF%BC%9F"><span class="nav-number">12.</span> <span class="nav-text">A部门是核心利润部门，B是边缘创新部门，但是A的架构师把A部门里所有pod的priorityClass改成10亿，导致A部门一压测或者扩容就把B部门的业务pod都驱逐了。现在A部门的priorityClass不能改，毕竟人家是核心利润部门，怎么操作来保护B部门基础生存空间？</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -502,12 +543,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="Symbols count total">558k</span>
+    <span title="Symbols count total">560k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">33:50</span>
+    <span title="Reading time total">33:57</span>
 </div>
   <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
   </div>
