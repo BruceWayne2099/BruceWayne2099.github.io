@@ -192,6 +192,122 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2018/09/25/Django%E5%B0%86%E6%9F%90%E4%B8%AA%E6%95%B0%E6%8D%AE%E5%BA%93%E5%AD%97%E6%AE%B5%E7%BB%99%E5%A4%9A%E4%B8%AAapp%E4%BD%BF%E7%94%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+      <meta itemprop="description" content="那些在阳光下挥洒青春的日子啊！">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2018/09/25/Django%E5%B0%86%E6%9F%90%E4%B8%AA%E6%95%B0%E6%8D%AE%E5%BA%93%E5%AD%97%E6%AE%B5%E7%BB%99%E5%A4%9A%E4%B8%AAapp%E4%BD%BF%E7%94%A8/" class="post-title-link" itemprop="url">Django将某个数据库字段给多个app使用</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-09-25 14:48:20" itemprop="dateCreated datePublished" datetime="2018-09-25T14:48:20+08:00">2018-09-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2025-11-08 08:46:50" itemprop="dateModified" datetime="2025-11-08T08:46:50+08:00">2025-11-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2018/09/25/Django%E5%B0%86%E6%9F%90%E4%B8%AA%E6%95%B0%E6%8D%AE%E5%BA%93%E5%AD%97%E6%AE%B5%E7%BB%99%E5%A4%9A%E4%B8%AAapp%E4%BD%BF%E7%94%A8/" class="post-meta-item leancloud_visitors" data-flag-title="Django将某个数据库字段给多个app使用" title="Views">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine: </span>
+    
+    <a title="valine" href="/2018/09/25/Django%E5%B0%86%E6%9F%90%E4%B8%AA%E6%95%B0%E6%8D%AE%E5%BA%93%E5%AD%97%E6%AE%B5%E7%BB%99%E5%A4%9A%E4%B8%AAapp%E4%BD%BF%E7%94%A8/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2018/09/25/Django%E5%B0%86%E6%9F%90%E4%B8%AA%E6%95%B0%E6%8D%AE%E5%BA%93%E5%AD%97%E6%AE%B5%E7%BB%99%E5%A4%9A%E4%B8%AAapp%E4%BD%BF%E7%94%A8/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>1.1k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>4 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>本文是杨世航大佬在Bilibili的第19讲，我这里只是做一个自己理解的复述而已</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2018/09/25/Django%E5%B0%86%E6%9F%90%E4%B8%AA%E6%95%B0%E6%8D%AE%E5%BA%93%E5%AD%97%E6%AE%B5%E7%BB%99%E5%A4%9A%E4%B8%AAapp%E4%BD%BF%E7%94%A8/">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="http://example.com/2018/09/18/Django%E9%80%9A%E8%BF%87%E5%94%AF%E4%B8%80%E6%A0%87%E8%AF%86%E7%AC%A6%E5%B0%86%E5%90%8E%E5%8F%B0%E6%95%B0%E6%8D%AE%E5%BA%93%E5%AF%B9%E5%BA%94%E8%BE%93%E5%87%BA/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1232,122 +1348,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2018/08/15/%E4%BD%BF%E7%94%A8gitlab%E6%90%AD%E9%85%8D%E9%98%BF%E9%87%8C%E4%BA%91%E5%AE%B9%E5%99%A8%E9%95%9C%E5%83%8F%E6%9C%8D%E5%8A%A1%E6%9E%84%E5%BB%BA%E9%95%9C%E5%83%8F/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Chris Chan">
-      <meta itemprop="description" content="那些在阳光下挥洒青春的日子啊！">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="石锤淡啤酒">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2018/08/15/%E4%BD%BF%E7%94%A8gitlab%E6%90%AD%E9%85%8D%E9%98%BF%E9%87%8C%E4%BA%91%E5%AE%B9%E5%99%A8%E9%95%9C%E5%83%8F%E6%9C%8D%E5%8A%A1%E6%9E%84%E5%BB%BA%E9%95%9C%E5%83%8F/" class="post-title-link" itemprop="url">使用gitlab搭配阿里云容器镜像服务构建镜像</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2018-08-15 10:15:44" itemprop="dateCreated datePublished" datetime="2018-08-15T10:15:44+08:00">2018-08-15</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2025-11-08 08:47:38" itemprop="dateModified" datetime="2025-11-08T08:47:38+08:00">2025-11-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/2018/08/15/%E4%BD%BF%E7%94%A8gitlab%E6%90%AD%E9%85%8D%E9%98%BF%E9%87%8C%E4%BA%91%E5%AE%B9%E5%99%A8%E9%95%9C%E5%83%8F%E6%9C%8D%E5%8A%A1%E6%9E%84%E5%BB%BA%E9%95%9C%E5%83%8F/" class="post-meta-item leancloud_visitors" data-flag-title="使用gitlab搭配阿里云容器镜像服务构建镜像" title="Views">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">Views: </span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Valine: </span>
-    
-    <a title="valine" href="/2018/08/15/%E4%BD%BF%E7%94%A8gitlab%E6%90%AD%E9%85%8D%E9%98%BF%E9%87%8C%E4%BA%91%E5%AE%B9%E5%99%A8%E9%95%9C%E5%83%8F%E6%9C%8D%E5%8A%A1%E6%9E%84%E5%BB%BA%E9%95%9C%E5%83%8F/#valine-comments" itemprop="discussionUrl">
-      <span class="post-comments-count valine-comment-count" data-xid="/2018/08/15/%E4%BD%BF%E7%94%A8gitlab%E6%90%AD%E9%85%8D%E9%98%BF%E9%87%8C%E4%BA%91%E5%AE%B9%E5%99%A8%E9%95%9C%E5%83%8F%E6%9C%8D%E5%8A%A1%E6%9E%84%E5%BB%BA%E9%95%9C%E5%83%8F/" itemprop="commentCount"></span>
-    </a>
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="Symbols count in article">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>1.1k</span>
-            </span>
-            <span class="post-meta-item" title="Reading time">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>4 mins.</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>出去参加交流才发现，我们的运维简直就是手工作坊...</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2018/08/15/%E4%BD%BF%E7%94%A8gitlab%E6%90%AD%E9%85%8D%E9%98%BF%E9%87%8C%E4%BA%91%E5%AE%B9%E5%99%A8%E9%95%9C%E5%83%8F%E6%9C%8D%E5%8A%A1%E6%9E%84%E5%BB%BA%E9%95%9C%E5%83%8F/">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1417,7 +1417,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">428</span>
+          <span class="site-state-item-count">429</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -1475,12 +1475,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="Symbols count total">560k</span>
+    <span title="Symbols count total">561k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">33:57</span>
+    <span title="Reading time total">34:01</span>
 </div>
   <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
   </div>
