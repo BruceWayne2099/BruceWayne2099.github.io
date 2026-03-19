@@ -25,7 +25,7 @@
 
   <meta name="description" content="完整的走一遍，面试的时候可以拿来吹牛逼">
 <meta property="og:type" content="article">
-<meta property="og:title" content="从零搭建ollama">
+<meta property="og:title" content="从零搭建一个本地ollama">
 <meta property="og:url" content="http://example.com/2026/03/19/%E6%9C%AC%E5%9C%B0%E6%90%AD%E5%BB%BA%E4%B8%80%E4%B8%AAollama%E5%A4%A7%E6%A8%A1%E5%9E%8B/index.html">
 <meta property="og:site_name" content="石锤淡啤酒">
 <meta property="og:description" content="完整的走一遍，面试的时候可以拿来吹牛逼">
@@ -33,7 +33,7 @@
 <meta property="og:image" content="http://example.com/images/k8s2.jpg">
 <meta property="og:image" content="http://example.com/images/k8s4.jpg">
 <meta property="article:published_time" content="2026-03-19T12:10:15.000Z">
-<meta property="article:modified_time" content="2026-03-19T12:59:06.964Z">
+<meta property="article:modified_time" content="2026-03-19T13:02:47.610Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="k8s">
 <meta property="article:tag" content="面试">
@@ -53,7 +53,7 @@
   };
 </script>
 
-  <title>从零搭建ollama | 石锤淡啤酒</title>
+  <title>从零搭建一个本地ollama | 石锤淡啤酒</title>
   
 
 
@@ -212,7 +212,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          从零搭建ollama
+          从零搭建一个本地ollama
         </h1>
 
         <div class="post-meta">
@@ -223,7 +223,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2026-03-19 20:10:15 / Modified: 20:59:06" itemprop="dateCreated datePublished" datetime="2026-03-19T20:10:15+08:00">2026-03-19</time>
+              <time title="Created: 2026-03-19 20:10:15 / Modified: 21:02:47" itemprop="dateCreated datePublished" datetime="2026-03-19T20:10:15+08:00">2026-03-19</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -236,7 +236,7 @@
             </span>
 
           
-            <span id="/2026/03/19/%E6%9C%AC%E5%9C%B0%E6%90%AD%E5%BB%BA%E4%B8%80%E4%B8%AAollama%E5%A4%A7%E6%A8%A1%E5%9E%8B/" class="post-meta-item leancloud_visitors" data-flag-title="从零搭建ollama" title="Views">
+            <span id="/2026/03/19/%E6%9C%AC%E5%9C%B0%E6%90%AD%E5%BB%BA%E4%B8%80%E4%B8%AAollama%E5%A4%A7%E6%A8%A1%E5%9E%8B/" class="post-meta-item leancloud_visitors" data-flag-title="从零搭建一个本地ollama" title="Views">
               <span class="post-meta-item-icon">
                 <i class="fa fa-eye"></i>
               </span>
@@ -262,14 +262,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>1.2k</span>
+              <span>1.3k</span>
             </span>
             <span class="post-meta-item" title="Reading time">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>4 mins.</span>
+              <span>5 mins.</span>
             </span>
             <div class="post-description">完整的走一遍，面试的时候可以拿来吹牛逼</div>
 
@@ -323,7 +323,8 @@
 <li>通过<code>ai.demo.com</code>域名，流量请求到开发机的80接口。</li>
 <li>k3s内部的ingress接客，看到路径是&#x2F;aigpt，就把请求转发给ai-backend-svc这个service。</li>
 <li>后端backend Pod接收请求，执行对应的python代码，发起一个requests请求ollama svc，这俩pod是互通的。</li>
-<li>返回结果到浏览器。</li>
+<li>返回结果到浏览器。整个过程闭环在macos和开发机里，哪怕开发机没有公网，一样请求OK，而且现在调用是不花token的。</li>
+<li>做pv&#x2F;pvc持久化，重启后就不用再去公网上下载模型了，避免了pod先活了，但是还要下载模型，其实服务没准备好，但是流量先进来的尴尬。</li>
 </ol>
 <h2 id="排错过程"><a href="#排错过程" class="headerlink" title="排错过程"></a>排错过程</h2><p>如果发现pod起不来，可以先通过describe命令粗略看一下原因，如果看不出来啥，可以再用<code>kubectl logs pod名称 --previous</code> ，来查看具体的一个pods的日志，能看出来为啥“镜像顺利拉到手，但是程序为啥启动不起来”。</p>
 
@@ -361,7 +362,7 @@
   </li>
   <li class="post-copyright-link">
     <strong>Post link: </strong>
-    <a href="http://example.com/2026/03/19/%E6%9C%AC%E5%9C%B0%E6%90%AD%E5%BB%BA%E4%B8%80%E4%B8%AAollama%E5%A4%A7%E6%A8%A1%E5%9E%8B/" title="从零搭建ollama">http://example.com/2026/03/19/本地搭建一个ollama大模型/</a>
+    <a href="http://example.com/2026/03/19/%E6%9C%AC%E5%9C%B0%E6%90%AD%E5%BB%BA%E4%B8%80%E4%B8%AAollama%E5%A4%A7%E6%A8%A1%E5%9E%8B/" title="从零搭建一个本地ollama">http://example.com/2026/03/19/本地搭建一个ollama大模型/</a>
   </li>
   <li class="post-copyright-license">
     <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
@@ -541,7 +542,7 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">34:01</span>
+    <span title="Reading time total">34:02</span>
 </div>
   <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
   </div>
