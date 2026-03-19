@@ -36,7 +36,7 @@
 <meta property="og:image" content="http://example.com/images/k8s5.jpg">
 <meta property="og:image" content="http://example.com/images/k8s6.jpg">
 <meta property="article:published_time" content="2026-03-19T12:10:15.000Z">
-<meta property="article:modified_time" content="2026-03-19T14:51:20.555Z">
+<meta property="article:modified_time" content="2026-03-19T15:22:47.598Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="k8s">
 <meta property="article:tag" content="面试">
@@ -226,7 +226,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2026-03-19 20:10:15 / Modified: 22:51:20" itemprop="dateCreated datePublished" datetime="2026-03-19T20:10:15+08:00">2026-03-19</time>
+              <time title="Created: 2026-03-19 20:10:15 / Modified: 23:22:47" itemprop="dateCreated datePublished" datetime="2026-03-19T20:10:15+08:00">2026-03-19</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -265,14 +265,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>1.9k</span>
+              <span>2.1k</span>
             </span>
             <span class="post-meta-item" title="Reading time">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>7 mins.</span>
+              <span>8 mins.</span>
             </span>
             <div class="post-description">完整的走一遍，面试的时候可以拿来吹牛逼</div>
 
@@ -333,8 +333,9 @@
 <h2 id="使用pvc做持久化"><a href="#使用pvc做持久化" class="headerlink" title="使用pvc做持久化"></a>使用pvc做持久化</h2><p>虽然上面的效果达到了目标，但是有一个致命的问题，就是ai模型动辄几十GB，容器的镜像拉取和启动太慢了，怎么缓解？</p>
 <p>所以这里要解耦一下，镜像只包括运行环境ollama，而巨大的模型权重用过pvc挂载，这样镜像只有只百MB,可快速分发，POD重启的时候直接挂在一下卷，实现秒级就绪。</p>
 <p>首先先创建一个<code>ollama-pvc.yaml</code>，做存储声明</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"># ollama-pvc.yaml</span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: PersistentVolumeClaim</span><br><span class="line">metadata:</span><br><span class="line">  name: ollama-storage-pvc</span><br><span class="line">spec:</span><br><span class="line">  # K3s 默认提供的存储类，会自动在宿主机 /var/lib/rancher/k3s/storage 下创建目录</span><br><span class="line">  storageClassName: local-path</span><br><span class="line">  accessModes:</span><br><span class="line">    - ReadWriteOnce  # 单节点读写，适合这种模型推理场景</span><br><span class="line">  resources:</span><br><span class="line">    requests:</span><br><span class="line">      storage: 50Gi  # 给够 50G，以后下个 70B 模型也放得下</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"># ollama-pvc.yaml</span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: PersistentVolumeClaim</span><br><span class="line">metadata:</span><br><span class="line">  name: ollama-storage-pvc</span><br><span class="line">spec:</span><br><span class="line">  # K3s 默认提供的存储类，会自动在宿主机 /var/lib/rancher/k3s/storage 下创建目录</span><br><span class="line">  storageClassName: local-path</span><br><span class="line">  accessModes:</span><br><span class="line">    - ReadWriteOnce  # 单节点读写，适合这种模型推理场景</span><br><span class="line">  resources:</span><br><span class="line">    requests:</span><br><span class="line">      storage: 50Gi  # 给够 50G，以后下个 70B 模型也放得下, </span><br></pre></td></tr></table></figure>
 
+<p>这里要注意！storage: 50Gi 这个数字将来只能往上加，不能往下减，因为会破坏文件系统，如果非要缩，只能删了重建，里面之前的东西都白下载了。</p>
 <p>然后修改<code>ollama-deployment.yaml</code>让它挂载到这个“pvc”上：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"># ollama-deployment.yaml</span><br><span class="line">apiVersion: apps/v1</span><br><span class="line">kind: Deployment</span><br><span class="line">metadata:</span><br><span class="line">  name: ollama</span><br><span class="line">spec:</span><br><span class="line">  replicas: 1</span><br><span class="line">  selector:</span><br><span class="line">    matchLabels:</span><br><span class="line">      app: ollama</span><br><span class="line">  template:</span><br><span class="line">    metadata:</span><br><span class="line">      labels:</span><br><span class="line">        app: ollama</span><br><span class="line">    spec:</span><br><span class="line">      containers:</span><br><span class="line">      - name: ollama</span><br><span class="line">        image: docker.m.daocloud.io/ollama/ollama:latest</span><br><span class="line">        ports:</span><br><span class="line">        - containerPort: 11434</span><br><span class="line">        volumeMounts:</span><br><span class="line">        - name: ollama-models</span><br><span class="line">          mountPath: /root/.ollama # 这里是容器里的路径，不是宿主机的路径</span><br><span class="line">        resources:</span><br><span class="line">          requests:</span><br><span class="line">            cpu: &quot;4&quot;</span><br><span class="line">            memory: &quot;8Gi&quot;</span><br><span class="line">          limits:</span><br><span class="line">            cpu: &quot;16&quot;</span><br><span class="line">            memory: &quot;32Gi&quot;</span><br><span class="line">      volumes:</span><br><span class="line">      - name: ollama-models</span><br><span class="line">        persistentVolumeClaim:</span><br><span class="line">          claimName: ollama-storage-pvc   # 这个名称就是刚才pvc里写的名称</span><br><span class="line">---</span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Service</span><br><span class="line">metadata:</span><br><span class="line">  name: ollama-svc</span><br><span class="line">spec:</span><br><span class="line">  selector:</span><br><span class="line">    app: ollama</span><br><span class="line">  ports:</span><br><span class="line">  - port: 11434</span><br><span class="line">    targetPort: 11434</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
@@ -351,6 +352,11 @@
 <li><code>Released</code>：已释放，Pod已删除但PV还未清理</li>
 <li><code>Failed</code>：失败，存储卷创建失败</li>
 </ul>
+<p>如果觉得8B模型不咋地，想升级用70B的大模型，就用这个：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 找到 pod 名</span><br><span class="line">export OLLAMA_POD=$(kubectl get pods -l app=ollama -o jsonpath=&#x27;&#123;.items[0].metadata.name&#125;&#x27;)</span><br><span class="line"></span><br><span class="line"># 开始拉取并运行（这个命令会卡住下载一段时间）</span><br><span class="line">kubectl exec -it $OLLAMA_POD -- ollama run llama3:70b</span><br></pre></td></tr></table></figure>
+
+<p>用了70B对8B是有了质的飞跃，而且即使想搞RAG，70B也比8B的效果更好，但是大小更大，要39G。但是它回答的时候需要先把这39G都加载到内存里，所以这里注意一下backend.py调用ollama的post请求要加上timeout&#x3D;300，这样不至于模型还没算完，链接就断了。</p>
+<p>39G虽然大，但是PVC是支持断点续传的，即使中间断网了，下一次启动会去看临时文件的。</p>
 
     </div>
 
@@ -566,7 +572,7 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">34:04</span>
+    <span title="Reading time total">34:05</span>
 </div>
   <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
   </div>
