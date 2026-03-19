@@ -30,12 +30,14 @@
 <meta property="og:site_name" content="石锤淡啤酒">
 <meta property="og:description" content="k8s是sre的命根子，而且现在随着gpu的大红大紫，ai的运维对职业生涯是延长是很有帮助的。">
 <meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/k8s.jpg">
 <meta property="article:published_time" content="2019-03-03T13:20:50.000Z">
-<meta property="article:modified_time" content="2026-03-19T02:58:07.300Z">
+<meta property="article:modified_time" content="2026-03-19T03:01:52.908Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="k8s">
 <meta property="article:tag" content="面试">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/k8s.jpg">
 
 <link rel="canonical" href="http://example.com/2019/03/03/k8s%E7%9A%84%E5%9F%BA%E7%A1%80%E7%AC%94%E8%AE%B0/">
 
@@ -226,7 +228,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2026-03-19 10:58:07" itemprop="dateModified" datetime="2026-03-19T10:58:07+08:00">2026-03-19</time>
+                <time title="Modified: 2026-03-19 11:01:52" itemprop="dateModified" datetime="2026-03-19T11:01:52+08:00">2026-03-19</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -317,7 +319,7 @@
 <h2 id="我有一个service-clusterip-是10-0-0-2，我发现在pod里ping不通这个ip，但是可以curl通对应的接口，为啥？"><a href="#我有一个service-clusterip-是10-0-0-2，我发现在pod里ping不通这个ip，但是可以curl通对应的接口，为啥？" class="headerlink" title="我有一个service,clusterip 是10.0.0.2，我发现在pod里ping不通这个ip，但是可以curl通对应的接口，为啥？"></a>我有一个service,clusterip 是10.0.0.2，我发现在pod里ping不通这个ip，但是可以curl通对应的接口，为啥？</h2><p>Cluster IP是一个虚拟ip，它没有一个真实的网络接口，它只是一个iptables的规则。<br>但是k8s不让Cluster IP来响应ping，是因为“kube-proxy职位service定义了针对TCP UDP SCTP接口的转发规则。iptables转发规则是带接口的，而ICMP是三层协议，没有端口，所以kube-proxy默认不会给他生成NAT转换逻辑”。</p>
 <h2 id="如果我有一个服务器，它只有内网IP，可以与你的macos电脑相连，现在它上面启动了一个grafana，你怎么看它的grafana-web页面？"><a href="#如果我有一个服务器，它只有内网IP，可以与你的macos电脑相连，现在它上面启动了一个grafana，你怎么看它的grafana-web页面？" class="headerlink" title="如果我有一个服务器，它只有内网IP，可以与你的macos电脑相连，现在它上面启动了一个grafana，你怎么看它的grafana web页面？"></a>如果我有一个服务器，它只有内网IP，可以与你的macos电脑相连，现在它上面启动了一个grafana，你怎么看它的grafana web页面？</h2><p>开发阶段：可以通过”kubectl port-forward + ssh隧道”把远程的接口转发到本地浏览器,这个是目前最安全零开销的私密访问模式：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1. kubectl port-forward -n monitoring svc/monitoring-grafana 3000:80 --address 127.0.0.1  # 将grafana pod的80接口映射到这个宿主机的3000接口，这个命令就不要动了，新开一个终端</span><br><span class="line">2. ssh -L 3000:localhost:3000 你的宿主机帐号@宿主机ip   #把远程服务器的localhost:3000接口映射到本地macos电脑的localhost:3000上</span><br></pre></td></tr></table></figure>
-
+<p><img data-src="/images/k8s.jpg" title="通过localhost:3000就可以看到web页面"></p>
 <p>如果是生产阶段：用一个ingress controller + 云厂商的loadbalancer 来解决。 </p>
 <h2 id="我这个是中国大陆的服务器，发现启动nginx这样的pod的时候，提示镜像拉取失败，应该怎么修？"><a href="#我这个是中国大陆的服务器，发现启动nginx这样的pod的时候，提示镜像拉取失败，应该怎么修？" class="headerlink" title="我这个是中国大陆的服务器，发现启动nginx这样的pod的时候，提示镜像拉取失败，应该怎么修？"></a>我这个是中国大陆的服务器，发现启动nginx这样的pod的时候，提示镜像拉取失败，应该怎么修？</h2><ol>
 <li>修改 &#x2F;etc&#x2F;rancher&#x2F;k3s&#x2F;registries.yaml 文件，如果没有就创建一个，然后把中国大陆的镜像地址写进去就行。</li>
