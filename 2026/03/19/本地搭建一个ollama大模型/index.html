@@ -38,8 +38,9 @@
 <meta property="og:image" content="http://example.com/images/k8s8.jpg">
 <meta property="og:image" content="http://example.com/images/k8s7.jpg">
 <meta property="article:published_time" content="2026-03-19T12:10:15.000Z">
-<meta property="article:modified_time" content="2026-03-20T03:36:29.112Z">
+<meta property="article:modified_time" content="2026-03-20T08:51:38.441Z">
 <meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="AI">
 <meta property="article:tag" content="k8s">
 <meta property="article:tag" content="面试">
 <meta name="twitter:card" content="summary">
@@ -234,7 +235,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2026-03-20 11:36:29" itemprop="dateModified" datetime="2026-03-20T11:36:29+08:00">2026-03-20</time>
+                <time title="Modified: 2026-03-20 16:51:38" itemprop="dateModified" datetime="2026-03-20T16:51:38+08:00">2026-03-20</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -368,7 +369,8 @@
 <p>用了70B对8B是有了质的飞跃，而且即使想搞RAG，70B也比8B的效果更好，但是大小更大，要39G。但是它回答的时候需要先把这39G都加载到内存里，所以这里注意一下backend.py调用ollama的post请求要加上timeout&#x3D;300，这样不至于模型还没算完，链接就断了。</p>
 <p>39G虽然大，但是PVC是支持断点续传的，即使中间断网了，下一次启动会去看临时文件的：<br><img data-src="/images/k8s8.jpg" title="8B的模型有时候就是胡说八道"></p>
 <p><img data-src="/images/k8s7.jpg" title="70B的模型果然靠谱多了"></p>
-
+<p>现在有了70B，8B对我就没用了，就直接干掉了：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">kubectl exec -it ollama-df8f889ff-nbjr2 -- ollama list #展示出来所有的ollama已经有的模型</span><br><span class="line">kubectl exec -it ollama-对应的pod名 -- ollama rm llama3:8b #对应删除即可</span><br></pre></td></tr></table></figure>
     </div>
 
     
@@ -435,6 +437,7 @@
           <div class="post-tags">
               <a href="/tags/%E9%9D%A2%E8%AF%95/" rel="tag"># 面试</a>
               <a href="/tags/k8s/" rel="tag"># k8s</a>
+              <a href="/tags/AI/" rel="tag"># AI</a>
           </div>
 
         
