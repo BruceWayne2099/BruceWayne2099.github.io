@@ -39,7 +39,7 @@
 <meta property="og:image" content="http://example.com/images/k8s14.jpg">
 <meta property="og:image" content="http://example.com/images/k8s16.jpg">
 <meta property="article:published_time" content="2026-03-20T06:26:42.000Z">
-<meta property="article:modified_time" content="2026-03-20T09:05:25.484Z">
+<meta property="article:modified_time" content="2026-03-20T09:16:12.018Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="AI">
 <meta property="article:tag" content="k8s">
@@ -230,7 +230,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2026-03-20 14:26:42 / Modified: 17:05:25" itemprop="dateCreated datePublished" datetime="2026-03-20T14:26:42+08:00">2026-03-20</time>
+              <time title="Created: 2026-03-20 14:26:42 / Modified: 17:16:12" itemprop="dateCreated datePublished" datetime="2026-03-20T14:26:42+08:00">2026-03-20</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -296,8 +296,8 @@
 <p><code>Dockerfile</code>也改成了这样：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">#Dockerfile </span><br><span class="line">FROM docker.m.daocloud.io/library/python:3.9-slim</span><br><span class="line">RUN apt-get update &amp;&amp; apt-get install -y ffmpeg</span><br><span class="line">RUN pip install flask prometheus_client requests openai-whisper setuptools wheel      # 这里加入了openai-whisper</span><br><span class="line"></span><br><span class="line"># 创建工作目录</span><br><span class="line">WORKDIR /app</span><br><span class="line"></span><br><span class="line"># 把当前目录下所有东西（包含 templates 文件夹）都拷贝进去</span><br><span class="line">COPY . .</span><br><span class="line"></span><br><span class="line"># 运行 app</span><br><span class="line">CMD [&quot;python&quot;, &quot;backend.py&quot;]  # 容器就是启动这个python</span><br></pre></td></tr></table></figure>
 
-<p>修改了Dockerfile之后，我们来打包一个镜像ai-backend v8版本：<code>docker build -t ai-backend:v8 . </code>,然后通过<code>docker images |grep v4</code>里看本地的确有了docker images库里的确有了<code>ai-backend:v8</code>这个镜像。这个镜像挺大的，足足11G。</p>
-<p>但是要注意这个镜像还不在k3s里，所以还要执行<code>docker save ai-backend:v4 |sudo k3s ctr images import - </code>, 这样k3s的镜像库才也有了这个<code>ai-backend:v4</code>的镜像，可以用<code>k3s ctr images list|grep ai-backend</code>这个命令来确认。</p>
+<p>修改了Dockerfile之后，我们来打包一个镜像ai-backend v8版本：<code>docker build -t ai-backend:v8 . </code>,然后通过<code>docker images |grep v8</code>里看本地的确有了docker images库里的确有了<code>ai-backend:v8</code>这个镜像。这个镜像挺大的，足足11G。</p>
+<p>但是要注意这个镜像还不在k3s里，所以还要执行<code>docker save ai-backend:v8 |sudo k3s ctr images import - </code>, 这样k3s的镜像库才也有了这个<code>ai-backend:v8</code>的镜像，可以用<code>k3s ctr images list|grep ai-backend</code>这个命令来确认。</p>
 <p>然后我就执行<code>kubectl rollout restart deployment ai-backend</code>来滚动发布。</p>
 <p>结果检测跟上一次发布的内容没变化，检查了一下原来是<code>deployment.yaml</code>里忘改v8镜像了，修改了之后，又执行<code>kubectl rollout restart deployment ai-backend</code>，此时发现所有的pod全挂了：<br><img data-src="/images/k8s9.jpg" title="所有的pod都不健康了,rs也多了很多"></p>
 <ul>
