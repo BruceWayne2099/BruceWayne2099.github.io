@@ -38,7 +38,7 @@
 <meta property="og:image" content="http://example.com/images/k8s8.jpg">
 <meta property="og:image" content="http://example.com/images/k8s7.jpg">
 <meta property="article:published_time" content="2026-03-19T12:10:15.000Z">
-<meta property="article:modified_time" content="2026-03-19T17:30:19.740Z">
+<meta property="article:modified_time" content="2026-03-20T03:36:29.112Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="k8s">
 <meta property="article:tag" content="面试">
@@ -234,7 +234,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2026-03-20 01:30:19" itemprop="dateModified" datetime="2026-03-20T01:30:19+08:00">2026-03-20</time>
+                <time title="Modified: 2026-03-20 11:36:29" itemprop="dateModified" datetime="2026-03-20T11:36:29+08:00">2026-03-20</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -273,7 +273,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>2.2k</span>
+              <span>2.3k</span>
             </span>
             <span class="post-meta-item" title="Reading time">
               <span class="post-meta-item-icon">
@@ -337,7 +337,8 @@
 <li>返回结果到浏览器。整个过程闭环在macos和开发机里，哪怕开发机没有公网，一样请求OK，而且现在调用是不花token的。</li>
 <li>做pv&#x2F;pvc持久化，重启后就不用再去公网上下载模型了，避免了pod先活了，但是还要下载模型，其实服务没准备好，但是流量先进来的尴尬。</li>
 </ol>
-<h2 id="排错过程"><a href="#排错过程" class="headerlink" title="排错过程"></a>排错过程</h2><p>如果发现pod起不来，可以先通过describe命令粗略看一下原因，如果看不出来啥，可以再用<code>kubectl logs pod名称 --previous</code> ，来查看具体的一个pods的日志，能看出来为啥“镜像顺利拉到手，但是程序为啥启动不起来”。</p>
+<h2 id="排错过程"><a href="#排错过程" class="headerlink" title="排错过程"></a>排错过程</h2><p>如果发现pod起不来，可以先通过describe命令粗略看一下原因，如果看不出来啥，可以再用<code>kubectl logs pod名称 --previous</code> ，来查看具体pods的日志，能看出来为啥“镜像顺利拉到手，但是程序为啥启动不起来”。</p>
+<p>或者是<code>kubectl exec -it pod名称 -- ls -R /app</code>这个命令看一下pod里面的文件是不是因为docker没写好没有打包进去或者其他什么事。</p>
 <h2 id="使用pvc做持久化"><a href="#使用pvc做持久化" class="headerlink" title="使用pvc做持久化"></a>使用pvc做持久化</h2><p>虽然上面的效果达到了目标，但是有一个致命的问题，就是ai模型动辄几十GB，容器的镜像拉取和启动太慢了，怎么缓解？</p>
 <p>所以这里要解耦一下，镜像只包括运行环境ollama，而巨大的模型权重用过pvc挂载，这样镜像只有只百MB,可快速分发，POD重启的时候直接挂在一下卷，实现秒级就绪。</p>
 <p>首先先创建一个<code>ollama-pvc.yaml</code>，做存储声明</p>
