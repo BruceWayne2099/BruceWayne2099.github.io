@@ -39,7 +39,7 @@
 <meta property="og:image" content="http://example.com/images/k8s14.jpg">
 <meta property="og:image" content="http://example.com/images/k8s16.jpg">
 <meta property="article:published_time" content="2026-03-20T06:26:42.000Z">
-<meta property="article:modified_time" content="2026-03-20T09:16:12.018Z">
+<meta property="article:modified_time" content="2026-03-20T09:16:47.759Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="AI">
 <meta property="article:tag" content="k8s">
@@ -230,7 +230,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2026-03-20 14:26:42 / Modified: 17:16:12" itemprop="dateCreated datePublished" datetime="2026-03-20T14:26:42+08:00">2026-03-20</time>
+              <time title="Created: 2026-03-20 14:26:42 / Modified: 17:16:47" itemprop="dateCreated datePublished" datetime="2026-03-20T14:26:42+08:00">2026-03-20</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -299,7 +299,7 @@
 <p>修改了Dockerfile之后，我们来打包一个镜像ai-backend v8版本：<code>docker build -t ai-backend:v8 . </code>,然后通过<code>docker images |grep v8</code>里看本地的确有了docker images库里的确有了<code>ai-backend:v8</code>这个镜像。这个镜像挺大的，足足11G。</p>
 <p>但是要注意这个镜像还不在k3s里，所以还要执行<code>docker save ai-backend:v8 |sudo k3s ctr images import - </code>, 这样k3s的镜像库才也有了这个<code>ai-backend:v8</code>的镜像，可以用<code>k3s ctr images list|grep ai-backend</code>这个命令来确认。</p>
 <p>然后我就执行<code>kubectl rollout restart deployment ai-backend</code>来滚动发布。</p>
-<p>结果检测跟上一次发布的内容没变化，检查了一下原来是<code>deployment.yaml</code>里忘改v8镜像了，修改了之后，又执行<code>kubectl rollout restart deployment ai-backend</code>，此时发现所有的pod全挂了：<br><img data-src="/images/k8s9.jpg" title="所有的pod都不健康了,rs也多了很多"></p>
+<p>发布完后，测试发现跟上一次发布的内容没变化，我检查了一下原来是<code>deployment.yaml</code>里忘改成v8镜像了，修改了之后，又执行<code>kubectl rollout restart deployment ai-backend</code>，此时发现所有的pod全挂了：<br><img data-src="/images/k8s9.jpg" title="所有的pod都不健康了,rs也多了很多"></p>
 <ul>
 <li>多个Deployment同时存在：有3个不同的ReplicaSet（5c87ccdd65, 5ffd4f657d, 6dddcb6665）</li>
 <li>Pod状态异常：Pending、Error、ContainerStatusUnknown、Completed</li>
@@ -548,12 +548,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="Symbols count total">564k</span>
+    <span title="Symbols count total">565k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">34:12</span>
+    <span title="Reading time total">34:13</span>
 </div>
   <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
   </div>
