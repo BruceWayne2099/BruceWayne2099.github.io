@@ -23,12 +23,12 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","width":300,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":true,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="动手中才能发现各种奇葩问题">
+  <meta name="description" content="只有亲自下场动手，才能发现各种奇葩问题">
 <meta property="og:type" content="article">
 <meta property="og:title" content="磁盘管理失败导致node的所有pod被逐出">
 <meta property="og:url" content="http://example.com/2026/03/20/%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86%E5%A4%B1%E8%B4%A5%E5%AF%BC%E8%87%B4pod%E8%A2%AB%E9%80%90%E5%87%BA/index.html">
 <meta property="og:site_name" content="石锤淡啤酒">
-<meta property="og:description" content="动手中才能发现各种奇葩问题">
+<meta property="og:description" content="只有亲自下场动手，才能发现各种奇葩问题">
 <meta property="og:locale">
 <meta property="og:image" content="http://example.com/images/k8s9.jpg">
 <meta property="og:image" content="http://example.com/images/k8s10.jpg">
@@ -39,7 +39,7 @@
 <meta property="og:image" content="http://example.com/images/k8s14.jpg">
 <meta property="og:image" content="http://example.com/images/k8s16.jpg">
 <meta property="article:published_time" content="2026-03-20T06:26:42.000Z">
-<meta property="article:modified_time" content="2026-03-20T09:16:47.759Z">
+<meta property="article:modified_time" content="2026-03-22T01:26:35.464Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="AI">
 <meta property="article:tag" content="k8s">
@@ -228,10 +228,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2026-03-20 14:26:42 / Modified: 17:16:47" itemprop="dateCreated datePublished" datetime="2026-03-20T14:26:42+08:00">2026-03-20</time>
+              <time title="Created: 2026-03-20 14:26:42" itemprop="dateCreated datePublished" datetime="2026-03-20T14:26:42+08:00">2026-03-20</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2026-03-22 09:26:35" itemprop="dateModified" datetime="2026-03-22T09:26:35+08:00">2026-03-22</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -278,7 +284,7 @@
                 <span class="post-meta-item-text">Reading time &asymp;</span>
               <span>6 mins.</span>
             </span>
-            <div class="post-description">动手中才能发现各种奇葩问题</div>
+            <div class="post-description">只有亲自下场动手，才能发现各种奇葩问题</div>
 
         </div>
       </header>
@@ -290,7 +296,7 @@
 
       
         <p>前文背景就是这篇文章：<a target="_blank" rel="noopener" href="https://brucewayne2099.github.io/2026/03/19/%E6%9C%AC%E5%9C%B0%E6%90%AD%E5%BB%BA%E4%B8%80%E4%B8%AAollama%E5%A4%A7%E6%A8%A1%E5%9E%8B/">https://brucewayne2099.github.io/2026/03/19/%E6%9C%AC%E5%9C%B0%E6%90%AD%E5%BB%BA%E4%B8%80%E4%B8%AAollama%E5%A4%A7%E6%A8%A1%E5%9E%8B/</a></p>
-<p>我现在打算加一个功能，就是加入openai-whisper，实现在web端用语音与ai交流的目的。对应的<code>backend.py</code>成了：</p>
+<p>我现在打算加一个功能，就是加入<code>openai-whisper</code>，实现在web端用语音与ai交流的目的。对应的<code>backend.py</code>成了：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line">from flask import Flask, render_template, request, jsonify</span><br><span class="line">from prometheus_client import start_http_server, Summary</span><br><span class="line">import requests</span><br><span class="line">import whisper</span><br><span class="line">import os</span><br><span class="line">import time</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line"></span><br><span class="line">LATENCY = Summary(&#x27;ai_inference_seconds&#x27;, &#x27;Time spent processing LLM prediction&#x27;)</span><br><span class="line">STT_LATENCY = Summary(&#x27;speech_to_text_seconds&#x27;, &#x27;Time spent on Whisper transcription&#x27;)</span><br><span class="line"></span><br><span class="line">stt_model = whisper.load_model(&quot;base&quot;)</span><br><span class="line">print(&quot;Whisper 加载完成，可以实现语音交流。&quot;)</span><br><span class="line"></span><br><span class="line">@app.route(&#x27;/&#x27;)</span><br><span class="line">def index():</span><br><span class="line">    return render_template(&#x27;index.html&#x27;) # 这里多了一个index.html，在页面里有一个喇叭按钮，可以传入语音</span><br><span class="line"></span><br><span class="line">@app.route(&#x27;/speech_to_text&#x27;, methods=[&#x27;POST&#x27;])</span><br><span class="line">def stt():</span><br><span class="line">    if &#x27;file&#x27; not in request.files:</span><br><span class="line">        return jsonify(&#123;&quot;error&quot;: &quot;未收到音频文件&quot;&#125;), 400</span><br><span class="line">    </span><br><span class="line">    file = request.files[&#x27;file&#x27;]</span><br><span class="line">    file_path = &quot;temp_audio.webm&quot;</span><br><span class="line">    file.save(file_path)</span><br><span class="line">    </span><br><span class="line">    try:</span><br><span class="line">        with STT_LATENCY.time():</span><br><span class="line">            result = stt_model.transcribe(file_path, language=&quot;zh&quot;)</span><br><span class="line">            text = result.get(&quot;text&quot;, &quot;&quot;).strip()</span><br><span class="line">        return jsonify(&#123;&quot;text&quot;: text&#125;)</span><br><span class="line">    except Exception as e:</span><br><span class="line">        return jsonify(&#123;&quot;error&quot;: str(e)&#125;), 500</span><br><span class="line">    finally:</span><br><span class="line">        if os.path.exists(file_path):</span><br><span class="line">            os.remove(file_path)</span><br><span class="line"></span><br><span class="line">@app.route(&#x27;/aigpt_api&#x27;)</span><br><span class="line">def aigpt_api():</span><br><span class="line">    user_prompt = request.args.get(&#x27;prompt&#x27;, &#x27;&#x27;)</span><br><span class="line">    if not user_prompt:</span><br><span class="line">        return jsonify(&#123;&quot;response&quot;: &quot;大哥，你还没说话呢&quot;&#125;)</span><br><span class="line"></span><br><span class="line">    ollama_url = &quot;http://ollama-svc:11434/api/generate&quot;</span><br><span class="line">    </span><br><span class="line">    try:</span><br><span class="line">        with LATENCY.time():</span><br><span class="line">            r = requests.post(</span><br><span class="line">                ollama_url,</span><br><span class="line">                json=&#123;</span><br><span class="line">                    &quot;model&quot;: &quot;llama3:70b&quot;, # 确保你 pull 的是这个名字</span><br><span class="line">                    &quot;prompt&quot;: user_prompt,</span><br><span class="line">                    &quot;stream&quot;: False</span><br><span class="line">                &#125;,</span><br><span class="line">                timeout=300 </span><br><span class="line">            )</span><br><span class="line">            r.raise_for_status()</span><br><span class="line">            return jsonify(r.json())</span><br><span class="line">    except requests.exceptions.Timeout:</span><br><span class="line">        return jsonify(&#123;&quot;response&quot;: &quot;⚠️ 70B 思考太久超时了，建议给 Pod 更多 CPU 资源&quot;&#125;), 504</span><br><span class="line">    except Exception as e:</span><br><span class="line">        return jsonify(&#123;&quot;response&quot;: f&quot;❌ 后端报错: &#123;str(e)&#125;&quot;&#125;), 500</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">if __name__ == &#x27;__main__&#x27;:</span><br><span class="line">    app.run(host=&#x27;0.0.0.0&#x27;, port=5000)</span><br></pre></td></tr></table></figure>
 
 <p><code>Dockerfile</code>也改成了这样：</p>
@@ -416,7 +422,10 @@
     <a href="/2026/03/19/%E6%9C%AC%E5%9C%B0%E6%90%AD%E5%BB%BA%E4%B8%80%E4%B8%AAollama%E5%A4%A7%E6%A8%A1%E5%9E%8B/" rel="prev" title="从零搭建一个本地ollama">
       <i class="fa fa-chevron-left"></i> 从零搭建一个本地ollama
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2026/03/22/%E7%BB%99%E6%9C%AC%E5%9C%B0%E7%9A%84AI%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%A2%9E%E5%8A%A0%E9%99%8D%E7%BA%A7%E5%92%8C%E6%9F%A5%E8%AF%A2%E5%8E%86%E5%8F%B2%E9%97%AE%E9%A2%98%E5%8A%9F%E8%83%BD/" rel="next" title="给本地的AI大模型增加降级和查询历史问题功能">
+      给本地的AI大模型增加降级和查询历史问题功能 <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -490,7 +499,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">430</span>
+          <span class="site-state-item-count">431</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -553,7 +562,7 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">34:13</span>
+    <span title="Reading time total">34:15</span>
 </div>
   <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
   </div>
