@@ -29,11 +29,11 @@
 <meta property="og:locale" content="zh_TW">
 <meta property="og:image" content="http://example.com/images/k8s45.png">
 <meta property="og:image" content="http://example.com/images/k8s46.png">
-<meta property="og:image" content="http://example.com/images/k8s48.jpg">
-<meta property="og:image" content="http://example.com/images/k8s47.jpg">
-<meta property="og:image" content="http://example.com/images/k8s50.jpg">
+<meta property="og:image" content="http://example.com/images/k8s48.png">
+<meta property="og:image" content="http://example.com/images/k8s47.png">
+<meta property="og:image" content="http://example.com/images/k8s50.png">
 <meta property="article:published_time" content="2026-03-24T14:03:48.000Z">
-<meta property="article:modified_time" content="2026-03-26T07:51:47.264Z">
+<meta property="article:modified_time" content="2026-03-26T08:10:59.847Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="AI">
 <meta property="article:tag" content="RAG">
@@ -205,7 +205,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新於</span>
-                <time title="修改時間：2026-03-26 15:51:47" itemprop="dateModified" datetime="2026-03-26T15:51:47+08:00">2026-03-26</time>
+                <time title="修改時間：2026-03-26 16:10:59" itemprop="dateModified" datetime="2026-03-26T16:10:59+08:00">2026-03-26</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -292,9 +292,9 @@
 </ol>
 <p>数值范围：通常在 -10 到 10 之间（取决于模型，BGE 系列通常以 0 为强弱分水岭）。</p>
 <p>SRE 判定标准：<br>1.0 左右甚至更高：这代表“极其精准的命中”。模型认为不仅关键词像，逻辑上也完全匹配，这就是你的“内部私有数据”。<br>0 左右：属于“疑似相关”。可能聊的是同一个领域，但细节未必匹配。<br>低于 -1.0：虽然海选可能因为“K8s”字眼给了分，但精排模型发现语义逻辑完全不同，直接判定为“误报”。</p>
-<p><img src="/images/k8s48.jpg" title="准备文档"></p>
-<p><img src="/images/k8s47.jpg" title="通过两轮计算，得到了文档的内容"></p>
-<p><img src="/images/k8s50.jpg" title="如果是非内部文档的内容，就会说这部分来自公共知识"></p>
+<p><img src="/images/k8s48.png" title="准备内部文档，这个文档需要让对应的pod查询到，权限要给到位"></p>
+<p><img src="/images/k8s47.png" title="通过两轮计算，得到了文档的内容"></p>
+<p><img src="/images/k8s50.png" title="如果是非内部文档的内容，就会说这部分来自公共知识"></p>
 <p>Rerank（精排）并不在“归一化”阶段，它处于整个检索链路的最后一步，也就是“计算&#x2F;检索”之后、送入大模型（LLM）回答之前。简单说是这样的：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">海选 (Retrieval)：用户提问向量化，去数据库里按相似度（余弦相似度等）捞出前 10-20 条最相关的 Chunk。</span><br><span class="line"></span><br><span class="line">归一化 (Normalization)：这是海选算法内部的数学步骤，用来保证不同量级的向量能在同一标准下比较。</span><br><span class="line"></span><br><span class="line">精排 (Rerank) &lt;--- 在这里！：将海选出的 20 条结果和用户问题一起塞给 bge-reranker-v2-m3 模型。它不看向量距离，而是深度理解两句话的语义关系，重新打分排序。</span><br><span class="line"></span><br><span class="line">截断 (Top-K)：取精排分最高的前 3-5 条。</span><br><span class="line"></span><br><span class="line">生成 (Generation)：把这最准的几条塞给 Llama3，让它组织语言回答。</span><br></pre></td></tr></table></figure>
     </div>
