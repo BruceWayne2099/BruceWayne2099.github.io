@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","width":300,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="运维这种有经常重复的工作的工种，ai真的能极大的释放生产力">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Agent Skill小白入门蓝皮书">
+<meta property="og:url" content="http://example.com/2026/03/04/Agent-Skill%E5%B0%8F%E7%99%BD%E5%85%A5%E9%97%A8%E8%93%9D%E7%9A%AE%E4%B9%A6/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="运维这种有经常重复的工作的工种，ai真的能极大的释放生产力">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/images/skill.jpg">
+<meta property="article:published_time" content="2026-03-04T13:01:30.000Z">
+<meta property="article:modified_time" content="2026-03-16T15:14:53.410Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="OpenClaw">
+<meta property="article:tag" content="ai">
+<meta property="article:tag" content="claude">
+<meta property="article:tag" content="mcp">
+<meta property="article:tag" content="skill">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/skill.jpg">
+
+<link rel="canonical" href="http://example.com/2026/03/04/Agent-Skill%E5%B0%8F%E7%99%BD%E5%85%A5%E9%97%A8%E8%93%9D%E7%9A%AE%E4%B9%A6/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>Agent Skill小白入门蓝皮书 | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2026/03/04/Agent-Skill%E5%B0%8F%E7%99%BD%E5%85%A5%E9%97%A8%E8%93%9D%E7%9A%AE%E4%B9%A6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Agent Skill小白入门蓝皮书
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2026-03-04 21:01:30" itemprop="dateCreated datePublished" datetime="2026-03-04T21:01:30+08:00">2026-03-04</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2026-03-16 23:14:53" itemprop="dateModified" datetime="2026-03-16T23:14:53+08:00">2026-03-16</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>3k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>3 mins.</span>
+            </span>
+            <div class="post-description">运维这种有经常重复的工作的工种，ai真的能极大的释放生产力</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Skill，顾名思义，就是技能的意思。在正式介绍 Skill 之前，可以想象一下骑自行车。这就是”技能（Skill）”的本质 —— 将复杂的、需要逐步推理的任务，封装成一套可以自动执行的流程。</p>
+<p>人类其实就是一个超级 Agent。让我们用 AI 的视角重新审视这个过程：人脑 &#x3D; 大语言模型（LLM）</p>
+<p>人类大脑的工作方式，和 Agent 惊人地相似：<br><img src="/images/skill.jpg" title="人与ai的对比"></p>
+<p>现在，我们可以正式定义了：Agent Skill，是一套标准化的能力封装，它将复杂的、需要多步推理和工具调用的任务，打包成一个可以直接使用的”技能包”。</p>
+<p>一个 Skill 通常是以一个文件夹的形式存在的，文件夹的目录结构如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">riding-skill/</span><br><span class="line">├── SKILL.md # 必须：Skill 的定义、执行流程（告诉LLM，如何执行这个 Skill）</span><br><span class="line">├── scripts/ # 可选：Skill 中可能用到的脚本（LLM 的“手脚”）</span><br><span class="line">├── assets/ # 可选：Skill 中可能用到的静态资源（也是LLM 的“手脚”）</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="举个例子"><a href="#举个例子" class="headerlink" title="举个例子"></a>举个例子</h2><p>为了给大家一个更直观的展示，这里给大家展示一个小示例：一个「两数相加的 Skill 」</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">two-numbers-sum/</span><br><span class="line">├── SKILL.md</span><br><span class="line">├── scripts/</span><br><span class="line">    ├── add_numbers.py</span><br></pre></td></tr></table></figure>
+
+<p>SKILL.md 文件内部主要包含两部分：</p>
+<ol>
+<li><p>元信息（Metadata）：告诉 Agent 这个 Skill 是什么，何时使用</p>
+</li>
+<li><p>name：技能名称</p>
+</li>
+<li><p>description：对技能功能的描述</p>
+</li>
+<li><p>操作流程（Steps）：告诉 Agent，如何执行这个 Skill</p>
+</li>
+</ol>
+<p>SKILL.md长下面这样：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">---</span><br><span class="line">name: two-numbers-sum</span><br><span class="line">description: 两数之和计算工具，用于快速准确地计算两个数字的和。当用户需要计算两个数字的加法运算时使用，支持整数、小数和负数。输出格式：&quot;哈哈哈，我算出来了！结果是&#123;结果&#125;&quot;。适用场景包括：(1) 简单的两个数字相加 (2) 需要确保计算准确性 (3) 批量的加法运算。</span><br><span class="line">---</span><br><span class="line"></span><br><span class="line"># 两数之和</span><br><span class="line"></span><br><span class="line">## 概览</span><br><span class="line"></span><br><span class="line">这个技能提供了一个专门用于计算两个数字之和的工具，使用Python脚本确保计算的准确性和一致性。当用户请求两个数字相加时，技能会调用优化的加法脚本并返回带有趣味性的格式化结果。</span><br><span class="line"></span><br><span class="line">## 执行步骤</span><br><span class="line"></span><br><span class="line">1. **提取数字**：从用户输入中识别两个数字</span><br><span class="line">2. **调用脚本**：使用 `scripts/add_numbers.py` 进行计算</span><br><span class="line">3. **格式化输出**：按照要求的格式返回结果</span><br><span class="line"></span><br><span class="line">## 使用方法</span><br><span class="line"></span><br><span class="line">### 脚本执行</span><br><span class="line"></span><br><span class="line"># 基本用法</span><br><span class="line">python3 scripts/add_numbers.py &lt;number1&gt; &lt;number2&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>add_numbers.py长这个样：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"> &quot;&quot;&quot;为便于大家理解，只放了部分核心代码，大家只需要知道，这是一个两数相加的脚本就好&quot;&quot;&quot;</span><br><span class="line">def add_two_numbers(num1, num2):</span><br><span class="line">    return num1 + num2</span><br><span class="line"></span><br><span class="line">def main():</span><br><span class="line">    result = add_two_numbers(args.num1, args.num2)</span><br></pre></td></tr></table></figure>
+
+<p>如果上面这个例子还不直观，你可以去 <a target="_blank" rel="noopener" href="https://www.coze.cn/skills">https://www.coze.cn/skills</a> 里看看，里面有很多“skill”，你可以添加然后跟他们进行自然语言交互得到返回结果。</p>
+<h2 id="何时使用-Skill"><a href="#何时使用-Skill" class="headerlink" title="何时使用 Skill"></a>何时使用 Skill</h2><p>当你的任务满足以下一个或多个特征时，就应该考虑使用 Skill，而不是依赖临时的长提示词或简单的脚本：</p>
+<ol>
+<li>需要处理本地文件：当 Agent 需要读取、分析、修改或创建本地文件时（如 PDF、Word 文档、Excel 表格、图片、代码等），Skill 可以将这些操作封装成标准流程。</li>
+<li>任务流程相对固定且可复用：例如，“将一篇 Markdown 文章进行风格优化，并转换为符合公司品牌指南的 PPT”这类任务，涉及多个固定步骤，非常适合封装成一个或多个 Skill。</li>
+<li>需要集成特定的知识或规范：比如，将公司的“品牌设计指南”、“代码审查规范”或“法务文案要求”封装成 Skill，可以让 Agent 在执行相关任务时自动遵循这些标准。</li>
+<li>非技术人员希望扩展 AI 的能力：Skill 的创建过程可以通过自然语言完成（借助 skill-creator），这极大地降低了非开发者为 Agent “赋能”的门槛。</li>
+<li>希望对 AI 的能力进行模块化管理和迭代：随着任务变得复杂，可以将不同的能力拆分成独立的 Skill（如文档读取 Skill、内容分析 Skill、图表生成 Skill），然后像乐高积木一样组合使用。当某个环节需要优化时，只需迭代对应的 Skill 即可。</li>
+</ol>
+<p>skill最开始只是配合Claude网页端和ClaudeCode使用的，后来用的人多了，就像MCP一样，这个标准就变成了行业标准，各个Agent工具、IDE，例如Codex、OpenCode、Gemini Cli、Cursor都开始支持。</p>
+<p>MCP 看上去效果跟skill差不多，但是mcp比较重，因为在“每一个连接的 MCP Server 必须在对话开始前，将其所有工具的完整定义（名称、详细描述、参数 Schema、使用示例）一次性注入 LLM 的上下文中”。每个工具消耗 500 个 Token，那只链接这一个工具就需要消耗将近 20000 Token。在真实环境下，一个 Agent 不会仅链接一个 MCP Server。假如你只问了 AI 一个非常简单的问题（1+1&#x3D;？），Agent 已经烧掉了大几万的 Token，这个成本是非常恐怖的。</p>
+<p>而 Skills 的核心机制是“渐进式披露”，不仅节省token，还能提升注意力，正确率更高。Skill 本质是把 “大模型能力 + 工程化逻辑 + 场景规则” 打包成一个可复用、可调用、可配置的功能模块，解决的是 “端到端的业务问题”，而非单点的技术问题。所以这里的重点是“可复用”，对于运维来说，无论是重复搭建环境还是查看问题，其实很多都是重复的过程，这些都建议去写成skill里，然后给全组人甚至客户使用。用 Skill 做任务，持续迭代优化。以后都用这个 Skill 来执行任务。每次完成后检查输出，哪里不满意就告诉Agent，让它改进并更新 Skill。在实战中不断打磨，这才是正确的使用姿势。</p>
+<p>更新信息可以看claude官网：<a target="_blank" rel="noopener" href="https://claude.com/blog/extending-claude-capabilities-with-skills-mcp-servers">https://claude.com/blog/extending-claude-capabilities-with-skills-mcp-servers</a></p>
+<p>依赖关系：一个Skill可以通过MCP来连接所需资源，但并非必须；它也可以直接调用API。MCP为Skill提供了一种更标准化、安全的资源接入方式。简而言之，MCP是用来统一工具调用的协议，Skill可以指挥Agent去调用MCP。<br>二者是互补的关系，而非替代关系。MCP负责连接外部世界界，提供实际的操作能力；Skill则负责指导AI如何思考和执行任务，确保输出的准确性和一致性。在实际应用中中，通常需要结合两者，才能构建出功能强大、稳定可靠的AI智能体。 </p>
+<p>这一期就是理论，下一步，我准备搞一个skill，实现一个简单的功能“采集XXX容器的火焰图并把分析结果传给我”。到时候整个过程会记录并发上来。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢你请我喝咖啡~</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/weixinzhifu.png" alt="John Doe WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/zhifubaopay.jpg" alt="John Doe Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/ai/" rel="tag"># ai</a>
+              <a href="/tags/skill/" rel="tag"># skill</a>
+              <a href="/tags/OpenClaw/" rel="tag"># OpenClaw</a>
+              <a href="/tags/mcp/" rel="tag"># mcp</a>
+              <a href="/tags/claude/" rel="tag"># claude</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2026/02/27/AI%E7%9A%84%E6%84%9F%E8%A7%89/" rel="prev" title="简单唠唠AI的感觉">
+      <i class="fa fa-chevron-left"></i> 简单唠唠AI的感觉
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2026/03/06/%E6%89%8B%E5%8A%A8%E6%90%AD%E4%B8%80%E4%B8%AAskill/" rel="next" title="手动搭一个skill">
+      手动搭一个skill <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BE%E4%B8%AA%E4%BE%8B%E5%AD%90"><span class="nav-number">2.</span> <span class="nav-text">举个例子</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%95%E6%97%B6%E4%BD%BF%E7%94%A8-Skill"><span class="nav-number">3.</span> <span class="nav-text">何时使用 Skill</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">435</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">385</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">1.2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">18:30</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

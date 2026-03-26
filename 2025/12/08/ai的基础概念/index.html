@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","width":300,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="会做饭的人很多，但是厨子依旧是独一档。未来只会是更懂高级生产工具的人。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ai的基础概念">
+<meta property="og:url" content="http://example.com/2025/12/08/ai%E7%9A%84%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="会做饭的人很多，但是厨子依旧是独一档。未来只会是更懂高级生产工具的人。">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-12-08T14:00:23.000Z">
+<meta property="article:modified_time" content="2026-03-16T15:14:54.733Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="ai">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2025/12/08/ai%E7%9A%84%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>ai的基础概念 | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2025/12/08/ai%E7%9A%84%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ai的基础概念
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2025-12-08 22:00:23" itemprop="dateCreated datePublished" datetime="2025-12-08T22:00:23+08:00">2025-12-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2026-03-16 23:14:54" itemprop="dateModified" datetime="2026-03-16T23:14:54+08:00">2026-03-16</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>6.6k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>6 mins.</span>
+            </span>
+            <div class="post-description">会做饭的人很多，但是厨子依旧是独一档。未来只会是更懂高级生产工具的人。</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>目前来说，很多人用ai都是拿它当“一个更有价值的搜索引擎”用，但是在这里还是有一个观点要说明。这里所有的知识都是基于deepseek 3.2。</p>
+<h2 id="AI的核心精华"><a href="#AI的核心精华" class="headerlink" title="AI的核心精华"></a>AI的核心精华</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">def ai_architecture_components():</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line">    AI系统的三大核心组件</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line">    </span><br><span class="line">    return &#123;</span><br><span class="line">        &quot;1. Transformer架构（真正灵魂）&quot;: &#123;</span><br><span class="line">            &quot;作用&quot;: &quot;注意力机制，让AI理解上下文关系&quot;,</span><br><span class="line">            &quot;类比&quot;: &quot;人类大脑的神经网络结构&quot;,</span><br><span class="line">            &quot;包含&quot;: &quot;Embedding层、注意力头、前馈网络等&quot;,</span><br><span class="line">            &quot;产出&quot;: &quot;BERT、GPT、T5等所有现代LLM&quot;</span><br><span class="line">        &#125;,</span><br><span class="line">        </span><br><span class="line">        &quot;2. Embedding向量化（核心能力）&quot;: &#123;</span><br><span class="line">            &quot;作用&quot;: &quot;将文本映射到高维语义空间&quot;,</span><br><span class="line">            &quot;位置&quot;: &quot;Transformer架构的一部分&quot;,</span><br><span class="line">            &quot;功能&quot;: &quot;编码语义，计算相似度&quot;,</span><br><span class="line">            &quot;应用&quot;: &quot;RAG检索、语义搜索、聚类等&quot;</span><br><span class="line">        &#125;,</span><br><span class="line">        </span><br><span class="line">        &quot;3. Chunk处理（RAG专用）&quot;: &#123;</span><br><span class="line">            &quot;作用&quot;: &quot;知识库的存储和检索单元&quot;,</span><br><span class="line">            &quot;位置&quot;: &quot;RAG系统的一部分，不是所有AI都有&quot;,</span><br><span class="line">            &quot;功能&quot;: &quot;管理外部知识，增强LLM&quot;,</span><br><span class="line">            &quot;关系&quot;: &quot;依赖Embedding进行向量化&quot;</span><br><span class="line">        &#125;,</span><br><span class="line">        </span><br><span class="line">        &quot;4. LLM（应用层）&quot;: &#123;</span><br><span class="line">            &quot;作用&quot;: &quot;基于理解生成自然语言&quot;,</span><br><span class="line">            &quot;位置&quot;: &quot;建立在Transformer之上&quot;,</span><br><span class="line">            &quot;功能&quot;: &quot;对话、创作、推理、分析&quot;,</span><br><span class="line">            &quot;关系&quot;: &quot;可以使用RAG增强，但不是必须&quot;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里Transformer架构就是传说中的“神经网络架构”,它让模型全局理解上下文，是ai的起点。</p>
+<h2 id="为什么要向量化？"><a href="#为什么要向量化？" class="headerlink" title="为什么要向量化？"></a>为什么要向量化？</h2><p>这个问题可以说是ai的核心，也可以说这个是ai的灵魂。</p>
+<p>它最早用于“人脸识别”，就是它通过录入你的面部特征，当你下一次验证的时候，它判断“几乎相似”就认为OK。跟指纹不同，人类的指纹是唯一的，所以要100%相同。</p>
+<p>回到ai，用ai和人类对比。人类理解： “苹果”和”水果”是相关的。但是计算机理解： “苹果” &#x3D; 两个汉字，”水果” &#x3D; 两个汉字，计算机看不到语义关联。但是就需要有向量化：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&quot;苹果&quot; → [0.85, 0.23, -0.42, 0.91, ...] #实际是1536个这样的数字。</span><br><span class="line">&quot;水果&quot; → [0.82, 0.25, -0.38, 0.89, ...]</span><br></pre></td></tr></table></figure>
+
+<p>这两个向量很接近，所以计算机知道它们相关。</p>
+<p>话说，果然技术是一点一点进步的，“人脸识别”肯定是要在ai之前出现的。</p>
+<h2 id="AI是如何搜索的？"><a href="#AI是如何搜索的？" class="headerlink" title="AI是如何搜索的？"></a>AI是如何搜索的？</h2><p>AI 其实用的最多的就是RAG功能，它能精确的搜索出来客户想要问的问题。</p>
+<p>比如用户问了一个问题：”令狐冲是谁？”，AI会进行如下操作：</p>
+<ol>
+<li>将问题转换为向量</li>
+<li>在向量数据库中搜索相似chunk</li>
+<li>返回top-3相关chunk：<ul>
+<li>chunk1: “微服务设计原则…”</li>
+<li>chunk2: “服务拆分策略…”</li>
+<li>chunk3: “分布式事务处理…”</li>
+</ul>
+</li>
+</ol>
+<p>chunk:”将大段文本、数据或任务分割成更小、可管理的单元”，因为LLM有上下文长度限制（如GPT-4的128K tokens），chunk也要做重叠，这是为了保持语义连贯性。但是这里面也有说法：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">1. 小型chunk：256-512 tokens</span><br><span class="line">   - 优点：检索精准，处理快</span><br><span class="line">   - 缺点：可能丢失上下文，失去必要背景</span><br><span class="line">2. 中型chunk：512-1024 tokens  </span><br><span class="line">   - 平衡选择：兼顾精度和上下文</span><br><span class="line">   - 适合大多数RAG应用</span><br><span class="line">3. 大型chunk：1024-2048 tokens</span><br><span class="line">   - 优点：保持完整上下文</span><br><span class="line">   - 缺点：检索可能不精准，成本高，比如你问&quot;如何配置Redis集群的哨兵模式？&quot;，它洋洋洒洒说了一堆redis其他的东西，废话一堆。</span><br></pre></td></tr></table></figure>
+
+<p>所以要做好chunk的平衡，而且为了输出的语义达到用户习惯，还可以是先用搜索去确定关键文档片段，再用chunk去进一步搜索。</p>
+<h2 id="RAG的原理"><a href="#RAG的原理" class="headerlink" title="RAG的原理"></a>RAG的原理</h2><p>rag 的原理，就是ai会把你要让它学的文档（比如公司内部的文档），通过“空格 回车”等等方式先进行分割，变成chunk。即“公司内部文档 → 分割（chunking） → 得到chunks”。</p>
+<p>然后对这些chunk进行embedding，然后这些自然语言变成一个一个向量语言，存入向量数据库。</p>
+<p>然后用户问的问题也会被ai转化成向量语言，最后ai通过“用户问的问题的向量”去找公司的内部贴近向量的所有文档，通过相似度搜索，找到相关chunks，取Top-K（如top 3或top 5）最相关的chunks，最后再通过llm来整合输出答案。</p>
+<p>举个例子，比如我说“令狐冲”，那么ai会对”令狐冲 整个文本的语义对应一个向量”，比如：[0.02324, 0.032131, 0.02323124, 0.04567, 0.01234, …] (1536个数字)，这个1536维向量代表了”令狐冲”这个名字的完整语义。然后大模型就会进一步推断：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"># 假设我们使用OpenAI的text-embedding-ada-002模型</span><br><span class="line"></span><br><span class="line">texts = [</span><br><span class="line">    &quot;令狐冲&quot;,                    # 武侠人物</span><br><span class="line">    &quot;独孤九剑&quot;,                  # 武功招式  </span><br><span class="line">    &quot;华山派&quot;,                    # 门派</span><br><span class="line">    &quot;苹果&quot;,                      # 水果</span><br><span class="line">    &quot;令狐冲是《笑傲江湖》的主角&quot;  # 完整描述</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line"># 每个文本都会得到一个1536维的向量</span><br><span class="line">vectors = &#123;</span><br><span class="line">    &quot;令狐冲&quot;: [0.023, 0.032, 0.023, 0.045, 0.012, ...],  # 1536个数字</span><br><span class="line">    &quot;独孤九剑&quot;: [0.034, 0.025, 0.031, 0.052, 0.018, ...],</span><br><span class="line">    &quot;华山派&quot;: [0.028, 0.029, 0.027, 0.048, 0.015, ...],</span><br><span class="line">    &quot;苹果&quot;: [0.015, 0.042, 0.019, 0.038, 0.025, ...],</span><br><span class="line">    &quot;令狐冲是《笑傲江湖》的主角&quot;: [0.026, 0.035, 0.025, 0.050, 0.014, ...]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># 关键观察：</span><br><span class="line"># 1. &quot;令狐冲&quot;和&quot;独孤九剑&quot;的向量会比较接近（都是武侠相关）</span><br><span class="line"># 2. &quot;令狐冲&quot;和&quot;苹果&quot;的向量会比较远（语义不相关）</span><br><span class="line"># 3. &quot;令狐冲&quot;和&quot;令狐冲是《笑傲江湖》的主角&quot;的向量会很接近</span><br></pre></td></tr></table></figure>
+
+<p>为啥是1536维？因为语义信息非常丰富：人名、虚拟人物、主角、性别、职业、爱好、国籍、肤色、面部特征等等等等，就像人一样，人也不是简单用一个3维来概括的。</p>
+<p>但是上面说了，”ai会对 令狐冲 整个文本的语义对应一个向量”，那么就是“XXX的令狐冲”这里会随着XXX的不同，产生不同的向量。比如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">武打中的&quot;令狐冲&quot; → [0.025, 0.030, 0.021, ...] (根据上下文变化) # &quot;向量特点&quot;: &quot;强调门派、武功名称、战绩如何&quot;</span><br><span class="line">爱情中的&quot;令狐冲&quot; → [0.022, 0.035, 0.024, ...] (可能不同)  # &quot;向量特点&quot;:任盈盈</span><br><span class="line">影视改编中的&quot;令狐冲&quot; → [0.027, 0.028, 0.026, ...] (可能不同)  # &quot;向量特点&quot;: &quot;强调影视、演员、改编&quot;</span><br></pre></td></tr></table></figure>
+
+<p>虽然都是”令狐冲”，但上下文不同，语义重点不同，因此向量也会有细微差异。</p>
+<p>最后结论：每一个场景下，令狐冲对应的 1536个数字都是不一样的，但是是很相似的。而且这1536个数字不会枯竭，这个组合老大了。</p>
+<h2 id="假如我现在写了一篇“令狐冲与迈克尔乔丹”的文章"><a href="#假如我现在写了一篇“令狐冲与迈克尔乔丹”的文章" class="headerlink" title="假如我现在写了一篇“令狐冲与迈克尔乔丹”的文章"></a>假如我现在写了一篇“令狐冲与迈克尔乔丹”的文章</h2><p>令狐冲与迈尔克乔丹，这八杆子打不着的两个人，假设有了这么一个文章或者影视作品把他俩关联起来（比如他俩在上海武康路飙车）。那么，当ai查询到了这篇文章的后果是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">1. 这篇文章中的&quot;令狐冲&quot;向量会变化</span><br><span class="line">2. 这篇文章中的&quot;迈克尔乔丹&quot;向量会变化  </span><br><span class="line">3. 但不会影响其他文章中的&quot;令狐冲&quot;向量</span><br><span class="line">4. 也不会影响其他文章中的&quot;迈克尔乔丹&quot;向量</span><br><span class="line">5. 模型会考虑：当&quot;令狐冲&quot;和&quot;迈克尔乔丹&quot;出现在同一个句子中，&quot;令狐冲&quot;的向量会稍微向&quot;人物&quot;、&quot;名人&quot;方向偏移，&quot;迈克尔乔丹&quot;的向量会稍微向&quot;虚构人物&quot;方向偏移。但只是在这个特定句子中！</span><br><span class="line"></span><br><span class="line">用户查询1：&quot;令狐冲的武功&quot;</span><br><span class="line">- 问题向量：[0.025, 0.030, 0.021, ...] (强调武功)</span><br><span class="line">- 找到：chunk1（令狐冲是《笑傲江湖》的主角...）</span><br><span class="line">- 此时“令狐冲与迈克尔乔丹”的chunk可能不会被找到（相关性低）</span><br><span class="line"></span><br><span class="line">用户查询2：&quot;令狐冲和迈克尔乔丹&quot;</span><br><span class="line">- 问题向量：[0.023, 0.032, 0.024, ...] (强调跨界关联)  </span><br><span class="line">- 找到：令狐冲和迈克尔乔丹的跨界故事的chunk就会查到</span><br><span class="line">- chunk1和chunk2可能不会被找到（相关性低）</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>可以看出其实ai每次查询，”令狐冲”的向量表示都不同。我们主要就是确认embedding之后，得到结果的相似度是不是满足预期的。</p>
+<h2 id="ai不会自己对某个事物产生直接情感和感触，它的反馈都是基于材料，然后学习得出的"><a href="#ai不会自己对某个事物产生直接情感和感触，它的反馈都是基于材料，然后学习得出的" class="headerlink" title="ai不会自己对某个事物产生直接情感和感触，它的反馈都是基于材料，然后学习得出的"></a>ai不会自己对某个事物产生直接情感和感触，它的反馈都是基于材料，然后学习得出的</h2><p>举个例子，你问ai”鹿鼎记里武功最厉害的人是谁？”，你以为ai是马上去把《鹿鼎记》都通读一遍然后给你答案吗？肯定不是的，它其实是去搜索“鹿鼎记武功排名”这类的文章，然后把这些文章进行分析和学习，然后得出它自己的结论。</p>
+<p>但是如果你问他《鹿鼎记》的细节，比如“冯锡范跟归辛树有没有交手的经历，如果有的话请找到原文”，他还是会给你直接返回原文的。</p>
+<h2 id="那ai写歌，是不是就是从网络上现有的音乐东扒一下，西扒一下，抄出来的？"><a href="#那ai写歌，是不是就是从网络上现有的音乐东扒一下，西扒一下，抄出来的？" class="headerlink" title="那ai写歌，是不是就是从网络上现有的音乐东扒一下，西扒一下，抄出来的？"></a>那ai写歌，是不是就是从网络上现有的音乐东扒一下，西扒一下，抄出来的？</h2><p>肯定不是，上面说的，ai是有学习功能的，它是“基于学习到的通用模式创造新内容”，因为它能从海量数据中学习音乐模式，也是基于学习后的创作，不是直接抄袭。所以ai的”创新”是已有模式的重新组合，无法像人类那样”有感而发”。</p>
+<p>所以这就看出来ai的局限性，它可以帮你干具体的活，帮你梳理，或者给你一些“你没想到但是其他人已经想到并写在网络上的建议”。但是你让它从0-1 挖掘出一个new point，是做不到的。所以说，ai总体来说还是一个提效的工具，所以如果你是一个有想法的人，ai在你手里就是一个很高效的武器。</p>
+<h2 id="那我有了ai是不是可以让它来帮我打《艾尔登法环》，我在旁边看着？"><a href="#那我有了ai是不是可以让它来帮我打《艾尔登法环》，我在旁边看着？" class="headerlink" title="那我有了ai是不是可以让它来帮我打《艾尔登法环》，我在旁边看着？"></a>那我有了ai是不是可以让它来帮我打《艾尔登法环》，我在旁边看着？</h2><p>理论上是可以的，但是会很花钱。</p>
+<p>首先AI可以通过脚本启动Steam和游戏，也会模拟键盘鼠标输入（WASD移动、鼠标点击），同时也能做到通过截图分析游戏画面（这一步很花钱）和识别血条、敌人位置、物品等（这一步也很花钱）。但是对于动作类游戏，需要毫秒级反应。ai做不到，需要明确的规则和大量训练数据。所以你会看到它操作你的主人公一遍一遍的死，死亡后回到检查点，AI还需要重新规划。但是ai肯定会通关，就是时间问题和token消耗的问题。</p>
+<p>所以ai目前可以给看你的录像给你一些建议，还不能亲自上手去打怪。即使你把你的录像给ai看，ai也是一模一样的打，但是怪物不一定会按照录像里的样子完全出招，所以还是死。</p>
+<p>再说了，游戏的魅力在于挑战和成长，如果让AI代劳，就失去了游戏的意义。</p>
+<h2 id="如果我问AI两遍一模一样的问题，比如“梅西有几个世界杯冠军”，它第二次的答案是从缓存里得到的吗？"><a href="#如果我问AI两遍一模一样的问题，比如“梅西有几个世界杯冠军”，它第二次的答案是从缓存里得到的吗？" class="headerlink" title="如果我问AI两遍一模一样的问题，比如“梅西有几个世界杯冠军”，它第二次的答案是从缓存里得到的吗？"></a>如果我问AI两遍一模一样的问题，比如“梅西有几个世界杯冠军”，它第二次的答案是从缓存里得到的吗？</h2><p>AI有两个缓存，一个是 KV Cache，这个是用来进行推理使用的，加速单个回答的生成过程，比如生成”梅西有1个世界杯冠军”这句话时，生成”梅”时计算的Key&#x2F;Value，生成”西”时可以直接用。</p>
+<p>还有一个缓存是结果缓存，这个缓存时间大约1～10分钟不等，而且有些模型支持这个结果缓存，那么如果你问了一模一样的问题，是有可能从这个缓存不用思考直接拿到结果返回给你的。</p>
+<p>如果响应头包含：<code>x-use-exact-cached-result: true</code>说明本次结果是缓存的结果。</p>
+<p>场景A：完全相同的两次请求</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"># 第一次请求</span><br><span class="line">request_1 = &#123;</span><br><span class="line">    &quot;messages&quot;: [&#123;&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;梅西有几个世界杯冠军&quot;&#125;],</span><br><span class="line">    &quot;model&quot;: &quot;gpt-4&quot;,</span><br><span class="line">    &quot;temperature&quot;: 0.7</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># 第二次请求（完全相同）</span><br><span class="line">request_2 = &#123;</span><br><span class="line">    &quot;messages&quot;: [&#123;&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;梅西有几个世界杯冠军&quot;&#125;],  # 完全一样</span><br><span class="line">    &quot;model&quot;: &quot;gpt-4&quot;,  # 相同模型</span><br><span class="line">    &quot;temperature&quot;: 0.7  # 相同参数</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># 结果：✅ 可能命中缓存（如果开启了缓存）</span><br></pre></td></tr></table></figure>
+
+<p>场景B：略有不同的两次请求</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"># 第一次请求</span><br><span class="line">request_1 = &#123;</span><br><span class="line">    &quot;messages&quot;: [&#123;&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;梅西有几个世界杯冠军&quot;&#125;],</span><br><span class="line">    &quot;model&quot;: &quot;gpt-4&quot;,</span><br><span class="line">    &quot;temperature&quot;: 0.7</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># 第二次请求（多了一个空格）</span><br><span class="line">request_2 = &#123;</span><br><span class="line">    &quot;messages&quot;: [&#123;&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;梅西有几个世界杯冠军 &quot;&#125;],  # 多了一个空格</span><br><span class="line">    &quot;model&quot;: &quot;gpt-4&quot;,</span><br><span class="line">    &quot;temperature&quot;: 0.7</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># 结果：❌ 不会命中缓存（不是&quot;完全相同的请求&quot;）</span><br></pre></td></tr></table></figure>
+
+<p>用结果缓存这种“拿空间换时间”的行为，解决了“厂家大模型推理成本高（GPU、电力）”的问题，也提升了使用者体验。</p>
+<h2 id="节约token"><a href="#节约token" class="headerlink" title="节约token"></a>节约token</h2><ol>
+<li>比如我有一个文档，文档里面有100个中文字，然后我对ai说“按照这个链接，概括一下”，那么输入的token是包括文档里的100个中文字的，想用这种方法来规避输入token是不行的。</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢你请我喝咖啡~</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/weixinzhifu.png" alt="John Doe WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/zhifubaopay.jpg" alt="John Doe Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/ai/" rel="tag"># ai</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2025/09/15/%E6%89%93%E9%80%9A%E4%BA%86%E3%80%8A%E8%89%BE%E5%B0%94%E7%99%BB%E6%B3%95%E7%8E%AF%E3%80%8B/" rel="prev" title="打通了《艾尔登法环》">
+      <i class="fa fa-chevron-left"></i> 打通了《艾尔登法环》
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2026/01/13/%E5%9C%A8excel%E9%87%8C%E7%94%A8k%E5%92%8Cm%E6%9D%A5%E4%BD%9C%E4%B8%BA%E5%8D%95%E4%BD%8D%E5%B1%95%E7%A4%BA/" rel="next" title="在excel里用k和m来作为单位展示">
+      在excel里用k和m来作为单位展示 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#AI%E7%9A%84%E6%A0%B8%E5%BF%83%E7%B2%BE%E5%8D%8E"><span class="nav-number">1.</span> <span class="nav-text">AI的核心精华</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%90%91%E9%87%8F%E5%8C%96%EF%BC%9F"><span class="nav-number">2.</span> <span class="nav-text">为什么要向量化？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AI%E6%98%AF%E5%A6%82%E4%BD%95%E6%90%9C%E7%B4%A2%E7%9A%84%EF%BC%9F"><span class="nav-number">3.</span> <span class="nav-text">AI是如何搜索的？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RAG%E7%9A%84%E5%8E%9F%E7%90%86"><span class="nav-number">4.</span> <span class="nav-text">RAG的原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%81%87%E5%A6%82%E6%88%91%E7%8E%B0%E5%9C%A8%E5%86%99%E4%BA%86%E4%B8%80%E7%AF%87%E2%80%9C%E4%BB%A4%E7%8B%90%E5%86%B2%E4%B8%8E%E8%BF%88%E5%85%8B%E5%B0%94%E4%B9%94%E4%B8%B9%E2%80%9D%E7%9A%84%E6%96%87%E7%AB%A0"><span class="nav-number">5.</span> <span class="nav-text">假如我现在写了一篇“令狐冲与迈克尔乔丹”的文章</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ai%E4%B8%8D%E4%BC%9A%E8%87%AA%E5%B7%B1%E5%AF%B9%E6%9F%90%E4%B8%AA%E4%BA%8B%E7%89%A9%E4%BA%A7%E7%94%9F%E7%9B%B4%E6%8E%A5%E6%83%85%E6%84%9F%E5%92%8C%E6%84%9F%E8%A7%A6%EF%BC%8C%E5%AE%83%E7%9A%84%E5%8F%8D%E9%A6%88%E9%83%BD%E6%98%AF%E5%9F%BA%E4%BA%8E%E6%9D%90%E6%96%99%EF%BC%8C%E7%84%B6%E5%90%8E%E5%AD%A6%E4%B9%A0%E5%BE%97%E5%87%BA%E7%9A%84"><span class="nav-number">6.</span> <span class="nav-text">ai不会自己对某个事物产生直接情感和感触，它的反馈都是基于材料，然后学习得出的</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%82%A3ai%E5%86%99%E6%AD%8C%EF%BC%8C%E6%98%AF%E4%B8%8D%E6%98%AF%E5%B0%B1%E6%98%AF%E4%BB%8E%E7%BD%91%E7%BB%9C%E4%B8%8A%E7%8E%B0%E6%9C%89%E7%9A%84%E9%9F%B3%E4%B9%90%E4%B8%9C%E6%89%92%E4%B8%80%E4%B8%8B%EF%BC%8C%E8%A5%BF%E6%89%92%E4%B8%80%E4%B8%8B%EF%BC%8C%E6%8A%84%E5%87%BA%E6%9D%A5%E7%9A%84%EF%BC%9F"><span class="nav-number">7.</span> <span class="nav-text">那ai写歌，是不是就是从网络上现有的音乐东扒一下，西扒一下，抄出来的？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%82%A3%E6%88%91%E6%9C%89%E4%BA%86ai%E6%98%AF%E4%B8%8D%E6%98%AF%E5%8F%AF%E4%BB%A5%E8%AE%A9%E5%AE%83%E6%9D%A5%E5%B8%AE%E6%88%91%E6%89%93%E3%80%8A%E8%89%BE%E5%B0%94%E7%99%BB%E6%B3%95%E7%8E%AF%E3%80%8B%EF%BC%8C%E6%88%91%E5%9C%A8%E6%97%81%E8%BE%B9%E7%9C%8B%E7%9D%80%EF%BC%9F"><span class="nav-number">8.</span> <span class="nav-text">那我有了ai是不是可以让它来帮我打《艾尔登法环》，我在旁边看着？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E6%9E%9C%E6%88%91%E9%97%AEAI%E4%B8%A4%E9%81%8D%E4%B8%80%E6%A8%A1%E4%B8%80%E6%A0%B7%E7%9A%84%E9%97%AE%E9%A2%98%EF%BC%8C%E6%AF%94%E5%A6%82%E2%80%9C%E6%A2%85%E8%A5%BF%E6%9C%89%E5%87%A0%E4%B8%AA%E4%B8%96%E7%95%8C%E6%9D%AF%E5%86%A0%E5%86%9B%E2%80%9D%EF%BC%8C%E5%AE%83%E7%AC%AC%E4%BA%8C%E6%AC%A1%E7%9A%84%E7%AD%94%E6%A1%88%E6%98%AF%E4%BB%8E%E7%BC%93%E5%AD%98%E9%87%8C%E5%BE%97%E5%88%B0%E7%9A%84%E5%90%97%EF%BC%9F"><span class="nav-number">9.</span> <span class="nav-text">如果我问AI两遍一模一样的问题，比如“梅西有几个世界杯冠军”，它第二次的答案是从缓存里得到的吗？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%8A%82%E7%BA%A6token"><span class="nav-number">10.</span> <span class="nav-text">节约token</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">435</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">385</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">1.2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">18:30</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

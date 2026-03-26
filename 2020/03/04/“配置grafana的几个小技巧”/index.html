@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","width":300,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="我觉得每个集团应该把自己的mertics的定义放到一个最规范的文档里，然后系统页面做成选择题而不是填空题，不然谁知道要填什么？">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用 metrics + bosun 配置grafana界面">
+<meta property="og:url" content="http://example.com/2020/03/04/%E2%80%9C%E9%85%8D%E7%BD%AEgrafana%E7%9A%84%E5%87%A0%E4%B8%AA%E5%B0%8F%E6%8A%80%E5%B7%A7%E2%80%9D/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="我觉得每个集团应该把自己的mertics的定义放到一个最规范的文档里，然后系统页面做成选择题而不是填空题，不然谁知道要填什么？">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/images/grafana1.jpeg">
+<meta property="og:image" content="http://example.com/images/grafana2.jpg">
+<meta property="og:image" content="http://example.com/images/grafana3.jpg">
+<meta property="og:image" content="http://example.com/images/grafana4.jpg">
+<meta property="og:image" content="http://example.com/images/grafana5.jpg">
+<meta property="og:image" content="http://example.com/images/grafana6.jpg">
+<meta property="og:image" content="http://example.com/images/grafana7.jpg">
+<meta property="og:image" content="http://example.com/images/grafana8.jpg">
+<meta property="og:image" content="http://example.com/images/grafana13.jpg">
+<meta property="og:image" content="http://example.com/images/grafana14.jpg">
+<meta property="og:image" content="http://example.com/images/grafana15.jpg">
+<meta property="og:image" content="http://example.com/images/grafana9.jpg">
+<meta property="og:image" content="http://example.com/images/grafana10.jpg">
+<meta property="og:image" content="http://example.com/images/grafana11.jpg">
+<meta property="og:image" content="http://example.com/images/grafana12.jpg">
+<meta property="article:published_time" content="2020-03-03T17:14:28.000Z">
+<meta property="article:modified_time" content="2026-03-25T16:27:33.167Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="bosun">
+<meta property="article:tag" content="grafana">
+<meta property="article:tag" content="metrics">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/grafana1.jpeg">
+
+<link rel="canonical" href="http://example.com/2020/03/04/%E2%80%9C%E9%85%8D%E7%BD%AEgrafana%E7%9A%84%E5%87%A0%E4%B8%AA%E5%B0%8F%E6%8A%80%E5%B7%A7%E2%80%9D/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>使用 metrics + bosun 配置grafana界面 | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2020/03/04/%E2%80%9C%E9%85%8D%E7%BD%AEgrafana%E7%9A%84%E5%87%A0%E4%B8%AA%E5%B0%8F%E6%8A%80%E5%B7%A7%E2%80%9D/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          使用 metrics + bosun 配置grafana界面
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-03-04 01:14:28" itemprop="dateCreated datePublished" datetime="2020-03-04T01:14:28+08:00">2020-03-04</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2026-03-26 00:27:33" itemprop="dateModified" datetime="2026-03-26T00:27:33+08:00">2026-03-26</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>2.2k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>2 mins.</span>
+            </span>
+            <div class="post-description">我觉得每个集团应该把自己的mertics的定义放到一个最规范的文档里，然后系统页面做成选择题而不是填空题，不然谁知道要填什么？</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="变量配置"><a href="#变量配置" class="headerlink" title="变量配置"></a>变量配置</h2><p>Grafana 给当前页面配置变量是在右上角的settings里：<br><img src="/images/grafana1.jpeg" title="在这里点击小齿轮"></p>
+<p>在这里的变量支持多种“源”：<br><img src="/images/grafana2.jpg" title="看type字段，这里是用数据库当源"><br><img src="/images/grafana3.jpg" title="这里是用constom即自定义的源，可以自己写，可以多选，到时候在查询里当变量使用"></p>
+<h2 id="bosun语句配置"><a href="#bosun语句配置" class="headerlink" title="bosun语句配置"></a>bosun语句配置</h2><p>如果你想用bosun语句来配置图表的话，首先你要确定好的bosun,我以我公司的一个sli公式为例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">((1 - (fv(nv((fv(nv(q(&quot;sum:1m-sum-none:top-1000-avg:bytedtrace.sdk.span.client.rate&#123;&#125;&#123;_is_error=1,_to_service=AAA&#125;&quot;,&quot;10800s&quot;,&quot;0s&quot;),0),0) + fv(nv(q(&quot;sum:1m-sum-none:top-1000-avg:bytedtrace.sdk.span.client.rate&#123;&#125;&#123;_biz_status_code=not_sliteral_or(0),_is_error=0,_to_service=AAA&#125;&quot;,&quot;10800s&quot;,&quot;0s&quot;),0),0)),0),0) / fv((nv(fv(nv(q(&quot;sum:1m-sum-none:top-1000-avg:bytedtrace.sdk.span.client.rate&#123;&#125;&#123;_to_service=AAA&#125;&quot;,&quot;10800s&quot;,&quot;0s&quot;),0),0),0) + 1e-9),0))) * 100)</span><br></pre></td></tr></table></figure>
+
+<p>这个公式就是算一个SLI成功率，认为AAA这个应用而言，<code>_is_error=1</code>和<code>_biz_status_code=not_sliteral_or(0) and _is_error=0</code>是不OK的，那么减掉这些流量拿到的成功率，就是这个应用的SLI。</p>
+<p>但是一个一个写公式太累了，我们就可以用上面做的变量来替换。具体方法见图：</p>
+<p><img src="/images/grafana4.jpg" title="这样就OK"></p>
+<p>如果你觉得多根线在一个图里太难看了，看不出来啥，那么你可以使用<code>repeat</code>，这样它就会去读你的变量，针对每一个变量来生成一个一模一样的图片，但是repeat出来的图是不能edit的，只能edit第一个图：<br><img src="/images/grafana5.jpg" title="repeat在panel的最下面"></p>
+<p>但是如果一个图里可以放多根线，那么依旧是添加query即可：<br><img src="/images/grafana6.jpg" title="query可以针对的添加变量和展示变量"></p>
+<p>grafana的变量可以用在多个地方，甚至可以放到row的名称里，比如：<br><img src="/images/grafana7.jpg" title="query可以针对的添加变量和展示变量"></p>
+<p>如果你有不同的row，每一个row除了通用的变量之外，还要读取单独的变量，那么你就只能分开设定不同的变量。然后对应不同的row的bosun公式在repeat的地方配置上不同的变量即可：<br><img src="/images/grafana8.jpg" title="这样实现了一个类似tab的功能"></p>
+<h2 id="改用stat"><a href="#改用stat" class="headerlink" title="改用stat"></a>改用stat</h2><p>现在你能看到满屏幕都是折线，但是却无法第一眼就看出来哪个曲线是有问题的，所以此时可以考虑改用stat，因为它有一个现成的Thresholds功能，这样就可以通过不同值得到不同的颜色:<br><img src="/images/grafana13.jpg" title="根据实际数据库的字段和对应的条件在grafana里填写"><br><img src="/images/grafana14.jpg" title="根据实际数据库的字段和对应的条件在grafana里填写"></p>
+<p>这样低于XXX值就是红色或者黄色，有问题的指标更加显眼：<br><img src="/images/grafana15.jpg" title="根据实际数据库的字段和对应的条件在grafana里填写"></p>
+<p>如果是你想用bosun来得到一些满足条件的结果，比如延迟大于18000的队列：<br><img src="/images/grafana9.jpg" title="这样实现了一个类似tab的功能"></p>
+<p>首先你要配置好对应的变量，然后bosun就是这样：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$metric = des.mq.handler.latency.pct99</span><br><span class="line">$queryA = q(&quot;max:1m-avg-zero:$metric&#123;res=suc,op=req,stage=replay,id=$need_filter,direction=literal_or($direction),caller=$caller,type=$type,cluster=$cluster&#125;&quot;,&quot;2m&quot;,&quot;1m&quot;) / 1000000000</span><br><span class="line">$base = filter($queryA,avg($queryA) &gt;$abnormal_delay)</span><br><span class="line">$base</span><br></pre></td></tr></table></figure>
+
+<p>以graph的形式输出，鼠标放到y轴就能看到队列细节了。</p>
+<h2 id="mertics配置"><a href="#mertics配置" class="headerlink" title="mertics配置"></a>mertics配置</h2><p>如果你觉得bosun太难了，只是想单纯的选择mertics来配置，那么你需要确认好你的租户，以及具体的mertics指标，比如“tce.container.cpu_usage.mt”。然后对应选择好你的条件，这些条件都是根据数据库的实际情况实际字段来填写的：<br><img src="/images/grafana10.jpg" title="根据实际数据库的字段和对应的条件在grafana里填写"><br><img src="/images/grafana11.jpg" title="如果出现This is a multi-field metric, please specify a field name，说明还要再选一个多值"><br><img src="/images/grafana12.jpg" title="选择好了就会出现曲线图了，这里的条件在grafana里就要一模一样的，因为他们其实的源是同一个，这里实际情况根据你们公司的数据库字段来"></p>
+<p>如果是mertics，想要“一图多线”，就直接用<code>XXX literal_or (AAA|BBB|ccc)，group by = true</code>的方式就行，但是在bosun里是不行的！因为<code>group by</code>的公式不是这么写的，具体怎么写我也还没弄清楚，所以boson我都是单图少线，mertics才是一图多线。</p>
+<p>这里还有一点要注意，就是降采样聚合方式，建议如果你的“聚合方式”用的是p99，那么“降采样聚合方式”也用p99。如果“聚合方式”用的是avg，那么“降采样聚合方式”也用avg，他俩同步。</p>
+<h2 id="新标签页链接"><a href="#新标签页链接" class="headerlink" title="新标签页链接"></a>新标签页链接</h2><p>用下面这个方式来写，就是跳转到新的标签页了，不然就是在当前页打开。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">核心应用范围可以看: &lt;a href=&quot;https://AAA.com/metadata/resource?name=&amp;type=tce&amp;priority=P0&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;应用清单列表&lt;/a&gt;</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢你请我喝咖啡~</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/weixinzhifu.png" alt="John Doe WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/zhifubaopay.jpg" alt="John Doe Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/grafana/" rel="tag"># grafana</a>
+              <a href="/tags/metrics/" rel="tag"># metrics</a>
+              <a href="/tags/bosun/" rel="tag"># bosun</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/02/03/2019%E5%B9%B4%E7%9A%84%E8%AF%BB%E4%B9%A6%E6%80%BB%E7%BB%93/" rel="prev" title="2019年的个人读书总结">
+      <i class="fa fa-chevron-left"></i> 2019年的个人读书总结
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/03/07/%E5%8D%87%E7%BA%A7%E4%BA%86tomcat%EF%BC%8C%E6%97%A5%E5%BF%97%E6%96%87%E4%BB%B6%E6%B2%A1%E6%9C%89%E8%AF%BB%E6%9D%83%E9%99%90%E4%BA%86/" rel="next" title="升级了tomcat8，日志文件没有读权限了">
+      升级了tomcat8，日志文件没有读权限了 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%98%E9%87%8F%E9%85%8D%E7%BD%AE"><span class="nav-number">1.</span> <span class="nav-text">变量配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#bosun%E8%AF%AD%E5%8F%A5%E9%85%8D%E7%BD%AE"><span class="nav-number">2.</span> <span class="nav-text">bosun语句配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%94%B9%E7%94%A8stat"><span class="nav-number">3.</span> <span class="nav-text">改用stat</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mertics%E9%85%8D%E7%BD%AE"><span class="nav-number">4.</span> <span class="nav-text">mertics配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B0%E6%A0%87%E7%AD%BE%E9%A1%B5%E9%93%BE%E6%8E%A5"><span class="nav-number">5.</span> <span class="nav-text">新标签页链接</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">435</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">385</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">1.2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">18:30</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

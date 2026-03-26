@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","width":300,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="kubectl get -A看到的资源，如果使用kubectl describe 却提示不存在，那么要加上-n 对应的namespace就可以看到了">
+<meta property="og:type" content="article">
+<meta property="og:title" content="搞来了一个GPU服务器来爽爽">
+<meta property="og:url" content="http://example.com/2026/03/23/%E6%90%9E%E6%9D%A5%E4%BA%86%E4%B8%80%E4%B8%AAGPU%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%9D%A5%E7%88%BD%E7%88%BD/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="kubectl get -A看到的资源，如果使用kubectl describe 却提示不存在，那么要加上-n 对应的namespace就可以看到了">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/images/k8s21.jpg">
+<meta property="og:image" content="http://example.com/images/k8s22.jpg">
+<meta property="og:image" content="http://example.com/images/k8s23.jpg">
+<meta property="og:image" content="http://example.com/images/k8s24.jpg">
+<meta property="og:image" content="http://example.com/images/k8s28.jpg">
+<meta property="og:image" content="http://example.com/images/k8s27.jpg">
+<meta property="og:image" content="http://example.com/images/k8s30.jpg">
+<meta property="og:image" content="http://example.com/images/k8s31.jpg">
+<meta property="og:image" content="http://example.com/images/k8s32.jpg">
+<meta property="og:image" content="http://example.com/images/k8s33.jpg">
+<meta property="og:image" content="http://example.com/images/k8s35.jpg">
+<meta property="og:image" content="http://example.com/images/k8s36.jpg">
+<meta property="og:image" content="http://example.com/images/k8s37.jpg">
+<meta property="og:image" content="http://example.com/images/k8s38.jpg">
+<meta property="article:published_time" content="2026-03-23T15:01:02.000Z">
+<meta property="article:modified_time" content="2026-03-25T02:34:38.579Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="AI">
+<meta property="article:tag" content="k8s">
+<meta property="article:tag" content="面试">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/k8s21.jpg">
+
+<link rel="canonical" href="http://example.com/2026/03/23/%E6%90%9E%E6%9D%A5%E4%BA%86%E4%B8%80%E4%B8%AAGPU%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%9D%A5%E7%88%BD%E7%88%BD/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>搞来了一个GPU服务器来爽爽 | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2026/03/23/%E6%90%9E%E6%9D%A5%E4%BA%86%E4%B8%80%E4%B8%AAGPU%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%9D%A5%E7%88%BD%E7%88%BD/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          搞来了一个GPU服务器来爽爽
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2026-03-23 23:01:02" itemprop="dateCreated datePublished" datetime="2026-03-23T23:01:02+08:00">2026-03-23</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2026-03-25 10:34:38" itemprop="dateModified" datetime="2026-03-25T10:34:38+08:00">2026-03-25</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>5.8k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>5 mins.</span>
+            </span>
+            <div class="post-description">kubectl get -A看到的资源，如果使用kubectl describe 却提示不存在，那么要加上-n 对应的namespace就可以看到了</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="背景交代"><a href="#背景交代" class="headerlink" title="背景交代"></a>背景交代</h2><p>在公司的开发环境搞到一个tesla T4 16显存的GPU服务器（同时还有16core 64G），搭配我之前的 32core 128G的CPU服务器，这俩可以做一个集群了，我给他俩的分工就是：CPU当k8s-master，GPU当k8s-worker。</p>
+<p>这么考虑的原因是：</p>
+<ol>
+<li>CPU服务器有32core，毕竟在master上是要运营“api server、scheduler、etcd、controller”这么多组件，所以需要一个逻辑密集型的服务器，而这些工作可以完全不需要GPU。而且我这个服务器的内存128G，能装很多东西～</li>
+<li>GPU唯一的使命就是把显存贡献给大模型，如果master节点的管理任务在GPU节点上，那么消耗GPU的CPU资源是不值当的。</li>
+</ol>
+<p>他俩的配合流程是：</p>
+<ol>
+<li>这个GPU上主要跑的就是docker和k3s-agent，在CPU master上执行<code>kubectl apply xxx</code>，master看到yaml里的nodeSeletor写的是gpu的服务器，就把任务下发。</li>
+<li>GPU服务器的k3s-agent监听6443端口知道属于自己的任务来了。</li>
+<li>GPU让docker去按照yaml里的要求拉取镜像。</li>
+<li>启动任务POD，反向给master同步。</li>
+</ol>
+<h2 id="搭建GPU的环境"><a href="#搭建GPU的环境" class="headerlink" title="搭建GPU的环境"></a>搭建GPU的环境</h2><p>首先,先确认GPU和CPU的服务器是互通的，互相的ping 和curl都是没问题的。</p>
+<p>去下载一个docker，注意调整<code>/etc/docker/daemon.json</code>:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">root@gpu-worker-01:/data00/home/chenshuo.007# cat  /etc/docker/daemon.json </span><br><span class="line">&#123;</span><br><span class="line">    &quot;default-runtime&quot;: &quot;nvidia&quot;,	</span><br><span class="line">    &quot;data-root&quot;: &quot;/data00/docker&quot;, # 这样镜像都去到数据盘里，不会放本地盘</span><br><span class="line">    &quot;insecure-registries&quot;: [</span><br><span class="line">        &quot;hub.byted.org&quot;,</span><br><span class="line">        &quot;hub.byted.org:443&quot;</span><br><span class="line">    ],</span><br><span class="line">    &quot;live-restore&quot;: true,</span><br><span class="line">    &quot;registry-mirrors&quot;: [</span><br><span class="line">        &quot;https://docker.m.daocloud.io&quot;</span><br><span class="line">    ],</span><br><span class="line">    &quot;runtimes&quot;: &#123;</span><br><span class="line">        &quot;nvidia&quot;: &#123;</span><br><span class="line">            &quot;args&quot;: [],</span><br><span class="line">            &quot;path&quot;: &quot;nvidia-container-runtime&quot;,</span><br><span class="line">	    &quot;runtimeArgs&quot;: []</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后启动docker 看一下挂载的目录是否正确：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">systemctl daemon-reload   </span><br><span class="line">systemctl restart docker </span><br><span class="line">docker info | grep &quot;Docker Root Dir&quot;</span><br></pre></td></tr></table></figure>
+
+<p>执行 <code>nvidia-smi</code> 看一下显卡是否启动了：<br><img src="/images/k8s21.jpg" title="这玩意现在很贵啊～"></p>
+<p>然后去cpu master机器上看一下 <code>node-token</code>，默认是在<code>/var/lib/rancher/k3s/server/node-token</code>里，把这个token复制出来，在GPU的服务器里：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">curl -Lo k3s_install.sh https://rancher-mirror.oss-cn-beijing.aliyuncs.com/k3s/k3s-install.sh</span><br><span class="line">chmod +x k3s_install.sh</span><br><span class="line">INSTALL_K3S_MIRROR=cn K3S_URL=https://master IP:6443 K3S_TOKEN=&lt;node-token&gt; ./k3s_install.sh agent --data-dir /data00/k3s --docker</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>在gpu的服务器使用<code>sudo journalctl -u k3s-agent -f</code> ,时刻关注日志的情况，如果日志没问题的话，就能在cpu master服务器上，看到2个node ready:<br><img src="/images/k8s22.jpg" title="能执行kubectl的就是master"></p>
+<p>在master上给这个GPU 服务器加一个label：<code>kubectl label node gpu-worker-01 accelerator=nvidia-t4</code>。</p>
+<p>然后我们要在gpu服务器上启动一个daemonset,内容如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">kubectl apply -f - &lt;&lt;EOF</span><br><span class="line">apiVersion: apps/v1</span><br><span class="line">kind: DaemonSet</span><br><span class="line">metadata:</span><br><span class="line">  name: nvidia-device-plugin-daemonset</span><br><span class="line">  namespace: kube-system</span><br><span class="line">spec:</span><br><span class="line">  selector:</span><br><span class="line">    matchLabels:</span><br><span class="line">      name: nvidia-device-plugin-ds</span><br><span class="line">  template:</span><br><span class="line">    metadata:</span><br><span class="line">      labels:</span><br><span class="line">        name: nvidia-device-plugin-ds</span><br><span class="line">    spec:</span><br><span class="line">      nodeSelector:</span><br><span class="line">        accelerator: nvidia-t4 # 这里写明要去GPU服务器</span><br><span class="line">      containers:</span><br><span class="line">      - image: nvcr.io/nvidia/k8s-device-plugin:v0.18.1  # 这个的链接用国内的链接，不然下载不下来。报错falling to pull image</span><br><span class="line">        name: nvidia-device-plugin-ctr</span><br><span class="line">        securityContext:</span><br><span class="line">          privileged: true </span><br><span class="line">        volumeMounts:</span><br><span class="line">          - name: device-plugin</span><br><span class="line">            mountPath: /var/lib/kubelet/device-plugins</span><br><span class="line">      volumes:</span><br><span class="line">        - name: device-plugin</span><br><span class="line">          hostPath:</span><br><span class="line">            path: /var/lib/kubelet/device-plugins</span><br><span class="line">EOF</span><br></pre></td></tr></table></figure>
+
+<p>然后我这里发现一个问题，用<code>kubectl get pods -A</code>来看，看到<code>nvidia-device-plugin-XXX</code>是在不断的重启：</p>
+<p><img src="/images/k8s23.jpg" title="在不停的restart"></p>
+<p><img src="/images/k8s24.jpg" title="但是通过describe来看都是success"></p>
+<p>这里我们一个一个的看event：</p>
+<ol>
+<li>Successfully assigned:调度器（Scheduler）成功地为这个 Pod 在集群中找到了一个合适的家（Node）。</li>
+<li>Container image … already present:运行这个 Pod 所需的容器镜像（<code>nvcr.io/nvidia/k8s-device-plugin:v0.18.1</code>）已经在本地存在了，不需要重新下载。</li>
+<li>Created container：<code>kubelet</code> 成功地根据镜像创建了容器实例。</li>
+<li>Started container：<code>kubelet</code> 成功地执行了启动容器的命令。</li>
+<li>Last State: Terminated, Reason: Error, Exit Code: 1：容器在启动后，因为内部程序错误，立刻就退出了，并且返回了一个非零的退出码（<code>1</code> 表示有错误）。</li>
+<li>然后继续重启</li>
+</ol>
+<p>遇到这种问题我觉得可以去看看具体的日志了，<code>kubectl logs nvidia-device-plugin-daemonset-r8ht9 -n kube-system --previous</code> ， 发现里面报错：<br><img src="/images/k8s28.jpg"></p>
+<p>重点看第三句，If this is a GPU node, did you configure the NVIDIA Container Toolkit? 翻译过来就是“如果这是个GPU节点，你配置好NVIDIA容器工具包（NVIDIA Container Toolkit）了吗？”，这就是问题，我的GPU没有<code>NVIDIA Container Toolkit</code>，于是就退出了。</p>
+<p>安装方法如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"># 在 gpu-worker-01 节点上执行</span><br><span class="line">curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \</span><br><span class="line">  &amp;&amp; curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \</span><br><span class="line">    sed &#x27;s#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g&#x27; | \</span><br><span class="line">    sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list</span><br><span class="line"></span><br><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install -y nvidia-container-toolkit</span><br><span class="line">sudo nvidia-ctk runtime configure --runtime=containerd</span><br><span class="line">sudo systemctl restart k3s-agent</span><br><span class="line">kubectl describe node gpu-worker-01 | grep nvidia.com/gpu #通过这个确认状态应该是running了</span><br></pre></td></tr></table></figure>
+
+<p>至此，准备工作终于完成了：</p>
+<ol>
+<li>gpu服务器已经顺利加入集群，并且身份是worker.</li>
+<li>gpu服务器配置好了label。</li>
+<li>GPU服务器安装好了<code>NVIDIA Container Toolkit</code>，nvidia-device-plugin-XXX RS已经能OK了。</li>
+<li>GPU服务器启动一个nvidia-device-plugin的ds，然后他会起一个pod，这个pod的存在就是让master知道这个节点是有一个t4 显卡。<br><img src="/images/k8s27.jpg"></li>
+</ol>
+<h2 id="测试一下GPU的威力"><a href="#测试一下GPU的威力" class="headerlink" title="测试一下GPU的威力"></a>测试一下GPU的威力</h2><p>现在GPU服务器已经就位，那么我们就可以搞一个可以识别图片的ai了，毕竟我们之前那个CPU的大模型只能识别文字，工作中我们还是要扔一些图片进去的。</p>
+<p>首先我们启动一个ollama的pod，让它准确的去调度gpu的服务器：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: apps/v1</span><br><span class="line">kind: Deployment</span><br><span class="line">metadata:</span><br><span class="line">  name: ollama-gpu</span><br><span class="line">spec:</span><br><span class="line">  replicas: 1</span><br><span class="line">  selector:</span><br><span class="line">    matchLabels:</span><br><span class="line">      app: ollama-gpu</span><br><span class="line">  template:</span><br><span class="line">    metadata:</span><br><span class="line">      labels:</span><br><span class="line">        app: ollama-gpu</span><br><span class="line">    spec:</span><br><span class="line">      nodeSelector:</span><br><span class="line">        accelerator: nvidia-t4  # 定向投送到 GPU 机器</span><br><span class="line">      containers:</span><br><span class="line">      - name: ollama</span><br><span class="line">        image: ollama/ollama:latest</span><br><span class="line">        imagePullPolicy: IfNotPresent  </span><br><span class="line">        ports:</span><br><span class="line">        - containerPort: 11434</span><br><span class="line">        env:</span><br><span class="line">        - name: NVIDIA_VISIBLE_DEVICES</span><br><span class="line">          value: &quot;all&quot;</span><br><span class="line">        - name: NVIDIA_DRIVER_CAPABILITIES</span><br><span class="line">          value: &quot;compute,utility&quot;</span><br><span class="line">        resources:</span><br><span class="line">          limits:</span><br><span class="line">            nvidia.com/gpu: 1 # 核心指令：索要显卡</span><br><span class="line">        volumeMounts:</span><br><span class="line">        - name: ollama-storage</span><br><span class="line">          mountPath: /root/.ollama</span><br><span class="line">      volumes:</span><br><span class="line">      - name: ollama-storage</span><br><span class="line">        hostPath:</span><br><span class="line">          path: /data00/k3s/ollama-models # 直接挂载 GPU 机器的 500G 大盘路径，也就是说容器里的/root/.ollama 对应的是宿主机上的/data00/k3s/ollama-models</span><br><span class="line">          type: DirectoryOrCreate</span><br><span class="line">---</span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Service</span><br><span class="line">metadata:</span><br><span class="line">  name: ollama-gpu-svc</span><br><span class="line">spec:</span><br><span class="line">  selector:</span><br><span class="line">    app: ollama-gpu</span><br><span class="line">  ports:</span><br><span class="line">  - protocol: TCP</span><br><span class="line">    port: 11434</span><br><span class="line">    targetPort: 11434</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>启动了之后，就看到有个ollama的pod已经在GPU worker上生成了。但是没有具体的大模型，所以我们选择用Qwen3.5,目前它能力是很强的。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ollama pull qwen3.5:latest   # 然后等待下载完毕</span><br><span class="line">ollama run qwen3.5:latest    # 进入命令行模式</span><br><span class="line">&gt;&gt;&gt; who is this man? /root/.ollama/yaoming.jpg # 注意！这里的图片的路径是POD里的路径。</span><br></pre></td></tr></table></figure>
+<p><img src="/images/k8s30.jpg" title="可以看出这个ai可以认出来照片里的人是姚明"></p>
+<p>但是这里要确认一下<code>ollama ps</code>，看一下究竟是cpu在运行还是gpu在运行。比如我这里就发现“我的GPU在摸鱼，CPU在干活”：<br><img src="/images/k8s31.jpg" title="processor 都是cpu"></p>
+<p><img src="/images/k8s32.jpg" title="在GPU的服务器上使用nvidia-smi可见没有进程在使用gpu"></p>
+<p>于是可以先<code>kubectl logs &lt;GPU pod&gt; | grep -i &#39;CUDA&#39; </code>：<br><img src="/images/k8s33.jpg" title="可见CUDA_VISIBLE_DEVICES 后面是空"></p>
+<p>这里为空，说明这个GPU POD 启动的时候，没有发现GPU编号，于是在“应该卷GPU的场景里卷CPU”。</p>
+<p>我后来查了一下，是因为我tesla T4跑的是450版本的驱动，最高只支持<code>CUDA 10</code>,而<code>qwen 3.5</code>是比较新的，要<code>CUDA 12</code>以上的版本，于是就在GPU上更新一下驱动：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">apt-cache search nvidia-driver</span><br><span class="line">apt-get install nvidia-tesla-535-driver -y #安装535驱动</span><br><span class="line">reboot # 重启宿主机，因为我们已经装了新驱动，新的.ko文件已经落盘，但是450模块还在内核里，所以需要重启来卸载酒模块</span><br></pre></td></tr></table></figure>
+
+<p>重启之后,检查一下k3s-agent和docker的状态，再来刷新一下<code>nvidia-smi</code>:<br><img src="/images/k8s35.jpg" title="CUDA 版本和驱动版本都更新了"></p>
+<p>此时再跑一个大模型的识图任务，就看到效果了，GPU开始工作了，而且返回字的速度也明显加快了：<br><img src="/images/k8s36.jpg" title="GPU开始工作了"><br><img src="/images/k8s37.jpg" title="在 gpu容器里看到processor已经是gpu了"></p>
+<p>这样才是真正的实现了“GPU通过ai大模型分析图形“的效果：<br><img src="/images/k8s38.jpg" title="把故障的图片直接放进去，让ai去分析"></p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>感谢你请我喝咖啡~</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    Donate
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/weixinzhifu.png" alt="John Doe WeChat Pay">
+        <p>WeChat Pay</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/zhifubaopay.jpg" alt="John Doe Alipay">
+        <p>Alipay</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+  <div class="followme">
+    <p>Welcome to my other publishing channels</p>
+
+    <div class="social-list">
+
+        <div class="social-item">
+          <a target="_blank" class="social-link" href="/atom.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+
+            <span class="label">RSS</span>
+          </a>
+        </div>
+    </div>
+  </div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/AI/" rel="tag"># AI</a>
+              <a href="/tags/k8s/" rel="tag"># k8s</a>
+              <a href="/tags/%E9%9D%A2%E8%AF%95/" rel="tag"># 面试</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2026/03/22/%E7%BB%99%E6%9C%AC%E5%9C%B0%E7%9A%84AI%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%A2%9E%E5%8A%A0%E9%99%8D%E7%BA%A7%E5%92%8C%E6%9F%A5%E8%AF%A2%E5%8E%86%E5%8F%B2%E9%97%AE%E9%A2%98%E5%8A%9F%E8%83%BD/" rel="prev" title="给本地的AI大模型增加模型降级、查询历史、RAG定制文档等功能">
+      <i class="fa fa-chevron-left"></i> 给本地的AI大模型增加模型降级、查询历史、RAG定制文档等功能
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2026/03/24/%E4%BD%BF%E7%94%A8%E5%90%91%E9%87%8F%E5%8C%96embedding%E6%9D%A5%E5%81%9ARAG/" rel="next" title="使用向量化embedding来做RAG">
+      使用向量化embedding来做RAG <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%83%8C%E6%99%AF%E4%BA%A4%E4%BB%A3"><span class="nav-number">1.</span> <span class="nav-text">背景交代</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%90%AD%E5%BB%BAGPU%E7%9A%84%E7%8E%AF%E5%A2%83"><span class="nav-number">2.</span> <span class="nav-text">搭建GPU的环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95%E4%B8%80%E4%B8%8BGPU%E7%9A%84%E5%A8%81%E5%8A%9B"><span class="nav-number">3.</span> <span class="nav-text">测试一下GPU的威力</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">435</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">385</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/chenshuo955@gmail.com" title="E-Mail → chenshuo955@gmail.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">1.2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">18:30</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
