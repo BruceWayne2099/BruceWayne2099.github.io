@@ -42,7 +42,7 @@
 <meta property="og:image" content="http://example.com/images/k8s37.jpg">
 <meta property="og:image" content="http://example.com/images/k8s38.jpg">
 <meta property="article:published_time" content="2026-03-23T15:01:02.000Z">
-<meta property="article:modified_time" content="2026-03-25T02:34:38.579Z">
+<meta property="article:modified_time" content="2026-03-26T07:35:16.752Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="AI">
 <meta property="article:tag" content="k8s">
@@ -214,7 +214,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新於</span>
-                <time title="修改時間：2026-03-25 10:34:38" itemprop="dateModified" datetime="2026-03-25T10:34:38+08:00">2026-03-25</time>
+                <time title="修改時間：2026-03-26 15:35:16" itemprop="dateModified" datetime="2026-03-26T15:35:16+08:00">2026-03-26</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -232,14 +232,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">文章字數：</span>
-              <span>5.8k</span>
+              <span>6.3k</span>
             </span>
             <span class="post-meta-item" title="所需閱讀時間">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">所需閱讀時間 &asymp;</span>
-              <span>5 分鐘</span>
+              <span>6 分鐘</span>
             </span>
             <div class="post-description">kubectl get -A看到的资源，如果使用kubectl describe 却提示不存在，那么要加上-n 对应的namespace就可以看到了</div>
 
@@ -266,7 +266,7 @@
 <li>启动任务POD，反向给master同步。</li>
 </ol>
 <h2 id="搭建GPU的环境"><a href="#搭建GPU的环境" class="headerlink" title="搭建GPU的环境"></a>搭建GPU的环境</h2><p>首先,先确认GPU和CPU的服务器是互通的，互相的ping 和curl都是没问题的。</p>
-<p>去下载一个docker，注意调整<code>/etc/docker/daemon.json</code>:</p>
+<p>去下载一个docker，注意调整docker的<code>/etc/docker/daemon.json</code>:</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">root@gpu-worker-01:/data00/home/chenshuo.007# cat  /etc/docker/daemon.json </span><br><span class="line">&#123;</span><br><span class="line">    &quot;default-runtime&quot;: &quot;nvidia&quot;,	</span><br><span class="line">    &quot;data-root&quot;: &quot;/data00/docker&quot;, # 这样镜像都去到数据盘里，不会放本地盘</span><br><span class="line">    &quot;insecure-registries&quot;: [</span><br><span class="line">        &quot;hub.byted.org&quot;,</span><br><span class="line">        &quot;hub.byted.org:443&quot;</span><br><span class="line">    ],</span><br><span class="line">    &quot;live-restore&quot;: true,</span><br><span class="line">    &quot;registry-mirrors&quot;: [</span><br><span class="line">        &quot;https://docker.m.daocloud.io&quot;</span><br><span class="line">    ],</span><br><span class="line">    &quot;runtimes&quot;: &#123;</span><br><span class="line">        &quot;nvidia&quot;: &#123;</span><br><span class="line">            &quot;args&quot;: [],</span><br><span class="line">            &quot;path&quot;: &quot;nvidia-container-runtime&quot;,</span><br><span class="line">	    &quot;runtimeArgs&quot;: []</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>然后启动docker 看一下挂载的目录是否正确：</p>
@@ -322,6 +322,15 @@
 <p>重启之后,检查一下k3s-agent和docker的状态，再来刷新一下<code>nvidia-smi</code>:<br><img src="/images/k8s35.jpg" title="CUDA 版本和驱动版本都更新了"></p>
 <p>此时再跑一个大模型的识图任务，就看到效果了，GPU开始工作了，而且返回字的速度也明显加快了：<br><img src="/images/k8s36.jpg" title="GPU开始工作了"><br><img src="/images/k8s37.jpg" title="在 gpu容器里看到processor已经是gpu了"></p>
 <p>这样才是真正的实现了“GPU通过ai大模型分析图形“的效果：<br><img src="/images/k8s38.jpg" title="把故障的图片直接放进去，让ai去分析"></p>
+<p>最后要注意一下，我这里做了图片上传覆盖的逻辑，也就是说如果上传了一个1.jpg，再上传另一幅图片但是也叫1.jpg的话，后者会覆盖前者。这样的好处一个是好管理，节省磁盘空间。</p>
+<p>缺点就是：</p>
+<ol>
+<li>缓存幻觉：如果两个用户（或你先后两次）上传了同名但内容不同的图片，后上传的会把前面的冲掉。</li>
+<li>并发冲突：如果 AI 正在读第一个 yaoming.jpg 进行推理，此时第二个同名文件写进来，可能会导致 AI 读取文件流中断或报错。</li>
+<li>历史追溯难：数据库 history 表里记录的图片路径都是同一个，你以后想看“昨天那个姚明”和“今天这个姚明”的区别，就找不到了。</li>
+<li>最重要的一点，如果直接用了<code>os.path.join(文件路径)</code>,那么遇到用户上传的文件故意起名叫”..&#x2F;..&#x2F;etc&#x2F;hosts”，这样很有可能真保存到<code>/etc/hosts</code>里，他猜这个上传的路径就是根路径的第二级，第二级不对就第三极。反正就是破坏你的原文件。</li>
+</ol>
+<p>所以建议给文件名加个“时间戳”或者“随机指纹” + secure_filename，secure_filename可以过滤掉危险字符（比如&#x2F; 和 .. 这样的路径字段），这样唯一性+安全就都解决了。</p>
 
     </div>
 
@@ -515,7 +524,7 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="所需總閱讀時間">18:30</span>
+    <span title="所需總閱讀時間">18:31</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 強力驅動
   </div>
