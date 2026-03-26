@@ -33,7 +33,7 @@
 <meta property="og:image" content="http://example.com/images/k8s47.jpg">
 <meta property="og:image" content="http://example.com/images/k8s50.jpg">
 <meta property="article:published_time" content="2026-03-24T14:03:48.000Z">
-<meta property="article:modified_time" content="2026-03-26T07:45:08.184Z">
+<meta property="article:modified_time" content="2026-03-26T07:51:47.264Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="AI">
 <meta property="article:tag" content="RAG">
@@ -205,7 +205,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新於</span>
-                <time title="修改時間：2026-03-26 15:45:08" itemprop="dateModified" datetime="2026-03-26T15:45:08+08:00">2026-03-26</time>
+                <time title="修改時間：2026-03-26 15:51:47" itemprop="dateModified" datetime="2026-03-26T15:51:47+08:00">2026-03-26</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -223,7 +223,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">文章字數：</span>
-              <span>2.8k</span>
+              <span>3.4k</span>
             </span>
             <span class="post-meta-item" title="所需閱讀時間">
               <span class="post-meta-item-icon">
@@ -280,6 +280,18 @@
 <p>选择的重排模型是：<a target="_blank" rel="noopener" href="https://huggingface.co/BAAI/bge-reranker-v2-m3/tree/main">https://huggingface.co/BAAI/bge-reranker-v2-m3/tree/main</a></p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Embedding：计算开销低，适合在数百万数据的“大海”里捞针。</span><br><span class="line"></span><br><span class="line">Rerank：计算开销高（需要 GPU 或高性能 CPU），不适合处理大数据量。</span><br><span class="line"></span><br><span class="line">先用 Embedding 从几千条 K8s 运维文档里，快速捞出最像答案的 20 条。，再用 Rerank 对这 20 条进行“精挑细选”。比如用户问“如何处理磁盘满”，Embedding 可能会捞出“如何清理日志”，也会捞出“如何挂载云盘”。Reranker 会根据语义深度，把真正解决问题的“清理日志”排到第一名。</span><br><span class="line"></span><br><span class="line">这种**“快慢结合”**的方案，是目前生产环境 AIOps 系统的标准工业实践。</span><br></pre></td></tr></table></figure>
 
+<p>具体的分数判断：</p>
+<ol>
+<li>第一道门：海选分 (coarse_dist) —— 语义“像不像”<br>在代码中，你使用了 faiss.normalize_L2 配合 IndexFlatIP，这在数学上计算的就是余弦相似度 (Cosine Similarity)。</li>
+</ol>
+<p>数值范围：0 到 1 之间（归一化后）。这个数值跟代码设定变化而变化。</p>
+<p>SRE 判定标准：</p>
+<p>0.80 左右或以上：说明用户的问题在向量空间里离你的知识库文档（比如那篇磁盘故障博客）非常近。这意味着“话题对上了”。<br>低于 0.80：说明用户可能在聊一些知识库里完全没提到的东西（比如问天气），语义距离较远。</p>
+<ol start="2">
+<li>第二道门：精排分 (rerank_score) —— 逻辑“对不对”<br>这是 bge-reranker-v2-m3 模型给出的深度分。与海选分不同，它不是简单的空间距离，而是模型通过深度神经网络强行理解 Q 和 A 之后的相关性打分。</li>
+</ol>
+<p>数值范围：通常在 -10 到 10 之间（取决于模型，BGE 系列通常以 0 为强弱分水岭）。</p>
+<p>SRE 判定标准：<br>1.0 左右甚至更高：这代表“极其精准的命中”。模型认为不仅关键词像，逻辑上也完全匹配，这就是你的“内部私有数据”。<br>0 左右：属于“疑似相关”。可能聊的是同一个领域，但细节未必匹配。<br>低于 -1.0：虽然海选可能因为“K8s”字眼给了分，但精排模型发现语义逻辑完全不同，直接判定为“误报”。</p>
 <p><img src="/images/k8s48.jpg" title="准备文档"></p>
 <p><img src="/images/k8s47.jpg" title="通过两轮计算，得到了文档的内容"></p>
 <p><img src="/images/k8s50.jpg" title="如果是非内部文档的内容，就会说这部分来自公共知识"></p>
@@ -474,7 +486,7 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="所需總閱讀時間">18:31</span>
+    <span title="所需總閱讀時間">18:32</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 強力驅動
   </div>
