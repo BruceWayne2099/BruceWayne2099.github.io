@@ -36,11 +36,10 @@
 <meta property="og:image" content="http://example.com/images/k8s8.jpg">
 <meta property="og:image" content="http://example.com/images/k8s7.jpg">
 <meta property="article:published_time" content="2026-03-19T12:10:15.000Z">
-<meta property="article:modified_time" content="2026-03-25T02:34:40.464Z">
+<meta property="article:modified_time" content="2026-03-27T15:58:46.815Z">
 <meta property="article:author" content="Chris Chan">
 <meta property="article:tag" content="AI">
 <meta property="article:tag" content="k8s">
-<meta property="article:tag" content="面试">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://example.com/images/k8s2.jpg">
 
@@ -236,7 +235,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2026-03-25 10:34:40" itemprop="dateModified" datetime="2026-03-25T10:34:40+08:00">2026-03-25</time>
+                <time title="修改时间：2026-03-27 23:58:46" itemprop="dateModified" datetime="2026-03-27T23:58:46+08:00">2026-03-27</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -317,6 +316,7 @@
 <li>后端backend Pod接收请求，执行对应的python代码，发起一个requests请求ollama svc，这俩pod是互通的。</li>
 <li>返回结果到浏览器。整个过程闭环在macos和开发机里，哪怕开发机没有公网，一样请求OK，而且现在调用是不花token的。</li>
 <li>做pv&#x2F;pvc持久化，重启后就不用再去公网上下载权重文件了，避免了pod先活了，但是还要每次都现去下载模型，这样“服务其实没准备好，但是流量先进来”的尴尬还是解决掉比较好。</li>
+<li>web端做好流式传输，这样对用户体验比较好。</li>
 </ol>
 <h2 id="排错过程"><a href="#排错过程" class="headerlink" title="排错过程"></a>排错过程</h2><p>如果发现pod起不来，可以先通过<code>kubect describe</code>命令粗略看一下原因，如果看不出来啥，可以再用<code>kubectl logs pod名称 --previous</code> ，来查看具体pods的日志，能看出来为啥“镜像顺利拉到手，但是程序为啥启动不起来”。</p>
 <p>或者是<code>kubectl exec -it pod名称 -- ls -R /app</code>这个命令看一下pod里面的文件是不是因为docker没写好没有打包进去或者其他什么事。</p>
@@ -399,7 +399,6 @@
       <footer class="post-footer">
           <div class="post-tags">
               <a href="/tags/AI/" rel="tag"># AI</a>
-              <a href="/tags/%E9%9D%A2%E8%AF%95/" rel="tag"># 面试</a>
               <a href="/tags/k8s/" rel="tag"># k8s</a>
           </div>
 
@@ -488,7 +487,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">436</span>
+          <span class="site-state-item-count">437</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -497,7 +496,7 @@
         <span class="site-state-item-name">分类</span>
       </div>
       <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">386</span>
+        <span class="site-state-item-count">387</span>
         <span class="site-state-item-name">标签</span>
       </div>
   </nav>
@@ -543,7 +542,7 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">18:34</span>
+    <span title="站点阅读时长">18:35</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
   </div>
