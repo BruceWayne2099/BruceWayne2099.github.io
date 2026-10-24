@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 8.1.2">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Muse","darkmode":true,"version":"8.29.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="我觉得每个集团应该把自己的mertics的定义放到一个最规范的文档里，然后系统页面做成选择题而不是填空题，不然谁知道要填什么？">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用 metrics + bosun 配置grafana界面">
+<meta property="og:url" content="http://example.com/2020/03/04/%E2%80%9C%E9%85%8D%E7%BD%AEgrafana%E7%9A%84%E5%87%A0%E4%B8%AA%E5%B0%8F%E6%8A%80%E5%B7%A7%E2%80%9D/index.html">
+<meta property="og:site_name" content="石锤淡啤酒">
+<meta property="og:description" content="我觉得每个集团应该把自己的mertics的定义放到一个最规范的文档里，然后系统页面做成选择题而不是填空题，不然谁知道要填什么？">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/images/grafana1.jpeg">
+<meta property="og:image" content="http://example.com/images/grafana2.jpg">
+<meta property="og:image" content="http://example.com/images/grafana3.jpg">
+<meta property="og:image" content="http://example.com/images/grafana4.jpg">
+<meta property="og:image" content="http://example.com/images/grafana5.jpg">
+<meta property="og:image" content="http://example.com/images/grafana6.jpg">
+<meta property="og:image" content="http://example.com/images/grafana7.jpg">
+<meta property="og:image" content="http://example.com/images/grafana8.jpg">
+<meta property="og:image" content="http://example.com/images/grafana13.jpg">
+<meta property="og:image" content="http://example.com/images/grafana14.jpg">
+<meta property="og:image" content="http://example.com/images/grafana15.jpg">
+<meta property="og:image" content="http://example.com/images/grafana9.jpg">
+<meta property="og:image" content="http://example.com/images/grafana10.jpg">
+<meta property="og:image" content="http://example.com/images/grafana11.jpg">
+<meta property="og:image" content="http://example.com/images/grafana12.jpg">
+<meta property="article:published_time" content="2020-03-03T17:14:28.000Z">
+<meta property="article:modified_time" content="2026-03-16T15:14:59.716Z">
+<meta property="article:author" content="Chris Chan">
+<meta property="article:tag" content="bosun">
+<meta property="article:tag" content="grafana">
+<meta property="article:tag" content="metrics">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/grafana1.jpeg">
+
+
+<link rel="canonical" href="http://example.com/2020/03/04/%E2%80%9C%E9%85%8D%E7%BD%AEgrafana%E7%9A%84%E5%87%A0%E4%B8%AA%E5%B0%8F%E6%8A%80%E5%B7%A7%E2%80%9D/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2020/03/04/%E2%80%9C%E9%85%8D%E7%BD%AEgrafana%E7%9A%84%E5%87%A0%E4%B8%AA%E5%B0%8F%E6%8A%80%E5%B7%A7%E2%80%9D/","path":"2020/03/04/“配置grafana的几个小技巧”/","title":"使用 metrics + bosun 配置grafana界面"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>使用 metrics + bosun 配置grafana界面 | 石锤淡啤酒</title>
+  
+
+
+
+
+
+
+
+
+  
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">石锤淡啤酒</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">生活就是等待戈多</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%98%E9%87%8F%E9%85%8D%E7%BD%AE"><span class="nav-number">1.</span> <span class="nav-text">变量配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#bosun%E8%AF%AD%E5%8F%A5%E9%85%8D%E7%BD%AE"><span class="nav-number">2.</span> <span class="nav-text">bosun语句配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%94%B9%E7%94%A8stat"><span class="nav-number">3.</span> <span class="nav-text">改用stat</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mertics%E9%85%8D%E7%BD%AE"><span class="nav-number">4.</span> <span class="nav-text">mertics配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B0%E6%A0%87%E7%AD%BE%E9%A1%B5%E9%93%BE%E6%8E%A5"><span class="nav-number">5.</span> <span class="nav-text">新标签页链接</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris Chan</p>
+  <div class="site-description" itemprop="description">那些在阳光下挥洒青春的日子啊！</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">436</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">384</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2020/03/04/%E2%80%9C%E9%85%8D%E7%BD%AEgrafana%E7%9A%84%E5%87%A0%E4%B8%AA%E5%B0%8F%E6%8A%80%E5%B7%A7%E2%80%9D/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris Chan">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="石锤淡啤酒">
+      <meta itemprop="description" content="那些在阳光下挥洒青春的日子啊！">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="使用 metrics + bosun 配置grafana界面 | 石锤淡啤酒">
+      <meta itemprop="description" content="我觉得每个集团应该把自己的mertics的定义放到一个最规范的文档里，然后系统页面做成选择题而不是填空题，不然谁知道要填什么？">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          使用 metrics + bosun 配置grafana界面
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-03-04 01:14:28" itemprop="dateCreated datePublished" datetime="2020-03-04T01:14:28+08:00">2020-03-04</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-03-16 23:14:59" itemprop="dateModified" datetime="2026-03-16T23:14:59+08:00">2026-03-16</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%B7%A5%E4%BD%9C%E4%B8%8E%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">工作与技术</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>934</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>3 分钟</span>
+    </span>
+</div>
+
+            <div class="post-description">我觉得每个集团应该把自己的mertics的定义放到一个最规范的文档里，然后系统页面做成选择题而不是填空题，不然谁知道要填什么？</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="变量配置"><a href="#变量配置" class="headerlink" title="变量配置"></a>变量配置</h2><p>Grafana 给当前页面配置变量是在右上角的settings里：<br><img src="/images/grafana1.jpeg" title="在这里点击小齿轮"></p>
+<p>在这里的变量支持多种“源”：<br><img src="/images/grafana2.jpg" title="看type字段，这里是用数据库当源"><br><img src="/images/grafana3.jpg" title="这里是用constom即自定义的源，可以自己写，可以多选，到时候在查询里当变量使用"></p>
+<h2 id="bosun语句配置"><a href="#bosun语句配置" class="headerlink" title="bosun语句配置"></a>bosun语句配置</h2><p>如果你想用bosun语句来配置图表的话，首先你要确定好的bosun,我以我公司的一个sli公式为例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">((1 - (fv(nv((fv(nv(q(&quot;sum:1m-sum-none:top-1000-avg:bytedtrace.sdk.span.client.rate&#123;&#125;&#123;_is_error=1,_to_service=AAA&#125;&quot;,&quot;10800s&quot;,&quot;0s&quot;),0),0) + fv(nv(q(&quot;sum:1m-sum-none:top-1000-avg:bytedtrace.sdk.span.client.rate&#123;&#125;&#123;_biz_status_code=not_sliteral_or(0),_is_error=0,_to_service=AAA&#125;&quot;,&quot;10800s&quot;,&quot;0s&quot;),0),0)),0),0) / fv((nv(fv(nv(q(&quot;sum:1m-sum-none:top-1000-avg:bytedtrace.sdk.span.client.rate&#123;&#125;&#123;_to_service=AAA&#125;&quot;,&quot;10800s&quot;,&quot;0s&quot;),0),0),0) + 1e-9),0))) * 100)</span><br></pre></td></tr></table></figure>
+
+<p>这个公式就是算一个SLI成功率，认为AAA这个应用而言，<code>_is_error=1</code>和<code>_biz_status_code=not_sliteral_or(0) and _is_error=0</code>是不OK的，那么减掉这些流量拿到的成功率，就是这个应用的SLI。</p>
+<p>但是一个一个写公式太累了，我们就可以用上面做的变量来替换。具体方法见图：</p>
+<p><img src="/images/grafana4.jpg" title="这样就OK"></p>
+<p>如果你觉得多根线在一个图里太难看了，看不出来啥，那么你可以使用<code>repeat</code>，这样它就会去读你的变量，针对每一个变量来生成一个一模一样的图片，但是repeat出来的图是不能edit的，只能edit第一个图：<br><img src="/images/grafana5.jpg" title="repeat在panel的最下面"></p>
+<p>但是如果一个图里可以放多根线，那么依旧是添加query即可：<br><img src="/images/grafana6.jpg" title="query可以针对的添加变量和展示变量"></p>
+<p>grafana的变量可以用在多个地方，甚至可以放到row的名称里，比如：<br><img src="/images/grafana7.jpg" title="query可以针对的添加变量和展示变量"></p>
+<p>如果你有不同的row，每一个row除了通用的变量之外，还要读取单独的变量，那么你就只能分开设定不同的变量。然后对应不同的row的bosun公式在repeat的地方配置上不同的变量即可：<br><img src="/images/grafana8.jpg" title="这样实现了一个类似tab的功能"></p>
+<h2 id="改用stat"><a href="#改用stat" class="headerlink" title="改用stat"></a>改用stat</h2><p>现在你能看到满屏幕都是折线，但是却无法第一眼就看出来哪个曲线是有问题的，所以此时可以考虑改用stat，因为它有一个现成的Thresholds功能，这样就可以通过不同值得到不同的颜色:<br><img src="/images/grafana13.jpg" title="根据实际数据库的字段和对应的条件在grafana里填写"><br><img src="/images/grafana14.jpg" title="根据实际数据库的字段和对应的条件在grafana里填写"></p>
+<p>这样低于XXX值就是红色或者黄色，有问题的指标更加显眼：<br><img src="/images/grafana15.jpg" title="根据实际数据库的字段和对应的条件在grafana里填写"></p>
+<p>如果是你想用bosun来得到一些满足条件的结果，比如延迟大于18000的队列：<br><img src="/images/grafana9.jpg" title="这样实现了一个类似tab的功能"></p>
+<p>首先你要配置好对应的变量，然后bosun就是这样：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$metric = des.mq.handler.latency.pct99</span><br><span class="line">$queryA = q(&quot;max:1m-avg-zero:$metric&#123;res=suc,op=req,stage=replay,id=$need_filter,direction=literal_or($direction),caller=$caller,type=$type,cluster=$cluster&#125;&quot;,&quot;2m&quot;,&quot;1m&quot;) / 1000000000</span><br><span class="line">$base = filter($queryA,avg($queryA) &gt;$abnormal_delay)</span><br><span class="line">$base</span><br></pre></td></tr></table></figure>
+
+<p>以graph的形式输出，鼠标放到y轴就能看到队列细节了。</p>
+<h2 id="mertics配置"><a href="#mertics配置" class="headerlink" title="mertics配置"></a>mertics配置</h2><p>如果你觉得bosun太难了，只是想单纯的选择mertics来配置，那么你需要确认好你的租户，以及具体的mertics指标，比如“tce.container.cpu_usage.mt”。然后对应选择好你的条件，这些条件都是根据数据库的实际情况实际字段来填写的：<br><img src="/images/grafana10.jpg" title="根据实际数据库的字段和对应的条件在grafana里填写"><br><img src="/images/grafana11.jpg" title="如果出现This is a multi-field metric, please specify a field name，说明还要再选一个多值"><br><img src="/images/grafana12.jpg" title="选择好了就会出现曲线图了，这里的条件在grafana里就要一模一样的，因为他们其实的源是同一个，这里实际情况根据你们公司的数据库字段来"></p>
+<p>如果是mertics，想要“一图多线”，就直接用<code>XXX literal_or (AAA|BBB|ccc)，group by = true</code>的方式就行，但是在bosun里是不行的！因为<code>group by</code>的公式不是这么写的，具体怎么写我也还没弄清楚，所以boson我都是单图少线，mertics才是一图多线。</p>
+<p>这里还有一点要注意，就是降采样聚合方式，建议如果你的“聚合方式”用的是p99，那么“降采样聚合方式”也用p99。如果“聚合方式”用的是avg，那么“降采样聚合方式”也用avg，他俩同步。</p>
+<h2 id="新标签页链接"><a href="#新标签页链接" class="headerlink" title="新标签页链接"></a>新标签页链接</h2><p>用下面这个方式来写，就是跳转到新的标签页了，不然就是在当前页打开。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">核心应用范围可以看: &lt;a href=&quot;https://AAA.com/metadata/resource?name=&amp;type=tce&amp;priority=P0&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;应用清单列表&lt;/a&gt;</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/grafana/" rel="tag"># grafana</a>
+              <a href="/tags/metrics/" rel="tag"># metrics</a>
+              <a href="/tags/bosun/" rel="tag"># bosun</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/02/03/2019%E5%B9%B4%E7%9A%84%E8%AF%BB%E4%B9%A6%E6%80%BB%E7%BB%93/" rel="prev" title="2019年的个人读书总结">
+                  <i class="fa fa-angle-left"></i> 2019年的个人读书总结
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/03/07/%E5%8D%87%E7%BA%A7%E4%BA%86tomcat%EF%BC%8C%E6%97%A5%E5%BF%97%E6%96%87%E4%BB%B6%E6%B2%A1%E6%9C%89%E8%AF%BB%E6%9D%83%E9%99%90%E4%BA%86/" rel="next" title="升级了tomcat8，日志文件没有读权限了">
+                  升级了tomcat8，日志文件没有读权限了 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Chris Chan</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">571k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">34:38</span>
+  </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>
