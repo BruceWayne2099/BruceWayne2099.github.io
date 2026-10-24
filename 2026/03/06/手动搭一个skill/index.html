@@ -20,7 +20,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pace/1.2.4/themes/blue/pace-theme-minimal.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pace/1.2.4/pace.min.js" integrity="sha256-gqd7YTjg/BtfqWSwsJOvndl0Bxc8gFImLEkXQT8+qj0=" crossorigin="anonymous" defer></script>
 
-<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.29.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.29.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"flat"},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false,"path":"search.xml"}}</script><script src="/js/config.js" defer></script>
 
     <meta name="description" content="你有没有想过，为啥ai为啥不能当定时任务？">
 <meta property="og:type" content="article">
@@ -295,10 +295,10 @@
     
     <div class="post-body" itemprop="articleBody"><h2 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h2><p>现在我要做一个“传入容器名然后去火焰图的api里获取火焰图链接”的效果：</p>
 <p>因为skill的文件夹格式是比较固定的，所以先创建一个文件夹：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">skill-create_flamegraph_task/</span><br><span class="line">├── SKILL.md</span><br><span class="line">├── references/</span><br><span class="line">│   ├── FAQ.md</span><br><span class="line">│   └── EXAMPLES.md</span><br><span class="line">└── scripts/</span><br><span class="line">    └── create_task.py</span><br></pre></td></tr></table></figure>
+<figure class="highlight dos"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">skill-create_flamegraph_task/</span><br><span class="line">├── SKILL.<span class="built_in">md</span></span><br><span class="line">├── references/</span><br><span class="line">│   ├── FAQ.<span class="built_in">md</span></span><br><span class="line">│   └── EXAMPLES.<span class="built_in">md</span></span><br><span class="line">└── scripts/</span><br><span class="line">    └── create_task.py</span><br></pre></td></tr></table></figure>
 
 <p>其中 skill.md长这样：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">---</span><br><span class="line">name: create_flamegraph_task</span><br><span class="line">description: &quot;当用户传入一个pod名称的时候，去执行script/create_task.py生成火焰图，返回火焰图的html链接。&quot;</span><br><span class="line">---</span><br></pre></td></tr></table></figure>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">name:</span> <span class="string">create_flamegraph_task</span></span><br><span class="line"><span class="attr">description:</span> <span class="string">&quot;当用户传入一个pod名称的时候，去执行script/create_task.py生成火焰图，返回火焰图的html链接。&quot;</span></span><br><span class="line"><span class="meta">---</span></span><br></pre></td></tr></table></figure>
 <p>skill.md的用途就是：</p>
 <ol>
 <li>这个 skill 的目的是什么？（几句话）</li>
@@ -309,7 +309,7 @@
 <p>然后再去create_task.py 就正常写逻辑就行，代码我就不放了。</p>
 <p>整个效果如图：<br><img src="/images/skill2.jpg" title="这里我写了两个skill"></p>
 <p>写完之后，把这个文件夹打包成.zip形式，然后上传到ai平台里，流程这样：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Skill代码 → 打包成zip → 上传到AI平台 → 平台加载Skill → 用户通过Tika使用</span><br></pre></td></tr></table></figure>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="title class_">Skill</span>代码 → 打包成zip → 上传到AI平台 → 平台加载<span class="title class_">Skill</span> → 用户通过<span class="title class_">Tika</span>使用</span><br></pre></td></tr></table></figure>
 <p><img src="/images/skill5.jpg" title="上传到公司内部的ai平台里"></p>
 <p>然后就可以用起来了，甚至可以多个skill混搭使用，效果如图：<br><img src="/images/skill4.jpg" title="这里我显式的体现了我的skill，其实也可以不显式"></p>
 <p><img src="/images/skill3.jpg" title="效果达成"></p>
@@ -410,5 +410,5 @@
   <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
 </noscript>
 
-</body>
+<script src="/live2d-widget/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2d-widget/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2d-widget/assets/hijiki.model.json"},"display":{"position":"right","width":150,"height":300,"hOffset":30,"vOffset":-20},"mobile":{"show":false},"log":false});</script></body>
 </html>
